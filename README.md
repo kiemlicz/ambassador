@@ -1,30 +1,33 @@
-#Basics
-Automated netboot&provision server
+# Basics
+Automated netboot&provisioning server
 
-##Rationale
+## Rationale
 Any setup takes time, practically it is never one-time action.  
 Updates break sometimes, anything breaks at some point - sometimes it's better to wipe everything/some part out
-and start over. Unfortunately as some work had already been done such solution may not be feasible.  
-Maintaining multi-node environments is cumbersome (configuration synchronization, duplicated installation process)
-Way of saving forgotten configuration tips&tricks for further re-use
+and start over.  
+Unfortunately as some setup work had already been done such solution may not be sensible.  
+Maintaining multi-node environments is cumbersome (configuration synchronization, duplicated installation process).
+Sometimes it would also be useful to keep your favourite os hacks/tips/tricks in structured manner (like in some configuration management solution)
 
-Setup (dev, prod, work, home) node using saltstack and pxeboot.
+Setup (dev, prod, work, home) node using saltstack and PXE booting.
 
-Saltstack is not used for per user configuration management&synchronization, git is
-(using this technique: https://developer.atlassian.com/blog/2016/02/best-way-to-store-dotfiles-git-bare-repo).
-Configured node clones the git cfg repo and uses it as its own apps configuration
+Will aim to be both Linux&Windows friendly.
 
-Linux&Windows friendly
+# "Installation"
+
+As the best way of documenting things is writing automation scripts, this automation server's installation process
+is also automated.  
+1. Follow [submodules section](https://github.com/kiemlicz/util/wiki/git#cloning) to clone this repo with submodules
+2. `sudo ./setup.sh -c -n ambassador --deploy_priv id_rsa --deploy_pub id_rsa.pub`
 
 
-
-#Links&References
-Debian netboot images:
+# Links&References
+#### Debian netboot images
 * https://www.debian.org/distrib/netinst#netboot
 
-Debian preseeding:
+#### Debian preseeding
 * https://wiki.debian.org/DebianInstaller/Preseed
 * https://www.debian.org/releases/stable/amd64/ch05s03.html.en
 
-General: 
+#### General
 1. https://wiki.debian.org/PXEBootInstall
