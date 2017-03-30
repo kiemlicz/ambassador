@@ -1,0 +1,5 @@
+{
+  "domain": {
+    "name": {{ domain_name }}
+  }
+}

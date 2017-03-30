@@ -1,0 +1,20 @@
+# This file describes the network interfaces available on your system
+# and how to activate them. For more information, see interfaces(5).
+
+source /etc/network/interfaces.d/*
+
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+allow-hotplug %IFACE%
+auto %IFACE%
+iface %IFACE% inet manual
+
+auto br0
+iface br0 inet dhcp
+        bridge_ports %IFACE%
+        bridge_stp off
+        bridge_fd 0
+        bridge_maxwait 0
