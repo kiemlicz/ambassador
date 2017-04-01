@@ -51,10 +51,42 @@ echo "$FOREMAN_PLUGINS_REPO_ENTRY" | sudo tee -a /etc/apt/sources.list.d/foreman
 # Install Salt and Foreman
 sudo apt-get update
 sudo apt-get install -y salt-master salt-api python-pip python-pygit2 foreman-installer dnsmasq
+sudo pip install --upgrade pip
+
+#check that libgit2 is properly built
+#there is bug that breaks https connection in git
+#https://bugs.launchpad.net/ubuntu/+source/libgit2/+bug/1595565
+if [ $(python -c "import pygit2; print(bool(pygit2.features & pygit2.GIT_FEATURE_HTTPS))") == "False" ]; then
+    echo "detected improper version of pygit2, fixing..."
+    sudo apt-get purge -y python-pygit2 libgit2-24
+    sudo apt-get install -y pkg-config libcurl3-dev libssh2-1-dev build-essential cmake libssl-dev
+
+    pushd /tmp
+    wget https://github.com/libgit2/libgit2/archive/v0.25.0.tar.gz
+    tar xzf /tmp/v0.25.0.tar.gz
+    pushd libgit2-0.25.0
+    cmake .
+    make
+    sudo make install
+    popd
+    popd
+    sudo ldconfig
+
+    sudo pip install --upgrade cffi pyOpenSSL pygit2
+    retval=$?
+    if [ $retval -ne 0 ]; then
+        echo "there were fatal errors during foreman installation (pygit2 workaround)"
+        exit 1
+    fi
+    if [ $(python -c "import pygit2; print(bool(pygit2.features & pygit2.GIT_FEATURE_HTTPS))") == "False" ]; then
+        echo "Unable to properly configure pygit2"
+        exit 1
+    fi
+fi
 
 #todo use pip install --user and add to PATH ~/.local/bin
 #somehow these dependencies are already present, that's why use of --upgrade
-sudo pip install --upgrade pip && sudo pip install --upgrade docker-py cherrypy
+sudo pip install --upgrade docker-py cherrypy
 
 sudo useradd -r saltuser
 echo 'saltuser:saltpassword' | sudo chpasswd

@@ -68,13 +68,12 @@ if [ "$AUTO_CERT_GENERATION" = false ] && ([ -z $CA_CERT_FILE ] || [ -z $SERVER_
 fi
 
 if ([ -z $DEPLOY_PUB_FILE ] || [ -z $DEPLOY_PRIV_FILE ]); then
-    echo "Provide salt repo keypair (--deploy_pub <location>, --deploy_priv <location>)"
-    exit 1
-fi
-
-if ! ([ -f $DEPLOY_PUB_FILE ] && [ -f $DEPLOY_PRIV_FILE ]); then
-    echo "Provided keypair not found in filesystem"
-    exit 1
+    echo "Not using salt repo keypair (in order to enable, use: --deploy_pub <location>, --deploy_priv <location>)"
+else
+    if ! ([ -f $DEPLOY_PUB_FILE ] && [ -f $DEPLOY_PRIV_FILE ]); then
+        echo "Provided keypair not found in filesystem"
+        exit 1
+    fi
 fi
 
 if [ -z "$(dnsdomainname)" ]; then
@@ -140,6 +139,12 @@ fi
 
 . util/core/text_functions
 
+mkdir -p $CONTAINER_ROOTFS/etc/salt/deploykeys/
+mkdir -p $CONTAINER_ROOTFS/etc/salt/master.d/
+mkdir -p $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/
+mkdir -p $CONTAINER_ROOTFS/etc/dnsmasq.d/
+mkdir -p $CONTAINER_ROOTFS/srv/salt_ext/
+
 AMBASSADOR_CA=$CONTAINER_CERT_DIR/$(basename $CA_CERT_FILE)
 AMBASSADOR_CRL=$CONTAINER_CERT_BASE/$(basename $CRL_FILE)
 AMBASSADOR_KEY=$CONTAINER_PRIVATE_DIR/$(basename $SERVER_KEY_FILE)
@@ -148,18 +153,15 @@ AMBASSADOR_GW=$(ip route get 8.8.8.8 | head -n1 | cut -d' ' -f3)
 AMBASSADOR_SALT_API_PORT=9191
 AMBASSADOR_SALT_API_INTERFACES=0.0.0.0
 AMBASSADOR_FQDN=$CONTAINER_FQDN
-AMBASSADOR_ENVOY_DEPLOY_PUB=$(basename $DEPLOY_PUB_FILE)
-AMBASSADOR_ENVOY_DEPLOY_PRIV=$(basename $DEPLOY_PRIV_FILE)
-
-mkdir -p $CONTAINER_ROOTFS/etc/salt/deploykeys/
-mkdir -p $CONTAINER_ROOTFS/etc/salt/master.d/
-mkdir -p $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/
-mkdir -p $CONTAINER_ROOTFS/etc/dnsmasq.d/
-mkdir -p $CONTAINER_ROOTFS/srv/salt_ext/
+if ! ([ -z $DEPLOY_PUB_FILE ] || [ -z $DEPLOY_PRIV_FILE ]); then
+    AMBASSADOR_ENVOY_DEPLOY_PUB=$(basename $DEPLOY_PUB_FILE)
+    AMBASSADOR_ENVOY_DEPLOY_PRIV=$(basename $DEPLOY_PRIV_FILE)
+    #copy keys to container
+    cp $DEPLOY_PUB_FILE $CONTAINER_ROOTFS/etc/salt/deploykeys/
+    cp $DEPLOY_PRIV_FILE $CONTAINER_ROOTFS/etc/salt/deploykeys/
+fi
 
 #copy dependencies to container
-cp $DEPLOY_PUB_FILE $CONTAINER_ROOTFS/etc/salt/deploykeys/
-cp $DEPLOY_PRIV_FILE $CONTAINER_ROOTFS/etc/salt/deploykeys/
 cp -r envoy/extensions/pillar/ $CONTAINER_ROOTFS/srv/salt_ext/
 
 #fill templates and copy to container
