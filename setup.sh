@@ -165,7 +165,7 @@ fi
 cp -r envoy/extensions/pillar/ $CONTAINER_ROOTFS/srv/salt_ext/
 
 #fill templates and copy to container
-substenv_file AMBASSADOR config_files/ambassador_salt.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_salt.conf
+substenv_file AMBASSADOR config_files/ambassador_salt.yaml > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_salt.yaml
 substenv_file AMBASSADOR config_files/foreman.yaml > $CONTAINER_ROOTFS/etc/salt/foreman.yaml
 substenv_file AMBASSADOR config_files/salt.yml > $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/salt.yml
 substenv_file AMBASSADOR config_files/proxydhcp.conf > $CONTAINER_ROOTFS/etc/dnsmasq.d/proxydhcp.conf

@@ -12,10 +12,9 @@ master_tops:
 
 extension_modules: /srv/salt_ext
 
-on_demand_ext_pillar:
-  - libvirt
-  - virtkey
-  - git
+git_pillar_refspecs:
+  - '+refs/heads/*:refs/remotes/origin/*'
+  - '+refs/tags/*:refs/tags/*'
 
 ext_pillar:
   - git:
@@ -32,9 +31,11 @@ fileserver_backend:
   - git
   - roots
 
-git_pillar_refspecs:
-  - '+refs/heads/*:refs/remotes/origin/*'
-  - '+refs/tags/*:refs/tags/*'
+#prevents printing strange environments
+gitfs_env_whitelist:
+  - base
+  - gui
+  - dev
 
 gitfs_provider: pygit2
 gitfs_remotes:
@@ -74,3 +75,7 @@ rest_cherrypy:
 #log_level: debug
 #log_level_logfile: debug
 #ext_pillar_first: True
+#on_demand_ext_pillar:
+#  - libvirt
+#  - virtkey
+#  - git
