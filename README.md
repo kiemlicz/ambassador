@@ -18,7 +18,7 @@ Will aim to be both Linux&Windows friendly.
 As the best way of documenting things is writing automation scripts, this automation server's installation process
 is also automated.  
 1. Follow [submodules section](https://github.com/kiemlicz/util/wiki/git#cloning) to clone this repo with submodules
-2. `sudo ./setup.sh -c -n ambassador --deploy_priv id_rsa --deploy_pub id_rsa.pub`
+2. `sudo ./setup.sh -c -n ambassador [--deploy_priv id_rsa --deploy_pub id_rsa.pub]`
 
 
 # Links&References
