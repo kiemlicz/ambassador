@@ -8,6 +8,9 @@
 while [[ $# -gt 0 ]]; do
     arg="$1"
     case $arg in
+        -r|--roots)
+        ROOTS=true
+        ;;
         -c|--cert-gen)
         GEN_CERT=true
         ;;
@@ -47,6 +50,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 readonly AUTO_CERT_GENERATION=${GEN_CERT-false}
+readonly USE_ROOTS=${ROOTS-false}
 readonly CONTAINER_NAME=${CN-ambassador}
 readonly CONTAINER_CERT_BASE=/etc/foreman/ssl
 readonly CONTAINER_CERT_DIR=$CONTAINER_CERT_BASE/certs
@@ -165,7 +169,15 @@ fi
 cp -r envoy/extensions/pillar/ $CONTAINER_ROOTFS/srv/salt_ext/
 
 #fill templates and copy to container
-substenv_file AMBASSADOR config_files/ambassador_salt.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_salt.conf
+if [ "$USE_ROOTS" = true ]; then
+    #if using roots, copy envoy to container as well
+    cp -r envoy/salt/ $CONTAINER_ROOTFS/srv/
+    cp -r envoy/pillar/ $CONTAINER_ROOTFS/srv/
+
+    substenv_file AMBASSADOR config_files/ambassador_roots.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_roots.conf
+else
+    substenv_file AMBASSADOR config_files/ambassador_gitfs.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_gitfs.conf
+fi
 substenv_file AMBASSADOR config_files/foreman.yaml > $CONTAINER_ROOTFS/etc/salt/foreman.yaml
 substenv_file AMBASSADOR config_files/salt.yml > $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/salt.yml
 substenv_file AMBASSADOR config_files/proxydhcp.conf > $CONTAINER_ROOTFS/etc/dnsmasq.d/proxydhcp.conf
