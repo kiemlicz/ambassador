@@ -168,4 +168,3 @@ print("Operating system created")
 remove_all_salt_states()
 import_salt_states(get_proxy_id(), ["base", "gui", "dev"])
 print("Salt states imported")
-#salt bogus environments are left
