@@ -176,7 +176,11 @@ if [ "$USE_ROOTS" = true ]; then
 
     substenv_file AMBASSADOR config_files/ambassador_roots.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_roots.conf
 else
-    substenv_file AMBASSADOR config_files/ambassador_gitfs.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_gitfs.conf
+    if ! ([ -z $DEPLOY_PUB_FILE ] || [ -z $DEPLOY_PRIV_FILE ]); then
+        substenv_file AMBASSADOR config_files/ambassador_gitfs_deploykeys.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_gitfs_deploykeys.conf
+    else
+        substenv_file AMBASSADOR config_files/ambassador_gitfs.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_gitfs.conf
+    fi
 fi
 substenv_file AMBASSADOR config_files/foreman.yaml > $CONTAINER_ROOTFS/etc/salt/foreman.yaml
 substenv_file AMBASSADOR config_files/salt.yml > $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/salt.yml
