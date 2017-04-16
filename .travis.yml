@@ -1,0 +1,19 @@
+language: python
+
+sudo: required
+
+dist: trusty
+
+services:
+  - docker
+
+matrix:
+  include:
+    - os: linux
+      env: DOCKER_IMAGE=debian-sid
+
+before_install:
+  - .travis/prepare.sh
+
+script:
+  - .travis/run.sh
