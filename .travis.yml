@@ -7,12 +7,9 @@ dist: trusty
 services:
   - docker
 
-matrix:
-  include:
-    - os: linux
-      env: DOCKER_IMAGE=debian-sid
-    - os: linux
-      env: DOCKER_IMAGE=debian-jessie
+env:
+  - DOCKER_IMAGE=debian-sid
+  - DOCKER_IMAGE=debian-jessie
 
 before_install:
   - .travis/prepare.sh
