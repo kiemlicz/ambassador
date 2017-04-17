@@ -1,5 +1,5 @@
 FROM debian:jessie
-RUN apt-get update && apt-get install -y curl
+RUN apt-get update && apt-get install -y curl dbus
 RUN curl -L https://bootstrap.saltstack.com | sh
 COPY envoy /srv/envoy
 COPY .travis/envoy_test.py /opt/
