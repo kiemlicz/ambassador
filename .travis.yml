@@ -11,6 +11,8 @@ matrix:
   include:
     - os: linux
       env: DOCKER_IMAGE=debian-sid
+    - os: linux
+      env: DOCKER_IMAGE=debian-jessie
 
 before_install:
   - .travis/prepare.sh
