@@ -1,4 +1,5 @@
 FROM debian:sid
+RUN apt-get update && apt-get install -y curl
 RUN curl -L https://bootstrap.saltstack.com | sh
 COPY envoy /srv/envoy
 COPY .travis/envoy_test.py /opt/
