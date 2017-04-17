@@ -1,6 +1,6 @@
 [submodule "envoy"]
 	path = envoy
-	url = git@github.com:kiemlicz/envoy.git
+	url = https://github.com/kiemlicz/envoy.git
 [submodule "util"]
 	path = util
-	url = git@github.com:kiemlicz/util.git
+	url = https://github.com/kiemlicz/util.git
