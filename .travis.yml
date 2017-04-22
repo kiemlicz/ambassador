@@ -10,6 +10,9 @@ services:
 env:
   - DOCKER_IMAGE=debian-sid
   - DOCKER_IMAGE=debian-jessie
+  - DOCKER_IMAGE=ubuntu-xenial
+  - DOCKER_IMAGE=ubuntu-yakkety
+  - DOCKER_IMAGE=ubuntu-zesty
 
 before_install:
   - .travis/prepare.sh
