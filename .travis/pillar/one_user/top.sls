@@ -1,0 +1,3 @@
+one_user:
+  '*':
+    - user
