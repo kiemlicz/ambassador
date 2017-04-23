@@ -58,4 +58,6 @@ if __name__ == "__main__":
     suite.addTest(ParametrizedTestCase.parametrize(AmbassadorTest, saltenv='base', pillarenv='one_user'))
     suite.addTest(ParametrizedTestCase.parametrize(AmbassadorTest, saltenv='gui', pillarenv='one_user'))
     suite.addTest(ParametrizedTestCase.parametrize(AmbassadorTest, saltenv='dev', pillarenv='one_user'))
-    unittest.TextTestRunner(verbosity=2).run(suite)
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    if not result.wasSuccessful():
+        raise SystemError("Some tests have failed, check logs")
