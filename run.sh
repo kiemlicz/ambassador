@@ -58,8 +58,9 @@ sudo pip install --upgrade pip
 #https://bugs.launchpad.net/ubuntu/+source/libgit2/+bug/1595565
 if [ $(python -c "import pygit2; print(bool(pygit2.features & pygit2.GIT_FEATURE_HTTPS))") == "False" ]; then
     echo "detected improper version of pygit2, fixing..."
-    sudo apt-get purge -y python-pygit2 libgit2-24
-    sudo apt-get install -y pkg-config libcurl3-dev libssh2-1-dev build-essential cmake libssl-dev
+    sudo apt-get purge -y python-pygit2 libgit2-24 python-cffi
+    yes | sudo pip uninstall cffi
+    sudo apt-get install -y pkg-config libcurl3-dev libssh2-1-dev build-essential cmake libssl-dev libffi-dev
 
     pushd /tmp
     wget https://github.com/libgit2/libgit2/archive/v0.25.0.tar.gz
@@ -72,7 +73,7 @@ if [ $(python -c "import pygit2; print(bool(pygit2.features & pygit2.GIT_FEATURE
     popd
     sudo ldconfig
 
-    sudo pip install --upgrade cffi pyOpenSSL pygit2
+    sudo pip install --upgrade pyOpenSSL pygit2
     retval=$?
     if [ $retval -ne 0 ]; then
         echo "there were fatal errors during foreman installation (pygit2 workaround)"
