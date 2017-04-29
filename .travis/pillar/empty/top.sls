@@ -1,3 +1,4 @@
 empty:
   '*':
+    - os
     - user

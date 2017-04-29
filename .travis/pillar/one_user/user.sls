@@ -1,51 +1,6 @@
 {% set username = 'coolguy' %}
 {% set home_dir = '/home/' + username %}
 
-base_pkgs:
-  names:
-    {{ salt['grains.filter_by']({
-         'default': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges",
-           "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync"],
-         'Windows': ["openvpn", "git"]
-       }) }}
-
-gui_pkgs:
-  names:
-    {{ salt['grains.filter_by']({
-           'default': ["kde-standard", "xterm", "yakuake", "print-manager", "wireshark", "network-manager-openvpn",
-           "google-chrome-stable", "firefox-esr"],
-           'Windows': ["wireshark", "keepass-2x"]
-         }, merge=salt['grains.filter_by']({
-             'sid': ["kde-standard", "xterm", "yakuake", "print-manager", "wireshark", "network-manager-openvpn",
-                     "google-chrome-stable", "firefox"]
-         }, grain='oscodename')) }}
-
-hosts:
-  1.2.3.4 : [ coolname ]
-  192.168.1.1 : [ gw, mygw]
-
-mounts:
-  - dev: /dev/sda1
-    target: /mnt/hdd1/main
-    file_type: ext4
-    options: [user]
-  - dev: /dev/sda2
-    target: /mnt/hdd1/var
-    file_type: ext4
-    options: [user]
-  - dev: /dev/sdb1
-    target: /mnt/win_c
-    file_type: ntfs-3g
-    options: [user, rw, noauto, suid]
-  - dev: /dev/sdd1
-    target: /mnt/win_d
-    file_type: ntfs
-    options: [user, rw, noauto, suid]
-
-locale:
-  locales:
-    - en_US.UTF-8
-    - pl_PL.UTF-8
 
 {# provide in foreman following variables: <username>_sec_ssh_home_privkey and <username>_sec_ssh_home_pubkey if you don't want to generate ssh keys #}
 {# provide in foreman following variables: <username>_sec_ssh_dotfile_privkey and <username>_sec_ssh_dotfile_pubkey if you want to clone dotfile repo #}
