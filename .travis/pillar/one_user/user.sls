@@ -78,9 +78,11 @@ users:
         url: https://github.com/junegunn/fzf.git
         target: {{ home_dir }}/projects/open-source/fzf
       powerline:
+        required_pkgs:
+          - vim-gtk3
+        pip: powerline-status
         url: https://github.com/powerline/fonts.git
         target: {{ home_dir }}/projects/open-source/powerline
-        pip: powerline-status
     dotfile:
       repo: git@bitbucket.org:someguy/cfg.git
       branch: {{ grains['host'] }}
