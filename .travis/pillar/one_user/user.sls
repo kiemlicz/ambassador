@@ -80,6 +80,7 @@ users:
       powerline:
         required_pkgs:
           - vim-gtk3
+          - python3-pip
         pip: powerline-status
         url: https://github.com/powerline/fonts.git
         target: {{ home_dir }}/projects/open-source/powerline
