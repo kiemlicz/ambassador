@@ -67,6 +67,14 @@ users:
           privkey_location: {{ home_dir }}/.ssh/cfg_ro.key
           pubkey_location: {{ home_dir }}/.ssh/cfg_ro.key.pub
           override: False
+    vpn:
+      - name: somename
+        location: {{ home_dir }}/.vpn/
+        config: |
+          important
+          vpn
+          long
+          data
     tools:
       oh_my_zsh:
         url: https://github.com/robbyrussell/oh-my-zsh.git
@@ -97,6 +105,18 @@ users:
       - url: https://github.com/kiemlicz/util.git
         target: {{ home_dir }}/projects/util
         cmd: ln -s {{ home_dir }}/projects/util {{ home_dir }}/projects/open-source/oh-my-zsh/custom/plugins/util
+    backup:
+      script_location: {{ home_dir }}/bin/backup
+      source_locations:
+        - /etc
+        - /boot
+        - /var
+        - /home
+      destination_location: /some/backup/path/OS/{{ grains['host'] }}
+      remote: coolguy@backuphost
+      hour: 21
+      minute: 0
+      archive_location: /some/archive/path/OS/{{ grains['host'] }}
 
 {% set owner = username %}
 
