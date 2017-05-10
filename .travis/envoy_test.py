@@ -1,6 +1,8 @@
 import os
 import salt.client
 import unittest
+import traceback
+from salt.exceptions import CommandExecutionError
 
 
 class ParametrizedTestCase(unittest.TestCase):
@@ -39,16 +41,24 @@ class AmbassadorTest(ParametrizedTestCase):
         self.assertTrue(os.path.isdir(os.path.join(self.pillarenv_location, self.pillarenv)),
                         msg="pillar data not found: {}".format(os.path.join(self.pillarenv_location, self.pillarenv)))
         caller = salt.client.Caller()
-        tops = caller.cmd("state.show_top")
-        for env, states in tops.iteritems():
-            for state in states:
-                result = caller.cmd("state.show_sls", state, saltenv=env, pillarenv=self.pillarenv)
-                self.assertTrue(isinstance(result, dict),
+        try:
+            tops = caller.cmd("state.show_top")
+            for env, states in tops.iteritems():
+                for state in states:
+                    result = caller.cmd("state.show_sls", state, saltenv=env, pillarenv=self.pillarenv)
+                    self.assertTrue(isinstance(result, dict),
                                 msg="rendering of: {} (saltenv={}, pillarenv={}), failed with: {}".format(state,
                                                                                                           env,
                                                                                                           self.pillarenv,
                                                                                                           result))
-
+        except CommandExecutionError:
+            traceback.print_exc()
+            stdin, stdout = os.popen2("tail -n 30 /var/log/salt/master")
+            stdin.close()
+            lines = stdout.readlines()
+            stdout.close()
+            print "".join(lines)
+            self.fail("Test unsuccessful due to exception")
 
 if __name__ == "__main__":
     suite = unittest.TestSuite()
