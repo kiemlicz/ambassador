@@ -116,9 +116,6 @@ users:
       remote: coolguy@backuphost
       hour: 21
       minute: 0
-      daymonth: "*"
-      month: "*"
-      dayweek: "*"
       archive_location: /some/archive/path/OS/{{ grains['host'] }}
 
 {% set owner = username %}
