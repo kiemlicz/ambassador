@@ -1,9 +1,9 @@
 {% set username = 'coolguy' %}
 {% set home_dir = '/home/' + username %}
 
-
 {# provide in foreman following variables: <username>_sec_ssh_home_privkey and <username>_sec_ssh_home_pubkey if you don't want to generate ssh keys #}
 {# provide in foreman following variables: <username>_sec_ssh_dotfile_privkey and <username>_sec_ssh_dotfile_pubkey if you want to clone dotfile repo #}
+{# provide in foreman following variables: <username>_vpn_<vpn name>_config if you want to setup vpn #}
 
 users:
   {{ username }}:
@@ -105,6 +105,8 @@ users:
       - url: https://github.com/kiemlicz/util.git
         target: {{ home_dir }}/projects/util
         cmd: ln -s {{ home_dir }}/projects/util {{ home_dir }}/projects/open-source/oh-my-zsh/custom/plugins/util
+      - url: https://github.com/VundleVim/Vundle.vim.git
+        target: {{ home_dir }}/.vim/bundle/Vundle.vim
     backup:
       script_location: {{ home_dir }}/bin/backup
       source_locations:
