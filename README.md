@@ -1,4 +1,6 @@
-# Basics
+# Ambassador
+![](https://travis-ci.org/kiemlicz/ambassador.svg?branch=master)
+----------
 Automated netboot&provisioning server
 
 ## Rationale
