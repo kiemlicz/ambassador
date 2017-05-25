@@ -1,5 +1,5 @@
 # Ambassador
-![](https://travis-ci.org/kiemlicz/ambassador.svg?branch=master)
+[![Build status](https://travis-ci.org/kiemlicz/ambassador.svg?branch=master)](https://travis-ci.org/kiemlicz/ambassador)
 
 Automated netboot&provisioning server
 
