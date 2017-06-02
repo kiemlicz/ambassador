@@ -12,6 +12,21 @@
 #KEY
 #CERT_BASEDIR
 
+assert_env() {
+    if [ -z $2 ]; then
+        echo "$1"
+        exit 1
+    fi
+}
+
+assert_env "fqdn is not set" $CID
+assert_env "container designated IP is not provided" $CIP
+assert_env "CA is not set" $CA
+assert_env "CRL is not set" $CRL
+assert_env "CERT is not set" $CERT
+assert_env "KEY is not set" $KEY
+assert_env "CERT_BASEDIR is not set" $CERT_BASEDIR
+
 #edit versions
 readonly FOREMAN_XENIAL_REPO_URL="deb http://deb.theforeman.org/ xenial 1.14"
 readonly FOREMAN_XENIAL_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.14"
@@ -29,11 +44,11 @@ readonly FOREMAN_REPO_KEY=$FOREMAN_XENIAL_REPO_KEY
 readonly SALTSTACK_REPO_ENTRY=$SALTSTACK_XENIAL_REPO_URL
 readonly SALTSTACK_REPO_KEY=$SALTSTACK_XENIAL_REPO_KEY_URL
 
-sudo apt-get update
-sudo apt-get upgrade -y -o DPkg::Options::=--force-confold
-sudo apt-get install -y ca-certificates wget host curl
+apt-get update
+apt-get upgrade -y -o DPkg::Options::=--force-confold
+apt-get install -y ca-certificates wget host curl
 
-wget -P /tmp/ $FOREMAN_PUPPET_SERVER && sudo dpkg -i /tmp/$PUPPET_SERVER_PKG
+wget -P /tmp/ $FOREMAN_PUPPET_SERVER && dpkg -i /tmp/$PUPPET_SERVER_PKG
 retval=$?
 # assignment so that it's a bit more clear that we need to check $? (which follows last executed command so it's easy
 # to add here something different, like echo, and $? changes...)
@@ -41,26 +56,26 @@ if [ $retval -ne 0 ]; then
     echo "error installing puppet"
     exit 1
 fi
-wget -O - $SALTSTACK_REPO_KEY | sudo apt-key add -
-wget -q $FOREMAN_REPO_KEY -O- | sudo apt-key add -
+wget -O - $SALTSTACK_REPO_KEY | apt-key add -
+wget -q $FOREMAN_REPO_KEY -O- | apt-key add -
 
-echo "$SALTSTACK_REPO_ENTRY" | sudo tee /etc/apt/sources.list.d/saltstack.list
-echo "$FOREMAN_REPO_ENTRY" | sudo tee /etc/apt/sources.list.d/foreman.list
-echo "$FOREMAN_PLUGINS_REPO_ENTRY" | sudo tee -a /etc/apt/sources.list.d/foreman.list
+echo "$SALTSTACK_REPO_ENTRY" | tee /etc/apt/sources.list.d/saltstack.list
+echo "$FOREMAN_REPO_ENTRY" | tee /etc/apt/sources.list.d/foreman.list
+echo "$FOREMAN_PLUGINS_REPO_ENTRY" | tee -a /etc/apt/sources.list.d/foreman.list
 
 # Install Salt and Foreman
-sudo apt-get update
-sudo apt-get install -y salt-master salt-api python-pip python-pygit2 foreman-installer dnsmasq
-sudo pip install --upgrade pip
+apt-get update
+apt-get install -y salt-master salt-api python-pip python-pygit2 foreman-installer dnsmasq
+pip install --upgrade pip
 
 #check that libgit2 is properly built
 #there is bug that breaks https connection in git
 #https://bugs.launchpad.net/ubuntu/+source/libgit2/+bug/1595565
 if [ $(python -c "import pygit2; print(bool(pygit2.features & pygit2.GIT_FEATURE_HTTPS))") == "False" ]; then
     echo "detected improper version of pygit2, fixing..."
-    sudo apt-get purge -y python-pygit2 libgit2-24 python-cffi
-    yes | sudo pip uninstall cffi
-    sudo apt-get install -y pkg-config libcurl3-dev libssh2-1-dev build-essential cmake libssl-dev libffi-dev
+    apt-get purge -y python-pygit2 libgit2-24 python-cffi
+    yes |  pip uninstall cffi
+    apt-get install -y pkg-config libcurl3-dev libssh2-1-dev build-essential cmake libssl-dev libffi-dev
 
     pushd /tmp
     wget https://github.com/libgit2/libgit2/archive/v0.25.0.tar.gz
@@ -68,12 +83,12 @@ if [ $(python -c "import pygit2; print(bool(pygit2.features & pygit2.GIT_FEATURE
     pushd libgit2-0.25.0
     cmake .
     make
-    sudo make install
+    make install
     popd
     popd
-    sudo ldconfig
+    ldconfig
 
-    sudo pip install --upgrade pyOpenSSL pygit2
+    pip install --upgrade pyOpenSSL pygit2
     retval=$?
     if [ $retval -ne 0 ]; then
         echo "there were fatal errors during foreman installation (pygit2 workaround)"
@@ -87,10 +102,10 @@ fi
 
 #todo use pip install --user and add to PATH ~/.local/bin
 #somehow these dependencies are already present, that's why use of --upgrade
-sudo pip install --upgrade docker-py cherrypy
+pip install --upgrade docker-py cherrypy
 
-sudo useradd -r saltuser
-echo 'saltuser:saltpassword' | sudo chpasswd
+useradd -r saltuser
+echo 'saltuser:saltpassword' |  chpasswd
 
 CIF=$(cat /etc/resolv.conf | egrep -v '(127.0.0.1)|(127.0.1.1)' | egrep -m 1 '^nameserver.+' | cut -d' ' -f2)
 
@@ -109,7 +124,7 @@ echo "running foreman-installer (nameserver=$CIF, domain=$(dnsdomainname), fqdn=
 #http://projects.theforeman.org/issues/16241
 #https://theforeman.org/manuals/1.12/index.html#3.2.3InstallationScenarios
 #disabling puppet requires user to provide certificate with key and ca certificate
-sudo foreman-installer \
+foreman-installer \
     --no-enable-puppet \
     --puppet-server=false \
     --foreman-proxy-puppet=false \
@@ -137,14 +152,14 @@ sudo foreman-installer \
     --foreman-proxy-puppet-ssl-key=$FOREMAN_KEY
 
 echo "enabling further foreman options"
-readonly OAUTH_KEY=$(sudo cat /etc/foreman/settings.yaml | grep :oauth_consumer_key: | cut -d' ' -f2)
-readonly OAUTH_SECRET=$(sudo cat /etc/foreman/settings.yaml | grep :oauth_consumer_secret: | cut -d' ' -f2)
+readonly OAUTH_KEY=$(cat /etc/foreman/settings.yaml | grep :oauth_consumer_key: | cut -d' ' -f2)
+readonly OAUTH_SECRET=$(cat /etc/foreman/settings.yaml | grep :oauth_consumer_secret: | cut -d' ' -f2)
 
 # salt integration based on:
 # https://theforeman.org/plugins/foreman_salt/7.0/index.html
 # in order to support more "host types", see:
 # https://theforeman.org/manuals/1.12/index.html#5.2ComputeResources
-readonly CRED=$(sudo foreman-installer \
+readonly CRED=$(foreman-installer \
     --enable-foreman-proxy \
     --foreman-proxy-tftp=true \
     --foreman-proxy-tftp-servername=$CIP \
@@ -172,12 +187,12 @@ if [ $retval -ne 0 ]; then
 fi
 
 echo "populating salt&foreman config files"
-sudo touch /etc/salt/autosign.conf
-sudo chgrp foreman-proxy /etc/salt/autosign.conf
-sudo chmod g+w /etc/salt/autosign.conf
+touch /etc/salt/autosign.conf
+chgrp foreman-proxy /etc/salt/autosign.conf
+chmod g+w /etc/salt/autosign.conf
 
-sudo systemctl enable foreman foreman-proxy salt-master salt-api dnsmasq
-sudo systemctl restart foreman foreman-proxy salt-master salt-api dnsmasq foreman-tasks
+systemctl enable foreman foreman-proxy salt-master salt-api dnsmasq
+systemctl restart foreman foreman-proxy salt-master salt-api dnsmasq foreman-tasks
 
 echo "User: $FOREMAN_GUI_USER"
 echo "Password: $FOREMAN_GUI_PASSWORD"
