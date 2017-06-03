@@ -91,7 +91,7 @@ readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
 ##### build container
 . util/vm/lxc_functions
 
-lxc-create -f container/network.conf -t ubuntu -n $CONTAINER_NAME -- -r xenial -a amd64
+lxc-create -f config/network.conf -t ubuntu -n $CONTAINER_NAME -- -r xenial -a amd64
 retval=$?
 if [ $retval -ne 0 ]; then
     echo "error creating container: $retval"
@@ -119,20 +119,21 @@ if [ "$AUTO_CERT_GENERATION" = true ]; then
     #further ssl/ca-certificates installation doesn't clear /etc/ssl/private/certs contents
     echo "generating ca, certs: $SSL_BASE"
     touch $SSL_BASE/index.txt
-    echo '01' > $SSL_BASE/serial.txt
-    CA_PK_FILE=$CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR/ca.key
-    CA_CERT_FILE=$CONTAINER_ROOTFS/$CONTAINER_CERT_DIR/ca.pem
+    echo '01' > $SSL_BASE/serial
+    echo '01' > $SSL_BASE/crlnumber
+    CA_PK_FILE=$CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR/ca.key.pem
+    CA_CERT_FILE=$CONTAINER_ROOTFS/$CONTAINER_CERT_DIR/ca.cert.pem
     SERVER_KEY_FILE=$CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR/$CONTAINER_FQDN.key
     SERVER_CERT_FILE=$CONTAINER_ROOTFS/$CONTAINER_CERT_DIR/$CONTAINER_FQDN.pem
     CRL_FILE=$SSL_BASE/crl.pem
     gen_rsa_key $CA_PK_FILE
-    CA_PK_FILE=$CA_PK_FILE gen_x509_cert_self_signed $CA_PK_FILE $CA_CERT_FILE util/sec/openssl-ca.cnf
+    gen_x509_cert_self_signed $CA_PK_FILE $CA_CERT_FILE config/ssl/openssl-ca.cnf $SSL_BASE
     echo "ca generation done, generating server secrets"
-    SSL_BASE=$SSL_BASE gen_crl_nonstd $CA_PK_FILE $CA_CERT_FILE $CRL_FILE util/sec/openssl-ca-signing.cnf
+    gen_crl_nonstd $CA_PK_FILE $CA_CERT_FILE $CRL_FILE config/ssl/openssl-ca.cnf $SSL_BASE
     gen_rsa_key $SERVER_KEY_FILE
-    SERVER_KEY_FILE=$SERVER_KEY_FILE SERVER_FQDN=$CONTAINER_FQDN gen_csr $SERVER_KEY_FILE /tmp/$CONTAINER_FQDN.csr util/sec/openssl-server.cnf
+    SERVER_FQDN=$CONTAINER_FQDN gen_csr $SERVER_KEY_FILE /tmp/$CONTAINER_FQDN.csr config/ssl/openssl-server.cnf $SSL_BASE
     echo "signing server's csr"
-    SSL_BASE=$SSL_BASE gen_csr_sign /tmp/$CONTAINER_FQDN.csr $SERVER_CERT_FILE util/sec/openssl-ca-signing.cnf
+    gen_csr_sign /tmp/$CONTAINER_FQDN.csr $SERVER_CERT_FILE config/ssl/openssl-ca.cnf $SSL_BASE
 else
     echo "copying certificates into container fs: $CONTAINER_ROOTFS"
     cp $CA_CERT_FILE $CONTAINER_ROOTFS/$CONTAINER_CERT_DIR
@@ -174,17 +175,17 @@ if [ "$USE_ROOTS" = true ]; then
     cp -r envoy/salt/ $CONTAINER_ROOTFS/srv/
     cp -r envoy/pillar/ $CONTAINER_ROOTFS/srv/
 
-    substenv_file AMBASSADOR config_files/ambassador_roots.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_roots.conf
+    substenv_file AMBASSADOR config/ambassador_roots.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_roots.conf
 else
     if ! ([ -z $DEPLOY_PUB_FILE ] || [ -z $DEPLOY_PRIV_FILE ]); then
-        substenv_file AMBASSADOR config_files/ambassador_gitfs_deploykeys.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_gitfs_deploykeys.conf
+        substenv_file AMBASSADOR config/ambassador_gitfs_deploykeys.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_gitfs_deploykeys.conf
     else
-        substenv_file AMBASSADOR config_files/ambassador_gitfs.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_gitfs.conf
+        substenv_file AMBASSADOR config/ambassador_gitfs.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_gitfs.conf
     fi
 fi
-substenv_file AMBASSADOR config_files/foreman.yaml > $CONTAINER_ROOTFS/etc/salt/foreman.yaml
-substenv_file AMBASSADOR config_files/salt.yml > $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/salt.yml
-substenv_file AMBASSADOR config_files/proxydhcp.conf > $CONTAINER_ROOTFS/etc/dnsmasq.d/proxydhcp.conf
+substenv_file AMBASSADOR config/foreman.yaml > $CONTAINER_ROOTFS/etc/salt/foreman.yaml
+substenv_file AMBASSADOR config/salt.yml > $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/salt.yml
+substenv_file AMBASSADOR config/proxydhcp.conf > $CONTAINER_ROOTFS/etc/dnsmasq.d/proxydhcp.conf
 
 #todo use /etc/ssl dir? ubuntu user add to ssl-cert group ?
 echo "starting: $CONTAINER_NAME"

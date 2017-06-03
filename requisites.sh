@@ -24,11 +24,11 @@ apt-get install lxc bridge-utils debootstrap ubuntu-archive-keyring
 
 
 mv /etc/default/lxc-net /etc/default/lxc-net.$(date +%F-%T).old
-cp container_host/lxc-net /etc/default/lxc-net
+cp requisites/lxc-net /etc/default/lxc-net
 
 readonly DEFAULT_INTERFACE=$(ip route get 8.8.8.8 | head -n1 | cut -d' ' -f5)
 mv /etc/network/interfaces /etc/network/interfaces.$(date +%F-%T).old
-sed -e "s;%IFACE%;$DEFAULT_INTERFACE;g" container_host/interfaces > /etc/network/interfaces
+sed -e "s;%IFACE%;$DEFAULT_INTERFACE;g" requisites/interfaces > /etc/network/interfaces
 
 sed -i '/^#net.ipv4.ip_forward/s/^#//' /etc/sysctl.conf
 sysctl -p
