@@ -1,11 +1,14 @@
 FROM ubuntu:xenial
-COPY .travis/test_ssl/*.key /etc/ssl/private/
-COPY .travis/test_ssl/*.cert /etc/ssl/certs/
-COPY .travis/test_ssl/crl.pem /etc/ssl/
+COPY .travis/ssl/*.key /etc/ssl/private/
+COPY .travis/ssl/*.cert /etc/ssl/certs/
+COPY .travis/ssl/crl.pem /etc/ssl/
+COPY .travis/config/foreman.yaml /etc/salt/
+COPY .travis/config/proxydhcp.conf /etc/dnsmasq.d/
+COPY .travis/config/salt.yml /etc/foreman-proxy/settings.d/
 COPY run.sh /opt/
 ARG FQDN
 ENV CID=$FQDN
-ENV CIP="1.2.3.4"
+ENV CIP="192.168.1.7"
 ENV CRL="/etc/ssl/crl.pem"
 ENV CA="/etc/ssl/certs/ca.cert"
 ENV CERT="/etc/ssl/certs/ambassador.mgl.cert"

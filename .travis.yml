@@ -19,7 +19,6 @@ env:
   - DOCKER_IMAGE=ubuntu-zesty
     TEST_CASE=salt-masterless
   - DOCKER_IMAGE=ubuntu-xenial
-    TEST_HOSTNAME=ambassadortest
     TEST_FQDN=ambassadortest.com
     TEST_CASE=ambassador-run
 
