@@ -105,7 +105,7 @@ fi
 pip install --upgrade docker-py cherrypy
 
 useradd -r saltuser
-echo 'saltuser:saltpassword' |  chpasswd
+echo 'saltuser:saltpassword' | chpasswd
 
 CIF=$(cat /etc/resolv.conf | egrep -v '(127.0.0.1)|(127.0.1.1)' | egrep -m 1 '^nameserver.+' | cut -d' ' -f2)
 

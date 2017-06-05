@@ -9,10 +9,19 @@ services:
 
 env:
   - DOCKER_IMAGE=debian-sid
+    TEST_CASE=salt-masterless
   - DOCKER_IMAGE=debian-jessie
+    TEST_CASE=salt-masterless
   - DOCKER_IMAGE=ubuntu-xenial
+    TEST_CASE=salt-masterless
   - DOCKER_IMAGE=ubuntu-yakkety
+    TEST_CASE=salt-masterless
   - DOCKER_IMAGE=ubuntu-zesty
+    TEST_CASE=salt-masterless
+  - DOCKER_IMAGE=ubuntu-xenial
+    TEST_HOSTNAME=ambassador_test
+    TEST_FQDN=ambassador_test.com
+    TEST_CASE=ambassador-run
 
 before_install:
   - .travis/prepare.sh

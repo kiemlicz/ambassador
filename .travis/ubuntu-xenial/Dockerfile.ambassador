@@ -1,0 +1,12 @@
+FROM ubuntu:xenial
+COPY .travis/test_ssl/*.key /etc/ssl/private/
+COPY .travis/test_ssl/*.cert /etc/ssl/certs/
+COPY .travis/test_ssl/crl.pem /etc/ssl/
+COPY run.sh /opt/
+ENV CIP="1.2.3.4"
+ENV CRL="/etc/ssl/crl.pem"
+ENV CA="/etc/ssl/certs/ca.cert"
+ENV CERT="/etc/ssl/certs/ambassador.mgl.cert"
+ENV KEY="/etc/ssl/private/ambassador.mgl.key"
+ENV CERT_BASEDIR="/etc/ssl/"
+ENTRYPOINT ["/opt/run.sh"]
