@@ -3,6 +3,7 @@ COPY .travis/test_ssl/*.key /etc/ssl/private/
 COPY .travis/test_ssl/*.cert /etc/ssl/certs/
 COPY .travis/test_ssl/crl.pem /etc/ssl/
 COPY run.sh /opt/
+ARG CID
 ENV CIP="1.2.3.4"
 ENV CRL="/etc/ssl/crl.pem"
 ENV CA="/etc/ssl/certs/ca.cert"
