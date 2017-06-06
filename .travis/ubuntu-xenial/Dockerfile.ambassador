@@ -14,4 +14,5 @@ ENV CA="/etc/ssl/certs/ca.cert"
 ENV CERT="/etc/ssl/certs/ambassador.mgl.cert"
 ENV KEY="/etc/ssl/private/ambassador.mgl.key"
 ENV CERT_BASEDIR="/etc/ssl/"
+ENV LANG en_US.UTF-8
 ENTRYPOINT ["/opt/run.sh"]

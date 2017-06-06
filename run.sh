@@ -28,8 +28,8 @@ assert_env "KEY is not set" $KEY
 assert_env "CERT_BASEDIR is not set" $CERT_BASEDIR
 
 #edit versions
-readonly FOREMAN_XENIAL_REPO_URL="deb http://deb.theforeman.org/ xenial 1.14"
-readonly FOREMAN_XENIAL_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.14"
+readonly FOREMAN_XENIAL_REPO_URL="deb http://deb.theforeman.org/ xenial 1.15"
+readonly FOREMAN_XENIAL_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.15"
 readonly FOREMAN_XENIAL_REPO_KEY="https://deb.theforeman.org/pubkey.gpg"
 readonly PUPPET_SERVER_PKG="puppetlabs-release-pc1-xenial.deb"
 readonly FOREMAN_XENIAL_PUPPET_SERVER="https://apt.puppetlabs.com/$PUPPET_SERVER_PKG"
