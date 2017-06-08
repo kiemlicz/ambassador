@@ -55,6 +55,8 @@ readonly CONTAINER_NAME=${CN-ambassador}
 readonly CONTAINER_CERT_BASE=/etc/foreman/ssl
 readonly CONTAINER_CERT_DIR=$CONTAINER_CERT_BASE/certs
 readonly CONTAINER_PRIVATE_DIR=$CONTAINER_CERT_BASE/private
+readonly CONTAINER_OS=ubuntu
+readonly CONTAINER_OS_MAJOR=yakkety
 
 ##### validate
 #expand to bash array for easier validation
@@ -91,7 +93,7 @@ readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
 ##### build container
 . util/vm/lxc_functions
 
-lxc-create -f config/network.conf -t ubuntu -n $CONTAINER_NAME -- -r xenial -a amd64
+lxc-create -f config/network.conf -t $CONTAINER_OS -n $CONTAINER_NAME -- -r $CONTAINER_OS_MAJOR -a amd64
 retval=$?
 if [ $retval -ne 0 ]; then
     echo "error creating container: $retval"

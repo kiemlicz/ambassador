@@ -31,7 +31,7 @@ assert_env "CERT_BASEDIR is not set" $CERT_BASEDIR
 readonly FOREMAN_XENIAL_REPO_URL="deb http://deb.theforeman.org/ xenial 1.15"
 readonly FOREMAN_XENIAL_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.15"
 readonly FOREMAN_XENIAL_REPO_KEY="https://deb.theforeman.org/pubkey.gpg"
-readonly PUPPET_SERVER_PKG="puppetlabs-release-pc1-xenial.deb"
+readonly PUPPET_SERVER_PKG="puppetlabs-release-pc1-yakkety.deb"
 readonly FOREMAN_XENIAL_PUPPET_SERVER="https://apt.puppetlabs.com/$PUPPET_SERVER_PKG"
 readonly SALTSTACK_XENIAL_REPO_URL="deb http://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest xenial main"
 readonly SALTSTACK_XENIAL_REPO_KEY_URL="https://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest/SALTSTACK-GPG-KEY.pub"
@@ -66,6 +66,7 @@ echo "$FOREMAN_PLUGINS_REPO_ENTRY" | tee -a /etc/apt/sources.list.d/foreman.list
 # Install Salt and Foreman
 apt-get update
 apt-get install -y salt-master salt-api python-pip python-pygit2 foreman-installer dnsmasq
+#for UEFI support via proxyDHCP the minimum dnsmasq version is 2.76
 pip install --upgrade pip
 
 #check that libgit2 is properly built
