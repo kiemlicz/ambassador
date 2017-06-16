@@ -55,6 +55,7 @@ readonly CONTAINER_NAME=${CN-ambassador}
 readonly CONTAINER_CERT_BASE=/etc/foreman/ssl
 readonly CONTAINER_CERT_DIR=$CONTAINER_CERT_BASE/certs
 readonly CONTAINER_PRIVATE_DIR=$CONTAINER_CERT_BASE/private
+readonly CONTAINER_USERNAME=ubuntu #don't use root here
 readonly CONTAINER_OS=ubuntu
 readonly CONTAINER_OS_MAJOR=yakkety
 
@@ -112,6 +113,9 @@ chroot $CONTAINER_ROOTFS sh -c "sed -i -e 's/\(^AcceptEnv LANG.*\)/#\1/g' /etc/s
 chroot $CONTAINER_ROOTFS sh -c "sed -i '/^127.0.1.1 /s/$CONTAINER_NAME/$CONTAINER_FQDN $CONTAINER_NAME/' /etc/hosts"
 #configure resolvconf utility so that proper nameserver exists, otherwise only 127.0.0.1 may appear
 chroot $CONTAINER_ROOTFS sh -c "echo 'TRUNCATE_NAMESERVER_LIST_AFTER_LOOPBACK_ADDRESS=no' > /etc/default/resolvconf"
+chroot $CONTAINER_ROOTFS sh -c "mkdir /home/$CONTAINER_USERNAME/.ssh/"
+cat ~/.ssh/id_rsa.pub >> $CONTAINER_ROOTFS/home/$CONTAINER_USERNAME/.ssh/authorized_keys
+chroot $CONTAINER_ROOTFS sh -c "chown $CONTAINER_USERNAME.$CONTAINER_USERNAME /home/$CONTAINER_USERNAME/.ssh/authorized_keys; chmod 600 /home/$CONTAINER_USERNAME/.ssh/authorized_keys"
 
 if [ "$AUTO_CERT_GENERATION" = true ]; then
     . util/sec/cert_functions
@@ -206,13 +210,15 @@ fi
 echo "running 'run' script inside container (IP = $CONTAINER_IP, DOMAIN=$CONTAINER_FQDN)"
 ssh ubuntu@$CONTAINER_IP -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" \
 CIP=$CONTAINER_IP CID=$CONTAINER_FQDN CERT_BASEDIR=$CONTAINER_CERT_BASE CA=$AMBASSADOR_CA CRL=$AMBASSADOR_CRL KEY=$AMBASSADOR_KEY CERT=$AMBASSADOR_CERT \
-'sudo -E bash -s' < ./run.sh
+'sudo -E bash -s' < ./run.sh > $CONTAINER_NAME.log 2>&1 &
+echo "script running in background, waiting for: $!"
+wait $!
 retval=$?
 echo "stopping container"
 stop_container $CONTAINER_NAME
 
 if [ $retval -ne 0 ]; then
-    echo "error running run.sh script inside of container: $retval"
+    echo "error running run.sh script inside of container: $retval, check: $CONTAINER_NAME.log file"
     exit 1
 else
     echo "success"

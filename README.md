@@ -15,12 +15,14 @@ Setup (dev, prod, work, home) node using saltstack and PXE booting.
 
 Will aim to be both Linux&Windows friendly.
 
-# "Installation"
+# Setup
 
 As the best way of documenting things is writing automation scripts, this automation server's installation process
 is also automated.  
-1. Follow [submodules section](https://github.com/kiemlicz/util/wiki/git#cloning) to clone this repo with submodules
-2. `sudo ./setup.sh -c -n ambassador [-r] [--deploy_priv id_rsa --deploy_pub id_rsa.pub]`
+The "installation" process end up with LXC container containing foreman&salt fully setup and configured.  
+Simply follow two steps:  
+1. Clone this repo with submodules: `git submodule update --init` ([read more about submodules](https://github.com/kiemlicz/util/wiki/git))
+2. `nohup sudo ./setup.sh -c -n ambassador [-r] [--deploy_priv id_rsa --deploy_pub id_rsa.pub] &`
 
 
 # Links&References
