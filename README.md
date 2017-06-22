@@ -24,8 +24,16 @@ Simply follow two steps:
 1. Clone this repo with submodules: `git submodule update --init` ([read more about submodules](https://github.com/kiemlicz/util/wiki/git))
 2. `nohup sudo ./setup.sh -c -n ambassador [-r] [--deploy_priv id_rsa --deploy_pub id_rsa.pub] &`
 
+# Workflow
+
+Foreman&Salt workflow is best depicted using this (Foreman's) diagram:
+![](https://theforeman.org/static/images/diagrams/foreman_workflow_final.jpg)
 
 # Links&References
+#### Tech stack manuals
+* https://theforeman.org/manuals/
+* https://docs.saltstack.com/en/latest/
+
 #### Debian netboot images
 * https://www.debian.org/distrib/netinst#netboot
 
