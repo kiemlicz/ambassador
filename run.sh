@@ -65,7 +65,7 @@ echo "$FOREMAN_PLUGINS_REPO_ENTRY" | tee -a /etc/apt/sources.list.d/foreman.list
 
 # Install Salt and Foreman
 apt-get update
-apt-get install -y salt-master salt-api python-pip python-pygit2 foreman-installer dnsmasq
+apt-get install -y salt-master salt-api python-pip python-pygit2 foreman-installer dnsmasq tcpdump
 #for UEFI support via proxyDHCP the minimum dnsmasq version is 2.76
 pip install --upgrade pip
 
@@ -174,6 +174,8 @@ readonly CRED=$(foreman-installer \
     --foreman-proxy-oauth-consumer-secret=$OAUTH_SECRET \
     --enable-foreman-plugin-remote-execution \
     --enable-foreman-proxy-plugin-remote-execution-ssh \
+    --enable-foreman-plugin-discovery \
+    --enable-foreman-proxy-plugin-discovery \
     --enable-foreman-plugin-salt \
     --enable-foreman-proxy-plugin-salt \
     --foreman-proxy-plugin-salt-api=true \
