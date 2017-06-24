@@ -22,17 +22,27 @@ is also automated.
 The "installation" process end up with LXC container containing foreman&salt fully setup and configured.  
 Simply follow two steps:  
 1. Clone this repo with submodules: `git submodule update --init` ([read more about submodules](https://github.com/kiemlicz/util/wiki/git))
-2. `nohup sudo ./setup.sh -c -n ambassador [-r] [--deploy_priv id_rsa --deploy_pub id_rsa.pub] &`
+2. Ensure you have LXC configured: `requisites.sh`
+3. `nohup sudo ./setup.sh -c -n ambassador [-r] [--deploy_priv id_rsa --deploy_pub id_rsa.pub] &`
 
 # Workflow
 
 Foreman&Salt workflow is best depicted using this (Foreman's) diagram:
 ![](https://theforeman.org/static/images/diagrams/foreman_workflow_final.jpg)
 
+# Known problems
+Provisioning of OSes involves many technologies and tools, it is very likely that something may not always works "as expected"
+1. Many BIOS/UEFI TFTP clients are of very low quality and fail on option negotiation. Thus it may be needed to disable negotiation for 
+ some options like _blksize_. Example for _tftp-hpa_ server: _/etc/default/tftpd-hpa_ append:  
+ `TFTP_OPTIONS="--secure --refuse blksize"`
+
 # Links&References
 #### Tech stack manuals
 * https://theforeman.org/manuals/
 * https://docs.saltstack.com/en/latest/
+
+#### Syslinux loaders
+* https://www.kernel.org/pub/linux/utils/boot/syslinux/Testing/6.04/ (latest stable totally doesn't work for UEFI)
 
 #### Debian netboot images
 * https://www.debian.org/distrib/netinst#netboot

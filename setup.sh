@@ -155,6 +155,7 @@ mkdir -p $CONTAINER_ROOTFS/etc/salt/master.d/
 mkdir -p $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/
 mkdir -p $CONTAINER_ROOTFS/etc/dnsmasq.d/
 mkdir -p $CONTAINER_ROOTFS/srv/salt_ext/
+mkdir -p $CONTAINER_ROOTFS/var/lib/tftpboot/
 
 AMBASSADOR_CA=$CONTAINER_CERT_DIR/$(basename $CA_CERT_FILE)
 AMBASSADOR_CRL=$CONTAINER_CERT_BASE/$(basename $CRL_FILE)
@@ -174,6 +175,7 @@ fi
 
 #copy dependencies to container
 cp -r envoy/extensions/pillar/ $CONTAINER_ROOTFS/srv/salt_ext/
+cp -r config/bootloader/* $CONTAINER_ROOTFS/var/lib/tftpboot/
 
 #fill templates and copy to container
 if [ "$USE_ROOTS" = true ]; then
@@ -194,6 +196,7 @@ substenv_file AMBASSADOR config/salt.yml > $CONTAINER_ROOTFS/etc/foreman-proxy/s
 substenv_file AMBASSADOR config/proxydhcp.conf > $CONTAINER_ROOTFS/etc/dnsmasq.d/proxydhcp.conf
 
 #todo use /etc/ssl dir? ubuntu user add to ssl-cert group ?
+#run container
 echo "starting: $CONTAINER_NAME"
 # -f (for lxc-start) not needed as during creation the option got persisted
 start_container_waiting_for_network $CONTAINER_NAME
