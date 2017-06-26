@@ -124,7 +124,9 @@ readonly FOREMAN_KEY=$KEY
 readonly FOREMAN_PROXY_CERT=$PROXY_CERT
 readonly FOREMAN_PROXY_KEY=$PROXY_KEY
 
-chown foreman-proxy $FOREMAN_PROXY_KEY
+#fixme o+r is not a good idea
+chmod o+r $FOREMAN_KEY
+chmod o+r $FOREMAN_PROXY_KEY
 
 echo "running foreman-installer (nameserver=$CIF, domain=$(dnsdomainname), fqdn=$CID, IP=$CIP)"
 #install process divided into two steps as oauth token needs to be present for PXE and salt setup

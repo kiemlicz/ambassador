@@ -232,7 +232,7 @@ fi
 echo "running 'run' script inside container (IP = $CONTAINER_IP, DOMAIN=$CONTAINER_FQDN)"
 ssh ubuntu@$CONTAINER_IP -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" \
 CIP=$CONTAINER_IP CID=$CONTAINER_FQDN CERT_BASEDIR=$CONTAINER_CERT_BASE CA=$AMBASSADOR_CA CRL=$AMBASSADOR_CRL KEY=$AMBASSADOR_KEY CERT=$AMBASSADOR_CERT \
-PROXY_KEY=$AMBASSADOR_PROXY_KEY PROXY_CERT=$AMBASSADOR_PROXY_CERT \
+PROXY_KEY=$AMBASSADOR_KEY PROXY_CERT=$AMBASSADOR_CERT \
 'sudo -E bash -s' < ./run.sh > $CONTAINER_NAME.log 2>&1 &
 echo "script running in background, waiting for: $!"
 wait $!
