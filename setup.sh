@@ -26,8 +26,16 @@ while [[ $# -gt 0 ]]; do
         SERVER_CERT_FILE="$2"
         shift # past argument
         ;;
+        --proxy-cert)
+        SERVER_PROXY_CERT_FILE="$2"
+        shift # past argument
+        ;;
         --key)
         SERVER_KEY_FILE="$2"
+        shift # past argument
+        ;;
+        --proxy-key)
+        SERVER_PROXY_KEY_FILE="$2"
         shift # past argument
         ;;
         --crl)
@@ -130,7 +138,9 @@ if [ "$AUTO_CERT_GENERATION" = true ]; then
     CA_PK_FILE=$CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR/ca.key.pem
     CA_CERT_FILE=$CONTAINER_ROOTFS/$CONTAINER_CERT_DIR/ca.cert.pem
     SERVER_KEY_FILE=$CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR/$CONTAINER_FQDN.key
+    SERVER_PROXY_KEY_FILE=$CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR/$CONTAINER_FQDN-proxy.key
     SERVER_CERT_FILE=$CONTAINER_ROOTFS/$CONTAINER_CERT_DIR/$CONTAINER_FQDN.pem
+    SERVER_PROXY_CERT_FILE=$CONTAINER_ROOTFS/$CONTAINER_CERT_DIR/$CONTAINER_FQDN-proxy.pem
     CRL_FILE=$SSL_BASE/crl.pem
     gen_rsa_key $CA_PK_FILE
     gen_x509_cert_self_signed $CA_PK_FILE $CA_CERT_FILE config/ssl/openssl-ca.cnf $SSL_BASE
@@ -140,11 +150,18 @@ if [ "$AUTO_CERT_GENERATION" = true ]; then
     SERVER_FQDN=$CONTAINER_FQDN gen_csr $SERVER_KEY_FILE /tmp/$CONTAINER_FQDN.csr config/ssl/openssl-server.cnf $SSL_BASE
     echo "signing server's csr"
     gen_csr_sign /tmp/$CONTAINER_FQDN.csr $SERVER_CERT_FILE config/ssl/openssl-ca.cnf $SSL_BASE
+    # key/cert for foreman-proxy as well
+    gen_rsa_key $SERVER_PROXY_KEY_FILE
+    SERVER_FQDN=$CONTAINER_FQDN-proxy gen_csr $SERVER_PROXY_KEY_FILE /tmp/$CONTAINER_FQDN-proxy.csr config/ssl/openssl-server.cnf $SSL_BASE
+    echo "signing server's proxy csr"
+    gen_csr_sign /tmp/$CONTAINER_FQDN-proxy.csr $SERVER_PROXY_CERT_FILE config/ssl/openssl-ca.cnf $SSL_BASE
 else
     echo "copying certificates into container fs: $CONTAINER_ROOTFS"
     cp $CA_CERT_FILE $CONTAINER_ROOTFS/$CONTAINER_CERT_DIR
     cp $SERVER_CERT_FILE $CONTAINER_ROOTFS/$CONTAINER_CERT_DIR
+    cp $SERVER_PROXY_CERT_FILE $CONTAINER_ROOTFS/$CONTAINER_CERT_DIR
     cp $SERVER_KEY_FILE $CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR
+    cp $SERVER_PROXY_KEY_FILE $CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR
     cp $CRL_FILE $CONTAINER_ROOTFS/$CONTAINER_CERT_BASE
 fi
 
@@ -160,7 +177,9 @@ mkdir -p $CONTAINER_ROOTFS/var/lib/tftpboot/
 AMBASSADOR_CA=$CONTAINER_CERT_DIR/$(basename $CA_CERT_FILE)
 AMBASSADOR_CRL=$CONTAINER_CERT_BASE/$(basename $CRL_FILE)
 AMBASSADOR_KEY=$CONTAINER_PRIVATE_DIR/$(basename $SERVER_KEY_FILE)
+AMBASSADOR_PROXY_KEY=$CONTAINER_PRIVATE_DIR/$(basename $SERVER_PROXY_KEY_FILE)
 AMBASSADOR_CERT=$CONTAINER_CERT_DIR/$(basename $SERVER_CERT_FILE)
+AMBASSADOR_PROXY_CERT=$CONTAINER_CERT_DIR/$(basename $SERVER_PROXY_CERT_FILE)
 AMBASSADOR_GW=$(ip route get 8.8.8.8 | head -n1 | cut -d' ' -f3)
 AMBASSADOR_SALT_API_PORT=9191
 AMBASSADOR_SALT_API_INTERFACES=0.0.0.0
@@ -213,6 +232,7 @@ fi
 echo "running 'run' script inside container (IP = $CONTAINER_IP, DOMAIN=$CONTAINER_FQDN)"
 ssh ubuntu@$CONTAINER_IP -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" \
 CIP=$CONTAINER_IP CID=$CONTAINER_FQDN CERT_BASEDIR=$CONTAINER_CERT_BASE CA=$AMBASSADOR_CA CRL=$AMBASSADOR_CRL KEY=$AMBASSADOR_KEY CERT=$AMBASSADOR_CERT \
+PROXY_KEY=$AMBASSADOR_PROXY_KEY PROXY_CERT=$AMBASSADOR_PROXY_CERT \
 'sudo -E bash -s' < ./run.sh > $CONTAINER_NAME.log 2>&1 &
 echo "script running in background, waiting for: $!"
 wait $!

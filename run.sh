@@ -24,7 +24,9 @@ assert_env "container designated IP is not provided" $CIP
 assert_env "CA is not set" $CA
 assert_env "CRL is not set" $CRL
 assert_env "CERT is not set" $CERT
+assert_env "PROXY_CERT is not set" $PROXY_CERT
 assert_env "KEY is not set" $KEY
+assert_env "PROXY_KEY is not set" $PROXY_KEY
 assert_env "CERT_BASEDIR is not set" $CERT_BASEDIR
 
 #edit versions
@@ -32,12 +34,12 @@ readonly FOREMAN_XENIAL_REPO_URL="deb http://deb.theforeman.org/ xenial 1.15"
 readonly FOREMAN_XENIAL_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.15"
 readonly FOREMAN_XENIAL_REPO_KEY="https://deb.theforeman.org/pubkey.gpg"
 readonly PUPPET_SERVER_PKG="puppetlabs-release-pc1-yakkety.deb"
-readonly FOREMAN_XENIAL_PUPPET_SERVER="https://apt.puppetlabs.com/$PUPPET_SERVER_PKG"
+readonly FOREMAN_PUPPET_SERVER_URL="https://apt.puppetlabs.com/$PUPPET_SERVER_PKG"
 readonly SALTSTACK_XENIAL_REPO_URL="deb http://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest xenial main"
 readonly SALTSTACK_XENIAL_REPO_KEY_URL="https://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest/SALTSTACK-GPG-KEY.pub"
 
 #don't edit these
-readonly FOREMAN_PUPPET_SERVER=$FOREMAN_XENIAL_PUPPET_SERVER
+readonly FOREMAN_PUPPET_SERVER=$FOREMAN_PUPPET_SERVER_URL
 readonly FOREMAN_REPO_ENTRY=$FOREMAN_XENIAL_REPO_URL
 readonly FOREMAN_PLUGINS_REPO_ENTRY=$FOREMAN_XENIAL_PLUGINS_REPO_URL
 readonly FOREMAN_REPO_KEY=$FOREMAN_XENIAL_REPO_KEY
@@ -119,6 +121,10 @@ readonly CA_CERT=$CA
 readonly FOREMAN_CRL=$CRL
 readonly FOREMAN_CERT=$CERT
 readonly FOREMAN_KEY=$KEY
+readonly FOREMAN_PROXY_CERT=$PROXY_CERT
+readonly FOREMAN_PROXY_KEY=$PROXY_KEY
+
+chown foreman-proxy $FOREMAN_PROXY_KEY
 
 echo "running foreman-installer (nameserver=$CIF, domain=$(dnsdomainname), fqdn=$CID, IP=$CIP)"
 #install process divided into two steps as oauth token needs to be present for PXE and salt setup
@@ -143,8 +149,8 @@ foreman-installer \
     --foreman-websockets-ssl-cert=$FOREMAN_CERT \
     --foreman-websockets-ssl-key=$FOREMAN_KEY \
     --foreman-proxy-ssl-ca=$CA_CERT \
-    --foreman-proxy-ssl-cert=$FOREMAN_CERT \
-    --foreman-proxy-ssl-key=$FOREMAN_KEY \
+    --foreman-proxy-ssl-cert=$FOREMAN_PROXY_CERT \
+    --foreman-proxy-ssl-key=$FOREMAN_PROXY_KEY \
     --foreman-proxy-ssldir=$CERT_BASEDIR \
     --puppet-ssldir=$CERT_BASEDIR \
     --foreman-puppet-ssldir=$CERT_BASEDIR \
