@@ -124,6 +124,8 @@ readonly FOREMAN_KEY=$KEY
 readonly FOREMAN_PROXY_CERT=$PROXY_CERT
 readonly FOREMAN_PROXY_KEY=$PROXY_KEY
 
+groupadd foreman
+chgrp foreman $FOREMAN_PROXY_KEY
 chmod 640 $FOREMAN_KEY
 chmod 640 $FOREMAN_PROXY_KEY
 
@@ -137,8 +139,8 @@ foreman-installer \
     --puppet-server=false \
     --foreman-proxy-puppet=false \
     --foreman-proxy-puppetca=false \
+    --foreman-proxy-puppet-group=foreman \
     --foreman-user-groups=EMPTY_ARRAY \
-    --foreman-proxy-puppet-group=$(whoami) \
     --foreman-server-ssl-ca=$CA_CERT \
     --foreman-server-ssl-chain=$CA_CERT \
     --foreman-server-ssl-cert=$FOREMAN_CERT \
@@ -152,12 +154,7 @@ foreman-installer \
     --foreman-proxy-ssl-ca=$CA_CERT \
     --foreman-proxy-ssl-cert=$FOREMAN_PROXY_CERT \
     --foreman-proxy-ssl-key=$FOREMAN_PROXY_KEY \
-    --foreman-proxy-ssldir=$CERT_BASEDIR \
-    --puppet-ssldir=$CERT_BASEDIR \
-    --foreman-puppet-ssldir=$CERT_BASEDIR \
-    --foreman-proxy-puppet-ssl-ca=$CA_CERT \
-    --foreman-proxy-puppet-ssl-cert=$FOREMAN_CERT \
-    --foreman-proxy-puppet-ssl-key=$FOREMAN_KEY
+    --foreman-proxy-ssldir=$CERT_BASEDIR
 
 echo "enabling further foreman options"
 readonly OAUTH_KEY=$(cat /etc/foreman/settings.yaml | grep :oauth_consumer_key: | cut -d' ' -f2)

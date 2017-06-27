@@ -221,6 +221,9 @@ echo "starting: $CONTAINER_NAME"
 start_container_waiting_for_network $CONTAINER_NAME
 echo "container running"
 
+#sometimes sshd need more time
+sleep 5
+
 readonly CONTAINER_IP=$(lxc-info -n $CONTAINER_NAME -i | cut -d: -f2 | sed -e 's/ //g')
 
 if [ -z "$CONTAINER_IP" ]; then
