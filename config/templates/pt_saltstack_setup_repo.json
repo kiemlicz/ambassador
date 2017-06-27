@@ -13,9 +13,8 @@ bin_path = (@host.operatingsystem.family == 'Freebsd') ? '/usr/local/bin' : '/us
 
 <% if @host.operatingsystem.family == 'Debian' -%>
 <%= bin_path %>/apt-get update
-<%= bin_path %>/apt-get dist-upgrade
+<%= bin_path %>/apt-get dist-upgrade -y
 <%= bin_path %>/wget --no-check-certificate -O - https://bootstrap.saltstack.com | sh
-<%= bin_path %>/apt-get install -y build-essential
 <% elsif @host.operatingsystem.family == 'Freebsd' -%>
 pkg install -y py27-salt
 <% elsif @host.operatingsystem.family == 'Redhat' -%>
