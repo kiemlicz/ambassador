@@ -20,8 +20,10 @@
 
 apt-get update
 #ubuntu-archive-keyring for ubuntu archives creation
-apt-get install lxc bridge-utils debootstrap ubuntu-archive-keyring
+apt-get install lxc bridge-utils debootstrap
 
+#ubuntu-archive-keyring not working for yakkety (and up)
+apt-get install ubuntu-archive-keyring
 
 mv /etc/default/lxc-net /etc/default/lxc-net.$(date +%F-%T).old
 cp requisites/lxc-net /etc/default/lxc-net
