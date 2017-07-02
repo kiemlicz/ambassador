@@ -95,22 +95,38 @@ repositories:
       },
   }, grain='oscodename')) }}
 
-pkgs:
-  names:
-    {{ salt['grains.filter_by']({
-         'default': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges",
-           "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync", "mc",
-           "openssh-server", "openssh-client", "openvpn",
-           "build-essential", "git", "zsh", "curl", "ethtool", "lm-sensors", "hddtemp", "hdparm", "ntp", "python-pip", "silversearcher-ag",
-           "kde-standard", "xterm", "yakuake", "google-chrome-stable", "firefox"],
-         'Windows': ["openvpn", "git", "wireshark", "keepass-2x"]
-       }, merge=salt['grains.filter_by']({
+{% set default_pkgs = salt['grains.filter_by']({
+      'default': {
+         'names': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
+                   "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync", "mc",
+                   "openssh-server", "openssh-client", "openvpn",
+                   "build-essential", "git", "zsh", "curl", "ethtool", "lm-sensors", "hddtemp", "hdparm", "ntp", "python-pip",
+                   "silversearcher-ag", "kde-standard", "xterm", "yakuake", "print-manager", "wireshark", "network-manager-openvpn",
+                   "google-chrome-stable", "firefox", "exuberant-ctags", "tig", "libreoffice", "software-properties-common",
+		           "ca-certificates", "gnupg2"],
+         'post_install': [
+                    "echo 'wireshark-common wireshark-common/install-setuid boolean true' | debconf-set-selections",
+                    "dpkg-reconfigure -f noninteractive wireshark-common",
+                    "yes YES | sensors-detect"],
+      },
+      'Windows': {
+         'names': ["openvpn", "git", "wireshark", "keepass-2x"]
+       }
+    },
+    merge=salt['grains.filter_by']({
+      },
+      grain='oscodename')) %}
 
-         }, grain='oscodename')) }}
+pkgs:
+  {{ salt['grains.filter_by']({
+            'somehost': {
+              'names': default_pkgs.names + ["firmware-iwlwifi"]
+              },
+            }, grain='host', merge=default_pkgs) }}
 
 hosts:
   1.2.3.4 : [ coolname ]
-  192.168.1.1 : [ gw, mygw]
+  192.168.1.1 : [ gw, mygw ]
 
 mounts:
   - dev: /dev/sda1

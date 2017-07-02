@@ -104,9 +104,13 @@ users:
     projects:
       - url: https://github.com/kiemlicz/util.git
         target: {{ home_dir }}/projects/util
-        cmd: ln -s {{ home_dir }}/projects/util {{ home_dir }}/projects/open-source/oh-my-zsh/custom/plugins/util
+        cmds:
+          - "ln -s {{ home_dir }}/projects/util {{ home_dir }}/projects/open-source/oh-my-zsh/custom/plugins/util"
+          - "ls -al {{ home_dir }}/projects/open-source/oh-my-zsh/custom/plugins/util"
       - url: https://github.com/VundleVim/Vundle.vim.git
         target: {{ home_dir }}/.vim/bundle/Vundle.vim
+        cmds:
+          - 'echo "\n" | vim +PluginInstall +qall'
     backup:
       script_location: {{ home_dir }}/bin/backup
       source_locations:
