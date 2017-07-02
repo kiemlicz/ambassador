@@ -7,8 +7,11 @@ if [ -z "$DOCKER_IMAGE" ]; then
 fi
 
 case "$TEST_CASE" in
-salt-masterless)
+salt-masterless-dry)
     docker build -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/Dockerfile .
+    ;;
+salt-masterless-run)
+    docker build -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/Dockerfile.run .
     ;;
 ambassador-run)
     docker build --build-arg=FQDN="$TEST_FQDN" \

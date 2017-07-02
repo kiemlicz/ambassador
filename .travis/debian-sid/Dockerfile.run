@@ -1,0 +1,10 @@
+FROM debian:sid
+RUN apt-get update && apt-get install -y curl
+RUN curl -L https://bootstrap.saltstack.com | sh
+COPY envoy /srv/envoy
+COPY .travis/envoy_test.py /opt/
+COPY .travis/minion.conf /etc/salt/minion
+COPY .travis/pillar /srv/pillar
+RUN ln -s /srv/envoy/salt /srv/salt && service salt-minion restart
+
+ENTRYPOINT ["salt-call", "--local", "state.highstate", "saltenv=base", "pillarenv=one_user", "-l debug"]

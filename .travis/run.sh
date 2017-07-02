@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 case "$TEST_CASE" in
-salt-masterless)
+salt-masterless-dry|salt-masterless-run)
     docker run "$DOCKER_IMAGE"
     ;;
 ambassador-run)
