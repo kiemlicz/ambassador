@@ -7,4 +7,4 @@ COPY .travis/minion.conf /etc/salt/minion
 COPY .travis/pillar /srv/pillar
 RUN ln -s /srv/envoy/salt /srv/salt && service salt-minion restart
 
-ENTRYPOINT ["salt-call", "--local", "state.highstate", "saltenv=base", "pillarenv=one_user", "-l debug"]
+ENTRYPOINT ["salt-call", "--local", "state.highstate", "saltenv=base", "pillarenv=one_user", "-l", "debug"]
