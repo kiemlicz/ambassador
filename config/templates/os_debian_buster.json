@@ -1,10 +1,10 @@
 {
   "operatingsystem": {
     "name": "Debian",
-    "major": "8",
-    "minor": "8",
+    "major": "10",
+    "minor": "0",
     "family": "Debian",
-    "release_name": "jessie",
+    "release_name": "stretch",
     "architectures": {{ arch_list }},
     "ptables": {{ partition_table_list }},
     "media": {{ installation_media_list }}
