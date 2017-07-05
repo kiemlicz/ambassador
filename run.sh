@@ -105,7 +105,7 @@ fi
 
 #todo use pip install --user and add to PATH ~/.local/bin
 #somehow these dependencies are already present, that's why use of --upgrade
-pip install --upgrade docker-py cherrypy
+pip install --upgrade docker-py cherrypy jinja2
 
 useradd -r saltuser
 echo 'saltuser:saltpassword' | chpasswd
