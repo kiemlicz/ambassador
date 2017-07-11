@@ -79,11 +79,11 @@ if [ $(python -c "import pygit2; print(bool(pygit2.features & pygit2.GIT_FEATURE
     apt-get purge -y python-pygit2 libgit2-24 python-cffi
     yes |  pip uninstall cffi
     apt-get install -y pkg-config libcurl3-dev libssh2-1-dev build-essential cmake libssl-dev libffi-dev
-
+    libgit_ver=0.26.0
     pushd /tmp
-    wget https://github.com/libgit2/libgit2/archive/v0.25.0.tar.gz
-    tar xzf /tmp/v0.25.0.tar.gz
-    pushd libgit2-0.25.0
+    wget https://github.com/libgit2/libgit2/archive/v$libgit_ver.tar.gz
+    tar xzf /tmp/v$libgit_ver.tar.gz
+    pushd libgit2-$libgit_ver
     cmake .
     make
     make install
