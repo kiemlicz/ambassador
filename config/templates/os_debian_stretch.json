@@ -2,7 +2,7 @@
   "operatingsystem": {
     "name": "Debian",
     "major": "9",
-    "minor": "0",
+    "minor": "1",
     "family": "Debian",
     "release_name": "stretch",
     "architectures": {{ arch_list }},

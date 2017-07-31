@@ -4,7 +4,7 @@
     "major": "10",
     "minor": "0",
     "family": "Debian",
-    "release_name": "stretch",
+    "release_name": "unstable",
     "architectures": {{ arch_list }},
     "ptables": {{ partition_table_list }},
     "media": {{ installation_media_list }}
