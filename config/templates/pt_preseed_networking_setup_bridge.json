@@ -1,6 +1,6 @@
 {
   "provisioning_template": {
-    "name": "saltstack_setup_repo",
+    "name": "preseed_networking_setup_bridge",
     "template": "<%#
 kind: snippet
 name: preseed_networking_setup
@@ -11,7 +11,7 @@ called in your preseed finish template.
 <% if @host.operatingsystem.family == 'Debian' -%>
 apt-get update
 apt-get install -y bridge-utils
-<% end -%>
+<% end %>
 <% subnet = @host.subnet -%>
 <% dhcp = subnet.dhcp_boot_mode? -%>
 
