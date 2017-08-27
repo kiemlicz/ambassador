@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+<head>
+    <title>Ambassador authorization</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+    </div>
+    <span class="navbar-text" aria-hidden="true">Ambassador</span>
+</nav>
+<div id="auth_container" class="col-md-4 col-md-offset-4">
+    {% if authorized %}
+    <p>
+        file_ext has access to your google drive
+    </p>
+    {% elif fail %}
+    <p>
+        Unable to authorize file_ext:
+        </br>
+        {{ fail }}
+    </p>
+    {% else %}
+    <p>
+        Ambassador in order to use <i>gdrive://</i> schema for file management needs to authorize within your google
+        account.
+        Authorization is performed per provisioned machine basis (e.g. per minion)
+    </p>
+    <p>
+        If you don't use such schema in your pillar data, then ignore this
+    </p>
+    <form id="authorize">
+        <div class="form-group row">
+            <label for="minion_id" class="col-2 col-form-label">Hostname</label>
+            <div class="col-10">
+                <input class="form-control" type="text" value="Minion ID" id="minion_id">
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Proceed with authorization</button>
+    </form>
+    {% endif %}
+</div>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" media="screen">
+<link href="/static/file_ext_authorize.css" rel="stylesheet" media="screen">
+<script
+        src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+$(document).ready(function(){
+    var socket = io.connect('http://' + document.domain + ':' + location.port + '/');
+
+    $('#authorize').submit(function(){
+        socket.emit('authorize', $('#minion_id').val());
+        return false;
+      });
+
+    socket.on('redirect', function(destination){
+        window.location.href = destination;
+    });
+
+    socket.on('authorized',function(){
+        $('#auth_container').html("This host is already authorized");
+    });
+});
+</script>
+</body>
+</html>

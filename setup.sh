@@ -4,6 +4,7 @@
 # Arguments:
 # -c generate certificates, without this option create 'ssl' dir (in container directory) with ca, key+cert (signed by ca)
 # -n container name
+# --client_id and --client_secret are google developer's console generated credentials
 
 while [[ $# -gt 0 ]]; do
     arg="$1"
@@ -48,6 +49,14 @@ while [[ $# -gt 0 ]]; do
         ;;
         --deploy_pub)
         DEPLOY_PUB_FILE="$2"
+        shift
+        ;;
+        --client_id)
+        CLIENT_ID="$2"
+        shift
+        ;;
+        --client_secret)
+        CLIENT_SECRET="$2"
         shift
         ;;
         *)
@@ -192,9 +201,15 @@ if ! ([ -z $DEPLOY_PUB_FILE ] || [ -z $DEPLOY_PRIV_FILE ]); then
     cp $DEPLOY_PRIV_FILE $CONTAINER_ROOTFS/etc/salt/deploykeys/
 fi
 
+if ([ -n $CLIENT_ID ] && [ -n $CLIENT_SECRET ]); then
+    AMBASSADOR_CLIENT_ID=$CLIENT_ID
+    AMBASSADOR_CLIENT_SECRET=$CLIENT_SECRET
+fi
+
 #copy dependencies to container
 cp -r envoy/extensions/pillar/ $CONTAINER_ROOTFS/srv/salt_ext/
 cp -r config/bootloader/* $CONTAINER_ROOTFS/var/lib/tftpboot/
+cp -r extensions/file_ext_authorize/ $CONTAINER_ROOTFS/opt/
 
 #fill templates and copy to container
 if [ "$USE_ROOTS" = true ]; then
@@ -213,6 +228,7 @@ fi
 substenv_file AMBASSADOR config/foreman.yaml > $CONTAINER_ROOTFS/etc/salt/foreman.yaml
 substenv_file AMBASSADOR config/salt.yml > $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/salt.yml
 substenv_file AMBASSADOR config/proxydhcp.conf > $CONTAINER_ROOTFS/etc/dnsmasq.d/proxydhcp.conf
+substenv_file AMBASSADOR config/file_ext_authorize.conf > $CONTAINER_ROOTFS/opt/file_ext_authorize/file_ext_authorize.conf
 
 #todo use /etc/ssl dir? ubuntu user add to ssl-cert group ?
 #run container
