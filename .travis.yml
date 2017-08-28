@@ -14,6 +14,8 @@ env:
     TEST_CASE=salt-masterless-run
   - DOCKER_IMAGE=debian-jessie
     TEST_CASE=salt-masterless-dry
+  - DOCKER_IMAGE=debian-stretch
+    TEST_CASE=salt-masterless-dry
   - DOCKER_IMAGE=ubuntu-xenial
     TEST_CASE=salt-masterless-dry
   - DOCKER_IMAGE=ubuntu-yakkety
