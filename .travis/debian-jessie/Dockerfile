@@ -1,6 +1,6 @@
 FROM debian:jessie
 RUN apt-get update && apt-get install -y curl
-RUN curl -L https://bootstrap.saltstack.com | sh || true
+RUN curl -L https://bootstrap.saltstack.com | sh
 COPY envoy /srv/envoy
 COPY .travis/envoy_test.py /opt/
 COPY .travis/minion.conf /etc/salt/minion
