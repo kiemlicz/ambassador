@@ -1,7 +1,7 @@
 import os
 import salt.client
-import unittest
 import traceback
+import unittest
 from salt.exceptions import CommandExecutionError
 
 
@@ -35,7 +35,7 @@ class ParametrizedTestCase(unittest.TestCase):
 
 
 class AmbassadorTest(ParametrizedTestCase):
-    def test_states(self):
+    def test_states_syntax(self):
         self.assertTrue(os.path.isdir(os.path.join(self.saltenv_location, self.saltenv)),
                         msg="salt states not found: {}".format(os.path.join(self.saltenv_location, self.saltenv)))
         self.assertTrue(os.path.isdir(os.path.join(self.pillarenv_location, self.pillarenv)),
@@ -43,14 +43,16 @@ class AmbassadorTest(ParametrizedTestCase):
         caller = salt.client.Caller()
         try:
             tops = caller.cmd("state.show_top")
+            self.assertFalse(len(tops) == 0, "empty state.show_top output")
             for env, states in tops.iteritems():
+                self.assertFalse(len(states) == 0, "empty state list for env: {}".format(env))
                 for state in states:
                     result = caller.cmd("state.show_sls", state, saltenv=env, pillarenv=self.pillarenv)
                     self.assertTrue(isinstance(result, dict),
-                                msg="rendering of: {} (saltenv={}, pillarenv={}), failed with: {}".format(state,
-                                                                                                          env,
-                                                                                                          self.pillarenv,
-                                                                                                          result))
+                                    msg="rendering of: {} (saltenv={}, pillarenv={}), failed with: {}".format(state,
+                                                                                                              env,
+                                                                                                              self.pillarenv,
+                                                                                                              result))
         except CommandExecutionError:
             traceback.print_exc()
             stdin, stdout = os.popen2("tail -n 30 /var/log/salt/master")
@@ -59,6 +61,10 @@ class AmbassadorTest(ParametrizedTestCase):
             stdout.close()
             print "".join(lines)
             self.fail("Test unsuccessful due to exception")
+
+    # def test_pkgs_state(self):
+        # assert proper overrides per distro!
+
 
 if __name__ == "__main__":
     suite = unittest.TestSuite()
