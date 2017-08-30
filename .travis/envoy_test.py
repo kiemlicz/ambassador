@@ -55,7 +55,7 @@ class AmbassadorTest(ParametrizedTestCase):
                                     msg="rendering of: {} (saltenv={}, pillarenv={}), failed with: {}".format(state,
                                                                                                               env,
                                                                                                               self.pillarenv,
-                                                                                                              result))
+                                                                                                              result_sls))
         except CommandExecutionError:
             traceback.print_exc()
             stdin, stdout = os.popen2("tail -n 30 /var/log/salt/master")
