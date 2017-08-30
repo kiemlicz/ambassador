@@ -35,20 +35,23 @@ class ParametrizedTestCase(unittest.TestCase):
 
 
 class AmbassadorTest(ParametrizedTestCase):
-    def test_states_syntax(self):
+    def _get_client(self):
         self.assertTrue(os.path.isdir(os.path.join(self.saltenv_location, self.saltenv)),
                         msg="salt states not found: {}".format(os.path.join(self.saltenv_location, self.saltenv)))
         self.assertTrue(os.path.isdir(os.path.join(self.pillarenv_location, self.pillarenv)),
                         msg="pillar data not found: {}".format(os.path.join(self.pillarenv_location, self.pillarenv)))
-        caller = salt.client.Caller()
+        return salt.client.Caller()
+
+    def test_states_syntax(self):
+        caller = self._get_client()
         try:
             tops = caller.cmd("state.show_top")
             self.assertFalse(len(tops) == 0, "empty state.show_top output")
             for env, states in tops.iteritems():
                 self.assertFalse(len(states) == 0, "empty state list for env: {}".format(env))
                 for state in states:
-                    result = caller.cmd("state.show_sls", state, saltenv=env, pillarenv=self.pillarenv)
-                    self.assertTrue(isinstance(result, dict),
+                    result_sls = caller.cmd("state.show_sls", state, saltenv=env, pillarenv=self.pillarenv)
+                    self.assertTrue(isinstance(result_sls, dict),
                                     msg="rendering of: {} (saltenv={}, pillarenv={}), failed with: {}".format(state,
                                                                                                               env,
                                                                                                               self.pillarenv,
@@ -62,8 +65,11 @@ class AmbassadorTest(ParametrizedTestCase):
             print "".join(lines)
             self.fail("Test unsuccessful due to exception")
 
-    # def test_pkgs_state(self):
-        # assert proper overrides per distro!
+    def test_pkgs(self):
+        caller = self._get_client()
+        result_dict = caller.cmd("state.show_sls", "pkgs", saltenv=self.saltenv, pillarenv=self.pillarenv)
+        l = result_dict['pkgs']['pkg']
+        self.assertTrue(isinstance(l, list))
 
 
 if __name__ == "__main__":
