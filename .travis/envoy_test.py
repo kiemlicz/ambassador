@@ -58,11 +58,6 @@ class AmbassadorTest(ParametrizedTestCase):
                                                                                                               result_sls))
         except CommandExecutionError:
             traceback.print_exc()
-            stdin, stdout = os.popen2("tail -n 30 /var/log/salt/master")
-            stdin.close()
-            lines = stdout.readlines()
-            stdout.close()
-            print "".join(lines)
             self.fail("Test unsuccessful due to exception")
 
     def test_pkgs(self):
