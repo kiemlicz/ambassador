@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-tail -f /var/log/salt/minion &
+: >> /var/log/salt/minion && tail -f /var/log/salt/minion &
 python /opt/envoy_test.py
