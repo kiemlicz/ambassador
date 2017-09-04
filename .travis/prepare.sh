@@ -14,7 +14,6 @@ salt-masterless-run)
     docker build -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/Dockerfile.run .
     ;;
 ambassador-run)
-    docker build --build-arg=FQDN="$TEST_FQDN" \
-    -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/Dockerfile.ambassador .
+    docker build --build-arg=FQDN="$TEST_FQDN" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/Dockerfile.ambassador .
     ;;
 esac
