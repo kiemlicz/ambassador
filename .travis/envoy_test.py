@@ -1,3 +1,4 @@
+import assertions
 import os
 import salt.client
 import traceback
@@ -65,6 +66,9 @@ class AmbassadorTest(ParametrizedTestCase):
         result_dict = caller.cmd("state.show_sls", "pkgs", saltenv=self.saltenv, pillarenv=self.pillarenv)
         l = result_dict['pkgs']['pkg']
         self.assertTrue(isinstance(l, list))
+        self.assertTrue(assertions.assert_pkgs(l, self.pillarenv),
+                        msg="pkgs state contains improper packages list (saltenv: {}, pillarenv: {})".format(
+                            self.saltenv, self.pillarenv))
 
 
 if __name__ == "__main__":
