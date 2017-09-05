@@ -65,10 +65,12 @@ class AmbassadorTest(ParametrizedTestCase):
         caller = self._get_client()
         result_dict = caller.cmd("state.show_sls", "pkgs", saltenv=self.saltenv, pillarenv=self.pillarenv)
         l = result_dict['pkgs']['pkg']
-        self.assertTrue(isinstance(l, list))
-        self.assertTrue(assertions.assert_pkgs(l, self.pillarenv),
+        #find pkgs in list of dicts and flatten
+        pkgs = [item for sublist in (e['pkgs'] for e in l if 'pkgs' in e) for item in sublist]
+        self.assertTrue(isinstance(pkgs, list))
+        self.assertTrue(assertions.assert_pkgs(pkgs, self.pillarenv),
                         msg="pkgs state contains improper packages list (saltenv: {}, pillarenv: {}), packages:{}".format(
-                            self.saltenv, self.pillarenv, l))
+                            self.saltenv, self.pillarenv, pkgs))
 
 
 if __name__ == "__main__":
