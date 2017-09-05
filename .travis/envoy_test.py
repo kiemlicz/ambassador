@@ -58,7 +58,7 @@ class AmbassadorTest(ParametrizedTestCase):
                                                                                                               result_sls))
         except CommandExecutionError:
             traceback.print_exc()
-            self.fail("Test unsuccessful due to exception")
+            self.fail("Unexpected error, failing...")
 
     def test_pkgs(self):
         caller = self._get_client()
