@@ -67,8 +67,8 @@ class AmbassadorTest(ParametrizedTestCase):
         l = result_dict['pkgs']['pkg']
         self.assertTrue(isinstance(l, list))
         self.assertTrue(assertions.assert_pkgs(l, self.pillarenv),
-                        msg="pkgs state contains improper packages list (saltenv: {}, pillarenv: {})".format(
-                            self.saltenv, self.pillarenv))
+                        msg="pkgs state contains improper packages list (saltenv: {}, pillarenv: {}), packages:{}".format(
+                            self.saltenv, self.pillarenv, l))
 
 
 if __name__ == "__main__":
