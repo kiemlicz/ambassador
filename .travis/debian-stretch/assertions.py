@@ -1,6 +1,6 @@
 def _data(env):
     assertions = {
-        'empty': [],
+        'empty': ["sudo", "apt-transport-https", "man", "rsync", "git", "curl", "ntp", "zsh"],
         'one_user': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
                      "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync", "mc",
                      "openssh-server", "openssh-client", "openvpn",
