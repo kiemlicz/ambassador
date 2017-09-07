@@ -5,4 +5,6 @@ rm /var/log/salt/minion
 ln -sf /proc/$$/fd/1 /var/log/salt/minion
 tail -f /var/log/salt/minion &
 service salt-minion restart
-salt-call --local state.highstate saltenv=base pillarenv=one_user -l debug
+#debug may be useful for travis
+salt-call --local state.highstate saltenv=base pillarenv=one_user -l debug | tee output
+cat output | awk '/^Failed:/ {if($2 != "0") exit 1}'
