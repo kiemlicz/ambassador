@@ -4,6 +4,7 @@ COPY envoy /srv/envoy
 COPY .travis/entrypoint_run.sh /opt/
 COPY .travis/minion.conf /etc/salt/minion.d/minion.conf
 COPY .travis/pillar /srv/pillar
+COPY .travis/debian-sid/SUPPORTED /usr/share/i18n/
 RUN ln -s /srv/envoy/salt /srv/salt
 RUN curl -L https://bootstrap.saltstack.com | sh
 
