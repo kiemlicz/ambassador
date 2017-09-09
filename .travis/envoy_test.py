@@ -71,11 +71,10 @@ class AmbassadorTest(ParametrizedTestCase):
         self.assertTrue(assertions.assert_pkgs(pkgs, self.pillarenv),
                         msg="pkgs state contains improper packages list (saltenv: {}, pillarenv: {}), packages:{}".format(
                             self.saltenv, self.pillarenv, pkgs))
-        c = result_dict['pkgs']['cmd']
-
         if self.pillarenv == "empty":
             cmds = []
         else:
+            c = result_dict['pkgs']['cmd']
             #find commands in list of dicts and flatten
             cmds = [item for sublist in (e['names'] for e in c if 'names' in e) for item in sublist]
         self.assertTrue(assertions.assert_cmds(cmds, self.pillarenv),
