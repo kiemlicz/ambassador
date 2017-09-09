@@ -1,7 +1,7 @@
 FROM ubuntu:xenial
-COPY .travis/ssl/*.key /etc/ssl/private/
-COPY .travis/ssl/*.cert /etc/ssl/certs/
-COPY .travis/ssl/crl.pem /etc/ssl/
+COPY .travis/config/ssl/*.key /etc/ssl/private/
+COPY .travis/config/ssl/*.cert /etc/ssl/certs/
+COPY .travis/config/ssl/crl.pem /etc/ssl/
 COPY .travis/config/foreman.yaml /etc/salt/
 COPY .travis/config/proxydhcp.conf /etc/dnsmasq.d/
 COPY .travis/config/salt.yml /etc/foreman-proxy/settings.d/
