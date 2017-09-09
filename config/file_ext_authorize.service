@@ -1,0 +1,14 @@
+[Unit]
+Description=Ambassador authorization application. Allows to use gdrive as file storage
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/file_ext_authorize/
+Environment=FLASK_APP=/opt/file_ext_authorize/file_ext_authorize.py
+ExecStart=flask run --host='0.0.0.0'
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

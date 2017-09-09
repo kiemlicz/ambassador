@@ -105,7 +105,7 @@ fi
 
 #todo use pip install --user and add to PATH ~/.local/bin
 #somehow these dependencies are already present, that's why use of --upgrade
-pip install --upgrade docker-py cherrypy jinja2
+pip install --upgrade docker-py cherrypy jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib
 
 useradd -r saltuser
 echo 'saltuser:saltpassword' | chpasswd
@@ -198,8 +198,8 @@ touch /etc/salt/autosign.conf
 chgrp foreman-proxy /etc/salt/autosign.conf
 chmod g+w /etc/salt/autosign.conf
 
-systemctl enable foreman foreman-proxy salt-master salt-api dnsmasq
-systemctl restart foreman foreman-proxy salt-master salt-api dnsmasq foreman-tasks
+systemctl enable foreman foreman-proxy salt-master salt-api dnsmasq file_ext_authorize
+systemctl restart foreman foreman-proxy salt-master salt-api dnsmasq foreman-tasks file_ext_authorize
 
 echo "User: $FOREMAN_GUI_USER"
 echo "Password: $FOREMAN_GUI_PASSWORD"

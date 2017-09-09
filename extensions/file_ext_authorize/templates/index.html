@@ -65,6 +65,10 @@ $(document).ready(function(){
     socket.on('authorized',function(){
         $('#auth_container').html("This host is already authorized");
     });
+
+    socket.on('fail', function(fail_log){
+        $('#auth_container').html("Error: " + fail_log);
+    });
 });
 </script>
 </body>

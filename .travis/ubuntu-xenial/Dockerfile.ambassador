@@ -5,6 +5,9 @@ COPY .travis/ssl/crl.pem /etc/ssl/
 COPY .travis/config/foreman.yaml /etc/salt/
 COPY .travis/config/proxydhcp.conf /etc/dnsmasq.d/
 COPY .travis/config/salt.yml /etc/foreman-proxy/settings.d/
+COPY config/file_ext_authorize.service /etc/systemd/system/
+COPY .travis/config/file_ext_authorize.conf /opt/file_ext_authorize/
+COPY extensions/file_ext_authorize/* /opt/file_ext_authorize/
 COPY run.sh /opt/
 ARG FQDN
 ENV CID=$FQDN
