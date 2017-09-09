@@ -197,10 +197,6 @@ hosts:
   192.168.1.1 : [ gw, mygw ]
 
 mounts:
-  - dev: /dev/null
-    target: /mnt/hdd1/main
-    file_type: ext4
-    options: [user]
 
 locale:
   locales:
