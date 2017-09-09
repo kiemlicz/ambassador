@@ -197,22 +197,10 @@ hosts:
   192.168.1.1 : [ gw, mygw ]
 
 mounts:
-  - dev: /dev/sda1
+  - dev: /dev/null
     target: /mnt/hdd1/main
     file_type: ext4
     options: [user]
-  - dev: /dev/sda2
-    target: /mnt/hdd1/var
-    file_type: ext4
-    options: [user]
-  - dev: /dev/sdb1
-    target: /mnt/win_c
-    file_type: ntfs-3g
-    options: [user, rw, noauto, suid]
-  - dev: /dev/sdd1
-    target: /mnt/win_d
-    file_type: ntfs
-    options: [user, rw, noauto, suid]
 
 locale:
   locales:
