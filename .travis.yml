@@ -30,4 +30,4 @@ before_install:
   - .travis/prepare.sh
 
 script:
-  - .travis/run.sh
+  - travis_wait 30 .travis/run.sh
