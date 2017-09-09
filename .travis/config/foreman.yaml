@@ -4,8 +4,8 @@
 :url: https://ambassadortest.com
 :port: 443
 :ssl_ca: /etc/ssl/certs/ca.cert
-:ssl_cert: /etc/ssl/certs/ambassador.mgl.cert
-:ssl_key: /etc/ssl/private/ambassador.mgl.key
+:ssl_cert: /etc/ssl/certs/server.cert
+:ssl_key: /etc/ssl/private/server.key
 :timeout: 10
 :salt: /usr/bin/salt
 :upload_grains: true
