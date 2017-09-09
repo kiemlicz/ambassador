@@ -167,7 +167,7 @@ repositories:
          'post_install': [
                     "echo 'wireshark-common wireshark-common/install-setuid boolean true' | debconf-set-selections",
                     "dpkg-reconfigure -f noninteractive wireshark-common",
-                    "yes YES | sensors-detect"],
+                    'echo "command3"', 'echo "command4"', 'echo "command5"'],
       },
       'Windows': {
          'names': ["openvpn", "git", "wireshark", "keepass-2x"]
