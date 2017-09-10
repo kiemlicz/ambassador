@@ -20,6 +20,8 @@ handler = RotatingFileHandler('file_ext_authorize.log', maxBytes=10000, backupCo
 handler.setLevel(logging.INFO)
 app.logger.addHandler(handler)
 
+salt_config = salt.config.master_config(config['SALT_CONFIG_LOCATION'])
+
 
 @app.route("/")
 def main():
@@ -33,9 +35,9 @@ def authorize(minion_id):
             "https://www.googleapis.com/auth/drive.readonly",
             "https://www.googleapis.com/auth/drive.metadata.readonly"
         ]
-        redirect_uri = config['REDIRECT_URI']
-        authorization_base_url = config['AUTHORIZATION_BASE_URL']
-        client_id = config['CLIENT_ID']
+        redirect_uri = salt_config['gdrive']['redirect_uri']
+        authorization_base_url = salt_config['gdrive']['authorization_base_url']
+        client_id = salt_config['gdrive']['client_id']
         path = os.path.join(_token_path(minion_id), 'gdrive_token')
 
         if os.path.exists(path):
@@ -51,7 +53,6 @@ def authorize(minion_id):
 
 
 def _token_path(minion_id):
-    salt_config = salt.config.master_config(config['SALT_CONFIG_LOCATION'])
     cache_dir = salt_config['cachedir']
     return os.path.join(cache_dir, "file_ext", minion_id)
 
@@ -61,10 +62,10 @@ def authorized():
     try:
         authorization_code = request.args.get('code')
         minion_id = request.args.get('state')
-        client_id = config['CLIENT_ID']
-        client_secret = config['CLIENT_SECRET']
-        token_url = config['TOKEN_URL']
-        redirect_uri = config['REDIRECT_URI']
+        client_id = salt_config['gdrive']['client_id']
+        client_secret = salt_config['gdrive']['client_secret']
+        token_url = salt_config['gdrive']['token_url']
+        redirect_uri = salt_config['gdrive']['redirect_uri']
         path = _token_path(minion_id)
 
         google = OAuth2Session(client_id, redirect_uri=redirect_uri)
@@ -73,7 +74,8 @@ def authorized():
         if not os.path.exists(path):
             os.makedirs(path)
         with open(os.path.join(path, 'gdrive_token'), 'w+') as token_file:
-            json.dump(token, token_file)
+            wrapped = {"gdrive": token}
+            json.dump(wrapped, token_file)
         return render_template('index.html', authorized=True)
     except Exception as e:
         app.logger.error("Cannot handle authorized response", str(e))
