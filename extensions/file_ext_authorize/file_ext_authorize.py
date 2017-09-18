@@ -29,32 +29,16 @@ def main():
 
 
 @socketio.on("authorize")
-def authorize(minion_id):
+def authorize(minion_id, authorization_code):
     try:
-        scope = [
-            "https://www.googleapis.com/auth/drive.readonly",
-            "https://www.googleapis.com/auth/drive.metadata.readonly"
-        ]
-        redirect_uri = salt_config['gdrive']['redirect_uri']
-        authorization_base_url = salt_config['gdrive']['authorization_base_url']
-        client_id = salt_config['gdrive']['client_id']
-        path = os.path.join(_token_path(minion_id), 'gdrive_token')
-
-        if os.path.exists(path):
-            emit('authorized')
+        if authorization_code is None or authorization_code == '':
+            _redirect(minion_id)
         else:
-            google = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
-            authorization_url, state = google.authorization_url(authorization_base_url, access_type="offline",
-                                                                state=minion_id, approval_prompt="force")
-            emit('redirect', authorization_url)
+            _obtain_token(minion_id, authorization_code)
+            emit('success')
     except Exception as e:
         app.logger.error("Cannot handle authorize request", str(e))
         emit('fail', str(e))
-
-
-def _token_path(minion_id):
-    cache_dir = salt_config['cachedir']
-    return os.path.join(cache_dir, "file_ext", minion_id)
 
 
 @app.route("/authorized")
@@ -62,21 +46,53 @@ def authorized():
     try:
         authorization_code = request.args.get('code')
         minion_id = request.args.get('state')
-        client_id = salt_config['gdrive']['client_id']
-        client_secret = salt_config['gdrive']['client_secret']
-        token_url = salt_config['gdrive']['token_url']
-        redirect_uri = salt_config['gdrive']['redirect_uri']
-        path = _token_path(minion_id)
+        _obtain_token(minion_id, authorization_code)
 
-        google = OAuth2Session(client_id, redirect_uri=redirect_uri)
-        token = google.fetch_token(token_url, client_secret=client_secret, code=authorization_code)
-
-        if not os.path.exists(path):
-            os.makedirs(path)
-        with open(os.path.join(path, 'gdrive_token'), 'w+') as token_file:
-            wrapped = {"gdrive": token}
-            json.dump(wrapped, token_file)
         return render_template('index.html', authorized=True)
     except Exception as e:
         app.logger.error("Cannot handle authorized response", str(e))
         return render_template('index.html', fail=str(e))
+
+
+def _token_path(minion_id):
+    cache_dir = salt_config['cachedir']
+    return os.path.join(cache_dir, "file_ext", minion_id)
+
+
+def _redirect(minion_id):
+    scope = [
+        "https://www.googleapis.com/auth/drive.readonly",
+        "https://www.googleapis.com/auth/drive.metadata.readonly"
+    ]
+    redirect_uri = salt_config['google_api']['redirect_uri']
+    authorization_base_url = salt_config['google_api']['authorization_base_url']
+    client_id = salt_config['google_api']['client_id']
+    path = os.path.join(_token_path(minion_id), 'gdrive_token')
+
+    if os.path.exists(path):
+        emit('already_authorized')
+    else:
+        google = OAuth2Session(client_id, scope=scope, redirect_uri=redirect_uri)
+        authorization_url, state = google.authorization_url(authorization_base_url, access_type="offline",
+                                                            state=minion_id, approval_prompt="force")
+        if redirect_uri.endswith("/authorized"):
+            emit('redirect', (authorization_url, 'automatic'))
+        else:
+            emit('redirect', (authorization_url, 'manual'))
+
+
+def _obtain_token(minion_id, authorization_code):
+    client_id = salt_config['google_api']['client_id']
+    client_secret = salt_config['google_api']['client_secret']
+    token_url = salt_config['google_api']['token_url']
+    redirect_uri = salt_config['google_api']['redirect_uri']
+    path = _token_path(minion_id)
+
+    google = OAuth2Session(client_id, redirect_uri=redirect_uri)
+    token = google.fetch_token(token_url, client_secret=client_secret, code=authorization_code)
+
+    if not os.path.exists(path):
+        os.makedirs(path)
+    with open(os.path.join(path, 'gdrive_token'), 'w+') as token_file:
+        wrapped = {"gdrive": token}
+        json.dump(wrapped, token_file)
