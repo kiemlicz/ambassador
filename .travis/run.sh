@@ -2,7 +2,7 @@
 
 case "$TEST_CASE" in
 salt-masterless-dry|salt-masterless-run)
-    docker run "$DOCKER_IMAGE"
+    docker run --privileged "$DOCKER_IMAGE"
     ;;
 ambassador-run)
     docker run -h $TEST_FQDN "$DOCKER_IMAGE"
