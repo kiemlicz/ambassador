@@ -1,6 +1,0 @@
-[submodule "envoy"]
-	path = envoy
-	url = https://github.com/kiemlicz/envoy.git
-[submodule "util"]
-	path = util
-	url = https://github.com/kiemlicz/util.git

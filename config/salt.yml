@@ -1,9 +1,0 @@
----
-:enabled: https
-:autosign_file: /etc/salt/autosign.conf
-:salt_command_user: root
-:use_api: true
-:api_url: https://%AMBASSADOR_FQDN%:%AMBASSADOR_SALT_API_PORT%
-:api_auth: pam
-:api_username: saltuser
-:api_password: saltpassword
