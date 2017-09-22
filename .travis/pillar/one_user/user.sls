@@ -91,10 +91,11 @@ users:
           - vim-gtk3
           - python3-pip
     dotfile:
-      repo: git@bitbucket.org:someguy/cfg.git
-      branch: {{ grains['host'] }}
+      repo: https://github.com/kiemlicz/ambassador.git
+      branch: test-dotfiles
       root: {{ home_dir }}
-      post_cmd: "fc-cache -vf ~/.fonts"
+      post_cmds:
+        - "fc-cache -vf ~/.fonts"
     git:
       global_config:
         user.name: coolnick
