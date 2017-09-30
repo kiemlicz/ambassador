@@ -6,5 +6,7 @@ COPY .travis/minion.conf /etc/salt/minion.d/minion.conf
 COPY .travis/pillar /srv/pillar
 RUN ln -s /srv/envoy/salt /srv/salt
 RUN curl -L https://bootstrap.saltstack.com | sh
+ARG LOG_LEVEL
+ENV LOG_LEVEL=$LOG_LEVEL
 
-ENTRYPOINT ["/opt/entrypoint_run.sh"]
+ENTRYPOINT ["/opt/entrypoint_run.sh", "$LOG_LEVEL"]
