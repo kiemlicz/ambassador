@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
+echo "OS version:"
+cat /etc/debian_version
 echo "starting (args = $@)"
+
 rm /var/log/salt/minion
 #so that docker logs will display it
 ln -sf /proc/$$/fd/1 /var/log/salt/minion
