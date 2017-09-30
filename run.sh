@@ -105,7 +105,7 @@ fi
 
 #todo use pip install --user and add to PATH ~/.local/bin
 #somehow these dependencies are already present, that's why use of --upgrade
-pip install --upgrade docker-py cherrypy jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib
+pip install --upgrade docker-py cherrypy jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib google-auth
 
 useradd -r saltuser
 echo 'saltuser:saltpassword' | chpasswd
