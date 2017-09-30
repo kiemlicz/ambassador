@@ -10,4 +10,4 @@ RUN pip install --upgrade google-auth
 ARG LOG_LEVEL
 ENV LOG_LEVEL=$LOG_LEVEL
 
-ENTRYPOINT ["/opt/entrypoint_run.sh $LOG_LEVEL"]
+ENTRYPOINT /opt/entrypoint_run.sh $LOG_LEVEL
