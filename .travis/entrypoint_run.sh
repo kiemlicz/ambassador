@@ -15,7 +15,7 @@ chmod 775 /sbin/runlevel
 
 service salt-minion restart
 #debug may be useful for travis (-l debug)
-salt-call --local state.highstate saltenv=base pillarenv=one_user -l ${1-info} --no-color --out-file output
+salt-call --local state.highstate saltenv=$1 pillarenv=one_user -l ${2-info} --no-color --out-file output
 #travis sometimes cannot handle properly this much of logs
 sleep 2
 echo "salt-call finished"
@@ -23,4 +23,4 @@ cat output
 #seems that `cat output` can take some time...
 sleep 10
 echo "scanning output"
-cat output | awk '/^Failed:/ {if($2 != "0") exit 3}'
+awk '/^Failed:/ {if($2 != "0") exit 3}' output

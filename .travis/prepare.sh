@@ -11,7 +11,7 @@ salt-masterless-dry)
     docker build -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/Dockerfile .
     ;;
 salt-masterless-run)
-    docker build --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/Dockerfile.run .
+    docker build --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" --build-arg=SALTENV="$SALTENV" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/Dockerfile.run .
     ;;
 ambassador-run)
     docker build --build-arg=FQDN="$TEST_FQDN" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/Dockerfile.ambassador .

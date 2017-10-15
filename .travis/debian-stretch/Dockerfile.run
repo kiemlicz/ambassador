@@ -1,4 +1,4 @@
-FROM debian:sid
+FROM debian:stretch
 RUN apt-get update && apt-get install -y curl python-pip
 COPY envoy /srv/envoy
 COPY .travis/entrypoint_run.sh /opt/
