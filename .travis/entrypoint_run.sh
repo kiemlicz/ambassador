@@ -18,7 +18,9 @@ service salt-minion restart
 salt-call --local state.highstate saltenv=base pillarenv=one_user -l ${1-info} --no-color --out-file output
 #travis sometimes cannot handle properly this much of logs
 sleep 2
-echo "salt-call finished, scanning output"
+echo "salt-call finished"
 cat output
-sleep 5
+#seems that `cat output` can take some time...
+sleep 10
+echo "scanning output"
 cat output | awk '/^Failed:/ {if($2 != "0") exit 3}'
