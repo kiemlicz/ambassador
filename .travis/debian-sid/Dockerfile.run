@@ -9,5 +9,7 @@ RUN curl -L https://bootstrap.saltstack.com | sh
 RUN pip install --upgrade google-auth
 ARG LOG_LEVEL
 ARG SALTENV
+ENV LOG_LEVEL=$LOG_LEVEL
+ENV SALTENV=$SALTENV
 
 ENTRYPOINT /opt/entrypoint_run.sh $SALTENV $LOG_LEVEL
