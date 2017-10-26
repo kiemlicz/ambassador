@@ -188,7 +188,7 @@ repositories:
 pkgs:
   {{ salt['grains.filter_by']({
             'somehost': {
-              'os_packages': default_pkgs.names + ["firmware-iwlwifi"]
+              'os_packages': default_pkgs.os_packages + ["firmware-iwlwifi"]
               },
             }, grain='host', merge=default_pkgs) }}
 
