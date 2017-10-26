@@ -157,7 +157,7 @@ repositories:
 
 {% set default_pkgs = salt['grains.filter_by']({
       'default': {
-         'names': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
+         'os_packages': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
                    "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync", "mc",
                    "openssh-server", "openssh-client", "openvpn",
                    "build-essential", "git", "zsh", "curl", "ethtool", "lm-sensors", "hddtemp", "hdparm", "ntp", "python-pip",
@@ -170,12 +170,12 @@ repositories:
                     'echo "command3"', 'echo "command4"', 'echo "command5"'],
       },
       'Windows': {
-         'names': ["openvpn", "git", "wireshark", "keepass-2x"]
+         'os_packages': ["openvpn", "git", "wireshark", "keepass-2x"]
        }
     },
     merge=salt['grains.filter_by']({
       'stretch': {
-        'names': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
+        'os_packages': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
                    "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync", "mc",
                    "openssh-server", "openssh-client", "openvpn",
                    "build-essential", "git", "zsh", "curl", "ethtool", "lm-sensors", "hddtemp", "hdparm", "ntp", "python-pip",
@@ -188,7 +188,7 @@ repositories:
 pkgs:
   {{ salt['grains.filter_by']({
             'somehost': {
-              'names': default_pkgs.names + ["firmware-iwlwifi"]
+              'os_packages': default_pkgs.names + ["firmware-iwlwifi"]
               },
             }, grain='host', merge=default_pkgs) }}
 
