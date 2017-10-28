@@ -1,6 +1,6 @@
 def _pkgs(env):
     assertions = {
-        'empty': ["sudo", "apt-transport-https", "man", "rsync", "git", "curl", "ntp", "zsh", "locales"],
+        'empty': ["sudo", "apt-transport-https", "man", "rsync", "git", "curl", "ntp", "zsh", "locales", "python-pip"],
         'one_user': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
                      "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync", "mc",
                      "openssh-server", "openssh-client", "openvpn",
