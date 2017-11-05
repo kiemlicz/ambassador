@@ -6,7 +6,7 @@ COPY .travis/config/minion.conf /etc/salt/minion.d/minion.conf
 COPY .travis/pillar /srv/pillar
 RUN ln -s /srv/envoy/salt /srv/salt
 RUN curl -L https://bootstrap.saltstack.com | sh
-RUN pip install --upgrade google-auth
+RUN ln -sf /dev/stdout /var/log/salt/minion
 ARG LOG_LEVEL
 ARG SALTENV
 ENV LOG_LEVEL=$LOG_LEVEL
