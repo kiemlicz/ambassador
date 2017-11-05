@@ -198,6 +198,9 @@ touch /etc/salt/autosign.conf
 chgrp foreman-proxy /etc/salt/autosign.conf
 chmod g+w /etc/salt/autosign.conf
 
+echo "enabling http resource provider"
+a2ensite 30-saltfs
+
 systemctl enable foreman foreman-proxy salt-master salt-api dnsmasq file_ext_authorize
 systemctl restart foreman foreman-proxy salt-master salt-api dnsmasq foreman-tasks file_ext_authorize
 

@@ -193,6 +193,7 @@ AMBASSADOR_GW=$(ip route get 8.8.8.8 | head -n1 | cut -d' ' -f3)
 AMBASSADOR_SALT_API_PORT=9191
 AMBASSADOR_SALT_API_INTERFACES=0.0.0.0
 AMBASSADOR_FQDN=$CONTAINER_FQDN
+
 if ! ([ -z $DEPLOY_PUB_FILE ] || [ -z $DEPLOY_PRIV_FILE ]); then
     AMBASSADOR_ENVOY_DEPLOY_PUB=$(basename $DEPLOY_PUB_FILE)
     AMBASSADOR_ENVOY_DEPLOY_PRIV=$(basename $DEPLOY_PRIV_FILE)
@@ -211,6 +212,7 @@ cp -r envoy/extensions/pillar/ $CONTAINER_ROOTFS/srv/salt_ext/
 cp -r config/bootloader/* $CONTAINER_ROOTFS/var/lib/tftpboot/
 cp -r extensions/file_ext_authorize/ $CONTAINER_ROOTFS/opt/
 cp config/file_ext_authorize.service $CONTAINER_ROOTFS/etc/systemd/system/
+cp config/apache2/* $CONTAINER_ROOTFS/etc/apache2/sites-available/
 
 #fill templates and copy to container
 if [ "$USE_ROOTS" = true ]; then
