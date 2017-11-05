@@ -1,8 +1,8 @@
-FROM ubuntu:zesty
+FROM ubuntu:artful
 RUN apt-get update && apt-get remove -y gnupg && apt-get install -y --reinstall gnupg2 && apt-get install -y curl dirmngr
 COPY envoy /srv/envoy
 COPY .travis/envoy_test.py /opt/
-COPY .travis/ubuntu-zesty/assertions.py /opt/
+COPY .travis/ubuntu-artful/assertions.py /opt/
 COPY .travis/entrypoint_dry.sh /opt/
 COPY .travis/config/minion.conf /etc/salt/minion.d/minion.conf
 COPY .travis/pillar /srv/pillar
