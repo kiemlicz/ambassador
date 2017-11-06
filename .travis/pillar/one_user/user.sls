@@ -97,9 +97,8 @@ users:
       post_cmds:
         - "fc-cache -vf ~/.fonts"
     git:
-      global_config:
-        user.name: coolnick
-        user.email: coolnick@gmail.com
+      user.name: coolnick
+      user.email: coolnick@gmail.com
     projects:
       - url: https://github.com/kiemlicz/util.git
         target: {{ home_dir }}/projects/util
