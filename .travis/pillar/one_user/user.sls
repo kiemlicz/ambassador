@@ -140,7 +140,7 @@ robomongo:
 scala:
   owner: {{ owner }}
 mongodb:
-  setup_type: docker
+  setup_type: repo
   docker:
     name: mongo-dev
   repo:
