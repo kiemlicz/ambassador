@@ -176,6 +176,7 @@ readonly CRED=$(foreman-installer \
     --foreman-proxy-foreman-base-url=https://$CID \
     --foreman-proxy-oauth-consumer-key=$OAUTH_KEY \
     --foreman-proxy-oauth-consumer-secret=$OAUTH_SECRET \
+    --enable-foreman-compute-libvirt \
     --enable-foreman-plugin-remote-execution \
     --enable-foreman-proxy-plugin-remote-execution-ssh \
     --enable-foreman-plugin-discovery \
