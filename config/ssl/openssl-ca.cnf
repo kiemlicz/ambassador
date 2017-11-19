@@ -23,7 +23,7 @@ certificate       = $dir/certs/ca.cert.pem
 crlnumber         = $dir/crlnumber
 crl               = $dir/crl/ca.crl.pem
 crl_extensions    = crl_ext
-default_crl_days  = 30
+default_crl_days  = 1000
 
 # SHA-1 is deprecated, so use SHA-2 instead.
 default_md        = sha256
