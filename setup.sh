@@ -219,14 +219,17 @@ if [ "$USE_ROOTS" = true ]; then
     #if using roots, copy envoy to container as well
     cp -r envoy/salt/ $CONTAINER_ROOTFS/srv/
     cp -r envoy/pillar/ $CONTAINER_ROOTFS/srv/
+    cp -r envoy/reactor/ $CONTAINER_ROOTFS/srv/
 
     substenv_file AMBASSADOR config/ambassador_roots.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_roots.conf
+    substenv_file AMBASSADOR config/reactor.conf > $CONTAINER_ROOTFS/etc/salt/master.d/reactor.conf
 else
     if ! ([ -z $DEPLOY_PUB_FILE ] || [ -z $DEPLOY_PRIV_FILE ]); then
         substenv_file AMBASSADOR config/ambassador_gitfs_deploykeys.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_gitfs_deploykeys.conf
     else
         substenv_file AMBASSADOR config/ambassador_gitfs.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_gitfs.conf
     fi
+    substenv_file AMBASSADOR config/reactor.conf > $CONTAINER_ROOTFS/etc/salt/master.d/reactor.conf
 fi
 substenv_file AMBASSADOR config/foreman.yaml > $CONTAINER_ROOTFS/etc/salt/foreman.yaml
 substenv_file AMBASSADOR config/salt.yml > $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/salt.yml
