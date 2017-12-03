@@ -1,0 +1,25 @@
+version: '3.4'
+services:
+  master:
+    build: .travis/debian-stretch/master
+    hostname: master
+    domainname: public.com
+    ports:
+     - "4505:4505"
+     - "4506:4506"
+    links:
+      - minion1
+      - minion2
+      - minion3
+  minion1:
+    build: .travis/debian-stretch/minion
+    hostname: minion1
+    domainname: public.com
+  minion2:
+    build: .travis/debian-stretch/minion
+    hostname: minion2
+    domainname: public.com
+  minion3:
+    build: .travis/debian-stretch/minion
+    hostname: minion3
+    domainname: public.com
