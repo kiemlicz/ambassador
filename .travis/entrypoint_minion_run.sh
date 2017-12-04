@@ -6,5 +6,4 @@ chmod 775 /sbin/runlevel
 
 service salt-minion restart
 
-echo "starting minion"
 /usr/bin/supervisord

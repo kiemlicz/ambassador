@@ -1,7 +1,12 @@
 version: '3.4'
 services:
   master:
-    build: .travis/debian-stretch/master
+    build:
+      context: .
+      dockerfile: .travis/debian-stretch/master/Dockerfile
+      args:
+        - LOG_LEVEL
+        - SALTENV
     hostname: master
     domainname: public.com
     ports:
@@ -12,14 +17,20 @@ services:
       - minion2
       - minion3
   minion1:
-    build: .travis/debian-stretch/minion
+    build:
+      context: .
+      dockerfile: .travis/debian-stretch/minion/Dockerfile
     hostname: minion1
     domainname: public.com
   minion2:
-    build: .travis/debian-stretch/minion
+    build:
+      context: .
+      dockerfile: .travis/debian-stretch/minion/Dockerfile
     hostname: minion2
     domainname: public.com
   minion3:
-    build: .travis/debian-stretch/minion
+    build:
+      context: .
+      dockerfile: .travis/debian-stretch/minion/Dockerfile
     hostname: minion3
     domainname: public.com
