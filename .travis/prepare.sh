@@ -29,6 +29,7 @@ salt-master-run)
     docker-compose --version
     docker --version
     docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. build
+#    --build-arg LOG_LEVEL="${LOG_LEVEL-info}" --build-arg SALTENV="$SALTENV"
     ;;
 ambassador-run)
     docker build --build-arg=FQDN="$TEST_FQDN" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/Dockerfile.ambassador .

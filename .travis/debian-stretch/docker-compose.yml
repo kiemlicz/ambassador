@@ -6,7 +6,7 @@ services:
       dockerfile: .travis/debian-stretch/master/Dockerfile
       args:
         - LOG_LEVEL
-        - SALTENV
+        - SALTENV=dev
     hostname: master
     domainname: public.com
     ports:

@@ -6,7 +6,7 @@ salt-masterless-dry|salt-masterless-run)
     docker run --privileged "$DOCKER_IMAGE"
     ;;
 salt-master-run)
-    docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. start
+    docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. up
     ;;
 ambassador-run)
     docker run -h $TEST_FQDN "$DOCKER_IMAGE"

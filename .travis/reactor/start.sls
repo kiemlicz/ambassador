@@ -1,5 +1,11 @@
+accept_key:
+  wheel.key.accept:
+    - args:
+      - match: {{ data['id'] }}
+
 highstate:
   local.state.highstate:
-    - tgt: *
+    - tgt: {{ data['id'] }}
     - args:
-      - saltenv: dev
+      - saltenv: base
+      # take SALTENV arg here
