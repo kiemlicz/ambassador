@@ -10,9 +10,8 @@ COPY .travis/pillar /srv/pillar
 RUN apt-get update && \
     apt-get install -y curl supervisor && \
     ln -s /srv/envoy/salt /srv/salt && \
-    ln -s /srv/envoy/extensions /srv/salt_ext && \
-    curl -L https://bootstrap.saltstack.com > /tmp/bootstrap.sh && \
-    sh /tmp/bootstrap.sh -M -N
+    ln -s /srv/envoy/extensions /srv/salt_ext
+
 
 ARG SALTENV
 ARG LOG_LEVEL
