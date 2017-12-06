@@ -6,7 +6,7 @@ salt-masterless-dry|salt-masterless-run)
     docker run --privileged "$DOCKER_IMAGE"
     ;;
 salt-master-run)
-    docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. run master minion1 minion2 minion3
+    docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. up --no-build --no-recreate
     ;;
 ambassador-run)
     docker run -h $TEST_FQDN "$DOCKER_IMAGE"

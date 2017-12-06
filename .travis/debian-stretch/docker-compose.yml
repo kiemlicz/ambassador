@@ -1,14 +1,17 @@
 version: '3.4'
 services:
   master:
+    image: salt_master
     build:
       context: .
       dockerfile: .travis/debian-stretch/master/Dockerfile
       args:
-        - LOG_LEVEL
+        - HOSTNAME=master
         - SALTENV=dev
+        - LOG_LEVEL
     hostname: master
-    domainname: public.com
+    domainname: local
+    privileged: true
     ports:
      - "4505:4505"
      - "4506:4506"
@@ -17,20 +20,26 @@ services:
       - minion2
       - minion3
   minion1:
+    image: salt_minion
     build:
       context: .
       dockerfile: .travis/debian-stretch/minion/Dockerfile
     hostname: minion1
-    domainname: public.com
+    domainname: local
+    privileged: true
   minion2:
+    image: salt_minion
     build:
       context: .
       dockerfile: .travis/debian-stretch/minion/Dockerfile
     hostname: minion2
-    domainname: public.com
+    domainname: local
+    privileged: true
   minion3:
+    image: salt_minion
     build:
       context: .
       dockerfile: .travis/debian-stretch/minion/Dockerfile
     hostname: minion3
-    domainname: public.com
+    domainname: local
+    privileged: true

@@ -6,7 +6,8 @@ COPY .travis/debian-stretch/assertions.py /opt/
 COPY .travis/entrypoint_dry.sh /opt/
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
 COPY .travis/pillar /srv/pillar
-RUN ln -s /srv/envoy/salt /srv/salt
-RUN curl -L https://bootstrap.saltstack.com | sh
+
+RUN ln -s /srv/envoy/salt /srv/salt && \
+    curl -L https://bootstrap.saltstack.com | sh
 
 ENTRYPOINT ["/opt/entrypoint_dry.sh"]

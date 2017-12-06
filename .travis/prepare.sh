@@ -28,7 +28,7 @@ salt-master-run)
     sudo mv docker-compose /usr/local/bin
     docker-compose --version
     docker --version
-    docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. build
+    docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. up --no-start
 #    --build-arg LOG_LEVEL="${LOG_LEVEL-info}" --build-arg SALTENV="$SALTENV"
     ;;
 ambassador-run)
