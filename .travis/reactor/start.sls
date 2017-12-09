@@ -8,4 +8,4 @@ highstate:
     - tgt: {{ data['id'] }}
     - args:
       - saltenv: base
-      # take SALTENV arg here
+      - pillarenv: one_user

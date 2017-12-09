@@ -1,4 +1,3 @@
-mark:
-  caller.file.touch:
-    - args:
-      - name: /tmp/foo_{{ data['jid'] }}
+#shutdown_minion:
+#  local.system.shutdown:
+#    - tgt: {{ data['id'] }}
