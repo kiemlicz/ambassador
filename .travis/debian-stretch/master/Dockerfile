@@ -6,12 +6,12 @@ COPY .travis/config/reactor_master.conf /etc/salt/master.d/reactor.conf
 COPY .travis/config/supervisord_master.conf /etc/supervisor/conf.d/supervisord.conf
 COPY .travis/reactor /srv/reactor
 COPY .travis/pillar /srv/pillar
+COPY .travis/extensions /srv/envoy/extensions
 
 RUN apt-get update && \
     apt-get install -y curl supervisor && \
     ln -s /srv/envoy/salt /srv/salt && \
     ln -s /srv/envoy/extensions /srv/salt_ext
-
 
 ARG SALTENV
 ARG LOG_LEVEL
