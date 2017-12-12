@@ -14,3 +14,6 @@ rm -rf /var/run/salt/master/master_event_pull.ipc
 service salt-master restart
 
 /usr/bin/supervisord
+
+# put master events processing logic here
+# exit with code if failure detected
