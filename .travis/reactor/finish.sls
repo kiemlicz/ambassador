@@ -1,8 +1,12 @@
 {% if data['fun'] == 'state.highstate' %}
+{% set highstates = salt.saltutil.runner("jobs.list_jobs").items()|map(attribute=1)|selectattr("Function", "equalto", "state.highstate")|list %}
+{% if highstates|length >= 3 %}
 
-detect_finish:
-  runner.travis_stop.no_jobs_running:
+finished:
+  runner.salt.cmd:
     - args:
-      - minion: {{ data['id'] }}
+      - fun: file.touch
+      - name: /tmp/hs_stop_{{ data['jid'] }}
 
+{% endif %}
 {% endif %}
