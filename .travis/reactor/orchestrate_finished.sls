@@ -1,4 +1,4 @@
-{% if data['fun'] == 'state.highstate' %}
+{% if data['fun'] == 'state.orchestrate' %}
 {% set jobs = salt.saltutil.runner("jobs.list_jobs").items()|map(attribute=1)|selectattr("Function", "equalto", "state.highstate")|list %}
 {% set completed_minions = jobs|map(attribute='Target')|unique %}
 {% if completed_minions|length >= 3 %}
