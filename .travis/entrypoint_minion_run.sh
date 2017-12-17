@@ -6,6 +6,6 @@ curl -L https://bootstrap.saltstack.com | sh
 echo -e '#!/bin/bash\necho "N 5"' > /sbin/runlevel
 chmod 775 /sbin/runlevel
 
-service salt-minion restart
+#service salt-minion restart
 
 /usr/bin/supervisord

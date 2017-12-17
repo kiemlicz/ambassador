@@ -8,12 +8,10 @@ sh /tmp/bootstrap.sh -M -N
 
 # workaround for
 # https://github.com/saltstack/salt/issues/37056
-rm -rf /var/run/salt/master/master_event_pub.ipc
-rm -rf /var/run/salt/master/master_event_pull.ipc
-
-service salt-master restart
+#rm -rf /var/run/salt/master/master_event_pub.ipc
+#rm -rf /var/run/salt/master/master_event_pull.ipc
+#service salt-master restart
 
 /usr/bin/supervisord
 
-# put master events processing logic here
-# exit with code if failure detected
+python /srv/scan_events.py /var/log/master/events
