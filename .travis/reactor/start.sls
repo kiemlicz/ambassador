@@ -1,7 +1,4 @@
-accept_key:
-  wheel.key.accept:
-    - args:
-      - match: {{ data['id'] }}
+{% if data['act'] == "accept" %}
 
 highstate:
   local.state.highstate:
@@ -9,3 +6,5 @@ highstate:
     - args:
       - saltenv: base
       - pillarenv: one_user
+
+{% endif %}
