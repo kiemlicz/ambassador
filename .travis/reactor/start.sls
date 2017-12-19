@@ -1,4 +1,4 @@
-{% if data['act'] == "accept" %}
+{% if data['id'] in ['minion1.local', 'minion2.local', 'minion3.local'] and data['act'] == "accept" %}
 
 highstate:
   local.state.highstate:
