@@ -1,14 +1,11 @@
-{% if data['type'] == 'orchestrate.finished' %}
-# no runs in jobs.list
-# fixme find a way to detect salt-run completion... if this is run so ONE ret should be present but I have multiple
-# filter out jobs.listjobs from event log
-# state.orchestrate doesn't exist - need to find a way of asserting completed runs
-# propagate dedicated event for completion of state.orchestrate, or (if) spawning salt.states - they result in jobs after all
-{% set jobs = salt.saltutil.runner("jobs.list_jobs").items()|map(attribute=1)|selectattr("Function", "equalto", "state.sls")|list %}
-{% set completed_minions = jobs|map(attribute='Target')|unique|list %}
-{% set expected_minions = ["minion1.local", "minion2.local", "minion3.local"] %}
+{% if 'fun' in data and data['fun'] == 'runner.state.orchestrate' %}
 
-{% if completed_minions|compare_lists(expected_minions)|length == 0 %}
+# assert result of ret or leave it for scanning
+# fixme salt run ret is not matched because all events 'fired by ourselves' are discarded
+# this is matched by event user which is present in run/*/ret
+# https://github.com/saltstack/salt/issues/18256 local cmd?
+# fallback to fun == state.sls from each of minions
+# use this fun name as cache's bank name
 
 stop_minion_containers:
   local.ps.pkill:
@@ -24,5 +21,4 @@ stop_master_container:
       - pattern: supervisord
       - signal: 2
 
-{% endif %}
 {% endif %}
