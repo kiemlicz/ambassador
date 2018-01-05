@@ -1,24 +1,18 @@
-{% if 'fun' in data and data['fun'] == 'runner.state.orchestrate' %}
+{% if data['fun'] == 'state.sls' %}
 
-# assert result of ret or leave it for scanning
-# fixme salt run ret is not matched because all events 'fired by ourselves' are discarded
-# this is matched by event user which is present in run/*/ret
-# https://github.com/saltstack/salt/issues/18256 local cmd?
-# fallback to fun == state.sls from each of minions
-# use this fun name as cache's bank name
+# it is impossible to attach reactor for salt/run/*/ret
+# because runner is started from reactor
+# https://github.com/saltstack/salt/issues/18256
+# that's why we check partial jobs corresponding to 'run'
 
-stop_minion_containers:
-  local.ps.pkill:
-    - tgt: '*'
+orchestrate_finished:
+  runner.guard.check:
     - args:
-      - pattern: supervisord
-      - signal: 2
-
-stop_master_container:
-  runner.salt.cmd:
-    - args:
-      - fun: ps.pkill
-      - pattern: supervisord
-      - signal: 2
+      - triggering_minion: {{ data['id'] }}
+      - expected_minions_list:
+        - minion1.local
+        - minion2.local
+        - minion3.local
+      - type: "orchestrate"
 
 {% endif %}

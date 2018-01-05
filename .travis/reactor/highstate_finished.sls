@@ -6,13 +6,13 @@
 # otherwise they get executed in random order even if it is said to be processed in single thread...
 
 highstate_finished:
-  runner.guard.check_highstate:
+  runner.guard.check:
     - args:
       - triggering_minion: {{ data['id'] }}
       - expected_minions_list:
         - minion1.local
         - minion2.local
         - minion3.local
-
+      - type: "highstate"
 
 {% endif %}
