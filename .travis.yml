@@ -43,8 +43,8 @@ env:
   - DOCKER_IMAGE=ubuntu-xenial
     TEST_FQDN=ambassadortest.com
     TEST_CASE=ambassador-run
-#  - DOCKER_IMAGE=debian-stretch
-#    TEST_CASE=salt-master-run
+  - DOCKER_IMAGE=debian-stretch
+    TEST_CASE=salt-master-run
 
 before_install:
   - .travis/prepare.sh

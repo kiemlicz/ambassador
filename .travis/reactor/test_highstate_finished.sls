@@ -6,7 +6,7 @@
 # otherwise they get executed in random order even if it is said to be processed in single thread...
 
 highstate_finished:
-  runner.guard.check:
+  runner.wait.until:
     - args:
       - triggering_minion: {{ data['id'] }}
       - expected_minions_list: {{ salt['pillar.get']("minions", pillarenv='one_user_orch') }}

@@ -6,7 +6,7 @@
 # that's why we check partial jobs corresponding to 'run'
 
 orchestrate_finished:
-  runner.guard.check:
+  runner.wait.until:
     - args:
       - triggering_minion: {{ data['id'] }}
       - expected_minions_list: {{ salt['pillar.get']("minions", pillarenv='one_user_orch') }}
