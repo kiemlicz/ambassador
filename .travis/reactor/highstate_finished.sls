@@ -9,10 +9,7 @@ highstate_finished:
   runner.guard.check:
     - args:
       - triggering_minion: {{ data['id'] }}
-      - expected_minions_list:
-        - minion1.local
-        - minion2.local
-        - minion3.local
-      - type: "highstate"
+      - expected_minions_list: {{ salt['pillar.get']("minions", pillarenv='one_user_orch') }}
+      - action_type: "highstate"
 
 {% endif %}

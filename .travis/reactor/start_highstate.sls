@@ -2,5 +2,5 @@ highstate:
   local.state.highstate:
     - tgt: {{ data['id'] }}
     - args:
-      - saltenv: base
-      - pillarenv: one_user
+      - saltenv: {{ saltenv }}
+      - pillarenv: one_user_orch

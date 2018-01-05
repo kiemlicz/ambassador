@@ -5,3 +5,4 @@ start_orchestration:
       - pillar:
           targets: {{ data['minions'] }}
       - saltenv: {{ saltenv }}
+      - pillarenv: one_user_orch
