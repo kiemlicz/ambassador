@@ -157,17 +157,9 @@ repositories:
 
 {% set default_pkgs = salt['grains.filter_by']({
       'default': {
-         'os_packages': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
-                   "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync", "mc",
-                   "openssh-server", "openssh-client", "openvpn",
-                   "build-essential", "git", "zsh", "curl", "ethtool", "lm-sensors", "hddtemp", "hdparm", "ntp", "python-pip",
-                   "silversearcher-ag", "kde-standard", "xterm", "yakuake", "print-manager", "wireshark", "network-manager-openvpn",
-                   "google-chrome-stable", "firefox", "exuberant-ctags", "tig", "libreoffice", "software-properties-common",
-		           "ca-certificates", "gnupg2"],
-         'post_install': [
-                    "echo 'wireshark-common wireshark-common/install-setuid boolean true' | debconf-set-selections",
-                    "dpkg-reconfigure -f noninteractive wireshark-common",
-                    'echo "command3"', 'echo "command4"', 'echo "command5"'],
+         'os_packages': ["aptitude", "apt-transport-https", "vim", "sudo", "man", "python-pip", "insserv",
+                   "openssh-server", "openssh-client", "build-essential", "git", "curl", "ca-certificates", "gnupg2"],
+         'post_install': ['echo "command3"', 'echo "command4"', 'echo "command5"'],
       },
       'Windows': {
          'os_packages': ["openvpn", "git", "wireshark", "keepass-2x"]
@@ -175,13 +167,8 @@ repositories:
     },
     merge=salt['grains.filter_by']({
       'stretch': {
-        'os_packages': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
-                   "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync", "mc",
-                   "openssh-server", "openssh-client", "openvpn",
-                   "build-essential", "git", "zsh", "curl", "ethtool", "lm-sensors", "hddtemp", "hdparm", "ntp", "python-pip",
-                   "silversearcher-ag", "kde-standard", "xterm", "yakuake", "print-manager", "wireshark", "network-manager-openvpn",
-                   "google-chrome-stable", "firefox-esr", "exuberant-ctags", "tig", "libreoffice", "software-properties-common",
-		           "ca-certificates", "gnupg2"],
+        'os_packages': ["aptitude", "apt-transport-https", "vim", "sudo", "man", "python-pip", "insserv",
+                   "openssh-server", "openssh-client", "build-essential", "git", "zsh", "curl", "ca-certificates", "gnupg2"],
       }
     }, grain='oscodename')) %}
 

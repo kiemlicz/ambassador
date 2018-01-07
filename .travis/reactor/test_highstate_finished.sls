@@ -12,4 +12,11 @@ highstate_finished:
       - expected_minions_list: {{ salt['pillar.get']("minions", pillarenv='one_user_orch') }}
       - action_type: "highstate"
 
+{% elif data['fun'] == 'state.highstate' %}
+
+failed:
+  runner.event.send:
+    - args:
+      - tag: 'salt/highstate/failure'
+
 {% endif %}

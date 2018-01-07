@@ -12,4 +12,11 @@ orchestrate_finished:
       - expected_minions_list: {{ salt['pillar.get']("minions", pillarenv='one_user_orch') }}
       - action_type: "orchestrate"
 
+{% elif data['fun'] == 'state.sls' %}
+
+failed:
+  runner.event.send:
+    - args:
+      - tag: 'salt/orchestrate/failure'
+
 {% endif %}

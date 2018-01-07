@@ -10,8 +10,7 @@ sh /tmp/bootstrap.sh -M -N
 # https://github.com/saltstack/salt/issues/37056
 #rm -rf /var/run/salt/master/master_event_pub.ipc
 #rm -rf /var/run/salt/master/master_event_pull.ipc
-#service salt-master restart
 
 /usr/bin/supervisord
 
-python /srv/scan_events.py /var/log/master/events
+python /opt/scan_events.py /var/log/salt/events

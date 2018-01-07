@@ -43,3 +43,6 @@ services:
     hostname: minion3
     domainname: local
     privileged: true
+
+#networks:
+#fixme inter-minion fqdn based communication
