@@ -15,10 +15,10 @@ services:
     ports:
      - "4505:4505"
      - "4506:4506"
-    links:
-      - minion1
-      - minion2
-      - minion3
+    networks:
+      local:
+        aliases:
+          - master.local
   minion1:
     image: salt_minion
     build:
@@ -27,6 +27,12 @@ services:
     hostname: minion1
     domainname: local
     privileged: true
+    depends_on:
+      - master
+    networks:
+      local:
+        aliases:
+          - minion1.local
   minion2:
     image: salt_minion
     build:
@@ -35,6 +41,12 @@ services:
     hostname: minion2
     domainname: local
     privileged: true
+    depends_on:
+      - master
+    networks:
+      local:
+        aliases:
+          - minion2.local
   minion3:
     image: salt_minion
     build:
@@ -43,6 +55,13 @@ services:
     hostname: minion3
     domainname: local
     privileged: true
+    depends_on:
+      - master
+    networks:
+      local:
+        aliases:
+          - minion3.local
 
-#networks:
-#fixme inter-minion fqdn based communication
+networks:
+  local:
+    driver: bridge
