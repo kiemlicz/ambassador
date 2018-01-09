@@ -43,3 +43,5 @@ runs_ok = _validate_runs(runs)
 
 if not jobs_ok or not runs_ok:
     sys.exit(3)
+else:
+    print("Event count: {}".format(len(all_events)))
