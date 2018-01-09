@@ -145,3 +145,6 @@ mongodb:
     name: mongo-dev
   repo:
   settings:
+redis:
+  install_type: repo
+  setup_type: cluster
