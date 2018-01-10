@@ -176,12 +176,14 @@ fi
 
 . util/core/text_functions
 
+# prepare directories
 mkdir -p $CONTAINER_ROOTFS/etc/salt/deploykeys/
 mkdir -p $CONTAINER_ROOTFS/etc/salt/master.d/
 mkdir -p $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/
 mkdir -p $CONTAINER_ROOTFS/etc/dnsmasq.d/
 mkdir -p $CONTAINER_ROOTFS/srv/salt_ext/
 mkdir -p $CONTAINER_ROOTFS/var/lib/tftpboot/
+mkdir -p $CONTAINER_ROOTFS/etc/apache2/sites-available/
 
 AMBASSADOR_CA=$CONTAINER_CERT_DIR/$(basename $CA_CERT_FILE)
 AMBASSADOR_CRL=$CONTAINER_CERT_BASE/$(basename $CRL_FILE)

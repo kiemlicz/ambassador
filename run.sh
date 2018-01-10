@@ -30,10 +30,10 @@ assert_env "PROXY_KEY is not set" $PROXY_KEY
 assert_env "CERT_BASEDIR is not set" $CERT_BASEDIR
 
 #edit versions
-readonly FOREMAN_XENIAL_REPO_URL="deb http://deb.theforeman.org/ xenial 1.15"
-readonly FOREMAN_XENIAL_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.15"
+readonly FOREMAN_XENIAL_REPO_URL="deb http://deb.theforeman.org/ xenial 1.16"
+readonly FOREMAN_XENIAL_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.16"
 readonly FOREMAN_XENIAL_REPO_KEY="https://deb.theforeman.org/pubkey.gpg"
-readonly PUPPET_SERVER_PKG="puppetlabs-release-pc1-yakkety.deb"
+readonly PUPPET_SERVER_PKG="puppet5-release-xenial.deb"
 readonly FOREMAN_PUPPET_SERVER_URL="https://apt.puppetlabs.com/$PUPPET_SERVER_PKG"
 readonly SALTSTACK_XENIAL_REPO_URL="deb http://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest xenial main"
 readonly SALTSTACK_XENIAL_REPO_KEY_URL="https://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest/SALTSTACK-GPG-KEY.pub"
@@ -177,14 +177,17 @@ readonly CRED=$(foreman-installer \
     --foreman-proxy-oauth-consumer-key=$OAUTH_KEY \
     --foreman-proxy-oauth-consumer-secret=$OAUTH_SECRET \
     --enable-foreman-compute-libvirt \
-    --enable-foreman-plugin-remote-execution \
-    --enable-foreman-proxy-plugin-remote-execution-ssh \
     --enable-foreman-plugin-discovery \
     --enable-foreman-proxy-plugin-discovery \
     --enable-foreman-plugin-salt \
     --enable-foreman-proxy-plugin-salt \
     --foreman-proxy-plugin-salt-api=true \
     --foreman-proxy-plugin-salt-api-url=https://$CID:9191 | sed -n 's/.*Initial credentials are \([[:alpha:]]*\) \/ \([[:alnum:]]*\)/\1:\2/p')
+
+#this plugin causes a lot of problems, disabled temporarily
+#foreman-installer \
+#    --enable-foreman-plugin-remote-execution \
+#    --enable-foreman-proxy-plugin-remote-execution-ssh
 
 readonly FOREMAN_GUI_USER=$(echo "$CRED" | cut -d: -f1)
 readonly FOREMAN_GUI_PASSWORD=$(echo "$CRED" | cut -d: -f2)
