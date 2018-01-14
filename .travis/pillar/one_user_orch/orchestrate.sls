@@ -4,7 +4,7 @@ minions:
   - minion3.local
 
 redis:
-  master_bind_list:
+  masters:
     - host_id: minion1.local
       host: minion1.local
       port: 6379
@@ -14,7 +14,7 @@ redis:
     - host_id: minion3.local
       host: minion3.local
       port: 6379
-  slave_bind_list:
+  slaves:
     - host_id: minion1.local
       master_host: minion2.local
       master_port: 6379
