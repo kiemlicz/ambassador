@@ -38,6 +38,10 @@ mongodb:
       replica_name: "testing"
       host: minion1.local
       port: 28018
+    - host_id: minion1.local
+      replica_name: "testing"
+      host: minion1.local
+      port: 28019
     - host_id: minion2.local
       replica_name: "testing"
       host: minion2.local

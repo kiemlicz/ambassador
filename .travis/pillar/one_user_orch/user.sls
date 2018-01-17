@@ -130,7 +130,7 @@ scala:
   owner: {{ owner }}
 mongodb:
   setup_type: cluster
-  install_type: repo
+  install_type: docker
 redis:
   install_type: repo
   setup_type: single
