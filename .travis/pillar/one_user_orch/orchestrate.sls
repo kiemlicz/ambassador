@@ -35,6 +35,7 @@ mongodb:
   shards: []
   replicas:
     - host_id: minion1.local
+      init: True
       replica_name: "testing"
       host: minion1.local
       port: 28018

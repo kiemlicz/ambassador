@@ -3,6 +3,7 @@ start_orchestration:
     - args:
       - mods:
         - redis.server.cluster._orchestrate.orch
+        - mongodb.server.cluster._orchestrate.orch
       - pillar:
           targets: {{ data['minions'] }}
       - saltenv: {{ salt['environ.get']("SALTENV") }}
