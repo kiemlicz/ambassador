@@ -6,7 +6,16 @@
 # -n container name
 # --client_id and --client_secret are google developer's console generated credentials
 
-set -e
+tear_down_container() {
+    local rv=$?
+    if [ $rv -ne 0 ]; then
+        echo "Fatal error, destroying container $CONTAINER_NAME"
+        lxc-stop -n $CONTAINER_NAME
+        lxc-destroy -n $CONTAINER_NAME
+    fi
+    exit $rv
+}
+trap tear_down_container EXIT TERM INT
 
 while [[ $# -gt 0 ]]; do
     arg="$1"
@@ -84,7 +93,8 @@ all_containers_array=($(lxc-ls))
 for container_name in "${all_containers_array[@]}"; do
     if [[ $container_name == $CONTAINER_NAME ]]; then
         echo "container with name: $CONTAINER_NAME already exists, exiting"
-        exit 1
+        # exit 0 as non 0 will destroy container
+        exit 0
     fi
 done
 
