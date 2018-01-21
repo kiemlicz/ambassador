@@ -6,6 +6,8 @@
 # -n container name
 # --client_id and --client_secret are google developer's console generated credentials
 
+set -e
+
 while [[ $# -gt 0 ]]; do
     arg="$1"
     case $arg in
