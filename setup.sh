@@ -84,8 +84,8 @@ readonly CONTAINER_CERT_BASE=/etc/foreman/ssl
 readonly CONTAINER_CERT_DIR=$CONTAINER_CERT_BASE/certs
 readonly CONTAINER_PRIVATE_DIR=$CONTAINER_CERT_BASE/private
 readonly CONTAINER_USERNAME=ubuntu #don't use root here
-readonly CONTAINER_OS=ubuntu
-readonly CONTAINER_OS_MAJOR=yakkety
+readonly CONTAINER_OS=debian
+readonly CONTAINER_OS_MAJOR=stretch
 
 ##### validate
 #expand to bash array for easier validation

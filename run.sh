@@ -35,18 +35,28 @@ assert_env "CERT_BASEDIR is not set" $CERT_BASEDIR
 readonly FOREMAN_XENIAL_REPO_URL="deb http://deb.theforeman.org/ xenial 1.16"
 readonly FOREMAN_XENIAL_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.16"
 readonly FOREMAN_XENIAL_REPO_KEY="https://deb.theforeman.org/pubkey.gpg"
-readonly PUPPET_SERVER_PKG="puppet5-release-xenial.deb"
-readonly FOREMAN_PUPPET_SERVER_URL="https://apt.puppetlabs.com/$PUPPET_SERVER_PKG"
+readonly FOREMAN_STRETCH_REPO_URL="deb http://deb.theforeman.org/ stretch 1.16"
+readonly FOREMAN_STRETCH_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.16"
+readonly FOREMAN_STRETCH_REPO_KEY="https://deb.theforeman.org/pubkey.gpg"
+
+readonly PUPPET_XENIAL_SERVER_PKG="puppet5-release-xenial.deb"
+readonly PUPPET_STRETCH_SERVER_PKG="puppet5-release-stretch.deb"
+
+readonly FOREMAN_PUPPET_SERVER_URL="https://apt.puppetlabs.com"
 readonly SALTSTACK_XENIAL_REPO_URL="deb http://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest xenial main"
 readonly SALTSTACK_XENIAL_REPO_KEY_URL="https://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest/SALTSTACK-GPG-KEY.pub"
 
+readonly SALTSTACK_STRETCH_REPO_URL="deb http://repo.saltstack.com/apt/debian/9/amd64/latest stretch main"
+readonly SALTSTACK_STRETCH_REPO_KEY_URL="https://repo.saltstack.com/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub"
+
 #don't edit these
-readonly FOREMAN_PUPPET_SERVER=$FOREMAN_PUPPET_SERVER_URL
-readonly FOREMAN_REPO_ENTRY=$FOREMAN_XENIAL_REPO_URL
-readonly FOREMAN_PLUGINS_REPO_ENTRY=$FOREMAN_XENIAL_PLUGINS_REPO_URL
-readonly FOREMAN_REPO_KEY=$FOREMAN_XENIAL_REPO_KEY
-readonly SALTSTACK_REPO_ENTRY=$SALTSTACK_XENIAL_REPO_URL
-readonly SALTSTACK_REPO_KEY=$SALTSTACK_XENIAL_REPO_KEY_URL
+readonly PUPPET_SERVER_PKG=$PUPPET_STRETCH_SERVER_PKG
+readonly FOREMAN_PUPPET_SERVER=$FOREMAN_PUPPET_SERVER_URL/$PUPPET_SERVER_PKG
+readonly FOREMAN_REPO_ENTRY=$FOREMAN_STRETCH_REPO_URL
+readonly FOREMAN_PLUGINS_REPO_ENTRY=$FOREMAN_STRETCH_PLUGINS_REPO_URL
+readonly FOREMAN_REPO_KEY=$FOREMAN_STRETCH_REPO_KEY
+readonly SALTSTACK_REPO_ENTRY=$SALTSTACK_STRETCH_REPO_URL
+readonly SALTSTACK_REPO_KEY=$SALTSTACK_STRETCH_REPO_KEY_URL
 
 apt-get update
 apt-get upgrade -y -o DPkg::Options::=--force-confold
