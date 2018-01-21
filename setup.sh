@@ -86,6 +86,7 @@ readonly CONTAINER_PRIVATE_DIR=$CONTAINER_CERT_BASE/private
 readonly CONTAINER_USERNAME=ubuntu #don't use root here
 readonly CONTAINER_OS=debian
 readonly CONTAINER_OS_MAJOR=stretch
+#fixme - resolve ssh root login and sudo issues (no sudo actually)
 
 ##### validate
 #expand to bash array for easier validation
