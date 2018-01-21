@@ -10,3 +10,4 @@ start_orchestration:
       - pillarenv: one_user_orch
 
 #salt-run state.orchestrate redis.server.cluster._orchestrate.orch pillar='{"targets": ["minion1.local", "minion2.local", "minion3.local"]}' saltenv=dev pillarenv=one_user_orch
+#salt-run state.orchestrate mongodb.server.cluster._orchestrate.orch saltenv=dev pillarenv=one_user_orch
