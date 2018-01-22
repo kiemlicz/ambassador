@@ -60,7 +60,7 @@ readonly SALTSTACK_REPO_KEY=$SALTSTACK_STRETCH_REPO_KEY_URL
 
 apt-get update
 apt-get upgrade -y -o DPkg::Options::=--force-confold
-apt-get install -y ca-certificates wget host curl
+apt-get install -y ca-certificates wget host curl gnupg2 sudo
 
 wget -P /tmp/ $FOREMAN_PUPPET_SERVER && dpkg -i /tmp/$PUPPET_SERVER_PKG
 retval=$?
@@ -89,7 +89,7 @@ pip install --upgrade pip
 if [ $(python -c "import pygit2; print(bool(pygit2.features & pygit2.GIT_FEATURE_HTTPS))") == "False" ]; then
     echo "detected improper version of pygit2, fixing..."
     apt-get purge -y python-pygit2 libgit2-24 python-cffi
-    yes |  pip uninstall cffi
+    pip uninstall -y cffi || true # pip uninstall for not installed package will fail the build due to `set -e`
     apt-get install -y pkg-config libcurl3-dev libssh2-1-dev build-essential cmake libssl-dev libffi-dev
     libgit_ver=0.26.0
     pushd /tmp

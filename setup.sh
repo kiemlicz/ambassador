@@ -83,10 +83,10 @@ readonly CONTAINER_NAME=${CN-ambassador}
 readonly CONTAINER_CERT_BASE=/etc/foreman/ssl
 readonly CONTAINER_CERT_DIR=$CONTAINER_CERT_BASE/certs
 readonly CONTAINER_PRIVATE_DIR=$CONTAINER_CERT_BASE/private
-readonly CONTAINER_USERNAME=ubuntu #don't use root here
+readonly CONTAINER_USERNAME=root
+readonly CONTAINER_USER_HOME=/root # /home/$CONTAINER_USERNAME
 readonly CONTAINER_OS=debian
 readonly CONTAINER_OS_MAJOR=stretch
-#fixme - resolve ssh root login and sudo issues (no sudo actually)
 
 ##### validate
 #expand to bash array for easier validation
@@ -131,21 +131,24 @@ if [ $retval -ne 0 ]; then
     exit 1
 fi
 
-chroot $CONTAINER_ROOTFS sh -c "echo 'ubuntu ALL=NOPASSWD:ALL' > /etc/sudoers.d/ubuntu; chmod 440 /etc/sudoers.d/ubuntu"
+if [ "$CONTAINER_USERNAME" != "root" ]; then
+    chroot $CONTAINER_ROOTFS sh -c "echo 'ubuntu ALL=NOPASSWD:ALL' > /etc/sudoers.d/ubuntu; chmod 440 /etc/sudoers.d/ubuntu"
+    echo "passwordless sudo enabled for ubuntu user"
+fi
+
 #todo how to achieve passwordless sudo -u postgres, below doesn't work
 #chroot $CONTAINER_ROOTFS sh -c "echo 'postgres ALL=NOPASSWD:ALL' > /etc/sudoers.d/postgres; chmod 440 /etc/sudoers.d/postgres"
 chroot $CONTAINER_ROOTFS sh -c \
     "echo 'Cmnd_Alias SALT = /usr/bin/salt, /usr/bin/salt-key\nforeman-proxy ALL = NOPASSWD: SALT\nDefaults:foreman-proxy !requiretty' > /etc/sudoers.d/salt; chmod 440 /etc/sudoers.d/salt"
-echo "passwordless sudo enabled for ubuntu user"
 
 # remove accepting locale on server so that no locale generation is needed
 chroot $CONTAINER_ROOTFS sh -c "sed -i -e 's/\(^AcceptEnv LANG.*\)/#\1/g' /etc/ssh/sshd_config"
 chroot $CONTAINER_ROOTFS sh -c "sed -i '/^127.0.1.1 /s/$CONTAINER_NAME/$CONTAINER_FQDN $CONTAINER_NAME/' /etc/hosts"
 #configure resolvconf utility so that proper nameserver exists, otherwise only 127.0.0.1 may appear
 chroot $CONTAINER_ROOTFS sh -c "echo 'TRUNCATE_NAMESERVER_LIST_AFTER_LOOPBACK_ADDRESS=no' > /etc/default/resolvconf"
-chroot $CONTAINER_ROOTFS sh -c "mkdir /home/$CONTAINER_USERNAME/.ssh/"
-cat ~/.ssh/id_rsa.pub >> $CONTAINER_ROOTFS/home/$CONTAINER_USERNAME/.ssh/authorized_keys
-chroot $CONTAINER_ROOTFS sh -c "chown $CONTAINER_USERNAME.$CONTAINER_USERNAME /home/$CONTAINER_USERNAME/.ssh/authorized_keys; chmod 600 /home/$CONTAINER_USERNAME/.ssh/authorized_keys"
+chroot $CONTAINER_ROOTFS sh -c "mkdir $CONTAINER_USER_HOME/.ssh/"
+cat ~/.ssh/id_rsa.pub >> $CONTAINER_ROOTFS/$CONTAINER_USER_HOME/.ssh/authorized_keys
+chroot $CONTAINER_ROOTFS sh -c "chown $CONTAINER_USERNAME.$CONTAINER_USERNAME $CONTAINER_USER_HOME/.ssh/authorized_keys; chmod 600 $CONTAINER_USER_HOME/.ssh/authorized_keys"
 
 if [ "$AUTO_CERT_GENERATION" = true ]; then
     . util/sec/cert_functions
@@ -269,11 +272,16 @@ if [ -z "$CONTAINER_IP" ]; then
 fi
 #this node (running setup.sh script) doesn't add ambassador to known hosts
 #as doing so will cause repeating "Host Verification Failed"
+if [ "$CONTAINER_USERNAME" = "root" ]; then
+    ENTRY_CMD='bash -s'
+else
+    ENTRY_CMD='sudo -E bash -s'
+fi
 echo "running 'run' script inside container (IP = $CONTAINER_IP, DOMAIN=$CONTAINER_FQDN)"
-ssh ubuntu@$CONTAINER_IP -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" \
+ssh $CONTAINER_USERNAME@$CONTAINER_IP -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" \
 CIP=$CONTAINER_IP CID=$CONTAINER_FQDN CERT_BASEDIR=$CONTAINER_CERT_BASE CA=$AMBASSADOR_CA CRL=$AMBASSADOR_CRL KEY=$AMBASSADOR_KEY CERT=$AMBASSADOR_CERT \
 PROXY_KEY=$AMBASSADOR_KEY PROXY_CERT=$AMBASSADOR_CERT \
-'sudo -E bash -s' < ./run.sh > $CONTAINER_NAME.log 2>&1 &
+$ENTRY_CMD < ./run.sh > $CONTAINER_NAME.log 2>&1 &
 echo "script running in background, waiting for: $!"
 wait $!
 retval=$?
