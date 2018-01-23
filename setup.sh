@@ -230,7 +230,8 @@ cp -r envoy/extensions/pillar/ $CONTAINER_ROOTFS/srv/salt_ext/
 cp -r config/bootloader/* $CONTAINER_ROOTFS/var/lib/tftpboot/
 cp -r extensions/file_ext_authorize/ $CONTAINER_ROOTFS/opt/
 cp config/file_ext_authorize.service $CONTAINER_ROOTFS/etc/systemd/system/
-cp config/apache2/* $CONTAINER_ROOTFS/etc/apache2/sites-available/
+#apache2 during installation removes contents of /etc/apache2/sites-available/, storing in tmp
+cp config/apache2/* $CONTAINER_ROOTFS/var/tmp/
 
 #fill templates and copy to container
 if [ "$USE_ROOTS" = true ]; then

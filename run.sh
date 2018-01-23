@@ -215,6 +215,7 @@ chgrp foreman-proxy /etc/salt/autosign.conf
 chmod g+w /etc/salt/autosign.conf
 
 echo "enabling http resource provider"
+mv /var/tmp/30-saltfs.conf /etc/apache2/sites-available/
 a2ensite 30-saltfs
 
 systemctl enable foreman foreman-proxy salt-master salt-api dnsmasq file_ext_authorize
