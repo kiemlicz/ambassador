@@ -25,7 +25,7 @@ iface lo inet loopback
 allow-hotplug $real
 iface $real inet manual
 
-allow-hotplug br0
+auto br0
 iface br0 inet <%= dhcp ? 'dhcp' : 'static' %>
 <% unless dhcp -%>
     address <%= @host.ip %>
