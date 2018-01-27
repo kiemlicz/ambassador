@@ -1,4 +1,3 @@
-import assertions
 import os
 import salt.client
 import traceback
@@ -60,26 +59,6 @@ class AmbassadorTest(ParametrizedTestCase):
         except CommandExecutionError:
             traceback.print_exc()
             self.fail("Unexpected error, failing...")
-
-    def test_pkgs(self):
-        caller = self._get_client()
-        result_dict = caller.cmd("state.show_sls", "pkgs", saltenv=self.saltenv, pillarenv=self.pillarenv)
-        l = result_dict['pkgs']['pkg']
-        #find pkgs in list of dicts and flatten
-        pkgs = [item for sublist in (e['pkgs'] for e in l if 'pkgs' in e) for item in sublist]
-        self.assertTrue(isinstance(pkgs, list))
-        self.assertTrue(assertions.assert_pkgs(pkgs, self.pillarenv),
-                        msg="pkgs state contains improper packages list (saltenv: {}, pillarenv: {}), packages:{}".format(
-                            self.saltenv, self.pillarenv, pkgs))
-        if self.pillarenv == "empty":
-            cmds = []
-        else:
-            c = result_dict['pkgs']['cmd']
-            #find commands in list of dicts and flatten
-            cmds = [item for sublist in (e['names'] for e in c if 'names' in e) for item in sublist]
-        self.assertTrue(assertions.assert_cmds(cmds, self.pillarenv),
-                        msg="pkgs state contains improper post_cmds list (saltenv: {}, pillarenv: {}), cmds: {}".format(
-                            self.saltenv, self.pillarenv, cmds))
 
 
 if __name__ == "__main__":
