@@ -7,7 +7,7 @@ if [ -z "$DOCKER_IMAGE" ]; then
 fi
 
 docker_compose_update() {
-    local docker_compose_version=1.17.1
+    local docker_compose_version=1.18.0
 
     docker-compose --version
     sudo rm /usr/local/bin/docker-compose
