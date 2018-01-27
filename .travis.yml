@@ -34,10 +34,6 @@ env:
     SALTENV=dev
   - DOCKER_IMAGE=ubuntu-xenial
     TEST_CASE=salt-masterless-dry
-  - DOCKER_IMAGE=ubuntu-yakkety
-    TEST_CASE=salt-masterless-dry
-  - DOCKER_IMAGE=ubuntu-zesty
-    TEST_CASE=salt-masterless-dry
   - DOCKER_IMAGE=ubuntu-artful
     TEST_CASE=salt-masterless-dry
   - DOCKER_IMAGE=debian-stretch
