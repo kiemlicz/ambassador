@@ -8,6 +8,7 @@ services:
       args:
         - HOSTNAME=master
         - SALTENV=dev
+        - SALT_VER="2017.7.1"
         - LOG_LEVEL
     hostname: master
     domainname: local
@@ -24,6 +25,8 @@ services:
     build:
       context: .
       dockerfile: .travis/debian-stretch/minion/Dockerfile
+      args:
+        - SALT_VER="2017.7.1"
     hostname: minion1
     domainname: local
     privileged: true
@@ -38,6 +41,8 @@ services:
     build:
       context: .
       dockerfile: .travis/debian-stretch/minion/Dockerfile
+      args:
+        - SALT_VER="2017.7.1"
     hostname: minion2
     domainname: local
     privileged: true
@@ -52,6 +57,8 @@ services:
     build:
       context: .
       dockerfile: .travis/debian-stretch/minion/Dockerfile
+      args:
+        - SALT_VER="2017.7.1"
     hostname: minion3
     domainname: local
     privileged: true

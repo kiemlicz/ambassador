@@ -1,4 +1,10 @@
 FROM debian:stretch
+
+ARG SALTENV
+ARG LOG_LEVEL
+# "" == latest
+ARG SALT_VER=""
+
 COPY envoy /srv/envoy
 COPY .travis/entrypoint_master_run.sh /opt/
 COPY .travis/scan_events.py /opt/
@@ -15,11 +21,10 @@ RUN apt-get update && \
 
 COPY .travis/reactor /srv/reactor
 
-ARG SALTENV
-ARG LOG_LEVEL
+EXPOSE 4505:4505 4506:4506
+
 ENV LOG_LEVEL=$LOG_LEVEL
 ENV SALTENV=$SALTENV
 
-EXPOSE 4505:4505 4506:4506
-
 ENTRYPOINT ["/opt/entrypoint_master_run.sh"]
+CMD [ "$SALT_VER" ]

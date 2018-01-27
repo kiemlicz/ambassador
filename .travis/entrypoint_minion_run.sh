@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-curl -L https://bootstrap.saltstack.com | sh
+curl -o /tmp/bootstrap.sh -L https://bootstrap.saltstack.com
+sh /tmp/bootstrap.sh stable ${1-""}
 
 # workaround for salt's service state
 echo -e '#!/bin/bash\necho "N 5"' > /sbin/runlevel
