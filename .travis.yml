@@ -40,7 +40,7 @@ env:
     TEST_CASE=salt-masterless-dry
   - DOCKER_IMAGE=ubuntu-artful
     TEST_CASE=salt-masterless-dry
-  - DOCKER_IMAGE=ubuntu-xenial
+  - DOCKER_IMAGE=debian-stretch
     TEST_FQDN=ambassadortest.com
     TEST_CASE=ambassador-run
   - DOCKER_IMAGE=debian-stretch

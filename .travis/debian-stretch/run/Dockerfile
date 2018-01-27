@@ -1,4 +1,5 @@
-FROM ubuntu:xenial
+FROM debian:stretch
+
 COPY .travis/config/ssl/*.key /etc/ssl/private/
 COPY .travis/config/ssl/*.cert /etc/ssl/certs/
 COPY .travis/config/ssl/crl.pem /etc/ssl/
@@ -9,7 +10,9 @@ COPY config/file_ext_authorize.service /etc/systemd/system/
 COPY .travis/config/file_ext_authorize.conf /opt/file_ext_authorize/
 COPY extensions/file_ext_authorize/* /opt/file_ext_authorize/
 COPY run.sh /opt/
+
 ARG FQDN
+
 ENV CID=$FQDN
 ENV CIP="192.168.1.7"
 ENV CRL="/etc/ssl/crl.pem"
@@ -23,4 +26,5 @@ RUN apt-get clean && apt-get update && apt-get install -y locales && locale-gen 
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
+
 ENTRYPOINT ["/opt/run.sh"]

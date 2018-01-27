@@ -32,19 +32,13 @@ assert_env "PROXY_KEY is not set" $PROXY_KEY
 assert_env "CERT_BASEDIR is not set" $CERT_BASEDIR
 
 #edit versions
-readonly FOREMAN_XENIAL_REPO_URL="deb http://deb.theforeman.org/ xenial 1.16"
-readonly FOREMAN_XENIAL_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.16"
-readonly FOREMAN_XENIAL_REPO_KEY="https://deb.theforeman.org/pubkey.gpg"
 readonly FOREMAN_STRETCH_REPO_URL="deb http://deb.theforeman.org/ stretch 1.16"
 readonly FOREMAN_STRETCH_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.16"
 readonly FOREMAN_STRETCH_REPO_KEY="https://deb.theforeman.org/pubkey.gpg"
 
-readonly PUPPET_XENIAL_SERVER_PKG="puppet5-release-xenial.deb"
 readonly PUPPET_STRETCH_SERVER_PKG="puppet5-release-stretch.deb"
 
 readonly FOREMAN_PUPPET_SERVER_URL="https://apt.puppetlabs.com"
-readonly SALTSTACK_XENIAL_REPO_URL="deb http://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest xenial main"
-readonly SALTSTACK_XENIAL_REPO_KEY_URL="https://repo.saltstack.com/apt/ubuntu/16.04/amd64/latest/SALTSTACK-GPG-KEY.pub"
 
 readonly SALTSTACK_STRETCH_REPO_URL="deb http://repo.saltstack.com/apt/debian/9/amd64/latest stretch main"
 readonly SALTSTACK_STRETCH_REPO_KEY_URL="https://repo.saltstack.com/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub"
