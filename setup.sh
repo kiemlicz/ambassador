@@ -230,8 +230,6 @@ cp -r envoy/extensions/pillar/ $CONTAINER_ROOTFS/srv/salt_ext/
 cp -r config/bootloader/* $CONTAINER_ROOTFS/var/lib/tftpboot/
 cp -r extensions/file_ext_authorize/ $CONTAINER_ROOTFS/opt/
 cp config/file_ext_authorize.service $CONTAINER_ROOTFS/etc/systemd/system/
-#apache2 during installation removes contents of /etc/apache2/sites-available/, storing in tmp
-cp config/apache2/* $CONTAINER_ROOTFS/var/tmp/
 
 #fill templates and copy to container
 if [ "$USE_ROOTS" = true ]; then
@@ -254,6 +252,8 @@ substenv_file AMBASSADOR config/foreman.yaml > $CONTAINER_ROOTFS/etc/salt/forema
 substenv_file AMBASSADOR config/salt.yml > $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/salt.yml
 substenv_file AMBASSADOR config/proxydhcp.conf > $CONTAINER_ROOTFS/etc/dnsmasq.d/proxydhcp.conf
 substenv_file AMBASSADOR config/file_ext_authorize.conf > $CONTAINER_ROOTFS/opt/file_ext_authorize/file_ext_authorize.conf
+#apache2 during installation removes contents of /etc/apache2/sites-available/, storing in tmp
+substenv_file AMBASSADOR config/apache2/30-saltfs.conf > $CONTAINER_ROOTFS/var/tmp/30-saltfs.conf
 
 #todo use /etc/ssl dir? ubuntu user add to ssl-cert group ?
 #run container

@@ -214,8 +214,17 @@ echo "enabling http resource provider"
 mv /var/tmp/30-saltfs.conf /etc/apache2/sites-available/
 a2ensite 30-saltfs
 
-systemctl enable foreman foreman-proxy salt-master salt-api dnsmasq file_ext_authorize
-systemctl restart foreman foreman-proxy salt-master salt-api dnsmasq foreman-tasks file_ext_authorize
+if [ -f /.dockerenv ]; then
+    # there is no systemd inside of docker containers, somehow service command works
+    service foreman restart
+    service foreman-proxy restart
+    service salt-master restart
+    service salt-api restart
+    service dnsmasq restart
+else
+    systemctl enable foreman foreman-proxy salt-master salt-api dnsmasq file_ext_authorize
+    systemctl restart foreman foreman-proxy salt-master salt-api dnsmasq foreman-tasks file_ext_authorize
+fi
 
 echo "User: $FOREMAN_GUI_USER"
 echo "Password: $FOREMAN_GUI_PASSWORD"
