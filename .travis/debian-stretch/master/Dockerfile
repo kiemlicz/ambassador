@@ -1,9 +1,9 @@
 FROM debian:stretch
 
-ARG SALTENV
-ARG LOG_LEVEL
+ARG saltenv
+ARG log_level
 # "" == latest
-ARG SALT_VER=""
+ARG salt_ver=""
 
 COPY envoy /srv/envoy
 COPY .travis/entrypoint_master_run.sh /opt/
@@ -14,7 +14,7 @@ COPY .travis/config/supervisord_master.conf /etc/supervisor/conf.d/supervisord.c
 COPY .travis/pillar /srv/pillar
 
 RUN apt-get update && \
-    apt-get install -y curl supervisor && \
+    apt-get install -y curl supervisor procps && \
     ln -s /srv/envoy/salt /srv/salt && \
     ln -s /srv/envoy/extensions /srv/salt_ext && \
     ln -s /srv/envoy/reactor /srv/reactor
@@ -23,8 +23,7 @@ COPY .travis/reactor /srv/reactor
 
 EXPOSE 4505:4505 4506:4506
 
-ENV LOG_LEVEL=$LOG_LEVEL
-ENV SALTENV=$SALTENV
-
-ENTRYPOINT ["/opt/entrypoint_master_run.sh"]
-CMD [ "$SALT_VER" ]
+ENV LOG_LEVEL=$log_level
+ENV SALTENV=$saltenv
+ENTRYPOINT [ "/opt/entrypoint_master_run.sh" ]
+CMD [ "$salt_ver" ]

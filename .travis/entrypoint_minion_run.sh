@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+echo "Installing salt-minion, version: $@"
+
 curl -o /tmp/bootstrap.sh -L https://bootstrap.saltstack.com
 sh /tmp/bootstrap.sh stable ${1-""}
 

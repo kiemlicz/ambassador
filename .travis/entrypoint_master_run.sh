@@ -3,6 +3,8 @@
 # use reactor to accept and start highstate on connected minions
 # wait for finish on master then invoke state.orchestrate
 
+echo "Installing salt-master, args: $@"
+
 curl -o /tmp/bootstrap.sh -L https://bootstrap.saltstack.com
 sh /tmp/bootstrap.sh -M -N stable ${1-""}
 
