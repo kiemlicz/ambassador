@@ -2,7 +2,13 @@
 
 accept_key:
   wheel.key.accept:
-    - args:
-      - match: {{ data['id'] }}
+    - kwarg:
+        match: {{ data['id'] }}
+
+#from 2017.7.2, use:
+#accept_key:
+#  wheel.key.accept:
+#    - args:
+#      - match: {{ data['id'] }}
 
 {% endif %}
