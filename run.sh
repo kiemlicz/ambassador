@@ -41,8 +41,8 @@ readonly PUPPET_STRETCH_SERVER_PKG="puppet5-release-stretch.deb"
 readonly FOREMAN_PUPPET_SERVER_URL="https://apt.puppetlabs.com"
 
 #due to https://github.com/saltstack/salt/issues/44013 2017.7.2 must be omitted
-readonly SALTSTACK_STRETCH_REPO_URL="deb http://repo.saltstack.com/apt/debian/9/amd64/archive/2017.7.1 stretch main"
-readonly SALTSTACK_STRETCH_REPO_KEY_URL="https://repo.saltstack.com/apt/debian/9/amd64/archive/2017.7.1/SALTSTACK-GPG-KEY.pub"
+readonly SALTSTACK_STRETCH_REPO_URL="deb http://repo.saltstack.com/apt/debian/9/amd64/latest stretch main"
+readonly SALTSTACK_STRETCH_REPO_KEY_URL="https://repo.saltstack.com/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub"
 
 #don't edit these
 readonly PUPPET_SERVER_PKG=$PUPPET_STRETCH_SERVER_PKG

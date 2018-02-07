@@ -6,7 +6,7 @@
 echo "Installing salt-master, args: $@"
 
 curl -o /tmp/bootstrap.sh -L https://bootstrap.saltstack.com
-sh /tmp/bootstrap.sh -M -N stable ${1-""}
+sh /tmp/bootstrap.sh -n -M -N stable ${1-""}
 
 # workaround for
 # https://github.com/saltstack/salt/issues/37056

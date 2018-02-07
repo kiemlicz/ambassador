@@ -12,6 +12,6 @@ COPY .travis/pillar /srv/pillar
 RUN apt-get update && apt-get install -y curl && \
     ln -s /srv/envoy/salt /srv/salt && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
-    sh /tmp/bootstrap-salt.sh stable $SALT_VER
+    sh /tmp/bootstrap-salt.sh -n stable $SALT_VER
 
 ENTRYPOINT ["/opt/entrypoint_dry.sh"]
