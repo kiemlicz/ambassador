@@ -7,24 +7,16 @@
 
 orchestrate_finished:
   runner.wait.until:
-    - kwarg:
-        triggering_minion: {{ data['id'] }}
-        expected_minions_list: {{ salt['pillar.get']("minions", pillarenv='one_user_orch') }}
-        action_type: "orchestrate"
-# 2017.7.2
-#    - args:
-#      - triggering_minion: {{ data['id'] }}
-#      - expected_minions_list: {{ salt['pillar.get']("minions", pillarenv='one_user_orch') }}
-#      - action_type: "orchestrate"
+    - args:
+      - triggering_minion: {{ data['id'] }}
+      - expected_minions_list: {{ salt['pillar.get']("minions", pillarenv='one_user_orch') }}
+      - action_type: "orchestrate"
 
 {% elif data['fun'] == 'state.sls' %}
 
 failed:
   runner.event.send:
-    - kwarg:
-        tag: 'salt/orchestrate/failure'
-# 2017.7.2
-#    - args:
-#      - tag: 'salt/orchestrate/failure'
+    - args:
+      - tag: 'salt/orchestrate/failure'
 
 {% endif %}

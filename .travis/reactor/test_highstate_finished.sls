@@ -7,24 +7,16 @@
 
 highstate_finished:
   runner.wait.until:
-    - kwarg:
-        triggering_minion: {{ data['id'] }}
-        expected_minions_list: {{ salt['pillar.get']("minions", pillarenv='one_user_orch') }}
-        action_type: "highstate"
-# 2017.7.2
-#    - args:
-#      - triggering_minion: {{ data['id'] }}
-#      - expected_minions_list: {{ salt['pillar.get']("minions", pillarenv='one_user_orch') }}
-#      - action_type: "highstate"
+    - args:
+      - triggering_minion: {{ data['id'] }}
+      - expected_minions_list: {{ salt['pillar.get']("minions", pillarenv='one_user_orch') }}
+      - action_type: "highstate"
 
 {% elif data['fun'] == 'state.highstate' %}
 
 failed:
   runner.event.send:
-    - kwarg:
-        tag: 'salt/highstate/failure'
-# 2017.7.2
-#    - args:
-#      - tag: 'salt/highstate/failure'
+    - args:
+      - tag: 'salt/highstate/failure'
 
 {% endif %}
