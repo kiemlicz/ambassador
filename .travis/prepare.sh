@@ -7,7 +7,7 @@ if [ -z "$DOCKER_IMAGE" ]; then
 fi
 
 docker_compose_update() {
-    local docker_compose_version=1.18.0
+    local docker_compose_version=1.19.0
 
     docker-compose --version
     sudo rm /usr/local/bin/docker-compose
@@ -32,7 +32,7 @@ salt-masterless-run)
     ;;
 salt-master-run)
     docker_compose_update
-    docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. up --no-start
+    docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. up --no-start --no-ansi
 #    --build-arg LOG_LEVEL="${LOG_LEVEL-info}" --build-arg SALTENV="$SALTENV"
     ;;
 ambassador-run)

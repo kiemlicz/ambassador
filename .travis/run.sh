@@ -7,9 +7,10 @@ salt-masterless-dry|salt-masterless-run)
     ;;
 salt-master-run)
     # --exit-code-from master isn't the way to go as implies --abort-on-container-exit
-    docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. up --no-build --no-recreate
-    exit $(docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. ps -q | \
-        xargs docker inspect -f '{{ .State.ExitCode }}' | grep -v 0 | wc -l | tr -d ' ')
+    docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. up --no-build --no-recreate --no-ansi
+    echo "Exit code: $?"
+#    exit $(docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. ps -q | \
+#        xargs docker inspect -f '{{ .State.ExitCode }}' | grep -v 0 | wc -l | tr -d ' ')
     ;;
 ambassador-run)
     docker run --privileged -h $TEST_FQDN "$DOCKER_IMAGE"
