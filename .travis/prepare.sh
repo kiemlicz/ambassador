@@ -32,7 +32,7 @@ salt-masterless-run)
     ;;
 salt-master-run)
     docker_compose_update
-    docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. up --no-start --no-ansi
+    docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. --no-ansi up --no-start
 #    --build-arg LOG_LEVEL="${LOG_LEVEL-info}" --build-arg SALTENV="$SALTENV"
     ;;
 ambassador-run)
