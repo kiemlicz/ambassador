@@ -162,7 +162,7 @@ repositories:
                    "openssh-server", "openssh-client", "openvpn", "insserv",
                    "build-essential", "git", "zsh", "curl", "ethtool", "lm-sensors", "hddtemp", "hdparm", "ntp", "python-pip",
                    "silversearcher-ag", "kde-standard", "xterm", "yakuake", "print-manager", "wireshark", "network-manager-openvpn",
-                   "google-chrome-stable", "firefox", "exuberant-ctags", "tig", "libreoffice", "software-properties-common",
+                   "google-chrome-stable", "firefox", "exuberant-ctags", "tig", "software-properties-common",
 		           "ca-certificates", "gnupg2"],
          'post_install': [
                     "echo 'wireshark-common wireshark-common/install-setuid boolean true' | debconf-set-selections",
