@@ -12,6 +12,7 @@ COPY .travis/config/master.conf /etc/salt/master.d/master.conf
 COPY .travis/config/reactor_master.conf /etc/salt/master.d/reactor.conf
 COPY .travis/config/supervisord_master.conf /etc/supervisor/conf.d/supervisord.conf
 COPY .travis/pillar /srv/pillar
+COPY .travis/salt/dev/top.sls /srv/envoy/salt/dev/
 
 RUN apt-get update && \
     apt-get install -y curl supervisor procps && \

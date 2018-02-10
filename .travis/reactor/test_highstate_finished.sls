@@ -8,9 +8,9 @@
 highstate_finished:
   runner.wait.until:
     - args:
-      - triggering_minion: {{ data['id'] }}
       - expected_minions_list: {{ salt['pillar.get']("minions", pillarenv='one_user_orch') }}
       - action_type: "highstate"
+      - data: {{ data|json }}
 
 {% elif data['fun'] == 'state.highstate' %}
 

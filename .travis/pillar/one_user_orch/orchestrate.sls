@@ -4,6 +4,7 @@ minions:
   - minion3.local
 
 redis:
+  setup_type: cluster
   masters:
     - host_id: minion1.local
       host: minion1.local
