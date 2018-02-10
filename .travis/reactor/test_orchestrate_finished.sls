@@ -12,9 +12,10 @@
 orchestrate_finished:
   runner.wait.until:
     - args:
-      - expected_minions_list: {{ salt['pillar.get']("mongodb:replicas", pillarenv='one_user_orch')|selectattr('master')|list }}
+      - expected_minions_list: {{ salt['pillar.get']("mongodb:replicas", pillarenv='one_user_orch')|selectattr('master', 'defined')|map(attribute='host_id')|list }}
+      - triggering_minion: {{ data['id'] }}
       - action_type: "orchestrate"
-      - data: {{ data|json }}
+      - fun_args: {{ data['fun_args'] }}
       - sls: "mongodb.server.cluster._orchestrate.replicate"
 
 {% elif data['fun'] == 'state.sls' %}
