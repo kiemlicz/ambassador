@@ -48,10 +48,4 @@ before_install:
 
 script:
   - travis_wait 60 .travis/run.sh
-  - if [ "$TEST_CASE" == "salt-master-run" ]; then
-      echo "scanning compose's containers"
-      exit $(docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. ps -q | xargs docker inspect -f '{{ .State.ExitCode }}' | grep -v 0 | wc -l | tr -d ' ')
-    else
-      echo "finished"
-    fi
-
+  - .travis/after.sh
