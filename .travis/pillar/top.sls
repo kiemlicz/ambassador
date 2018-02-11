@@ -21,4 +21,4 @@ orch:
     - orchestrate
 empty:
   '*':
-    - empty.sls
+    - empty

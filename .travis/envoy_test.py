@@ -38,8 +38,6 @@ class AmbassadorTest(ParametrizedTestCase):
     def _get_client(self):
         self.assertTrue(os.path.isdir(os.path.join(self.saltenv_location, self.saltenv)),
                         msg="salt states not found: {}".format(os.path.join(self.saltenv_location, self.saltenv)))
-        self.assertTrue(os.path.isdir(os.path.join(self.pillarenv_location, self.pillarenv)),
-                        msg="pillar data not found: {}".format(os.path.join(self.pillarenv_location, self.pillarenv)))
         return salt.client.Caller()
 
     def test_states_syntax(self):
