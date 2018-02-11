@@ -9,8 +9,9 @@ dev:
     - docker
     - docker.compose
     - projects
-    - redis.client
-    - mongodb.client
+# don't install clients on server enabled environments
+#    - redis.client
+#    - mongodb.client
 
   'I@redis:setup_type:cluster and I@redis:install_type:repo':
     - match: compound
