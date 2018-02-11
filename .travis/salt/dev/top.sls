@@ -6,16 +6,8 @@ dev:
     - pkgs
     - mounts
     - samba
-    - java
-    - scala
-    - erlang
-    - gradle
-    - maven
-    - sbt
-    - rebar
     - docker
     - docker.compose
-    - virtualbox
     - projects
     - redis.client
     - mongodb.client
@@ -48,5 +40,4 @@ dev:
 
   'not G@os:Windows':
     - match: compound
-    - lxc
     - users

@@ -1,6 +1,7 @@
 FROM debian:stretch
 
 ARG saltenv
+ARG pillarenv
 ARG log_level
 # "" == latest
 ARG salt_ver=""
@@ -24,7 +25,8 @@ COPY .travis/reactor /srv/reactor
 
 EXPOSE 4505:4505 4506:4506
 
-ENV LOG_LEVEL=$log_level
 ENV SALTENV=$saltenv
+ENV PILLARENV=$pillarenv
+ENV LOG_LEVEL=$log_level
 ENTRYPOINT [ "/opt/entrypoint_master_run.sh" ]
 CMD [ "$salt_ver" ]

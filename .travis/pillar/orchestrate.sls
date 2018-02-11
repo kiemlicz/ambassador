@@ -5,6 +5,7 @@ minions:
 
 redis:
   setup_type: cluster
+  install_type: repo
   masters:
     - host_id: minion1.local
       host: minion1.local
@@ -33,6 +34,8 @@ redis:
       port: 6380
 
 mongodb:
+  setup_type: cluster
+  install_type: repo
   shards: []
   replicas:
     - host_id: minion1.local

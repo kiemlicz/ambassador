@@ -1,4 +1,0 @@
-empty:
-  '*':
-    - os
-    - user

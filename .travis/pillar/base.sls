@@ -155,43 +155,6 @@ repositories:
       },
   }, grain='oscodename')) }}
 
-{% set default_pkgs = salt['grains.filter_by']({
-      'default': {
-         'os_packages': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
-                   "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync", "mc",
-                   "openssh-server", "openssh-client", "openvpn", "insserv",
-                   "build-essential", "git", "zsh", "curl", "ethtool", "lm-sensors", "hddtemp", "hdparm", "ntp", "python-pip",
-                   "silversearcher-ag", "kde-standard", "xterm", "yakuake", "print-manager", "wireshark", "network-manager-openvpn",
-                   "google-chrome-stable", "firefox", "exuberant-ctags", "tig", "software-properties-common",
-		           "ca-certificates", "gnupg2"],
-         'post_install': [
-                    "echo 'wireshark-common wireshark-common/install-setuid boolean true' | debconf-set-selections",
-                    "dpkg-reconfigure -f noninteractive wireshark-common",
-                    'echo "command3"', 'echo "command4"', 'echo "command5"'],
-      },
-      'Windows': {
-         'os_packages': ["openvpn", "git", "wireshark", "keepass-2x"]
-       }
-    },
-    merge=salt['grains.filter_by']({
-      'stretch': {
-        'os_packages': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
-                   "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync", "mc",
-                   "openssh-server", "openssh-client", "openvpn", "insserv",
-                   "build-essential", "git", "zsh", "curl", "ethtool", "lm-sensors", "hddtemp", "hdparm", "ntp", "python-pip",
-                   "silversearcher-ag", "kde-standard", "xterm", "yakuake", "print-manager", "wireshark", "network-manager-openvpn",
-                   "google-chrome-stable", "firefox-esr", "exuberant-ctags", "tig", "libreoffice", "software-properties-common",
-		           "ca-certificates", "gnupg2"],
-      }
-    }, grain='oscodename')) %}
-
-pkgs:
-  {{ salt['grains.filter_by']({
-            'somehost': {
-              'os_packages': default_pkgs.os_packages + ["firmware-iwlwifi"]
-              },
-            }, grain='host', merge=default_pkgs) }}
-
 hosts:
   1.2.3.4 : [ coolname ]
   192.168.1.1 : [ gw, mygw ]

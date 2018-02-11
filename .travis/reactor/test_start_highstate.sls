@@ -3,4 +3,4 @@ highstate:
     - tgt: {{ data['id'] }}
     - args:
       - saltenv: {{ salt['environ.get']("SALTENV") }}
-      - pillarenv: one_user_orch
+      - pillarenv: {{ salt['environ.get']("PILLARENV") }}

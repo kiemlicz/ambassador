@@ -66,9 +66,10 @@ if __name__ == "__main__":
     suite.addTest(ParametrizedTestCase.parametrize(AmbassadorTest, saltenv='base', pillarenv='empty'))
     suite.addTest(ParametrizedTestCase.parametrize(AmbassadorTest, saltenv='gui', pillarenv='empty'))
     suite.addTest(ParametrizedTestCase.parametrize(AmbassadorTest, saltenv='dev', pillarenv='empty'))
-    suite.addTest(ParametrizedTestCase.parametrize(AmbassadorTest, saltenv='base', pillarenv='one_user'))
-    suite.addTest(ParametrizedTestCase.parametrize(AmbassadorTest, saltenv='gui', pillarenv='one_user'))
-    suite.addTest(ParametrizedTestCase.parametrize(AmbassadorTest, saltenv='dev', pillarenv='one_user'))
+    suite.addTest(ParametrizedTestCase.parametrize(AmbassadorTest, saltenv='base', pillarenv='base'))
+    suite.addTest(ParametrizedTestCase.parametrize(AmbassadorTest, saltenv='gui', pillarenv='gui'))
+    suite.addTest(ParametrizedTestCase.parametrize(AmbassadorTest, saltenv='dev', pillarenv='dev'))
+    suite.addTest(ParametrizedTestCase.parametrize(AmbassadorTest, saltenv='dev', pillarenv='orch'))
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     if not result.wasSuccessful():
         raise SystemError("Some tests have failed, check logs")

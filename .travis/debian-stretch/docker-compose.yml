@@ -8,6 +8,7 @@ services:
       args:
         hostname: master
         saltenv: dev
+        pillarenv: orch
         salt_ver: "2017.7.3"
         log_level: "info"
     command: "2017.7.3"

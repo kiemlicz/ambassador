@@ -2,6 +2,7 @@ FROM debian:sid
 
 ARG LOG_LEVEL
 ARG SALTENV
+ARG PILLARENV
 # "" == latest
 ARG SALT_VER=""
 
@@ -16,7 +17,8 @@ RUN apt-get update && apt-get install -y curl python-pip && \
     sh /tmp/bootstrap-salt.sh -n stable $SALT_VER && \
     ln -sf /dev/stdout /var/log/salt/minion
 
-ENV LOG_LEVEL=$LOG_LEVEL
 ENV SALTENV=$SALTENV
+ENV PILLARENV=$PILLARENV
+ENV LOG_LEVEL=$LOG_LEVEL
 
-ENTRYPOINT /opt/entrypoint_masterless_run.sh $SALTENV $LOG_LEVEL
+ENTRYPOINT /opt/entrypoint_masterless_run.sh $SALTENV $PILLARENV $LOG_LEVEL
