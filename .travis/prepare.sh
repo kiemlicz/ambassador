@@ -28,7 +28,7 @@ salt-masterless-dry)
     docker build --build-arg=SALT_VER="2017.7.3" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/dry/Dockerfile .
     ;;
 salt-masterless-run)
-    docker build --build-arg=SALT_VER="2017.7.3" --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" --build-arg=SALTENV="$SALTENV" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/masterless/Dockerfile .
+    docker build --build-arg=SALT_VER="2017.7.3" --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" --build-arg=SALTENV="$SALTENV" --build-arg=PILLARENV="$PILLARENV" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/masterless/Dockerfile .
     ;;
 salt-master-run)
     docker_compose_update
