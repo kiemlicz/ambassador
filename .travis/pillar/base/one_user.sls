@@ -9,7 +9,7 @@ users:
   {{ username }}:
     name: {{ username }}
     fullname: Coolest One
-    nick: coolnick
+    nick: {{ username }}
     home_dir: {{ home_dir }}
     shell: /bin/zsh
     groups:

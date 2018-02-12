@@ -22,6 +22,7 @@ services:
       local:
         aliases:
           - master.local
+#      hostnet: {}
   minion1:
     image: salt_minion
     build:
@@ -77,3 +78,6 @@ services:
 networks:
   local:
     driver: bridge
+#  hostnet:
+#    external:
+#      name: host
