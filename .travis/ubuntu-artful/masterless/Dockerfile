@@ -4,7 +4,8 @@ ARG LOG_LEVEL
 ARG SALTENV
 ARG PILLARENV
 # "" == latest
-ARG SALT_VER=""
+# stable doesn't work for artful
+ARG SALT_VER="develop"
 
 COPY envoy /srv/envoy
 COPY .travis/entrypoint_masterless_run.sh /opt/
@@ -14,7 +15,7 @@ COPY .travis/pillar /srv/pillar
 RUN apt-get update && apt-get install -y curl python-pip && \
     ln -s /srv/envoy/salt /srv/salt && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
-    sh /tmp/bootstrap-salt.sh -n stable $SALT_VER && \
+    sh /tmp/bootstrap-salt.sh -n git $SALT_VER && \
     ln -sf /dev/stdout /var/log/salt/minion
 
 ENV SALTENV=$SALTENV
