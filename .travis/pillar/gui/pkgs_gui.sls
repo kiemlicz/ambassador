@@ -31,9 +31,9 @@
                    "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync", "mc",
                    "openssh-server", "openssh-client", "openvpn",
                    "build-essential", "git", "zsh", "curl", "ethtool", "lm-sensors", "hddtemp", "hdparm", "ntp", "python-pip",
-                   "silversearcher-ag", "kde-standard", "xterm", "yakuake", "print-manager", "wireshark", "network-manager-openvpn",
-                   "google-chrome-stable", "firefox-esr", "exuberant-ctags", "tig", "libreoffice", "software-properties-common",
-		           "ca-certificates", "gnupg2"],
+                   "silversearcher-ag", "xterm", "yakuake", "print-manager", "wireshark", "network-manager-openvpn",
+                   "google-chrome-stable", "exuberant-ctags", "tig", "libreoffice", "software-properties-common",
+		           "ca-certificates", "gnupg2", "ubuntu-desktop"],
       }
     }, grain='oscodename')) %}
 
