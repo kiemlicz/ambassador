@@ -10,6 +10,9 @@
     merge=salt['grains.filter_by']({
       'stretch': {
         'os_packages': ["vim", "sudo", "man", "rsync", "insserv", "git", "zsh", "curl", "ntp",  "ca-certificates", "gnupg2"],
+      },
+      'artful': {
+        'os_packages': ["vim", "sudo", "man", "rsync", "git", "zsh", "curl", "ntp",  "ca-certificates", "gnupg2"],
       }
     }, grain='oscodename')) %}
 
