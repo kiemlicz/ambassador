@@ -146,6 +146,10 @@ chroot $CONTAINER_ROOTFS sh -c "sed -i -e 's/\(^AcceptEnv LANG.*\)/#\1/g' /etc/s
 chroot $CONTAINER_ROOTFS sh -c "sed -i '/^127.0.1.1 /s/$CONTAINER_NAME/$CONTAINER_FQDN $CONTAINER_NAME/' /etc/hosts"
 #configure resolvconf utility so that proper nameserver exists, otherwise only 127.0.0.1 may appear
 chroot $CONTAINER_ROOTFS sh -c "echo 'TRUNCATE_NAMESERVER_LIST_AFTER_LOOPBACK_ADDRESS=no' > /etc/default/resolvconf"
+if [ ! -f ~/.ssh/id_rsa.pub ]; then
+    echo "User: $CONTAINER_USERNAME, keypair doesn't exist, please generate it"
+    exit 1
+fi
 chroot $CONTAINER_ROOTFS sh -c "mkdir $CONTAINER_USER_HOME/.ssh/"
 cat ~/.ssh/id_rsa.pub >> $CONTAINER_ROOTFS/$CONTAINER_USER_HOME/.ssh/authorized_keys
 chroot $CONTAINER_ROOTFS sh -c "chown $CONTAINER_USERNAME.$CONTAINER_USERNAME $CONTAINER_USER_HOME/.ssh/authorized_keys; chmod 600 $CONTAINER_USER_HOME/.ssh/authorized_keys"

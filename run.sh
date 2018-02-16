@@ -55,7 +55,11 @@ readonly SALTSTACK_REPO_KEY=$SALTSTACK_STRETCH_REPO_KEY_URL
 
 apt-get update
 apt-get upgrade -y -o DPkg::Options::=--force-confold
-apt-get install -y ca-certificates wget host curl gnupg2 sudo
+apt-get install -y ca-certificates wget host curl gnupg2 sudo apt-transport-https
+
+#ensure en_US.UTF-8 locale is present, foreman installer requires it
+sed -i -e 's/^#\(.*en_US.UTF-8 UTF-8.*\)/\1/g' /etc/locale.gen
+locale-gen
 
 wget -P /tmp/ $FOREMAN_PUPPET_SERVER && dpkg -i /tmp/$PUPPET_SERVER_PKG
 retval=$?
@@ -85,7 +89,7 @@ if [ $(python -c "import pygit2; print(bool(pygit2.features & pygit2.GIT_FEATURE
     echo "detected improper version of pygit2, fixing..."
     apt-get purge -y python-pygit2 libgit2-24 python-cffi
     pip uninstall -y cffi || true # pip uninstall for not installed package will fail the build due to `set -e`
-    apt-get install -y pkg-config libcurl3-dev libssh2-1-dev build-essential cmake libssl-dev libffi-dev
+    apt-get install -y pkg-config libcurl3-dev libssh2-1-dev build-essential cmake libssl-dev libffi-dev zlib1g-dev
     libgit_ver=0.26.0
     pushd /tmp
     wget https://github.com/libgit2/libgit2/archive/v$libgit_ver.tar.gz
@@ -105,7 +109,11 @@ if [ $(python -c "import pygit2; print(bool(pygit2.features & pygit2.GIT_FEATURE
         exit 1
     fi
     if [ $(python -c "import pygit2; print(bool(pygit2.features & pygit2.GIT_FEATURE_HTTPS))") == "False" ]; then
-        echo "Unable to properly configure pygit2"
+        echo "Unable to properly configure pygit2 (missing HTTPS support)"
+        exit 1
+    fi
+    if [ $(python -c "import pygit2; print(bool(pygit2.features & pygit2.GIT_FEATURE_SSH))") == "False" ]; then
+        echo "Unable to properly configure pygit2 (missing SSH support)"
         exit 1
     fi
 fi
