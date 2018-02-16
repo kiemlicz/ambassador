@@ -88,6 +88,8 @@ readonly CONTAINER_USER_HOME=/root # /home/$CONTAINER_USERNAME
 readonly CONTAINER_OS=debian
 readonly CONTAINER_OS_MAJOR=stretch
 
+readonly setup_start_ts=$(date +%s.%N)
+
 ##### validate
 #expand to bash array for easier validation
 all_containers_array=($(lxc-ls))
@@ -283,6 +285,9 @@ else
     ENTRY_CMD='sudo -E bash -s'
 fi
 echo "running 'run' script inside container (IP = $CONTAINER_IP, DOMAIN=$CONTAINER_FQDN)"
+
+readonly run_start_ts=$(date +%s.%N)
+
 ssh $CONTAINER_USERNAME@$CONTAINER_IP -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" \
 CIP=$CONTAINER_IP CID=$CONTAINER_FQDN CERT_BASEDIR=$CONTAINER_CERT_BASE CA=$AMBASSADOR_CA CRL=$AMBASSADOR_CRL KEY=$AMBASSADOR_KEY CERT=$AMBASSADOR_CERT \
 PROXY_KEY=$AMBASSADOR_KEY PROXY_CERT=$AMBASSADOR_CERT \
@@ -292,6 +297,16 @@ wait $!
 retval=$?
 echo "stopping container"
 stop_container $CONTAINER_NAME
+
+readonly run_stop_ts=$(date +%s.%N)
+
+readonly container_prep_time=$(echo "$run_start_ts - $setup_start_ts" | bc)
+readonly run_time=$(echo "$run_stop_ts - $run_start_ts" | bc)
+readonly total_time=$(echo "$run_stop_ts - $setup_start_ts" | bc)
+
+echo "Container preparation time: ${container_prep_time}[s]"
+echo "Installation time: ${run_time}[s]"
+echo "Total time: ${total_time}[s] "
 
 if [ $retval -ne 0 ]; then
     echo "error running run.sh script inside of container: $retval, check: $CONTAINER_NAME.log file"
