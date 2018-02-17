@@ -87,6 +87,7 @@ readonly CONTAINER_USERNAME=root
 readonly CONTAINER_USER_HOME=/root # /home/$CONTAINER_USERNAME
 readonly CONTAINER_OS=debian
 readonly CONTAINER_OS_MAJOR=stretch
+readonly CONTAINER_BACKING_STORE=best
 
 readonly setup_start_ts=$(date +%s.%N)
 
@@ -126,7 +127,7 @@ readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
 ##### build container
 . util/vm/lxc_functions
 
-lxc-create -f config/network.conf -t $CONTAINER_OS -n $CONTAINER_NAME -- -r $CONTAINER_OS_MAJOR -a amd64
+lxc-create -B $CONTAINER_BACKING_STORE -f config/network.conf -t $CONTAINER_OS -n $CONTAINER_NAME -- -r $CONTAINER_OS_MAJOR -a amd64
 retval=$?
 if [ $retval -ne 0 ]; then
     echo "error creating container: $retval"
@@ -140,6 +141,8 @@ fi
 
 #todo how to achieve passwordless sudo -u postgres, below doesn't work
 #chroot $CONTAINER_ROOTFS sh -c "echo 'postgres ALL=NOPASSWD:ALL' > /etc/sudoers.d/postgres; chmod 440 /etc/sudoers.d/postgres"
+chroot $CONTAINER_ROOTFS sh -c \
+    "mkdir -p /etc/sudoers.d/"
 chroot $CONTAINER_ROOTFS sh -c \
     "echo 'Cmnd_Alias SALT = /usr/bin/salt, /usr/bin/salt-key\nforeman-proxy ALL = NOPASSWD: SALT\nDefaults:foreman-proxy !requiretty' > /etc/sudoers.d/salt; chmod 440 /etc/sudoers.d/salt"
 
