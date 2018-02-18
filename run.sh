@@ -208,11 +208,6 @@ readonly CRED=$(foreman-installer \
 readonly FOREMAN_GUI_USER=$(echo "$CRED" | cut -d: -f1)
 readonly FOREMAN_GUI_PASSWORD=$(echo "$CRED" | cut -d: -f2)
 
-retval=$?
-if [ $retval -ne 0 ]; then
-    echo "there were errors during foreman installation, not breaking as some of them are non-fatal"
-fi
-
 echo "populating salt&foreman config files"
 touch /etc/salt/autosign.conf
 chgrp foreman-proxy /etc/salt/autosign.conf
@@ -221,6 +216,17 @@ chmod g+w /etc/salt/autosign.conf
 echo "enabling http resource provider"
 mv /var/tmp/30-saltfs.conf /etc/apache2/sites-available/
 a2ensite 30-saltfs
+
+echo "generating foreman keys"
+mkdir -p /usr/share/foreman/.ssh
+chmod 700 /usr/share/foreman/.ssh
+chown foreman:foreman /usr/share/foreman/.ssh
+sudo -u foreman bash << EOF
+    echo -e "\n" | ssh-keygen -t rsa -N ""
+EOF
+#authorize foreman to KVM host
+#su foreman -s /bin/bash
+#ssh-copy-id user@KVM_host
 
 if [ -f /.dockerenv ]; then
     # there is no systemd inside of docker containers, somehow service command works
