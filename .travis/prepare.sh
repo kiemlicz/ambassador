@@ -6,6 +6,9 @@ if [ -z "$DOCKER_IMAGE" ]; then
     exit 1
 fi
 
+#"2017.7.3", "" - latest stable
+SALT_VER=""
+
 docker_compose_update() {
     local docker_compose_version=1.19.0
 
@@ -25,10 +28,10 @@ sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 
 case "$TEST_CASE" in
 salt-masterless-dry)
-    docker build --build-arg=SALT_VER="2017.7.3" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/dry/Dockerfile .
+    docker build --build-arg=SALT_VER=$SALT_VER -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/dry/Dockerfile .
     ;;
 salt-masterless-run)
-    docker build --build-arg=SALT_VER="2017.7.3" --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" --build-arg=SALTENV="$SALTENV" --build-arg=PILLARENV="$PILLARENV" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/masterless/Dockerfile .
+    docker build --build-arg=SALT_VER=$SALT_VER --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" --build-arg=SALTENV="$SALTENV" --build-arg=PILLARENV="$PILLARENV" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/masterless/Dockerfile .
     ;;
 salt-master-run)
     docker_compose_update
