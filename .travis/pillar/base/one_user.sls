@@ -140,11 +140,12 @@ robomongo:
 scala:
   owner: {{ owner }}
 mongodb:
-  setup_type: repo
+  setup_type: single
+  install_type: repo
   docker:
     name: mongo-dev
   repo:
   settings:
 redis:
-  install_type: repo
   setup_type: cluster
+  install_type: repo
