@@ -6,11 +6,12 @@ if [ -z "$DOCKER_IMAGE" ]; then
     exit 1
 fi
 
-#"2017.7.3", "" - latest stable
+#"2017.7.3", "" - latest stable extract to var.sh and import everywhere
 SALT_VER=""
+COMPOSE_VER="1.19.0"
 
 docker_compose_update() {
-    local docker_compose_version=1.19.0
+    local docker_compose_version=$COMPOSE_VER
 
     docker-compose --version
     sudo rm /usr/local/bin/docker-compose

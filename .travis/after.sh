@@ -6,5 +6,4 @@ salt-master-run)
     exit $(docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. ps -q | xargs docker inspect -f '{{ .State.ExitCode }}' | grep -v 0 | wc -l | tr -d ' ')
     ;;
 *)
-
 esac

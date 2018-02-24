@@ -1,9 +1,6 @@
 #!/usr/bin/env bash
 
-echo "Installing salt-minion, version: $@"
-
-curl -o /tmp/bootstrap.sh -L https://bootstrap.saltstack.com
-sh /tmp/bootstrap.sh -n stable ${1-""}
+sed -i -e "s/\(^id: \)minion/\1$(hostname -f)/g" /etc/salt/minion.d/minion.conf
 
 # workaround for salt's service state
 echo -e '#!/bin/bash\necho "N 5"' > /sbin/runlevel

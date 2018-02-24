@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.6'
 services:
   master:
     image: salt_master
@@ -6,12 +6,11 @@ services:
       context: .
       dockerfile: .travis/debian-stretch/master/Dockerfile
       args:
-        hostname: master
+        hostname: master.local
         saltenv: dev
         pillarenv: orch
-        salt_ver: "2017.7.3"
-        log_level: "info"
-    command: "2017.7.3"
+        salt_ver: ${SALT_VER}
+        log_level: ${LOG_LEVEL}
     hostname: master
     domainname: local
     privileged: true
@@ -29,8 +28,8 @@ services:
       context: .
       dockerfile: .travis/debian-stretch/minion/Dockerfile
       args:
-        salt_ver: "2017.7.3"
-    command: "2017.7.3"
+        hostname: minion1.local
+        salt_ver: ${SALT_VER}
     hostname: minion1
     domainname: local
     privileged: true
@@ -46,8 +45,8 @@ services:
       context: .
       dockerfile: .travis/debian-stretch/minion/Dockerfile
       args:
-        salt_ver: "2017.7.3"
-    command: "2017.7.3"
+        hostname: minion2.local
+        salt_ver: ${SALT_VER}
     hostname: minion2
     domainname: local
     privileged: true
@@ -63,8 +62,8 @@ services:
       context: .
       dockerfile: .travis/debian-stretch/minion/Dockerfile
       args:
-        salt_ver: "2017.7.3"
-    command: "2017.7.3"
+        hostname: minion3.local
+        salt_ver: ${SALT_VER}
     hostname: minion3
     domainname: local
     privileged: true
