@@ -60,6 +60,8 @@ env:
     TEST_CASE=ambassador-run
   - DOCKER_IMAGE=debian-stretch
     TEST_CASE=salt-master-run
+    SALTENV=dev
+    PILLARENV=orch
 
 before_install:
   - .travis/prepare.sh

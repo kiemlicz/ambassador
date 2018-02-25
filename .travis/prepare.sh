@@ -6,7 +6,7 @@ if [ -z "$DOCKER_IMAGE" ]; then
     exit 1
 fi
 
-#"2017.7.3", "" - latest stable extract to var.sh and import everywhere
+#"2017.7.3", "" - latest stable
 SALT_VER=""
 COMPOSE_VER="1.19.0"
 
@@ -37,7 +37,6 @@ salt-masterless-run)
 salt-master-run)
     docker_compose_update
     docker-compose -f .travis/"$DOCKER_IMAGE"/docker-compose.yml --project-directory=. --no-ansi up --no-start
-#    --build-arg LOG_LEVEL="${LOG_LEVEL-info}" --build-arg SALTENV="$SALTENV"
     ;;
 ambassador-run)
     docker build --build-arg=FQDN="$TEST_FQDN" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/run/Dockerfile .
