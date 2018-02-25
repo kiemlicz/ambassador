@@ -67,16 +67,10 @@ env:
       PILLARENV=orch
 
 matrix:
-  allow_failures:
-    - env: # only debian-sid based tests are allowed to fail
-      - DOCKER_IMAGE=debian-sid
-        TEST_CASE=salt-masterless-run
-        SALTENV=gui
-        PILLARENV=gui
-      - DOCKER_IMAGE=debian-sid
-        TEST_CASE=salt-masterless-run
-        SALTENV=dev
-        PILLARENV=dev
+  fast_finish: true
+  allow_failures: # only debian-sid based tests are allowed to fail
+    - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=gui PILLARENV=gui
+    - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=dev PILLARENV=dev
 
 before_install:
   - .travis/prepare.sh
