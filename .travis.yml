@@ -9,59 +9,74 @@ services:
 
 # don't add ubuntu non-LTSs versions
 env:
-  - DOCKER_IMAGE=debian-sid
-    TEST_CASE=salt-masterless-dry
-  - DOCKER_IMAGE=debian-sid
-    TEST_CASE=salt-masterless-run
-    SALTENV=base
-    PILLARENV=base
-  - DOCKER_IMAGE=debian-sid
-    TEST_CASE=salt-masterless-run
-    SALTENV=gui
-    PILLARENV=gui
-  - DOCKER_IMAGE=debian-sid
-    TEST_CASE=salt-masterless-run
-    SALTENV=dev
-    PILLARENV=dev
-  - DOCKER_IMAGE=debian-jessie
-    TEST_CASE=salt-masterless-dry
-  - DOCKER_IMAGE=debian-stretch
-    TEST_CASE=salt-masterless-dry
-  - DOCKER_IMAGE=debian-stretch
-    TEST_CASE=salt-masterless-run
-    SALTENV=base
-    PILLARENV=base
-  - DOCKER_IMAGE=debian-stretch
-    TEST_CASE=salt-masterless-run
-    SALTENV=gui
-    PILLARENV=gui
-  - DOCKER_IMAGE=debian-stretch
-    TEST_CASE=salt-masterless-run
-    SALTENV=dev
-    PILLARENV=dev
-  - DOCKER_IMAGE=ubuntu-xenial
-    TEST_CASE=salt-masterless-dry
-  - DOCKER_IMAGE=ubuntu-artful
-    TEST_CASE=salt-masterless-dry
-  - DOCKER_IMAGE=ubuntu-artful
-    TEST_CASE=salt-masterless-run
-    SALTENV=base
-    PILLARENV=base
-  - DOCKER_IMAGE=ubuntu-artful
-    TEST_CASE=salt-masterless-run
-    SALTENV=gui
-    PILLARENV=gui
-  - DOCKER_IMAGE=ubuntu-artful
-    TEST_CASE=salt-masterless-run
-    SALTENV=dev
-    PILLARENV=dev
-  - DOCKER_IMAGE=debian-stretch
-    TEST_FQDN=ambassadortest.com
-    TEST_CASE=ambassador-run
-  - DOCKER_IMAGE=debian-stretch
-    TEST_CASE=salt-master-run
-    SALTENV=dev
-    PILLARENV=orch
+  global:
+    - SALT_VER="" # latest
+  matrix:
+    - DOCKER_IMAGE=debian-sid
+      TEST_CASE=salt-masterless-dry
+    - DOCKER_IMAGE=debian-sid
+      TEST_CASE=salt-masterless-run
+      SALTENV=base
+      PILLARENV=base
+    - DOCKER_IMAGE=debian-sid
+      TEST_CASE=salt-masterless-run
+      SALTENV=gui
+      PILLARENV=gui
+    - DOCKER_IMAGE=debian-sid
+      TEST_CASE=salt-masterless-run
+      SALTENV=dev
+      PILLARENV=dev
+    - DOCKER_IMAGE=debian-jessie
+      TEST_CASE=salt-masterless-dry
+    - DOCKER_IMAGE=debian-stretch
+      TEST_CASE=salt-masterless-dry
+    - DOCKER_IMAGE=debian-stretch
+      TEST_CASE=salt-masterless-run
+      SALTENV=base
+      PILLARENV=base
+    - DOCKER_IMAGE=debian-stretch
+      TEST_CASE=salt-masterless-run
+      SALTENV=gui
+      PILLARENV=gui
+    - DOCKER_IMAGE=debian-stretch
+      TEST_CASE=salt-masterless-run
+      SALTENV=dev
+      PILLARENV=dev
+    - DOCKER_IMAGE=ubuntu-xenial
+      TEST_CASE=salt-masterless-dry
+    - DOCKER_IMAGE=ubuntu-artful
+      TEST_CASE=salt-masterless-dry
+    - DOCKER_IMAGE=ubuntu-artful
+      TEST_CASE=salt-masterless-run
+      SALTENV=base
+      PILLARENV=base
+    - DOCKER_IMAGE=ubuntu-artful
+      TEST_CASE=salt-masterless-run
+      SALTENV=gui
+      PILLARENV=gui
+    - DOCKER_IMAGE=ubuntu-artful
+      TEST_CASE=salt-masterless-run
+      SALTENV=dev
+      PILLARENV=dev
+    - DOCKER_IMAGE=debian-stretch
+      TEST_FQDN=ambassadortest.com
+      TEST_CASE=ambassador-run
+    - DOCKER_IMAGE=debian-stretch
+      TEST_CASE=salt-master-run
+      SALTENV=dev
+      PILLARENV=orch
+
+matrix:
+  allow_failures:
+    - env: # only debian-sid based tests are allowed to fail
+      - DOCKER_IMAGE=debian-sid
+        TEST_CASE=salt-masterless-run
+        SALTENV=gui
+        PILLARENV=gui
+      - DOCKER_IMAGE=debian-sid
+        TEST_CASE=salt-masterless-run
+        SALTENV=dev
+        PILLARENV=dev
 
 before_install:
   - .travis/prepare.sh

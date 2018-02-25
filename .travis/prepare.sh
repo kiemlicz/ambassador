@@ -6,8 +6,6 @@ if [ -z "$DOCKER_IMAGE" ]; then
     exit 1
 fi
 
-#"2017.7.3", "" - latest stable
-SALT_VER=""
 COMPOSE_VER="1.19.0"
 
 docker_compose_update() {
