@@ -1,4 +1,5 @@
-{% if data['id'] in salt['pillar.get']("minions", pillarenv=salt['environ.get']("PILLARENV")) and data['act'] == "pend" %}
+{% set pillarenv = salt['environ.get']("PILLARENV") %}
+{% if data['id'] in salt['pillar.get']("minions", pillarenv=pillarenv) and data['act'] == "pend" %}
 
 #pre 2017.7.2, use (in all reactor sls'es):
 #accept_key:
