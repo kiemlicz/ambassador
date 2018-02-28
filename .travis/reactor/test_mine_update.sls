@@ -1,3 +1,3 @@
 mine_update:
-  runner.mine.update:
-    - tgt: '*'
+  local.mine.update:
+    - tgt: {{ data['id'] }}
