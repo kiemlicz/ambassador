@@ -32,20 +32,16 @@ mongodb:
   install_type: repo
   shards: []
   replicas:
-    - host_id: minion1.local
+    - id: minion1.local
       master: True
       replica_name: "testing"
-      host: minion1.local
       port: 28018
-    - host_id: minion1.local
+    - id: minion1.local
       replica_name: "testing"
-      host: minion1.local
       port: 28019
-    - host_id: minion2.local
+    - id: minion2.local
       replica_name: "testing"
-      host: minion2.local
       port: 28018
-    - host_id: minion3.local
+    - id: minion3.local
       replica_name: "testing"
-      host: minion3.local
       port: 28018
