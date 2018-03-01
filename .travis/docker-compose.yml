@@ -4,7 +4,7 @@ services:
     image: salt_master
     build:
       context: .
-      dockerfile: .travis/debian-stretch/master/Dockerfile
+      dockerfile: .travis/$DOCKER_IMAGE/master/Dockerfile
       args:
         hostname: master.local
         saltenv: $SALTENV
@@ -26,7 +26,7 @@ services:
     image: salt_minion
     build:
       context: .
-      dockerfile: .travis/debian-stretch/minion/Dockerfile
+      dockerfile: .travis/$DOCKER_IMAGE/minion/Dockerfile
       args:
         hostname: minion1.local
         salt_ver: $SALT_VER
@@ -43,7 +43,7 @@ services:
     image: salt_minion
     build:
       context: .
-      dockerfile: .travis/debian-stretch/minion/Dockerfile
+      dockerfile: .travis/$DOCKER_IMAGE/minion/Dockerfile
       args:
         hostname: minion2.local
         salt_ver: $SALT_VER
@@ -60,7 +60,7 @@ services:
     image: salt_minion
     build:
       context: .
-      dockerfile: .travis/debian-stretch/minion/Dockerfile
+      dockerfile: .travis/$DOCKER_IMAGE/minion/Dockerfile
       args:
         hostname: minion3.local
         salt_ver: $SALT_VER

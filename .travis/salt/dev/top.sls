@@ -5,7 +5,6 @@ dev:
     - locale
     - pkgs
     - mounts
-    - samba
     - projects
     - redis.client
     - mongodb.client
