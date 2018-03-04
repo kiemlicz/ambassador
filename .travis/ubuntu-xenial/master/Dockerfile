@@ -14,6 +14,7 @@ COPY .travis/config/master.conf /etc/salt/master.d/master.conf
 COPY .travis/config/reactor_master.conf /etc/salt/master.d/reactor.conf
 COPY .travis/config/supervisord_master.conf /etc/supervisor/conf.d/supervisord.conf
 COPY .travis/pillar /srv/pillar
+COPY .travis/reactor /srv/reactor
 COPY .travis/salt/dev/top.sls /srv/envoy/salt/dev/
 COPY .travis/config/no_daemon_env /etc/default/salt-master
 
@@ -24,13 +25,12 @@ RUN echo $(grep $(hostname) /etc/hosts | cut -f1) $hostname >> /etc/hosts && \
     sh /tmp/bootstrap-salt.sh -n -M -N -X stable $salt_ver && \
     ln -s /srv/envoy/salt /srv/salt && \
     ln -s /srv/envoy/extensions /srv/salt_ext && \
-    ln -s /srv/envoy/reactor /srv/reactor && \
+    mkdir /srv/envoy/extensions/renderers && \
+    ln -s /srv/envoy/salt/base/_renderers/stringpy.py /srv/envoy/extensions/renderers/stringpy.py && \
 # workaround for (needed only when installed via Dockerfile)
 # https://github.com/saltstack/salt/issues/37056
     rm -rf /var/run/salt/master/master_event_pub.ipc && \
     rm -rf /var/run/salt/master/master_event_pull.ipc
-
-COPY .travis/reactor /srv/reactor
 
 EXPOSE 4505:4505 4506:4506
 

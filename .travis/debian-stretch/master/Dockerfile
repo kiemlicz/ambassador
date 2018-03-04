@@ -25,7 +25,8 @@ RUN echo $(grep $(hostname) /etc/hosts | cut -f1) $hostname >> /etc/hosts && \
     sh /tmp/bootstrap-salt.sh -n -M -N -X stable $salt_ver && \
     ln -s /srv/envoy/salt /srv/salt && \
     ln -s /srv/envoy/extensions /srv/salt_ext && \
-    ln -s /srv/envoy/reactor /srv/reactor && \
+    mkdir /srv/envoy/extensions/renderers && \
+    cp /srv/envoy/salt/base/_renderers/stringpy.py /srv/envoy/extensions/renderers/ && \
 # workaround for (needed only when installed via Dockerfile)
 # https://github.com/saltstack/salt/issues/37056
     rm -rf /var/run/salt/master/master_event_pub.ipc && \

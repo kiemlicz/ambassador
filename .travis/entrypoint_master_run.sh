@@ -3,6 +3,7 @@
 # use reactor to accept and start highstate on connected minions
 # wait for finish on master then invoke state.orchestrate
 
+#salt-run saltutil.sync_all
 /usr/bin/supervisord
 
 python /opt/scan_events.py /var/log/salt/events
