@@ -33,7 +33,7 @@ mongodb:
   shards: []
   replicas:
     - id: minion1.local
-      master: True
+      master: "True"
       replica_name: "testing"
       port: 28018
     - id: minion1.local

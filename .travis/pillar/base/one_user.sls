@@ -144,8 +144,6 @@ mongodb:
   install_type: repo
   docker:
     name: mongo-dev
-  repo:
-  settings:
 redis:
   setup_type: cluster
   install_type: repo
