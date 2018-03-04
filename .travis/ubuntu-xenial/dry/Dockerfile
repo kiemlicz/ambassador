@@ -9,7 +9,7 @@ COPY .travis/entrypoint_dry.sh /opt/
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
 COPY .travis/pillar /srv/pillar
 
-RUN apt-get update && apt-get install -y curl && \
+RUN apt-get update && apt-get install -y curl iproute2 && \
     ln -s /srv/envoy/salt /srv/salt && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -n stable $SALT_VER

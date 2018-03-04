@@ -9,7 +9,7 @@ COPY .travis/entrypoint_dry.sh /opt/
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
 COPY .travis/pillar /srv/pillar
 
-RUN apt-get update && apt-get remove -y gnupg && \
+RUN apt-get update && apt-get remove -y gnupg iproute2 && \
     apt-get install -y --reinstall gnupg2 && \
     apt-get install -y curl dirmngr && \
     ln -s /srv/envoy/salt /srv/salt && \
