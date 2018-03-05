@@ -26,9 +26,6 @@ sudo apt-get update
 sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 
 case "$TEST_CASE" in
-salt-masterless-dry)
-    docker build --build-arg=SALT_VER=$SALT_VER -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/dry/Dockerfile .
-    ;;
 salt-masterless-run)
     docker build --build-arg=SALT_VER=$SALT_VER --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" --build-arg=SALTENV="$SALTENV" --build-arg=PILLARENV="$PILLARENV" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/masterless/Dockerfile .
     ;;
