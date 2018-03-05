@@ -59,6 +59,10 @@ env:
       TEST_CASE=salt-master-run
       SALTENV=dev
       PILLARENV=orch
+    - DOCKER_IMAGE=ubuntu-artful
+      TEST_CASE=salt-master-run
+      SALTENV=dev
+      PILLARENV=orch
 
 matrix:
   fast_finish: true
