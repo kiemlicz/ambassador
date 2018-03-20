@@ -141,9 +141,7 @@ scala:
   owner: {{ owner }}
 mongodb:
   setup_type: single
-  install_type: repo
   docker:
     name: mongo-dev
 redis:
-  setup_type: cluster
-  install_type: repo
+  setup_type: single
