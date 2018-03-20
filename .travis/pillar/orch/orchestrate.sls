@@ -15,16 +15,19 @@ redis:
       port: 6379
   slaves:
     - id: minion1.local
-      master_id: minion2.local
-      master_port: 6379
+      of_master:
+        id: minion2.local
+        port: 6379
       port: 6380
     - id: minion2.local
-      master_id: minion3.local
-      master_port: 6379
+      of_master:
+        id: minion3.local
+        port: 6379
       port: 6380
     - id: minion3.local
-      master_id: minion1.local
-      master_port: 6379
+      of_master:
+        id: minion1.local
+        port: 6379
       port: 6380
 
 mongodb:
