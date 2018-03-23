@@ -15,7 +15,7 @@ COPY .travis/config/reactor_master.conf /etc/salt/master.d/reactor.conf
 COPY .travis/config/supervisord_master.conf /etc/supervisor/conf.d/supervisord.conf
 COPY .travis/pillar /srv/pillar
 COPY .travis/reactor /srv/reactor
-COPY .travis/salt/dev/top.sls /srv/envoy/salt/dev/
+COPY .travis/salt/dev/top.sls /srv/envoy/salt/base/
 COPY .travis/config/no_daemon_env /etc/default/salt-master
 
 RUN echo $(grep $(hostname) /etc/hosts | cut -f1) $hostname >> /etc/hosts && \
