@@ -1,6 +1,6 @@
 {% set default_pkgs = salt['grains.filter_by']({
       'default': {
-         'os_packages': ["vim", "sudo", "man", "insserv", "git", "zsh", "curl", "ca-certificates", "gnupg2"],
+         'os_packages': ["cron", "vim", "sudo", "man", "insserv", "git", "zsh", "curl", "ca-certificates", "gnupg2"],
          'post_install': ['echo "command3"', 'echo "command4"', 'echo "command5"'],
       },
       'Windows': {
@@ -9,7 +9,7 @@
     },
     merge=salt['grains.filter_by']({
       'stretch': {
-        'os_packages': ["vim", "sudo", "man", "rsync", "insserv", "git", "zsh", "curl", "ntp",  "ca-certificates", "gnupg2"],
+        'os_packages': ["cron", "vim", "sudo", "man", "rsync", "insserv", "git", "zsh", "curl", "ntp",  "ca-certificates", "gnupg2"],
       },
       'artful': {
         'os_packages': ["vim", "sudo", "man", "rsync", "git", "zsh", "curl", "ntp",  "ca-certificates", "gnupg2"],
