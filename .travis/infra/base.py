@@ -1,0 +1,7 @@
+def test_hosts(host):
+    hosts = host.file("/etc/hosts")
+    assert hosts.contains("1.2.3.4")
+    assert hosts.contains("coolname")
+    assert hosts.contains("192.168.1.1")
+    assert hosts.contains("gw")
+    assert hosts.contains("mygw")

@@ -15,3 +15,5 @@ echo "salt-call finished"
 cat output
 echo "scanning output"
 awk '/^Failed:/ {if($2 != "0") exit 3}' output
+
+py.test --sudo /opt/infra/$2.py
