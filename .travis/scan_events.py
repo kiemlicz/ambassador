@@ -17,7 +17,7 @@ def _validate_jobs(event_list):
     failures = [e for e in event_list if not e["success"] or e["success"] and e["retcode"] != 0]
     for f in failures:
         print("Job: {}, on minion: {}, finished with error:\n{}\n"
-              .format(f["fun"], f["id"], f["return"]).decode('string_escape'), file=sys.stderr)
+              .format(f["fun"], f["id"], json.dumps(f["return"], indent=4)).decode('string_escape'), file=sys.stderr)
 
     return len(failures) == 0
 
@@ -26,7 +26,7 @@ def _validate_runs(event_list):
     failures = [e for e in event_list if not e["success"]]
     for f in failures:
         print("Run: {}, from master, finished with error:\n{}\n"
-              .format(f["fun"], f["return"]).decode('string_escape'), file=sys.stderr)
+              .format(f["fun"], json.dumps(f["return"], indent=4)).decode('string_escape'), file=sys.stderr)
 
     return len(failures) == 0
 
