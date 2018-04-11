@@ -1,4 +1,4 @@
-def test_hosts(host):
+def test_hosts_file(host):
     hosts = host.file("/etc/hosts")
     assert hosts.contains("1.2.3.4")
     assert hosts.contains("coolname")
