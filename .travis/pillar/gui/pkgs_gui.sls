@@ -1,7 +1,7 @@
 {% set default_pkgs = salt['grains.filter_by']({
       'default': {
          'os_packages': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
-                   "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync", "mc",
+                   "nano", "tmux", "tmuxinator", "vim", "sudo", "man-db", "rsync", "mc",
                    "openssh-server", "openssh-client", "openvpn", "insserv",
                    "build-essential", "git", "zsh", "curl", "ethtool", "lm-sensors", "hddtemp", "hdparm", "ntp", "python-pip",
                    "silversearcher-ag", "kde-standard", "xterm", "yakuake", "print-manager", "wireshark", "network-manager-openvpn",
@@ -19,7 +19,7 @@
     merge=salt['grains.filter_by']({
       'stretch': {
         'os_packages': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
-                   "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync", "mc",
+                   "nano", "tmux", "tmuxinator", "vim", "sudo", "man-db", "rsync", "mc",
                    "openssh-server", "openssh-client", "openvpn", "insserv",
                    "build-essential", "git", "zsh", "curl", "ethtool", "lm-sensors", "hddtemp", "hdparm", "ntp", "python-pip",
                    "silversearcher-ag", "kde-standard", "xterm", "yakuake", "print-manager", "wireshark", "network-manager-openvpn",
@@ -28,7 +28,7 @@
       },
       'artful': {
         'os_packages': ["aptitude", "apt-transport-https",
-                   "nano", "tmux", "tmuxinator", "vim", "sudo", "man", "rsync", "mc",
+                   "nano", "tmux", "tmuxinator", "vim", "sudo", "man-db", "rsync", "mc",
                    "openssh-server", "openssh-client", "openvpn",
                    "build-essential", "git", "zsh", "curl", "ethtool", "lm-sensors", "hddtemp", "hdparm", "ntp", "python-pip",
                    "silversearcher-ag", "xterm", "yakuake", "print-manager", "wireshark", "network-manager-openvpn",
