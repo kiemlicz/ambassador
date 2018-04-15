@@ -80,7 +80,8 @@ echo "$FOREMAN_PLUGINS_REPO_ENTRY" | tee -a /etc/apt/sources.list.d/foreman.list
 apt-get update
 apt-get install -y salt-master salt-api python-pip python-pygit2 foreman-installer dnsmasq tcpdump
 #for UEFI support via proxyDHCP the minimum dnsmasq version is 2.76
-pip install --upgrade pip
+#pip 10 is not backward compatible
+#pip install --upgrade pip
 
 #check that libgit2 is properly built
 #there is bug that breaks https connection in git
