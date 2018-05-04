@@ -32,15 +32,14 @@ assert_env "PROXY_KEY is not set" $PROXY_KEY
 assert_env "CERT_BASEDIR is not set" $CERT_BASEDIR
 
 #edit versions
-readonly FOREMAN_STRETCH_REPO_URL="deb http://deb.theforeman.org/ stretch 1.16"
-readonly FOREMAN_STRETCH_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.16"
+readonly FOREMAN_STRETCH_REPO_URL="deb http://deb.theforeman.org/ stretch 1.17"
+readonly FOREMAN_STRETCH_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.17"
 readonly FOREMAN_STRETCH_REPO_KEY="https://deb.theforeman.org/pubkey.gpg"
 
 readonly PUPPET_STRETCH_SERVER_PKG="puppet5-release-stretch.deb"
 
 readonly FOREMAN_PUPPET_SERVER_URL="https://apt.puppetlabs.com"
 
-#due to https://github.com/saltstack/salt/issues/44013 2017.7.2 must be omitted
 readonly SALTSTACK_STRETCH_REPO_URL="deb http://repo.saltstack.com/apt/debian/9/amd64/latest stretch main"
 readonly SALTSTACK_STRETCH_REPO_KEY_URL="https://repo.saltstack.com/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub"
 
