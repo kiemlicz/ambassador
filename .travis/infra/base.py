@@ -25,4 +25,3 @@ def test_mail(host):
     assert addresses.contains("username@domain.com")
     exim = host.service("exim4")
     assert exim.is_running
-    assert exim.is_enabled
