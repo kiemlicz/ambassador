@@ -15,7 +15,7 @@ def test_packages(host):
 def test_mail(host):
     update_conf = host.file("/etc/exim4/update-exim4.conf.conf")
     assert update_conf.contains("dc_smarthost")
-    assert update_conf.contains("'smtp.gmail.com::587'")
+    assert update_conf.contains("smtp.gmail.com::587")
     assert update_conf.contains("MAIN_TLS_ENABLE")
     passwd = host.file("/etc/exim4/passwd")
     assert passwd.contains("username@domain.com:uberpassword")
