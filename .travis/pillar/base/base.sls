@@ -28,7 +28,7 @@ mail:
         dc_hide_mailname: 'false'
         dc_mailname_in_oh: 'true'
         dc_localdelivery: 'mail_spool'
-        MAIN_TLS_ENABLE': 1
+        MAIN_TLS_ENABLE: 1
     - location: "/etc/exim4/passwd"
       source: "salt://mail/templates/passwd"
       user: 'root'
