@@ -32,15 +32,14 @@ assert_env "PROXY_KEY is not set" $PROXY_KEY
 assert_env "CERT_BASEDIR is not set" $CERT_BASEDIR
 
 #edit versions
-readonly FOREMAN_STRETCH_REPO_URL="deb http://deb.theforeman.org/ stretch 1.16"
-readonly FOREMAN_STRETCH_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.16"
+readonly FOREMAN_STRETCH_REPO_URL="deb http://deb.theforeman.org/ stretch 1.17"
+readonly FOREMAN_STRETCH_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.17"
 readonly FOREMAN_STRETCH_REPO_KEY="https://deb.theforeman.org/pubkey.gpg"
 
 readonly PUPPET_STRETCH_SERVER_PKG="puppet5-release-stretch.deb"
 
 readonly FOREMAN_PUPPET_SERVER_URL="https://apt.puppetlabs.com"
 
-#due to https://github.com/saltstack/salt/issues/44013 2017.7.2 must be omitted
 readonly SALTSTACK_STRETCH_REPO_URL="deb http://repo.saltstack.com/apt/debian/9/amd64/latest stretch main"
 readonly SALTSTACK_STRETCH_REPO_KEY_URL="https://repo.saltstack.com/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub"
 
@@ -122,7 +121,7 @@ fi
 #todo use pip install --user and add to PATH ~/.local/bin
 #somehow these dependencies are already present, that's why use of --upgrade
 #as long as this is not released https://github.com/saltstack/salt/issues/44601 CherryPy max supported version is 11.2.0
-pip install --upgrade docker-py cherrypy==11.2.0 jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib google-auth
+pip install --upgrade docker-py cherrypy jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib google-auth
 
 useradd -r saltuser
 echo 'saltuser:saltpassword' | chpasswd
@@ -195,16 +194,16 @@ readonly CRED=$(foreman-installer \
     --foreman-proxy-oauth-consumer-secret=$OAUTH_SECRET \
     --enable-foreman-compute-libvirt \
     --enable-foreman-plugin-discovery \
-    --enable-foreman-proxy-plugin-discovery \
-    --enable-foreman-plugin-salt \
-    --enable-foreman-proxy-plugin-salt \
-    --foreman-proxy-plugin-salt-api=true \
-    --foreman-proxy-plugin-salt-api-url=https://$CID:9191 | sed -n 's/.*Initial credentials are \([[:alpha:]]*\) \/ \([[:alnum:]]*\)/\1:\2/p')
+    --enable-foreman-proxy-plugin-discovery | sed -n 's/.*Initial credentials are \([[:alpha:]]*\) \/ \([[:alnum:]]*\)/\1:\2/p')
 
 #this plugin causes a lot of problems, disabled temporarily
 #foreman-installer \
 #    --enable-foreman-plugin-remote-execution \
 #    --enable-foreman-proxy-plugin-remote-execution-ssh
+#    --enable-foreman-plugin-salt \
+#    --enable-foreman-proxy-plugin-salt \
+#    --foreman-proxy-plugin-salt-api=true \
+#    --foreman-proxy-plugin-salt-api-url=https://$CID:9191
 
 readonly FOREMAN_GUI_USER=$(echo "$CRED" | cut -d: -f1)
 readonly FOREMAN_GUI_PASSWORD=$(echo "$CRED" | cut -d: -f2)
