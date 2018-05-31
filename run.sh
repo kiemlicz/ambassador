@@ -193,6 +193,10 @@ readonly CRED=$(foreman-installer \
     --foreman-proxy-oauth-consumer-key=$OAUTH_KEY \
     --foreman-proxy-oauth-consumer-secret=$OAUTH_SECRET \
     --enable-foreman-compute-libvirt \
+    --enable-foreman-plugin-salt \
+    --enable-foreman-proxy-plugin-salt \
+    --foreman-proxy-plugin-salt-api=true \
+    --foreman-proxy-plugin-salt-api-url=https://$CID:9191 \
     --enable-foreman-plugin-discovery \
     --enable-foreman-proxy-plugin-discovery | sed -n 's/.*Initial credentials are \([[:alpha:]]*\) \/ \([[:alnum:]]*\)/\1:\2/p')
 
@@ -200,10 +204,6 @@ readonly CRED=$(foreman-installer \
 #foreman-installer \
 #    --enable-foreman-plugin-remote-execution \
 #    --enable-foreman-proxy-plugin-remote-execution-ssh
-#    --enable-foreman-plugin-salt \
-#    --enable-foreman-proxy-plugin-salt \
-#    --foreman-proxy-plugin-salt-api=true \
-#    --foreman-proxy-plugin-salt-api-url=https://$CID:9191
 
 readonly FOREMAN_GUI_USER=$(echo "$CRED" | cut -d: -f1)
 readonly FOREMAN_GUI_PASSWORD=$(echo "$CRED" | cut -d: -f2)
