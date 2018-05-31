@@ -17,7 +17,7 @@ mail:
       settings:
         dc_eximconfig_configtype: 'smarthost'
         dc_other_hostnames: ''
-        dc_local_interfaces: '127.0.0.1 ; ::1'
+        dc_local_interfaces: '127.0.0.1'
         dc_readhost: ''
         dc_relay_domains: ''
         dc_minimaldns: 'false'
@@ -29,6 +29,7 @@ mail:
         dc_mailname_in_oh: 'true'
         dc_localdelivery: 'mail_spool'
         MAIN_TLS_ENABLE: 1
+        disable_ipv6: 'true'
     - location: "/etc/exim4/passwd"
       source: "salt://mail/templates/passwd"
       user: 'root'
