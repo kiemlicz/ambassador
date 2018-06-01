@@ -237,7 +237,7 @@ if [ -f /.dockerenv ]; then
     service dnsmasq restart
 else
     systemctl enable foreman foreman-proxy salt-master salt-api dnsmasq file_ext_authorize
-    systemctl restart foreman foreman-proxy salt-master salt-api dnsmasq foreman-tasks file_ext_authorize
+    systemctl restart foreman foreman-proxy salt-master salt-api dnsmasq file_ext_authorize ruby-foreman-tasks
 fi
 
 echo "User: $FOREMAN_GUI_USER"
