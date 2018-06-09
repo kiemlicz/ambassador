@@ -70,6 +70,11 @@ while [[ $# -gt 0 ]]; do
         CLIENT_SECRET="$2"
         shift
         ;;
+        -u|--users)
+        #comma separated alowed users list
+        ALLOWED_USERS="$2"
+        shift
+        ;;
         *)
         # unknown option
         ;;
@@ -88,6 +93,7 @@ readonly CONTAINER_USER_HOME=/root # /home/$CONTAINER_USERNAME
 readonly CONTAINER_OS=debian
 readonly CONTAINER_OS_MAJOR=stretch
 readonly CONTAINER_BACKING_STORE=best
+readonly USERS=${ALLOWED_USERS-"$USER"}
 
 readonly setup_start_ts=$(date +%s.%N)
 
@@ -155,8 +161,18 @@ if [ ! -f ~/.ssh/id_rsa.pub ]; then
     echo "User: $CONTAINER_USERNAME, keypair doesn't exist, please generate it"
     exit 1
 fi
+#setup SSH keys for login
 chroot $CONTAINER_ROOTFS sh -c "mkdir $CONTAINER_USER_HOME/.ssh/"
-cat ~/.ssh/id_rsa.pub >> $CONTAINER_ROOTFS/$CONTAINER_USER_HOME/.ssh/authorized_keys
+OIFS=$IFS
+IFS=","
+for u in $USERS; do
+    #use tilde expansion to get arbitrary user home directory
+    user_home=$(eval echo "~$u")
+    #remove previous association if any
+    ssh-keygen -f $user_home/.ssh/known_hosts -R $CONTAINER_FQDN
+    cat $user_home/.ssh/id_rsa.pub >> $CONTAINER_ROOTFS/$CONTAINER_USER_HOME/.ssh/authorized_keys
+done
+IFS=$OIFS
 chroot $CONTAINER_ROOTFS sh -c "chown $CONTAINER_USERNAME.$CONTAINER_USERNAME $CONTAINER_USER_HOME/.ssh/authorized_keys; chmod 600 $CONTAINER_USER_HOME/.ssh/authorized_keys"
 
 if [ "$AUTO_CERT_GENERATION" = true ]; then
