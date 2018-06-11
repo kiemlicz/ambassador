@@ -78,3 +78,6 @@ before_install:
 script:
   - travis_wait 60 .travis/run.sh
   - .travis/after.sh
+
+after_failure:
+  - .travis/publish.sh
