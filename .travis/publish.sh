@@ -1,15 +1,29 @@
 #!/usr/bin/env bash
 
+
+# $1 tag name
+docker_push() {
+    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    docker commit $1 kiemlicz/ambassador:$1
+    docker push kiemlicz/ambassador:$1
+}
+
 case "$TEST_CASE" in
 salt-masterless-run)
-    echo "Unable to publish yet"
+    if [ $TRAVIS_TEST_RESULT -eq 0 ]; then
+        docker_push "salt-masterless-$TRAVIS_JOB_NUMBER"
+    else
+        docker_push "salt-masterless-$TRAVIS_JOB_NUMBER-failed"
+    fi
     ;;
 salt-master-run)
-    echo "Unable to publish yet"
+    echo "salt-master-run publish is disabled"
     ;;
 ambassador-run)
-    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    docker commit "ambassador-run-$TRAVIS_JOB_NUMBER" kiemlicz/ambassador:"ambassador-run-$TRAVIS_JOB_NUMBER"
-    docker push kiemlicz/ambassador:"ambassador-run-$TRAVIS_JOB_NUMBER"
+    if [ $TRAVIS_TEST_RESULT -eq 0 ]; then
+        docker_push "ambassador-run-$TRAVIS_JOB_NUMBER"
+    else
+        docker_push "ambassador-run-$TRAVIS_JOB_NUMBER-failed"
+    fi
     ;;
 esac
