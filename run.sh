@@ -146,6 +146,39 @@ chmod 640 $FOREMAN_KEY
 chmod 640 $FOREMAN_PROXY_KEY
 
 echo "running foreman-installer (nameserver=$CIF, domain=$(dnsdomainname), fqdn=$CID, IP=$CIP)"
+
+if [ -f /.dockerenv ]; then
+    # terrible workaround for http://projects.theforeman.org/issues/23656
+    cat << EOF > /etc/default/dynflowd
+FOREMAN_USER=foreman
+BUNDLER_EXT_HOME=/usr/share/foreman
+RAILS_ENV=production
+FOREMAN_LOGGING=warn
+FOREMAN_LOGGING_SQL=warn
+FOREMAN_TASK_PARAMS=' '
+FOREMAN_LOG_DIR=/var/log/foreman
+
+RUBY_GC_MALLOC_LIMIT=4000100
+RUBY_GC_MALLOC_LIMIT_MAX=16000100
+RUBY_GC_MALLOC_LIMIT_GROWTH_FACTOR=1.1
+RUBY_GC_OLDMALLOC_LIMIT=16000100
+RUBY_GC_OLDMALLOC_LIMIT_MAX=16000100
+
+#Set the number of executors you want to run
+#EXECUTORS_COUNT=1
+
+#Set memory limit for executor process, before it's restarted automatically
+#EXECUTOR_MEMORY_LIMIT=2gb
+
+#Set delay before first memory polling to let executor initialize (in sec)
+#EXECUTOR_MEMORY_MONITOR_DELAY=7200 #default: 2 hours
+
+#Set memory polling interval, process memory will be checked every N seconds.
+#EXECUTOR_MEMORY_MONITOR_INTERVAL=60
+
+EOF
+fi
+
 #install process divided into two steps as oauth token needs to be present for PXE and salt setup
 #http://projects.theforeman.org/issues/16241
 #https://theforeman.org/manuals/1.12/index.html#3.2.3InstallationScenarios
