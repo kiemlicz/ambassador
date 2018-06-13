@@ -35,6 +35,16 @@ salt-master-run)
     ;;
 ambassador-run)
     #docker build --build-arg=FQDN="$TEST_FQDN" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/run/Dockerfile .
+    mkdir -p /etc/foreman/ssl/private/
+    mkdir -p /etc/foreman/ssl/certs/
+    mkdir -p /etc/foreman/ssl/
+    mkdir -p /etc/salt/
+    mkdir -p /var/tmp/
+    mkdir -p /etc/dnsmasq.d/
+    mkdir -p /etc/foreman-proxy/settings.d/
+    mkdir -p /etc/systemd/system/
+    mkdir -p /opt/file_ext_authorize/
+
     cp .travis/config/ssl/*.key /etc/foreman/ssl/private/
     cp .travis/config/ssl/*.cert /etc/foreman/ssl/certs/
     cp .travis/config/ssl/crl.pem /etc/foreman/ssl/
