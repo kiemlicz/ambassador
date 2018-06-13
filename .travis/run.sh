@@ -10,7 +10,6 @@ salt-master-run)
     docker-compose -f .travis/docker-compose.yml --project-directory=. --no-ansi up --no-build --no-recreate
     ;;
 ambassador-run)
-    #docker run --name "ambassador-run-$TRAVIS_JOB_NUMBER" --privileged -h $TEST_FQDN "$DOCKER_IMAGE"
-    sudo /opt/run.sh
+    docker run --name "ambassador-run-$TRAVIS_JOB_NUMBER" --privileged -h $TEST_FQDN "$DOCKER_IMAGE"
     ;;
 esac
