@@ -148,6 +148,7 @@ chmod 640 $FOREMAN_PROXY_KEY
 echo "running foreman-installer (nameserver=$CIF, domain=$(dnsdomainname), fqdn=$CID, IP=$CIP)"
 
 if [ -f /.dockerenv ]; then
+    echo "dynflow bogus argument workaround"
     # terrible workaround for http://projects.theforeman.org/issues/23656
     cat << EOF > /etc/default/dynflowd
 FOREMAN_USER=foreman

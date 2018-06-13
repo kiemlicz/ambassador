@@ -81,3 +81,7 @@ script:
 
 after_failure:
   - .travis/publish.sh
+
+addons:
+  hosts:
+    - ambassadortest.com
