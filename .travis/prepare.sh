@@ -20,30 +20,35 @@ docker_compose_update() {
     docker --version
 }
 
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-sudo apt-get update
-sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+docker_update() {
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    sudo apt-get update
+    sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
+}
+
 
 case "$TEST_CASE" in
 salt-masterless-run)
+    docker_update
     docker build --build-arg=SALT_VER=$SALT_VER --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" --build-arg=SALTENV="$SALTENV" --build-arg=PILLARENV="$PILLARENV" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/masterless/Dockerfile .
     ;;
 salt-master-run)
+    docker_update
     docker_compose_update
     docker-compose -f .travis/docker-compose.yml --project-directory=. --no-ansi up --no-start
     ;;
 ambassador-run)
     #docker build --build-arg=FQDN="$TEST_FQDN" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/run/Dockerfile .
-    mkdir -p /etc/foreman/ssl/private/
-    mkdir -p /etc/foreman/ssl/certs/
-    mkdir -p /etc/foreman/ssl/
-    mkdir -p /etc/salt/
-    mkdir -p /var/tmp/
-    mkdir -p /etc/dnsmasq.d/
-    mkdir -p /etc/foreman-proxy/settings.d/
-    mkdir -p /etc/systemd/system/
-    mkdir -p /opt/file_ext_authorize/
+    sudo mkdir -p /etc/foreman/ssl/private/
+    sudo mkdir -p /etc/foreman/ssl/certs/
+    sudo mkdir -p /etc/foreman/ssl/
+    sudo mkdir -p /etc/salt/
+    sudo mkdir -p /var/tmp/
+    sudo mkdir -p /etc/dnsmasq.d/
+    sudo mkdir -p /etc/foreman-proxy/settings.d/
+    sudo mkdir -p /etc/systemd/system/
+    sudo mkdir -p /opt/file_ext_authorize/
 
     cp .travis/config/ssl/*.key /etc/foreman/ssl/private/
     cp .travis/config/ssl/*.cert /etc/foreman/ssl/certs/

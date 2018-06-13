@@ -11,6 +11,6 @@ salt-master-run)
     ;;
 ambassador-run)
     #docker run --name "ambassador-run-$TRAVIS_JOB_NUMBER" --privileged -h $TEST_FQDN "$DOCKER_IMAGE"
-    /opt/run.sh
+    sudo /opt/run.sh
     ;;
 esac
