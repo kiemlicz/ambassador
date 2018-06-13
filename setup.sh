@@ -170,6 +170,8 @@ for u in $USERS; do
     user_home=$(eval echo "~$u")
     #remove previous association if any
     ssh-keygen -f $user_home/.ssh/known_hosts -R $CONTAINER_FQDN
+    #ssh-keygen will change the ownership
+    chown $u.$u $user_home/.ssh/known_hosts
     cat $user_home/.ssh/id_rsa.pub >> $CONTAINER_ROOTFS/$CONTAINER_USER_HOME/.ssh/authorized_keys
 done
 IFS=$OIFS
