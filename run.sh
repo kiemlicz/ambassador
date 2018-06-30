@@ -262,6 +262,9 @@ EOF
 #su foreman -s /bin/bash
 #ssh-copy-id user@KVM_host
 
+# makes gitfs work...
+salt-run fileserver.clear_cache
+
 if [ -f /.dockerenv ]; then
     # there is no systemd inside of docker containers, somehow service command works
     service foreman restart
