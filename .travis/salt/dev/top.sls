@@ -1,10 +1,6 @@
 dev:
   '*':
-    - hosts
-    - repositories
-    - locale
-    - pkgs
-    - mounts
+    - os
     - projects
     - redis.client
     - mongodb.client
