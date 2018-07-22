@@ -36,15 +36,15 @@ env:
       TEST_CASE=salt-masterless-run
       SALTENV=dev
       PILLARENV=dev
-    - DOCKER_IMAGE=ubuntu-artful
+    - DOCKER_IMAGE=ubuntu-bionic
       TEST_CASE=salt-masterless-run
       SALTENV=base
       PILLARENV=base
-    - DOCKER_IMAGE=ubuntu-artful
+    - DOCKER_IMAGE=ubuntu-bionic
       TEST_CASE=salt-masterless-run
       SALTENV=gui
       PILLARENV=gui
-    - DOCKER_IMAGE=ubuntu-artful
+    - DOCKER_IMAGE=ubuntu-bionic
       TEST_CASE=salt-masterless-run
       SALTENV=dev
       PILLARENV=dev
@@ -60,7 +60,7 @@ env:
 #      TEST_CASE=salt-master-run
 #      SALTENV=dev
 #      PILLARENV=orch
-    - DOCKER_IMAGE=ubuntu-artful
+    - DOCKER_IMAGE=ubuntu-bionic
       TEST_CASE=salt-master-run
       SALTENV=dev
       PILLARENV=orch

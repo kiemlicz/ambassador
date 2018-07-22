@@ -1,4 +1,4 @@
-FROM ubuntu:artful
+FROM ubuntu:bionic
 
 ARG LOG_LEVEL
 ARG SALTENV
