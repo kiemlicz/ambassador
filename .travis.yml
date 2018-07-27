@@ -18,10 +18,6 @@ env:
       PILLARENV=base
     - DOCKER_IMAGE=debian-sid
       TEST_CASE=salt-masterless-run
-      SALTENV=gui
-      PILLARENV=gui
-    - DOCKER_IMAGE=debian-sid
-      TEST_CASE=salt-masterless-run
       SALTENV=dev
       PILLARENV=dev
     - DOCKER_IMAGE=debian-stretch
@@ -30,7 +26,7 @@ env:
       PILLARENV=base
     - DOCKER_IMAGE=debian-stretch
       TEST_CASE=salt-masterless-run
-      SALTENV=gui
+      SALTENV=base
       PILLARENV=gui
     - DOCKER_IMAGE=debian-stretch
       TEST_CASE=salt-masterless-run
@@ -40,10 +36,6 @@ env:
       TEST_CASE=salt-masterless-run
       SALTENV=base
       PILLARENV=base
-    - DOCKER_IMAGE=ubuntu-bionic
-      TEST_CASE=salt-masterless-run
-      SALTENV=gui
-      PILLARENV=gui
     - DOCKER_IMAGE=ubuntu-bionic
       TEST_CASE=salt-masterless-run
       SALTENV=dev
@@ -69,7 +61,6 @@ matrix:
   fast_finish: true
   allow_failures: # only unstable distro-based tests are allowed to fail
     - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=base PILLARENV=base
-    - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=gui PILLARENV=gui
     - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=dev PILLARENV=dev
 
 before_install:
