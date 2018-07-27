@@ -1,3 +1,6 @@
+{% set os = salt['grains.get']('lsb_distrib_id') %}
+{% set dist_codename = salt['grains.get']('lsb_distrib_codename') %}
+
 repositories:
   {{ salt['grains.filter_by']({
     'default': {
