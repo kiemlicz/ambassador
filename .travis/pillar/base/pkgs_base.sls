@@ -11,7 +11,7 @@
       'stretch': {
         'os_packages': ["cron", "vim", "sudo", "man-db", "rsync", "insserv", "git", "zsh", "curl", "ntp",  "ca-certificates", "gnupg2"],
       },
-      'artful': {
+      'bionic': {
         'os_packages': ["vim", "sudo", "man-db", "rsync", "git", "zsh", "curl", "ntp",  "ca-certificates", "gnupg2"],
       }
     }, grain='oscodename')) %}

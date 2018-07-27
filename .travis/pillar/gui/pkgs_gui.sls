@@ -26,7 +26,7 @@
                    "google-chrome-stable", "firefox-esr", "exuberant-ctags", "tig", "libreoffice", "software-properties-common",
 		           "ca-certificates", "gnupg2"],
       },
-      'artful': {
+      'bionic': {
         'os_packages': ["aptitude", "apt-transport-https",
                    "nano", "tmux", "tmuxinator", "vim", "sudo", "man-db", "rsync", "mc",
                    "openssh-server", "openssh-client", "openvpn",
