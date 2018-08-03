@@ -16,7 +16,7 @@ docker_push() {
 
 case "$TEST_CASE" in
 salt-masterless-run)
-    docker_push "salt-masterless-$TRAVIS_JOB_NUMBER"
+    docker_push "ambassador-salt-masterless-run-$TRAVIS_JOB_NUMBER"
     ;;
 salt-master-run)
     echo "salt-master-run publish is disabled"
