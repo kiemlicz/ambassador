@@ -29,6 +29,11 @@ users:
       - bitbucket.org
       - github.com
     sec:
+      ssh_authorized_keys:
+        - names:
+            - "AAAAB3NzaC1yc2OIUASDAFOUISDDAQABAAABAQDeweoaAYfqjhSJK47"
+            - "AAAAB3NzaC1yc2OIUASDAFOUISDDAQABAAABAQDeweoaAYfqjhSJK48"
+          enc: "ssh-rsa"
       ssh:
         - name: home
           privkey_location: {{ home_dir }}/.ssh/id_rsa
