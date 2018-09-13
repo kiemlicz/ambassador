@@ -31,8 +31,8 @@ users:
     sec:
       ssh_authorized_keys:
         - names:
-            - "AAAAB3NzaC1yc2OIUASDAFOUISDDAQABAAABAQDeweoaAYfqjhSJK47"
-            - "AAAAB3NzaC1yc2OIUASDAFOUISDDAQABAAABAQDeweoaAYfqjhSJK48"
+            - "AAAAB3NzaC1yc2EAAAADAQABAAABAQDSG20upSqUIvb6OpPMG1/KR+EIKf2d3VZOOlm5baoXSW9sxRZe4rjxPcPwUb4ArJFECOkwdxJrZ3I9hGZ4si3Gn3ibBoopncydIV274p34yyT3h0WMadijkkI4m8eLgjV2a6IaPjuLyNtPtMme6b4jYuiBaQ9RMUCnhY49mkGzd7BI8do6pJEJXOaiR4agrr3WMQQBNmjrAoVv1OUsUd0/22BAobcDioa+LGAf+FaJoXTUkGtSf6FKGRu1HYBz0AmHmdNexRZSlzutzSQOZgK9qwmbKlj0cgl4CMBwkL5nL/1CQjHyoqPxaPGZs4jIb5+UxbYpZgPPwimcXAhu57QR"
+            - "AAAAB3NzaC1yc2EAAAADAQABAAABAQC+wNUrLZrf4lQATkgW8N0wYPIHsTh2LJhL3mctkiLQNPhEX9FU8Y8K3mFROOsl5usJg/EzxLGap4ZLuy5ued7EFIODzZFWok9ewVthG3meeByrrfissUX/fcnaMQGpu0wrbm/xVpMXXTg3jKPzx1rkqzNZfswQ1UyIxlCQUkWhAGoDO0H1I1RDdKwNsQ7jG1/2d3qOQkw5jT2RlI2EhzSiLnI5MRs7QAfzZOGH135q039BzwoLsukNiCYtiAd3aVO8xTh/Q3jP/kvosObQ6jWzGUtbABl8lSlMiS8ocefG1q1XWOPxv3eS8wS/TUQOV+2rXxXXigTJbkyX8GEzcUG1"
           enc: "ssh-rsa"
       ssh:
         - name: home
