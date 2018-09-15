@@ -183,11 +183,12 @@ done
 IFS=$OIFS
 chroot $CONTAINER_ROOTFS sh -c "chown $CONTAINER_USERNAME.$CONTAINER_USERNAME $CONTAINER_USER_HOME/.ssh/authorized_keys; chmod 600 $CONTAINER_USER_HOME/.ssh/authorized_keys"
 
+mkdir -p $CONTAINER_ROOTFS/$CONTAINER_CERT_DIR
+mkdir -p $CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR
+
 if [ "$AUTO_CERT_GENERATION" = true ]; then
     . util/sec/cert_functions
     SSL_BASE=$CONTAINER_ROOTFS/$CONTAINER_CERT_BASE
-    mkdir -p $CONTAINER_ROOTFS/$CONTAINER_CERT_DIR
-    mkdir -p $CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR
     #further ssl/ca-certificates installation doesn't clear /etc/ssl/private/certs contents
     echo "generating ca, certs: $SSL_BASE"
     touch $SSL_BASE/index.txt
