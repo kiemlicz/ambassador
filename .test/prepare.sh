@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+
+report_error() {
+    #todo attach logs
+    mail -s "Test failure" $NOTIFY
+}
+trap report_error ERR
+
+while [[ $# -gt 0 ]]; do
+    arg="$1"
+    case $arg in
+        -m|--mail)
+        NOTIFY="$2"
+        shift
+        ;;
+        --client_id)
+        CLIENT_ID="$2"
+        shift
+        ;;
+        --client_secret)
+        CLIENT_SECRET="$2"
+        shift
+        ;;
+        *)
+        # unknown option
+        ;;
+    esac
+    shift # past argument or value
+done
+
+readonly CONTAINER_NAME=tester
+readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
+
+./setup.sh --ca .test/ca.cert.pem --cert .test/server.cert.pem --proxy-cert .test/server.cert.pem \
+    --key .test/server.key --proxy-key .test/server.key \
+    --client_id $CLIENT_ID --client_secret $CLIENT_SECRET -u "$USER" -n $CONTAINER_NAME
+
+. util/core/text_functions
+
+substenv_file AMBASSADOR .test/config/lxc.conf > $CONTAINER_ROOTFS/etc/salt/cloud.d/ambassador_common.conf
+
+#todo create test container node (LXC salt module)
+#todo provision node
+#todo add to cron (should go backgroud or not?)

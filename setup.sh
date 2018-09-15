@@ -75,6 +75,11 @@ while [[ $# -gt 0 ]]; do
         ALLOWED_USERS="$2"
         shift
         ;;
+        -s|--stop)
+        #comma separated alowed users list
+        CONTAINER_STOP="$2"
+        shift
+        ;;
         *)
         # unknown option
         ;;
@@ -93,6 +98,7 @@ readonly CONTAINER_USER_HOME=/root # /home/$CONTAINER_USERNAME
 readonly CONTAINER_OS=debian
 readonly CONTAINER_OS_MAJOR=stretch
 readonly CONTAINER_BACKING_STORE=best
+readonly CONTAINER_STOP_AFTER=${CONTAINER_STOP-false}
 readonly USERS=${ALLOWED_USERS-"$USER"}
 
 readonly setup_start_ts=$(date +%s.%N)
@@ -317,7 +323,10 @@ echo "script running in background, waiting for: $!"
 wait $!
 retval=$?
 echo "stopping container"
-stop_container $CONTAINER_NAME
+
+if [ "$CONTAINER_STOP_AFTER" = true ]; then
+    stop_container $CONTAINER_NAME
+fi
 
 readonly run_stop_ts=$(date +%s.%N)
 
