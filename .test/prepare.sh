@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 
 report_error() {
+    local rv=$?
     #todo attach logs
     echo "Check logs" | mail -s "Test failure" $NOTIFY
+    exit $rv
 }
 trap report_error ERR
 
