@@ -2,7 +2,7 @@
 
 report_error() {
     #todo attach logs
-    mail -s "Test failure" $NOTIFY
+    echo "Check logs" | mail -s "Test failure" $NOTIFY
 }
 trap report_error ERR
 
