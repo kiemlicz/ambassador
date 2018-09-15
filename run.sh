@@ -77,7 +77,7 @@ echo "$FOREMAN_PLUGINS_REPO_ENTRY" | tee -a /etc/apt/sources.list.d/foreman.list
 
 # Install Salt and Foreman
 apt-get update
-apt-get install -y salt-master salt-api python-pip python-pygit2 foreman-installer dnsmasq tcpdump nano vim
+apt-get install -y salt-master salt-api salt-ssh python-pip python-pygit2 foreman-installer dnsmasq tcpdump nano vim
 #for UEFI support via proxyDHCP the minimum dnsmasq version is 2.76
 #pip 10 is not backward compatible
 #pip install --upgrade pip
