@@ -33,10 +33,7 @@ done
 readonly CONTAINER_NAME=tester
 readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
 
-./setup.sh --ca .test/config/ssl/ca.cert.pem --cert .test/config/ssl/server.cert.pem --proxy-cert .test/config/ssl/server.cert.pem \
-    --key .test/config/ssl/server.key --proxy-key .test/config/ssl/server.key \
-    --crl .test/config/ssl/crl.pem \
-    --client_id $CLIENT_ID --client_secret $CLIENT_SECRET -u "$USER" -n $CONTAINER_NAME
+./setup.sh -c --client_id $CLIENT_ID --client_secret $CLIENT_SECRET -u "$USER" -n $CONTAINER_NAME
 
 . util/core/text_functions
 
