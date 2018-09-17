@@ -229,6 +229,7 @@ fi
 # prepare directories
 mkdir -p $CONTAINER_ROOTFS/etc/salt/deploykeys/
 mkdir -p $CONTAINER_ROOTFS/etc/salt/master.d/
+mkdir -p $CONTAINER_ROOTFS/etc/salt/cloud.d/
 mkdir -p $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/
 mkdir -p $CONTAINER_ROOTFS/etc/dnsmasq.d/
 mkdir -p $CONTAINER_ROOTFS/srv/salt_ext/
