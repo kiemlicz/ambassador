@@ -37,7 +37,9 @@ readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
 
 . util/core/text_functions
 
-substenv_file AMBASSADOR .test/config/lxc.conf > $CONTAINER_ROOTFS/etc/salt/cloud.d/ambassador_common.conf
+substenv_file AMBASSADOR .test/config/lxc-provider.conf > $CONTAINER_ROOTFS/etc/salt/cloud.providers.d/lxc.conf
+substenv_file AMBASSADOR .test/config/lxc-profile.conf > $CONTAINER_ROOTFS/etc/salt/cloud.profiles.d/lxc.conf
+substenv_file AMBASSADOR .test/config/lxc.conf > $CONTAINER_ROOTFS/etc/salt/master.d/lxc.conf
 
 #todo create test container node (LXC salt module)
 #todo provision node
