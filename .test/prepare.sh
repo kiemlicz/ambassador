@@ -37,6 +37,8 @@ readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
 
 . util/core/text_functions
 
+AMBASSADOR_LXC_HOST=$(hostname -f)
+
 substenv_file AMBASSADOR .test/config/lxc-provider.conf > $CONTAINER_ROOTFS/etc/salt/cloud.providers.d/lxc.conf
 substenv_file AMBASSADOR .test/config/lxc-profile.conf > $CONTAINER_ROOTFS/etc/salt/cloud.profiles.d/lxc.conf
 substenv_file AMBASSADOR .test/config/lxc.conf > $CONTAINER_ROOTFS/etc/salt/master.d/lxc.conf
