@@ -30,19 +30,24 @@ while [[ $# -gt 0 ]]; do
     shift # past argument or value
 done
 
-readonly CONTAINER_NAME=tester
-readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
+readonly CONTAINER_MASTER_NAME=tester
+readonly CONTAINER_SLAVE_NAME=tested
+readonly CONTAINER_MASTER_ROOTFS=/var/lib/lxc/$CONTAINER_MASTER_NAME/rootfs
+readonly CONTAINER_SLAVE_ROOTFS=/var/lib/lxc/$CONTAINER_SLAVE_NAME/rootfs
 
-./setup.sh -c --client_id $CLIENT_ID --client_secret $CLIENT_SECRET -u "$USER" -n $CONTAINER_NAME
+./setup.sh -c --client_id $CLIENT_ID --client_secret $CLIENT_SECRET -u "$USER" -n $CONTAINER_MASTER_NAME
 
 . util/core/text_functions
+. util/vm/lxc_functions
 
 AMBASSADOR_LXC_HOST=$(hostname -f)
 
-substenv_file AMBASSADOR .test/config/lxc-provider.conf > $CONTAINER_ROOTFS/etc/salt/cloud.providers.d/lxc.conf
-substenv_file AMBASSADOR .test/config/lxc-profile.conf > $CONTAINER_ROOTFS/etc/salt/cloud.profiles.d/lxc.conf
-substenv_file AMBASSADOR .test/config/lxc.conf > $CONTAINER_ROOTFS/etc/salt/master.d/lxc.conf
+substenv_file AMBASSADOR .test/config/lxc-provider.conf > $CONTAINER_MASTER_ROOTFS/etc/salt/cloud.providers.d/lxc.conf
+substenv_file AMBASSADOR .test/config/lxc-profile.conf > $CONTAINER_MASTER_ROOTFS/etc/salt/cloud.profiles.d/lxc.conf
+substenv_file AMBASSADOR .test/config/lxc.conf > $CONTAINER_MASTER_ROOTFS/etc/salt/master.d/lxc.conf
 
-#todo create test container node (LXC salt module)
+# create test container
+create_container config/network.conf $CONTAINER_SLAVE_NAME
+
 #todo provision node
 #todo add to cron (should go backgroud or not?)
