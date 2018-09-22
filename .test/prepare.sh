@@ -54,7 +54,7 @@ create_container config/network.conf $CONTAINER_SLAVE_NAME
 lxc_ensure_ssh_key $USER $CONTAINER_SLAVE_FQDN $CONTAINER_SLAVE_ROOTFS/root
 chroot $CONTAINER_SLAVE_ROOTFS sh -c "chown root.root /root/.ssh/authorized_keys; chmod 600 /root/.ssh/authorized_keys"
 
-substenv_file AMBASSADOR .test/config/minion.conf > $CONTAINER_MASTER_ROOTFS/etc/salt/minion.d/minion.conf
+substenv_file AMBASSADOR .test/config/minion.conf > $CONTAINER_SLAVE_ROOTFS/etc/salt/minion.d/minion.conf
 
 echo "starting: $CONTAINER_SLAVE_NAME"
 start_container_waiting_for_network $CONTAINER_SLAVE_NAME
