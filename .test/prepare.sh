@@ -44,9 +44,12 @@ readonly CONTAINER_SLAVE_ROOTFS=/var/lib/lxc/$CONTAINER_SLAVE_NAME/rootfs
 #todo validate the need of this LXC host
 AMBASSADOR_LXC_HOST=$(hostname -f)
 
+#how to override configs before the salt restart?
+# todo generialize setup so that it can override configs
 substenv_file AMBASSADOR .test/config/lxc-provider.conf > $CONTAINER_MASTER_ROOTFS/etc/salt/cloud.providers.d/lxc.conf
 substenv_file AMBASSADOR .test/config/lxc-profile.conf > $CONTAINER_MASTER_ROOTFS/etc/salt/cloud.profiles.d/lxc.conf
 substenv_file AMBASSADOR .test/config/lxc.conf > $CONTAINER_MASTER_ROOTFS/etc/salt/master.d/lxc.conf
+substenv_file AMBASSADOR .test/config/ambassador_ext_pillar.conf > $CONTAINER_MASTER_ROOTFS/etc/salt/master.d/ambassador_ext_pillar.conf
 
 # container under test
 

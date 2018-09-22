@@ -278,6 +278,7 @@ else
     substenv_file AMBASSADOR config/ambassador_gitfs.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_gitfs.conf
 fi
 substenv_file AMBASSADOR config/ambassador_common.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_common.conf
+substenv_file AMBASSADOR config/ambassador_ext_pillar.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_ext_pillar.conf
 substenv_file AMBASSADOR config/ambassador_salt_foreman.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_salt_foreman.conf
 substenv_file AMBASSADOR config/reactor.conf > $CONTAINER_ROOTFS/etc/salt/master.d/reactor.conf
 substenv_file AMBASSADOR config/foreman.yaml > $CONTAINER_ROOTFS/etc/salt/foreman.yaml
