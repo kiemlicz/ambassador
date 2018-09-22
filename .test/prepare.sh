@@ -41,6 +41,7 @@ readonly CONTAINER_SLAVE_ROOTFS=/var/lib/lxc/$CONTAINER_SLAVE_NAME/rootfs
 . util/core/text_functions
 . util/vm/lxc_functions
 
+#todo validate the need of this LXC host
 AMBASSADOR_LXC_HOST=$(hostname -f)
 
 substenv_file AMBASSADOR .test/config/lxc-provider.conf > $CONTAINER_MASTER_ROOTFS/etc/salt/cloud.providers.d/lxc.conf
@@ -50,12 +51,15 @@ substenv_file AMBASSADOR .test/config/lxc.conf > $CONTAINER_MASTER_ROOTFS/etc/sa
 # container under test
 
 # create test container
-chroot $CONTAINER_SLAVE_ROOTFS sh -c "mkdir /root/.ssh/"
 create_container config/network.conf $CONTAINER_SLAVE_NAME
+
+# setup container
+chroot $CONTAINER_SLAVE_ROOTFS sh -c "mkdir /root/.ssh/"
+chroot $CONTAINER_SLAVE_ROOTFS sh -c "mkdir -p /etc/salt/minion.d/"
 lxc_ensure_ssh_key $USER $CONTAINER_SLAVE_FQDN $CONTAINER_SLAVE_ROOTFS/root
 chroot $CONTAINER_SLAVE_ROOTFS sh -c "chown root.root /root/.ssh/authorized_keys; chmod 600 /root/.ssh/authorized_keys"
 
-substenv_file AMBASSADOR .test/config/minion.conf > $CONTAINER_SLAVE_ROOTFS/etc/salt/minion.d/minion.conf
+substenv_file CONTAINER .test/config/minion.conf > $CONTAINER_SLAVE_ROOTFS/etc/salt/minion.d/minion.conf
 
 echo "starting: $CONTAINER_SLAVE_NAME"
 start_container_waiting_for_network $CONTAINER_SLAVE_NAME
