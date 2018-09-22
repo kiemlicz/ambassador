@@ -172,13 +172,7 @@ chroot $CONTAINER_ROOTFS sh -c "mkdir $CONTAINER_USER_HOME/.ssh/"
 OIFS=$IFS
 IFS=","
 for u in $USERS; do
-    #use tilde expansion to get arbitrary user home directory
-    user_home=$(eval echo "~$u")
-    #remove previous association if any
-    ssh-keygen -f $user_home/.ssh/known_hosts -R $CONTAINER_FQDN
-    #ssh-keygen will change the ownership
-    chown $u.$u $user_home/.ssh/known_hosts
-    cat $user_home/.ssh/id_rsa.pub >> $CONTAINER_ROOTFS/$CONTAINER_USER_HOME/.ssh/authorized_keys
+    lxc_ensure_ssh_key $u $CONTAINER_FQDN $CONTAINER_ROOTFS/$CONTAINER_USER_HOME
 done
 IFS=$OIFS
 chroot $CONTAINER_ROOTFS sh -c "chown $CONTAINER_USERNAME.$CONTAINER_USERNAME $CONTAINER_USER_HOME/.ssh/authorized_keys; chmod 600 $CONTAINER_USER_HOME/.ssh/authorized_keys"
