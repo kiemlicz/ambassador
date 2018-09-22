@@ -167,6 +167,8 @@ if [ ! -f ~/.ssh/id_rsa.pub ]; then
     echo "User: $CONTAINER_USERNAME, keypair doesn't exist, please generate it"
     exit 1
 fi
+
+##### container login
 #setup SSH keys for login
 chroot $CONTAINER_ROOTFS sh -c "mkdir $CONTAINER_USER_HOME/.ssh/"
 OIFS=$IFS

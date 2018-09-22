@@ -50,6 +50,7 @@ substenv_file AMBASSADOR .test/config/lxc.conf > $CONTAINER_MASTER_ROOTFS/etc/sa
 # container under test
 
 # create test container
+chroot $CONTAINER_SLAVE_ROOTFS sh -c "mkdir /root/.ssh/"
 create_container config/network.conf $CONTAINER_SLAVE_NAME
 lxc_ensure_ssh_key $USER $CONTAINER_SLAVE_FQDN $CONTAINER_SLAVE_ROOTFS/root
 chroot $CONTAINER_SLAVE_ROOTFS sh -c "chown root.root /root/.ssh/authorized_keys; chmod 600 /root/.ssh/authorized_keys"
