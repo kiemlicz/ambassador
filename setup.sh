@@ -8,11 +8,15 @@
 
 tear_down_container() {
     local rv=$?
-    if [ $rv -ne 0 ]; then
+    case $rv in
+        0|3)
+        ;;
+        *)
         echo "Fatal error, destroying container $CONTAINER_NAME"
         lxc-stop -n $CONTAINER_NAME
         lxc-destroy -n $CONTAINER_NAME
-    fi
+        ;;
+    esac
     exit $rv
 }
 trap tear_down_container EXIT TERM INT
@@ -104,16 +108,6 @@ readonly USERS=${ALLOWED_USERS-"$USER"}
 readonly setup_start_ts=$(date +%s.%N)
 
 ##### validate
-#expand to bash array for easier validation
-all_containers_array=($(lxc-ls))
-for container_name in "${all_containers_array[@]}"; do
-    if [[ $container_name == $CONTAINER_NAME ]]; then
-        echo "container with name: $CONTAINER_NAME already exists, exiting"
-        # exit 0 as non 0 will destroy container
-        exit 0
-    fi
-done
-
 if [ "$AUTO_CERT_GENERATION" = false ] && ([ -z $CA_CERT_FILE ] || [ -z $SERVER_CERT_FILE ] || [ -z $SERVER_KEY_FILE ] || [ -z $CRL_FILE ]); then
     echo "Provide all: ca cert, server cert, server key and crl file or use auto-generation method"
     exit 1
@@ -137,7 +131,18 @@ readonly CONTAINER_FQDN="$CONTAINER_NAME.$(dnsdomainname)"
 readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
 
 ##### build container
+
 . util/vm/lxc_functions
+
+#expand to bash array for easier validation
+all_containers_array=($(lxc-ls))
+for container_name in "${all_containers_array[@]}"; do
+    if [[ $container_name == $CONTAINER_NAME ]]; then
+        echo "container with name: $CONTAINER_NAME already exists, exiting"
+        # separate code in order not to destroy container
+        exit 3
+    fi
+done
 
 lxc-create -B $CONTAINER_BACKING_STORE -f config/network.conf -t $CONTAINER_OS -n $CONTAINER_NAME -- -r $CONTAINER_OS_MAJOR -a amd64
 retval=$?
