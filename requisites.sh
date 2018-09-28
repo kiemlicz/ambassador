@@ -20,7 +20,7 @@
 
 apt-get update
 #ubuntu-archive-keyring for ubuntu archives creation
-apt-get install lxc bridge-utils debootstrap
+apt-get install lxc bridge-utils debootstrap vagrant vagrant-lxc
 
 #ubuntu-archive-keyring not working for yakkety (and up)
 apt-get install ubuntu-archive-keyring

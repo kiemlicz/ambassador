@@ -13,8 +13,7 @@ tear_down_container() {
         ;;
         *)
         echo "Fatal error, destroying container $CONTAINER_NAME"
-        lxc-stop -n $CONTAINER_NAME
-        lxc-destroy -n $CONTAINER_NAME
+        vagrant destroy
         ;;
     esac
     exit $rv
@@ -127,6 +126,11 @@ if [ -z "$(dnsdomainname)" ]; then
     exit 1
 fi
 
+if [ ! -f ~/.ssh/id_rsa.pub ]; then
+    echo "User: $CONTAINER_USERNAME, keypair doesn't exist, please generate it"
+    exit 1
+fi
+
 readonly CONTAINER_FQDN="$CONTAINER_NAME.$(dnsdomainname)"
 readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
 
@@ -134,44 +138,15 @@ readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
 
 . util/vm/lxc_functions
 
-#expand to bash array for easier validation
-all_containers_array=($(lxc-ls))
-for container_name in "${all_containers_array[@]}"; do
-    if [[ $container_name == $CONTAINER_NAME ]]; then
-        echo "container with name: $CONTAINER_NAME already exists, exiting"
-        # separate code in order not to destroy container
-        exit 3
-    fi
-done
+vagrant up --provider=lxc
 
-lxc-create -B $CONTAINER_BACKING_STORE -f config/network.conf -t $CONTAINER_OS -n $CONTAINER_NAME -- -r $CONTAINER_OS_MAJOR -a amd64
-retval=$?
-if [ $retval -ne 0 ]; then
-    echo "error creating container: $retval"
-    exit 1
-fi
-
+#move to vagrant provisioning script
 if [ "$CONTAINER_USERNAME" != "root" ]; then
     chroot $CONTAINER_ROOTFS sh -c "echo 'ubuntu ALL=NOPASSWD:ALL' > /etc/sudoers.d/ubuntu; chmod 440 /etc/sudoers.d/ubuntu"
     echo "passwordless sudo enabled for ubuntu user"
 fi
 
-#todo how to achieve passwordless sudo -u postgres, below doesn't work
-#chroot $CONTAINER_ROOTFS sh -c "echo 'postgres ALL=NOPASSWD:ALL' > /etc/sudoers.d/postgres; chmod 440 /etc/sudoers.d/postgres"
-chroot $CONTAINER_ROOTFS sh -c \
-    "mkdir -p /etc/sudoers.d/"
-chroot $CONTAINER_ROOTFS sh -c \
-    "echo 'Cmnd_Alias SALT = /usr/bin/salt, /usr/bin/salt-key\nforeman-proxy ALL = NOPASSWD: SALT\nDefaults:foreman-proxy !requiretty' > /etc/sudoers.d/salt; chmod 440 /etc/sudoers.d/salt"
-
-# remove accepting locale on server so that no locale generation is needed
-chroot $CONTAINER_ROOTFS sh -c "sed -i -e 's/\(^AcceptEnv LANG.*\)/#\1/g' /etc/ssh/sshd_config"
-chroot $CONTAINER_ROOTFS sh -c "sed -i '/^127.0.1.1 /s/$CONTAINER_NAME/$CONTAINER_FQDN $CONTAINER_NAME/' /etc/hosts"
-#configure resolvconf utility so that proper nameserver exists, otherwise only 127.0.0.1 may appear
-chroot $CONTAINER_ROOTFS sh -c "echo 'TRUNCATE_NAMESERVER_LIST_AFTER_LOOPBACK_ADDRESS=no' > /etc/default/resolvconf"
-if [ ! -f ~/.ssh/id_rsa.pub ]; then
-    echo "User: $CONTAINER_USERNAME, keypair doesn't exist, please generate it"
-    exit 1
-fi
+#todo relocate below logic
 
 ##### container login
 #setup SSH keys for login
