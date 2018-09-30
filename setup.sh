@@ -92,17 +92,17 @@ done
 
 readonly AUTO_CERT_GENERATION=${GEN_CERT-false}
 readonly USE_ROOTS=${ROOTS-false}
-readonly CONTAINER_NAME=${CN-ambassador}
-readonly CONTAINER_CERT_BASE=/etc/foreman/ssl
-readonly CONTAINER_CERT_DIR=$CONTAINER_CERT_BASE/certs
-readonly CONTAINER_PRIVATE_DIR=$CONTAINER_CERT_BASE/private
-readonly CONTAINER_USERNAME=root
-readonly CONTAINER_USER_HOME=/root # /home/$CONTAINER_USERNAME
+export readonly CONTAINER_NAME=${CN-ambassador}
+export readonly CONTAINER_CERT_BASE=/etc/foreman/ssl
+export readonly CONTAINER_CERT_DIR=$CONTAINER_CERT_BASE/certs
+export readonly CONTAINER_PRIVATE_DIR=$CONTAINER_CERT_BASE/private
+export readonly CONTAINER_USERNAME=root
+export readonly CONTAINER_USER_HOME=/root # /home/$CONTAINER_USERNAME
 readonly CONTAINER_OS=debian
 readonly CONTAINER_OS_MAJOR=stretch
 readonly CONTAINER_BACKING_STORE=best
 readonly CONTAINER_STOP_AFTER=${CONTAINER_STOP-false}
-readonly USERS=${ALLOWED_USERS-"$USER"}
+export readonly USERS=${ALLOWED_USERS-"$USER"}
 
 readonly setup_start_ts=$(date +%s.%N)
 
@@ -131,51 +131,28 @@ if [ ! -f ~/.ssh/id_rsa.pub ]; then
     exit 1
 fi
 
-readonly CONTAINER_FQDN="$CONTAINER_NAME.$(dnsdomainname)"
+export readonly CONTAINER_FQDN="$CONTAINER_NAME.$(dnsdomainname)"
 readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
 
-##### build container
-
-. util/vm/lxc_functions
-
-vagrant up --provider=lxc
-
-#move to vagrant provisioning script
-if [ "$CONTAINER_USERNAME" != "root" ]; then
-    chroot $CONTAINER_ROOTFS sh -c "echo 'ubuntu ALL=NOPASSWD:ALL' > /etc/sudoers.d/ubuntu; chmod 440 /etc/sudoers.d/ubuntu"
-    echo "passwordless sudo enabled for ubuntu user"
-fi
-
-#todo relocate below logic
-
-##### container login
-#setup SSH keys for login
-chroot $CONTAINER_ROOTFS sh -c "mkdir $CONTAINER_USER_HOME/.ssh/"
-OIFS=$IFS
-IFS=","
-for u in $USERS; do
-    lxc_ensure_ssh_key $u $CONTAINER_FQDN $CONTAINER_ROOTFS/$CONTAINER_USER_HOME
-done
-IFS=$OIFS
-chroot $CONTAINER_ROOTFS sh -c "chown $CONTAINER_USERNAME.$CONTAINER_USERNAME $CONTAINER_USER_HOME/.ssh/authorized_keys; chmod 600 $CONTAINER_USER_HOME/.ssh/authorized_keys"
-
-mkdir -p $CONTAINER_ROOTFS/$CONTAINER_CERT_DIR
-mkdir -p $CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR
+##### initial
 
 if [ "$AUTO_CERT_GENERATION" = true ]; then
     . util/sec/cert_functions
-    SSL_BASE=$CONTAINER_ROOTFS/$CONTAINER_CERT_BASE
+    SSL_BASE=/tmp/ssl
+    SSL_CERT_DIR=$SSL_BASE/certs
+    SSL_PRIVATE_DIR=$SSL_BASE/private
     #further ssl/ca-certificates installation doesn't clear /etc/ssl/private/certs contents
     echo "generating ca, certs: $SSL_BASE"
     touch $SSL_BASE/index.txt
     echo '01' > $SSL_BASE/serial
     echo '01' > $SSL_BASE/crlnumber
-    CA_PK_FILE=$CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR/ca.key.pem
-    CA_CERT_FILE=$CONTAINER_ROOTFS/$CONTAINER_CERT_DIR/ca.cert.pem
-    SERVER_KEY_FILE=$CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR/$CONTAINER_FQDN.key
-    SERVER_PROXY_KEY_FILE=$CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR/$CONTAINER_FQDN-proxy.key
-    SERVER_CERT_FILE=$CONTAINER_ROOTFS/$CONTAINER_CERT_DIR/$CONTAINER_FQDN.pem
-    SERVER_PROXY_CERT_FILE=$CONTAINER_ROOTFS/$CONTAINER_CERT_DIR/$CONTAINER_FQDN-proxy.pem
+
+    CA_PK_FILE=$SSL_PRIVATE_DIR/ca.key.pem
+    CA_CERT_FILE=$SSL_CERT_DIR/ca.cert.pem
+    SERVER_KEY_FILE=$SSL_PRIVATE_DIR/$CONTAINER_FQDN.key
+    SERVER_PROXY_KEY_FILE=$SSL_PRIVATE_DIR/$CONTAINER_FQDN-proxy.key
+    SERVER_CERT_FILE=$SSL_CERT_DIR/$CONTAINER_FQDN.pem
+    SERVER_PROXY_CERT_FILE=$SSL_CERT_DIR/$CONTAINER_FQDN-proxy.pem
     CRL_FILE=$SSL_BASE/crl.pem
     gen_rsa_key $CA_PK_FILE
     gen_x509_cert_self_signed $CA_PK_FILE $CA_CERT_FILE config/ssl/openssl-ca.cnf $SSL_BASE
@@ -190,15 +167,26 @@ if [ "$AUTO_CERT_GENERATION" = true ]; then
     SERVER_FQDN=$CONTAINER_FQDN-proxy gen_csr $SERVER_PROXY_KEY_FILE /tmp/$CONTAINER_FQDN-proxy.csr config/ssl/openssl-server.cnf $SSL_BASE
     echo "signing server's proxy csr"
     gen_csr_sign /tmp/$CONTAINER_FQDN-proxy.csr $SERVER_PROXY_CERT_FILE config/ssl/openssl-ca.cnf $SSL_BASE
-else
-    echo "copying certificates into container fs: $CONTAINER_ROOTFS"
-    cp $CA_CERT_FILE $CONTAINER_ROOTFS/$CONTAINER_CERT_DIR
-    cp $SERVER_CERT_FILE $CONTAINER_ROOTFS/$CONTAINER_CERT_DIR
-    cp $SERVER_PROXY_CERT_FILE $CONTAINER_ROOTFS/$CONTAINER_CERT_DIR
-    cp $SERVER_KEY_FILE $CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR
-    cp $SERVER_PROXY_KEY_FILE $CONTAINER_ROOTFS/$CONTAINER_PRIVATE_DIR
-    cp $CRL_FILE $CONTAINER_ROOTFS/$CONTAINER_CERT_BASE
 fi
+
+##### build container
+
+. util/vm/lxc_functions #remove
+
+vagrant up --provider=lxc
+
+##### container login
+#setup SSH keys for login
+
+OIFS=$IFS
+IFS=","
+for u in $USERS; do
+    lxc_ensure_ssh_key $u $CONTAINER_FQDN $CONTAINER_ROOTFS/$CONTAINER_USER_HOME
+done
+IFS=$OIFS
+chroot $CONTAINER_ROOTFS sh -c "chown $CONTAINER_USERNAME.$CONTAINER_USERNAME $CONTAINER_USER_HOME/.ssh/authorized_keys; chmod 600 $CONTAINER_USER_HOME/.ssh/authorized_keys"
+
+
 
 . util/core/text_functions
 

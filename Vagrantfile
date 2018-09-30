@@ -11,11 +11,18 @@ Vagrant.configure("2") do |config|
     end
   end
 
-# todo decide if we need script or we're fine with inline commands
-#  config.vm.provision "shell", path: "script.sh"
-  config.vm.provision "shell" do |s|
+
+  config.vm.provision "file", source: ENV['CA_CERT_FILE'], destination: ENV['CONTAINER_CERT_DIR']
+  config.vm.provision "file", source: ENV['SERVER_CERT_FILE'], destination: ENV['CONTAINER_CERT_DIR']
+  config.vm.provision "file", source: ENV['SERVER_PROXY_CERT_FILE'], destination: ENV['CONTAINER_CERT_DIR']
+  config.vm.provision "file", source: ENV['SERVER_KEY_FILE'], destination: ENV['CONTAINER_PRIVATE_DIR']
+  config.vm.provision "file", source: ENV['SERVER_PROXY_KEY_FILE'], destination: ENV['CONTAINER_PRIVATE_DIR']
+  config.vm.provision "file", source: ENV['CRL_FILE'], destination: ENV['CONTAINER_CERT_BASE']
+
+  config.vm.provision "init", type: "shell" do |s|
     s.args = [ENV['CONTAINER_NAME'], ENV['CONTAINER_FQDN']]
     s.inline = <<-SHELL
+
         mkdir -p /etc/sudoers.d/
         echo 'Cmnd_Alias SALT = /usr/bin/salt, /usr/bin/salt-key\nforeman-proxy ALL = NOPASSWD: SALT\nDefaults:foreman-proxy !requiretty' > /etc/sudoers.d/salt; chmod 440 /etc/sudoers.d/salt
 
@@ -30,4 +37,18 @@ Vagrant.configure("2") do |config|
         echo 'TRUNCATE_NAMESERVER_LIST_AFTER_LOOPBACK_ADDRESS=no' > /etc/default/resolvconf
     SHELL
   end
+
+  config.vm.provision "login", type: "shell", env: {"CONTAINER_USERNAME" => ENV['CONTAINER_USERNAME']} do |s|
+  # todo upload all users config files
+    ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
+    s.inline = <<-SHELL
+        if [ "$CONTAINER_USERNAME" != "root" ]; then
+            echo 'ubuntu ALL=NOPASSWD:ALL' > /etc/sudoers.d/ubuntu; chmod 440 /etc/sudoers.d/ubuntu
+        fi
+
+        mkdir -p /root/.ssh/
+        echo #{ssh_pub_key} >> /root/.ssh/authorized_keys
+    SHELL
+  end
+
 end
