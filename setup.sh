@@ -187,54 +187,8 @@ IFS=$OIFS
 
 . util/core/text_functions
 
-# prepare directories
-mkdir -p $CONTAINER_ROOTFS/etc/salt/deploykeys/
-mkdir -p $CONTAINER_ROOTFS/etc/salt/master.d/
-mkdir -p $CONTAINER_ROOTFS/etc/salt/cloud.providers.d/
-mkdir -p $CONTAINER_ROOTFS/etc/salt/cloud.profiles.d/
-mkdir -p $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/
-mkdir -p $CONTAINER_ROOTFS/etc/dnsmasq.d/
-mkdir -p $CONTAINER_ROOTFS/srv/salt_ext/
-mkdir -p $CONTAINER_ROOTFS/var/lib/tftpboot/
-mkdir -p $CONTAINER_ROOTFS/etc/apache2/sites-available/
-
-AMBASSADOR_CA=$CONTAINER_CERT_DIR/$(basename $CA_CERT_FILE)
-AMBASSADOR_CRL=$CONTAINER_CERT_BASE/$(basename $CRL_FILE)
-AMBASSADOR_KEY=$CONTAINER_PRIVATE_DIR/$(basename $SERVER_KEY_FILE)
-AMBASSADOR_PROXY_KEY=$CONTAINER_PRIVATE_DIR/$(basename $SERVER_PROXY_KEY_FILE)
-AMBASSADOR_CERT=$CONTAINER_CERT_DIR/$(basename $SERVER_CERT_FILE)
-AMBASSADOR_PROXY_CERT=$CONTAINER_CERT_DIR/$(basename $SERVER_PROXY_CERT_FILE)
-AMBASSADOR_GW=$(ip route get 8.8.8.8 | head -n1 | cut -d' ' -f3)
-AMBASSADOR_SALT_API_PORT=9191
-AMBASSADOR_SALT_API_INTERFACES=0.0.0.0
-AMBASSADOR_FQDN=$CONTAINER_FQDN
-
-if ! ([ -z $DEPLOY_PUB_FILE ] || [ -z $DEPLOY_PRIV_FILE ]); then
-    AMBASSADOR_ENVOY_DEPLOY_PUB=$(basename $DEPLOY_PUB_FILE)
-    AMBASSADOR_ENVOY_DEPLOY_PRIV=$(basename $DEPLOY_PRIV_FILE)
-    #copy keys to container
-    cp $DEPLOY_PUB_FILE $CONTAINER_ROOTFS/etc/salt/deploykeys/
-    cp $DEPLOY_PRIV_FILE $CONTAINER_ROOTFS/etc/salt/deploykeys/
-fi
-
-if ([ -n $CLIENT_ID ] && [ -n $CLIENT_SECRET ]); then
-    AMBASSADOR_CLIENT_ID=$CLIENT_ID
-    AMBASSADOR_CLIENT_SECRET=$CLIENT_SECRET
-fi
-
-#copy dependencies to container
-cp -r envoy/extensions/pillar/ $CONTAINER_ROOTFS/srv/salt_ext/
-cp -r config/bootloader/* $CONTAINER_ROOTFS/var/lib/tftpboot/
-cp -r extensions/file_ext_authorize/ $CONTAINER_ROOTFS/opt/
-cp config/file_ext_authorize.service $CONTAINER_ROOTFS/etc/systemd/system/
-
 #fill templates and copy to container
 if [ "$USE_ROOTS" = true ]; then
-    #if using roots, copy envoy to container as well
-    cp -r envoy/salt/ $CONTAINER_ROOTFS/srv/
-    cp -r envoy/pillar/ $CONTAINER_ROOTFS/srv/
-    cp -r envoy/reactor/ $CONTAINER_ROOTFS/srv/
-
     substenv_file AMBASSADOR config/ambassador_roots.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_roots.conf
 else
     if ! ([ -z $DEPLOY_PUB_FILE ] || [ -z $DEPLOY_PRIV_FILE ]); then
@@ -252,6 +206,8 @@ substenv_file AMBASSADOR config/proxydhcp.conf > $CONTAINER_ROOTFS/etc/dnsmasq.d
 substenv_file AMBASSADOR config/file_ext_authorize.conf > $CONTAINER_ROOTFS/opt/file_ext_authorize/file_ext_authorize.conf
 #apache2 during installation removes contents of /etc/apache2/sites-available/, storing in tmp
 substenv_file AMBASSADOR config/apache2/30-saltfs.conf > $CONTAINER_ROOTFS/var/tmp/30-saltfs.conf
+
+
 
 #todo use /etc/ssl dir? ubuntu user add to ssl-cert group ?
 #run container
