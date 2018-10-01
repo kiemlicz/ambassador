@@ -175,18 +175,15 @@ fi
 
 vagrant up --provider=lxc
 
-##### container login
-#setup SSH keys for login
-
+##### after completion
+#reinstall known hosts
 OIFS=$IFS
 IFS=","
 for u in $USERS; do
-    lxc_ensure_ssh_key $u $CONTAINER_FQDN $CONTAINER_ROOTFS/$CONTAINER_USER_HOME
+    ssh-keygen -f ~$u/.ssh/known_hosts -R $2
+    chown $u.$u ~$u/.ssh/known_hosts
 done
 IFS=$OIFS
-chroot $CONTAINER_ROOTFS sh -c "chown $CONTAINER_USERNAME.$CONTAINER_USERNAME $CONTAINER_USER_HOME/.ssh/authorized_keys; chmod 600 $CONTAINER_USER_HOME/.ssh/authorized_keys"
-
-
 
 . util/core/text_functions
 

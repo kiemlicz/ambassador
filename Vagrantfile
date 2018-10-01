@@ -1,6 +1,8 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+require 'csv'
+
 Vagrant.configure("2") do |config|
   config.vm.box = "debian/stretch64"
 
@@ -38,16 +40,23 @@ Vagrant.configure("2") do |config|
     SHELL
   end
 
+  CSV.parse_line(ENV['USERS']).each do |u|
+    config.vm.provision "#{u} key", type: "shell", env: {"CONTAINER_USERNAME" => ENV['CONTAINER_USERNAME']} do |s|
+        ssh_pub_key = File.readlines("#{Dir.home(u)}/.ssh/id_rsa.pub").first.strip
+        s.inline = <<-SHELL
+            user_dir=$(eval echo "~$CONTAINER_USERNAME")
+            mkdir -p $user_dir/.ssh/
+            echo #{ssh_pub_key} >> $user_dir/.ssh/authorized_keys
+            #todo  verify permissions of authorized_keys
+        SHELL
+    end
+  end
+
   config.vm.provision "login", type: "shell", env: {"CONTAINER_USERNAME" => ENV['CONTAINER_USERNAME']} do |s|
-  # todo upload all users config files
-    ssh_pub_key = File.readlines("#{Dir.home}/.ssh/id_rsa.pub").first.strip
     s.inline = <<-SHELL
         if [ "$CONTAINER_USERNAME" != "root" ]; then
             echo 'ubuntu ALL=NOPASSWD:ALL' > /etc/sudoers.d/ubuntu; chmod 440 /etc/sudoers.d/ubuntu
         fi
-
-        mkdir -p /root/.ssh/
-        echo #{ssh_pub_key} >> /root/.ssh/authorized_keys
     SHELL
   end
 
