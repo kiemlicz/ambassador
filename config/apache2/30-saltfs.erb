@@ -1,7 +1,7 @@
 Listen 88
 
 <VirtualHost *:88>
-  ServerName %AMBASSADOR_FQDN%
+  ServerName <%=ambassador_fqdn%>
 
   ## Vhost docroot
   DocumentRoot "/var/www/saltfs"

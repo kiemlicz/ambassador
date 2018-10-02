@@ -9,7 +9,7 @@ master_tops:
   ext_nodes: /usr/bin/foreman-node
 
 rest_cherrypy:
-  port: %AMBASSADOR_SALT_API_PORT%
-  host: %AMBASSADOR_SALT_API_INTERFACES%
-  ssl_key: %AMBASSADOR_KEY%
-  ssl_crt: %AMBASSADOR_CERT%
+  port: <%=ambassador_salt_api_port%>
+  host: <%=ambassador_salt_api_interfaces%>
+  ssl_key: <%=ambassador_key%>
+  ssl_crt: <%=ambassador_cert%>

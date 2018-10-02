@@ -91,7 +91,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 readonly AUTO_CERT_GENERATION=${GEN_CERT-false}
-readonly USE_ROOTS=${ROOTS-false}
+export readonly USE_ROOTS=${ROOTS-false}
 export readonly CONTAINER_NAME=${CN-ambassador}
 export readonly CONTAINER_CERT_BASE=/etc/foreman/ssl
 export readonly CONTAINER_CERT_DIR=$CONTAINER_CERT_BASE/certs
@@ -173,6 +173,8 @@ fi
 
 . util/vm/lxc_functions #remove
 
+readonly run_start_ts=$(date +%s.%N)
+
 vagrant up --provider=lxc
 
 ##### after completion
@@ -184,66 +186,6 @@ for u in $USERS; do
     chown $u.$u ~$u/.ssh/known_hosts
 done
 IFS=$OIFS
-
-. util/core/text_functions
-
-#fill templates and copy to container
-if [ "$USE_ROOTS" = true ]; then
-    substenv_file AMBASSADOR config/ambassador_roots.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_roots.conf
-else
-    if ! ([ -z $DEPLOY_PUB_FILE ] || [ -z $DEPLOY_PRIV_FILE ]); then
-        substenv_file AMBASSADOR config/ambassador_gitfs_deploykeys.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_gitfs_deploykeys.conf
-    fi
-    substenv_file AMBASSADOR config/ambassador_gitfs.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_gitfs.conf
-fi
-substenv_file AMBASSADOR config/ambassador_common.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_common.conf
-substenv_file AMBASSADOR config/ambassador_ext_pillar.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_ext_pillar.conf
-substenv_file AMBASSADOR config/ambassador_salt_foreman.conf > $CONTAINER_ROOTFS/etc/salt/master.d/ambassador_salt_foreman.conf
-substenv_file AMBASSADOR config/reactor.conf > $CONTAINER_ROOTFS/etc/salt/master.d/reactor.conf
-substenv_file AMBASSADOR config/foreman.yaml > $CONTAINER_ROOTFS/etc/salt/foreman.yaml
-substenv_file AMBASSADOR config/salt.yml > $CONTAINER_ROOTFS/etc/foreman-proxy/settings.d/salt.yml
-substenv_file AMBASSADOR config/proxydhcp.conf > $CONTAINER_ROOTFS/etc/dnsmasq.d/proxydhcp.conf
-substenv_file AMBASSADOR config/file_ext_authorize.conf > $CONTAINER_ROOTFS/opt/file_ext_authorize/file_ext_authorize.conf
-#apache2 during installation removes contents of /etc/apache2/sites-available/, storing in tmp
-substenv_file AMBASSADOR config/apache2/30-saltfs.conf > $CONTAINER_ROOTFS/var/tmp/30-saltfs.conf
-
-
-
-#todo use /etc/ssl dir? ubuntu user add to ssl-cert group ?
-#run container
-echo "starting: $CONTAINER_NAME"
-# -f (for lxc-start) not needed as during creation the option got persisted
-start_container_waiting_for_network $CONTAINER_NAME
-echo "container running"
-
-#sometimes sshd need more time
-sleep 5
-
-readonly CONTAINER_IP=$(lxc-info -n $CONTAINER_NAME -i | cut -d: -f2 | sed -e 's/ //g')
-
-if [ -z "$CONTAINER_IP" ]; then
-    echo "cannot resolve IP (domain = $CONTAINER_FQDN, IP = $CONTAINER_IP) for container, exiting"
-    exit 1
-fi
-#this node (running setup.sh script) doesn't add ambassador to known hosts
-#as doing so will cause repeating "Host Verification Failed"
-if [ "$CONTAINER_USERNAME" = "root" ]; then
-    ENTRY_CMD='bash -s'
-else
-    ENTRY_CMD='sudo -E bash -s'
-fi
-echo "running 'run' script inside container (IP = $CONTAINER_IP, DOMAIN=$CONTAINER_FQDN)"
-
-readonly run_start_ts=$(date +%s.%N)
-
-ssh $CONTAINER_USERNAME@$CONTAINER_IP -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" \
-CIP=$CONTAINER_IP CID=$CONTAINER_FQDN CERT_BASEDIR=$CONTAINER_CERT_BASE CA=$AMBASSADOR_CA CRL=$AMBASSADOR_CRL KEY=$AMBASSADOR_KEY CERT=$AMBASSADOR_CERT \
-PROXY_KEY=$AMBASSADOR_KEY PROXY_CERT=$AMBASSADOR_CERT \
-$ENTRY_CMD < ./run.sh > $CONTAINER_NAME.log 2>&1 &
-echo "script running in background, waiting for: $!"
-wait $!
-retval=$?
-echo "stopping container"
 
 if [ "$CONTAINER_STOP_AFTER" = true ]; then
     stop_container $CONTAINER_NAME
@@ -258,10 +200,3 @@ readonly total_time=$(echo "$run_stop_ts - $setup_start_ts" | bc)
 echo "Container preparation time: ${container_prep_time}[s]"
 echo "Installation time: ${run_time}[s]"
 echo "Total time: ${total_time}[s] "
-
-if [ $retval -ne 0 ]; then
-    echo "error running run.sh script inside of container: $retval, check: $CONTAINER_NAME.log file"
-    exit 1
-else
-    echo "success"
-fi

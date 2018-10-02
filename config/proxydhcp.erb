@@ -33,4 +33,4 @@ pxe-service=X86PC, "Boot from network", pxelinux
 # fixme debug if menu can be displayed in UEFI
 pxe-prompt="Press F8 for boot menu", 10
 
-dhcp-range=%AMBASSADOR_GW%,proxy
+dhcp-range=<%=ambassador_gw%>,proxy

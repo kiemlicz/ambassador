@@ -14,6 +14,12 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  def materialize(render, filename)
+    File.open(filename, "w") do |f|
+      f.write render
+    end
+  end
+
   config.vm.provision "init", type: "shell", env: {
     "CONTAINER_USERNAME" => ENV['CONTAINER_USERNAME'],
     "CONTAINER_NAME" => ENV['CONTAINER_NAME'],
@@ -63,15 +69,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "file", source: "envoy/salt", destination: "/srv/salt"
   config.vm.provision "file", source: "envoy/pillar", destination: "/srv/pillar"
   config.vm.provision "file", source: "envoy/reactor", destination: "/srv/reactor"
-
-  if File.file?(ENV['DEPLOY_PUB_FILE']) and File.file?(ENV['DEPLOY_PRIV_FILE'])
-    # todo what is the visibility scope, is it like in bash?
-    ambassador_envoy_deploy_pub = File.basename(ENV['DEPLOY_PUB_FILE'])
-    ambassador_envoy_deploy_priv = File.basename(ENV['DEPLOY_PRIV_FILE'])
-
-    config.vm.provision "file", source: ENV['DEPLOY_PUB_FILE'], destination: /etc/salt/deploykeys/
-    config.vm.provision "file", source: ENV['DEPLOY_PRIV_FILE'], destination: /etc/salt/deploykeys/
-  end
+  config.vm.provision "file", source: "config/file_ext_authorize.conf", destination: "/opt/file_ext_authorize"
 
   if ENV.has_key?("CLIENT_ID") and ENV.has_key?("CLIENT_SECRET")
     ambassador_client_id = ENV["CLIENT_ID"]
@@ -89,8 +87,38 @@ Vagrant.configure("2") do |config|
   ambassador_salt_api_interfaces = 0.0.0.0
   ambassador_fqdn = ENV['CONTAINER_FQDN']
 
-  #todo read all configs (change variable patterns to ERB-style) and render them to guest
-  template = ERB.new File.read("config/ambassador_roots.conf")
+  if File.file?(ENV['DEPLOY_PUB_FILE']) and File.file?(ENV['DEPLOY_PRIV_FILE'])
+    # todo what is the visibility scope, is it like in bash?
+    ambassador_envoy_deploy_pub = File.basename(ENV['DEPLOY_PUB_FILE'])
+    ambassador_envoy_deploy_priv = File.basename(ENV['DEPLOY_PRIV_FILE'])
+
+    materialize(ERB.new(File.read("config/salt/ambassador_gitfs_deploykeys.erb")).result(binding), "tmp_etc/salt/master.d/ambassador_gitfs_deploykeys.conf")
+
+    config.vm.provision "file", source: ENV['DEPLOY_PUB_FILE'], destination: /etc/salt/deploykeys/
+    config.vm.provision "file", source: ENV['DEPLOY_PRIV_FILE'], destination: /etc/salt/deploykeys/
+  end
+
+  if ENV['USE_ROOTS'] == "true"
+    materialize(ERB.new(File.read("config/salt/ambassador_roots.erb")).result(binding), "tmp_etc/salt/master.d/ambassador_roots.conf")
+  else
+    materialize(ERB.new(File.read("config/salt/ambassador_gitfs.erb")).result(binding), "tmp_etc/salt/master.d/ambassador_gitfs.conf")
+  end
+  materialize(ERB.new(File.read("config/salt/ambassador_common.erb")).result(binding), "tmp_etc/salt/master.d/ambassador_common.conf")
+  materialize(ERB.new(File.read("config/salt/ambassador_ext_pillar.erb")).result(binding), "tmp_etc/salt/master.d/ambassador_ext_pillar.conf")
+  materialize(ERB.new(File.read("config/salt/ambassador_salt_foreman.erb")).result(binding), "tmp_etc/salt/master.d/ambassador_salt_foreman.conf")
+  materialize(ERB.new(File.read("config/salt/reactor.erb")).result(binding), "tmp_etc/salt/master.d/reactor.conf")
+  materialize(ERB.new(File.read("config/salt/foreman.erb")).result(binding), "tmp_etc/salt/foreman.yaml")
+  materialize(ERB.new(File.read("config/foreman/salt.erb")).result(binding), "tmp_etc/foreman-proxy/settings.d/salt.yml")
+  materialize(ERB.new(File.read("config/proxydhcp.erb")).result(binding), "tmp_etc/dnsmasq.d/proxydhcp.conf")
+  #apache2 during installation removes contents of /etc/apache2/sites-available/, storing in tmp, for now logic is disabled
+  #materialize(ERB.new(File.read("config/apache2/30-saltfs.erb")).result(binding), "tmp_var/tmp/30-saltfs.conf")
+
+  config.vm.provision "file", source: "tmp_etc/salt", destination: "/etc/salt"
+  config.vm.provision "file", source: "tmp_etc/foreman-proxy", destination: "/etc/foreman-proxy"
+  config.vm.provision "file", source: "tmp_etc/dnsmasq.d", destination: "/etc/dnsmasq.d"
+
+  #fixme copy all these files to container user dir
+  #then from shell copy it to desired locations https://github.com/hashicorp/vagrant/issues/4032
 
   CSV.parse_line(ENV['USERS']).each do |u|
     config.vm.provision "#{u} key", type: "shell", env: {"CONTAINER_USERNAME" => ENV['CONTAINER_USERNAME']} do |s|
@@ -104,6 +132,17 @@ Vagrant.configure("2") do |config|
     end
   end
 
-
+  config.vm.provision "install", type: "shell", env: {
+    "CID" => ENV['CONTAINER_FQDN'],
+    "CERT_BASEDIR" => ENV['CONTAINER_CERT_BASE'],
+    "CA" => ENV['AMBASSADOR_CA'],
+    "CRL" => ENV['AMBASSADOR_CRL'],
+    "KEY" => ENV['AMBASSADOR_KEY'],
+    "PROXY_KEY" => ENV['AMBASSADOR_KEY'],
+    "CERT" => ENV['AMBASSADOR_CERT'],
+    "PROXY_CERT" => ENV['AMBASSADOR_CERT']
+    } do |s|
+    s.path = "run.sh"
+  end
 
 end

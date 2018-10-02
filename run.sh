@@ -22,7 +22,6 @@ assert_env() {
 }
 
 assert_env "fqdn is not set" $CID
-assert_env "container designated IP is not provided" $CIP
 assert_env "CA is not set" $CA
 assert_env "CRL is not set" $CRL
 assert_env "CERT is not set" $CERT
@@ -44,6 +43,7 @@ readonly SALTSTACK_STRETCH_REPO_URL="deb http://repo.saltstack.com/apt/debian/9/
 readonly SALTSTACK_STRETCH_REPO_KEY_URL="https://repo.saltstack.com/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub"
 
 #don't edit these
+readonly CIP=${CIP-$(hostname -i)} #fixme confirm this usage in ambassador's containers
 readonly PUPPET_SERVER_PKG=$PUPPET_STRETCH_SERVER_PKG
 readonly FOREMAN_PUPPET_SERVER=$FOREMAN_PUPPET_SERVER_URL/$PUPPET_SERVER_PKG
 readonly FOREMAN_REPO_ENTRY=$FOREMAN_STRETCH_REPO_URL

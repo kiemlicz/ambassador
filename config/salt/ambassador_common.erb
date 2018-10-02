@@ -1,4 +1,4 @@
-interface: %AMBASSADOR_SALT_API_INTERFACES%
+interface: <%=ambassador_salt_api_interfaces%>
 
 extension_modules: /srv/salt_ext
 
@@ -19,8 +19,8 @@ fileserver_backend:
 pillar_opts: True
 
 google_api:
-  client_id: "%AMBASSADOR_CLIENT_ID%"
-  client_secret: "%AMBASSADOR_CLIENT_SECRET%"
+  client_id: "<%=ambassador_client_id%>"
+  client_secret: "<%=ambassador_client_secret%>"
   token_url: "https://accounts.google.com/o/oauth2/token"
   authorization_base_url: "https://accounts.google.com/o/oauth2/v2/auth"
   redirect_uri: "urn:ietf:wg:oauth:2.0:oob"

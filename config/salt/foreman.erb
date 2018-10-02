@@ -1,0 +1,11 @@
+---
+:proto: https
+:host: <%=ambassador_fqdn%>
+:url: https://<%=ambassador_fqdn%>
+:port: 443
+:ssl_ca: <%=ambassador_ca%>
+:ssl_cert: <%=ambassador_cert%>
+:ssl_key: <%=ambassador_key%>
+:timeout: 10
+:salt: /usr/bin/salt
+:upload_grains: true
