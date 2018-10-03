@@ -138,7 +138,9 @@ readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
 
 if [ "$AUTO_CERT_GENERATION" = true ]; then
     . util/sec/cert_functions
-    SSL_BASE=/tmp/ssl
+    mkdir -p etc/foreman/ssl/private
+    mkdir -p etc/foreman/ssl/certs
+    SSL_BASE=etc/foreman/ssl
     SSL_CERT_DIR=$SSL_BASE/certs
     SSL_PRIVATE_DIR=$SSL_BASE/private
     #further ssl/ca-certificates installation doesn't clear /etc/ssl/private/certs contents
@@ -147,13 +149,13 @@ if [ "$AUTO_CERT_GENERATION" = true ]; then
     echo '01' > $SSL_BASE/serial
     echo '01' > $SSL_BASE/crlnumber
 
-    CA_PK_FILE=$SSL_PRIVATE_DIR/ca.key.pem
-    CA_CERT_FILE=$SSL_CERT_DIR/ca.cert.pem
-    SERVER_KEY_FILE=$SSL_PRIVATE_DIR/$CONTAINER_FQDN.key
-    SERVER_PROXY_KEY_FILE=$SSL_PRIVATE_DIR/$CONTAINER_FQDN-proxy.key
-    SERVER_CERT_FILE=$SSL_CERT_DIR/$CONTAINER_FQDN.pem
-    SERVER_PROXY_CERT_FILE=$SSL_CERT_DIR/$CONTAINER_FQDN-proxy.pem
-    CRL_FILE=$SSL_BASE/crl.pem
+    export readonly CA_PK_FILE=$SSL_PRIVATE_DIR/ca.key.pem
+    export readonly CA_CERT_FILE=$SSL_CERT_DIR/ca.cert.pem
+    export readonly SERVER_KEY_FILE=$SSL_PRIVATE_DIR/$CONTAINER_FQDN.key
+    export readonly SERVER_PROXY_KEY_FILE=$SSL_PRIVATE_DIR/$CONTAINER_FQDN-proxy.key
+    export readonly SERVER_CERT_FILE=$SSL_CERT_DIR/$CONTAINER_FQDN.pem
+    export readonly SERVER_PROXY_CERT_FILE=$SSL_CERT_DIR/$CONTAINER_FQDN-proxy.pem
+    export readonly CRL_FILE=$SSL_BASE/crl.pem
     gen_rsa_key $CA_PK_FILE
     gen_x509_cert_self_signed $CA_PK_FILE $CA_CERT_FILE config/ssl/openssl-ca.cnf $SSL_BASE
     echo "ca generation done, generating server secrets"
@@ -182,8 +184,9 @@ vagrant up --provider=lxc
 OIFS=$IFS
 IFS=","
 for u in $USERS; do
-    ssh-keygen -f ~$u/.ssh/known_hosts -R $2
-    chown $u.$u ~$u/.ssh/known_hosts
+    user_homedir=$(eval echo ~"$u")
+    ssh-keygen -f $user_homedir/.ssh/known_hosts -R $CONTAINER_FQDN
+    chown $u.$u $user_homedir/.ssh/known_hosts
 done
 IFS=$OIFS
 

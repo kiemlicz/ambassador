@@ -3,6 +3,7 @@
 
 require 'csv'
 require 'erb'
+require 'fileutils'
 
 Vagrant.configure("2") do |config|
   config.vm.box = "debian/stretch64"
@@ -15,6 +16,7 @@ Vagrant.configure("2") do |config|
   end
 
   def materialize(render, filename)
+    FileUtils.mkdir_p(File.dirname(filename))
     File.open(filename, "w") do |f|
       f.write render
     end
@@ -26,7 +28,9 @@ Vagrant.configure("2") do |config|
     "CONTAINER_FQDN" => ENV['CONTAINER_FQDN']
     } do |s|
     s.inline = <<-SHELL
-        mkdir -p /etc/sudoers.d/
+        sudo apt-get update
+        sudo apt-get install rsync
+        sudo mkdir -p /etc/sudoers.d/
         echo 'Cmnd_Alias SALT = /usr/bin/salt, /usr/bin/salt-key\nforeman-proxy ALL = NOPASSWD: SALT\nDefaults:foreman-proxy !requiretty' > /etc/sudoers.d/salt; chmod 440 /etc/sudoers.d/salt
 
         if [ "$CONTAINER_USERNAME" != "root" ]; then
@@ -56,20 +60,23 @@ Vagrant.configure("2") do |config|
   end
 
   # todo check if destination is auto-created, if so move to top and remove above mkdir -p
-  config.vm.provision "file", source: ENV['CA_CERT_FILE'], destination: ENV['CONTAINER_CERT_DIR']
-  config.vm.provision "file", source: ENV['SERVER_CERT_FILE'], destination: ENV['CONTAINER_CERT_DIR']
-  config.vm.provision "file", source: ENV['SERVER_PROXY_CERT_FILE'], destination: ENV['CONTAINER_CERT_DIR']
-  config.vm.provision "file", source: ENV['SERVER_KEY_FILE'], destination: ENV['CONTAINER_PRIVATE_DIR']
-  config.vm.provision "file", source: ENV['SERVER_PROXY_KEY_FILE'], destination: ENV['CONTAINER_PRIVATE_DIR']
-  config.vm.provision "file", source: ENV['CRL_FILE'], destination: ENV['CONTAINER_CERT_BASE']
-  config.vm.provision "file", source: "envoy/extensions/pillar", destination: "/srv/salt_ext/pillar"
-  config.vm.provision "file", source: "config/bootloader", destination: "/var/lib/tftpboot"
-  config.vm.provision "file", source: "extensions/file_ext_authorize", destination: "/opt/file_ext_authorize"
-  config.vm.provision "file", source: "config/file_ext_authorize.service", destination: "/etc/systemd/system"
-  config.vm.provision "file", source: "envoy/salt", destination: "/srv/salt"
-  config.vm.provision "file", source: "envoy/pillar", destination: "/srv/pillar"
-  config.vm.provision "file", source: "envoy/reactor", destination: "/srv/reactor"
-  config.vm.provision "file", source: "config/file_ext_authorize.conf", destination: "/opt/file_ext_authorize"
+  #fixme there is no permission to copy to that directory
+#  config.vm.provision ENV['CA_CERT_FILE'], source: ENV['CA_CERT_FILE'], destination: File.join("~", ENV['CONTAINER_CERT_DIR'])
+#  config.vm.provision "file", source: ENV['SERVER_CERT_FILE'], destination: File.join("~", ENV['CONTAINER_CERT_DIR'])
+#  config.vm.provision "file", source: ENV['SERVER_PROXY_CERT_FILE'], destination: File.join("~", ENV['CONTAINER_CERT_DIR'])
+#  config.vm.provision "file", source: ENV['SERVER_KEY_FILE'], destination: File.join("~", ENV['CONTAINER_PRIVATE_DIR'])
+#  config.vm.provision "file", source: ENV['SERVER_PROXY_KEY_FILE'], destination: File.join("~", ENV['CONTAINER_PRIVATE_DIR'])
+#  config.vm.provision "file", source: ENV['CRL_FILE'], destination: File.join("~", ENV['CONTAINER_CERT_BASE'])
+  config.vm.provision "file", source: "etc", destination: "~/etc"
+
+  config.vm.provision "file", source: "envoy/extensions/pillar", destination: "~/srv/salt_ext/pillar"
+  config.vm.provision "file", source: "config/bootloader", destination: "~/var/lib/tftpboot"
+  config.vm.provision "file", source: "extensions/file_ext_authorize", destination: "~/opt/file_ext_authorize"
+  config.vm.provision "file", source: "config/file_ext_authorize.service", destination: "~/etc/systemd/system/file_ext_authorize.service"
+  config.vm.provision "file", source: "envoy/salt", destination: "~/srv/salt"
+  config.vm.provision "file", source: "envoy/pillar", destination: "~/srv/pillar"
+  config.vm.provision "file", source: "envoy/reactor", destination: "~/srv/reactor"
+  config.vm.provision "file", source: "config/file_ext_authorize.conf", destination: "~/opt/file_ext_authorize/file_ext_authorize.conf"
 
   if ENV.has_key?("CLIENT_ID") and ENV.has_key?("CLIENT_SECRET")
     ambassador_client_id = ENV["CLIENT_ID"]
@@ -83,47 +90,53 @@ Vagrant.configure("2") do |config|
   ambassador_cert = File.join(ENV['CONTAINER_CERT_DIR'], File.basename(ENV['SERVER_CERT_FILE']))
   ambassador_proxy_cert = File.join(ENV['CONTAINER_CERT_DIR'], File.basename(ENV['SERVER_PROXY_CERT_FILE']))
   ambassador_gw = `ip route show`[/default.*/][/\d+\.\d+\.\d+\.\d+/]
-  ambassador_salt_api_port = 9191
-  ambassador_salt_api_interfaces = 0.0.0.0
+  ambassador_salt_api_port = "9191"
+  ambassador_salt_api_interfaces = "0.0.0.0"
   ambassador_fqdn = ENV['CONTAINER_FQDN']
 
-  if File.file?(ENV['DEPLOY_PUB_FILE']) and File.file?(ENV['DEPLOY_PRIV_FILE'])
-    # todo what is the visibility scope, is it like in bash?
+  if ENV.has_key?('DEPLOY_PUB_FILE') and ENV.has_key?('DEPLOY_PRIV_FILE')
+       # todo what is the visibility scope, is it like in bash?
     ambassador_envoy_deploy_pub = File.basename(ENV['DEPLOY_PUB_FILE'])
     ambassador_envoy_deploy_priv = File.basename(ENV['DEPLOY_PRIV_FILE'])
 
-    materialize(ERB.new(File.read("config/salt/ambassador_gitfs_deploykeys.erb")).result(binding), "tmp_etc/salt/master.d/ambassador_gitfs_deploykeys.conf")
+    materialize(ERB.new(File.read("config/salt/ambassador_gitfs_deploykeys.erb")).result(binding), "etc/salt/master.d/ambassador_gitfs_deploykeys.conf")
 
-    config.vm.provision "file", source: ENV['DEPLOY_PUB_FILE'], destination: /etc/salt/deploykeys/
-    config.vm.provision "file", source: ENV['DEPLOY_PRIV_FILE'], destination: /etc/salt/deploykeys/
+    config.vm.provision "file", source: ENV['DEPLOY_PUB_FILE'], destination: "/etc/salt/deploykeys/"
+    config.vm.provision "file", source: ENV['DEPLOY_PRIV_FILE'], destination: "/etc/salt/deploykeys/"
   end
 
   if ENV['USE_ROOTS'] == "true"
-    materialize(ERB.new(File.read("config/salt/ambassador_roots.erb")).result(binding), "tmp_etc/salt/master.d/ambassador_roots.conf")
+    materialize(ERB.new(File.read("config/salt/ambassador_roots.erb")).result(binding), "etc/salt/master.d/ambassador_roots.conf")
   else
-    materialize(ERB.new(File.read("config/salt/ambassador_gitfs.erb")).result(binding), "tmp_etc/salt/master.d/ambassador_gitfs.conf")
+    materialize(ERB.new(File.read("config/salt/ambassador_gitfs.erb")).result(binding), "etc/salt/master.d/ambassador_gitfs.conf")
   end
-  materialize(ERB.new(File.read("config/salt/ambassador_common.erb")).result(binding), "tmp_etc/salt/master.d/ambassador_common.conf")
-  materialize(ERB.new(File.read("config/salt/ambassador_ext_pillar.erb")).result(binding), "tmp_etc/salt/master.d/ambassador_ext_pillar.conf")
-  materialize(ERB.new(File.read("config/salt/ambassador_salt_foreman.erb")).result(binding), "tmp_etc/salt/master.d/ambassador_salt_foreman.conf")
-  materialize(ERB.new(File.read("config/salt/reactor.erb")).result(binding), "tmp_etc/salt/master.d/reactor.conf")
-  materialize(ERB.new(File.read("config/salt/foreman.erb")).result(binding), "tmp_etc/salt/foreman.yaml")
-  materialize(ERB.new(File.read("config/foreman/salt.erb")).result(binding), "tmp_etc/foreman-proxy/settings.d/salt.yml")
-  materialize(ERB.new(File.read("config/proxydhcp.erb")).result(binding), "tmp_etc/dnsmasq.d/proxydhcp.conf")
+  materialize(ERB.new(File.read("config/salt/ambassador_common.erb")).result(binding), "etc/salt/master.d/ambassador_common.conf")
+  materialize(ERB.new(File.read("config/salt/ambassador_ext_pillar.erb")).result(binding), "etc/salt/master.d/ambassador_ext_pillar.conf")
+  materialize(ERB.new(File.read("config/salt/ambassador_salt_foreman.erb")).result(binding), "etc/salt/master.d/ambassador_salt_foreman.conf")
+  materialize(ERB.new(File.read("config/salt/reactor.erb")).result(binding), "etc/salt/master.d/reactor.conf")
+  materialize(ERB.new(File.read("config/salt/foreman.erb")).result(binding), "etc/salt/foreman.yaml")
+  materialize(ERB.new(File.read("config/foreman/salt.erb")).result(binding), "etc/foreman-proxy/settings.d/salt.yml")
+  materialize(ERB.new(File.read("config/proxydhcp.erb")).result(binding), "etc/dnsmasq.d/proxydhcp.conf")
+
   #apache2 during installation removes contents of /etc/apache2/sites-available/, storing in tmp, for now logic is disabled
   #materialize(ERB.new(File.read("config/apache2/30-saltfs.erb")).result(binding), "tmp_var/tmp/30-saltfs.conf")
 
-  config.vm.provision "file", source: "tmp_etc", destination: "~/tmp_etc"
+  config.vm.provision "file", source: "etc", destination: "~/etc"
 
   config.vm.provision "move config", type: "shell", env: {
+  #todo most likely not needed
     "CONTAINER_USERNAME" => ENV['CONTAINER_USERNAME'],
     "CONTAINER_NAME" => ENV['CONTAINER_NAME'],
-    "CONTAINER_FQDN" => ENV['CONTAINER_FQDN']
+    "CONTAINER_FQDN" => ENV['CONTAINER_FQDN'],
+    "CONTAINER_CERT_DIR" => ENV['CONTAINER_CERT_DIR'],
+    "CONTAINER_PRIVATE_DIR" => ENV['CONTAINER_PRIVATE_DIR'],
+    "CONTAINER_CERT_BASE" => ENV['CONTAINER_CERT_BASE']
     } do |s|
     s.inline = <<-SHELL
-         sudo mv tmp_ect/salt /etc
-         sudo mv tmp_ect/foreman-proxy /etc
-         sudo mv tmp_ect/dnsmasq.d /etc
+         sudo rsync -avzh etc/ /etc
+         sudo rsync -avzh opt/ /opt
+         sudo rsync -avzh var/ /var
+         sudo rsync -avzh src/ /src
     SHELL
   end
 
