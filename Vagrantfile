@@ -113,12 +113,19 @@ Vagrant.configure("2") do |config|
   #apache2 during installation removes contents of /etc/apache2/sites-available/, storing in tmp, for now logic is disabled
   #materialize(ERB.new(File.read("config/apache2/30-saltfs.erb")).result(binding), "tmp_var/tmp/30-saltfs.conf")
 
-  config.vm.provision "file", source: "tmp_etc/salt", destination: "/etc/salt"
-  config.vm.provision "file", source: "tmp_etc/foreman-proxy", destination: "/etc/foreman-proxy"
-  config.vm.provision "file", source: "tmp_etc/dnsmasq.d", destination: "/etc/dnsmasq.d"
+  config.vm.provision "file", source: "tmp_etc", destination: "~/tmp_etc"
 
-  #fixme copy all these files to container user dir
-  #then from shell copy it to desired locations https://github.com/hashicorp/vagrant/issues/4032
+  config.vm.provision "move config", type: "shell", env: {
+    "CONTAINER_USERNAME" => ENV['CONTAINER_USERNAME'],
+    "CONTAINER_NAME" => ENV['CONTAINER_NAME'],
+    "CONTAINER_FQDN" => ENV['CONTAINER_FQDN']
+    } do |s|
+    s.inline = <<-SHELL
+         sudo mv tmp_ect/salt /etc
+         sudo mv tmp_ect/foreman-proxy /etc
+         sudo mv tmp_ect/dnsmasq.d /etc
+    SHELL
+  end
 
   CSV.parse_line(ENV['USERS']).each do |u|
     config.vm.provision "#{u} key", type: "shell", env: {"CONTAINER_USERNAME" => ENV['CONTAINER_USERNAME']} do |s|
