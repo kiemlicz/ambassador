@@ -139,6 +139,7 @@ readonly FOREMAN_CERT=$CERT
 readonly FOREMAN_KEY=$KEY
 readonly FOREMAN_PROXY_CERT=$PROXY_CERT
 readonly FOREMAN_PROXY_KEY=$PROXY_KEY
+echo "CA cert location: $CA_CERT, foreman cert: $FOREMAN_CERT"
 
 groupadd foreman
 chgrp foreman $FOREMAN_PROXY_KEY
