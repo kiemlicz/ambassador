@@ -21,7 +21,4 @@ salt-masterless-run)
 salt-master-run)
     echo "salt-master-run publish is disabled"
     ;;
-ambassador-run)
-    docker_push "ambassador-run-$TRAVIS_JOB_NUMBER"
-    ;;
 esac

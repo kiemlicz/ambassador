@@ -7,6 +7,7 @@ require 'fileutils'
 
 Vagrant.configure("2") do |config|
   config.vm.box = "debian/stretch64"
+  config.vm.hostname = ENV['CONTAINER_FQDN']
 
   config.vm.define ENV['CONTAINER_NAME'] do |node|
     node.vm.provider :lxc do |lxc|
@@ -29,7 +30,7 @@ Vagrant.configure("2") do |config|
     } do |s|
     s.inline = <<-SHELL
         sudo apt-get update
-        sudo apt-get install rsync
+        sudo apt-get install -y rsync
         sudo mkdir -p /etc/sudoers.d/
         echo 'Cmnd_Alias SALT = /usr/bin/salt, /usr/bin/salt-key\nforeman-proxy ALL = NOPASSWD: SALT\nDefaults:foreman-proxy !requiretty' > /etc/sudoers.d/salt; chmod 440 /etc/sudoers.d/salt
 
@@ -46,43 +47,23 @@ Vagrant.configure("2") do |config|
 
         #configure resolvconf utility so that proper nameserver exists, otherwise only 127.0.0.1 may appear
         echo 'TRUNCATE_NAMESERVER_LIST_AFTER_LOOPBACK_ADDRESS=no' > /etc/default/resolvconf
-
-        mkdir -p /etc/salt/deploykeys/
-        mkdir -p /etc/salt/master.d/
-        mkdir -p /etc/salt/cloud.providers.d/
-        mkdir -p /etc/salt/cloud.profiles.d/
-        mkdir -p /etc/foreman-proxy/settings.d/
-        mkdir -p /etc/dnsmasq.d/
-        mkdir -p /srv/salt_ext/
-        mkdir -p /var/lib/tftpboot/
-        mkdir -p /etc/apache2/sites-available/
     SHELL
   end
 
-  # todo check if destination is auto-created, if so move to top and remove above mkdir -p
-  #fixme there is no permission to copy to that directory
-#  config.vm.provision ENV['CA_CERT_FILE'], source: ENV['CA_CERT_FILE'], destination: File.join("~", ENV['CONTAINER_CERT_DIR'])
-#  config.vm.provision "file", source: ENV['SERVER_CERT_FILE'], destination: File.join("~", ENV['CONTAINER_CERT_DIR'])
-#  config.vm.provision "file", source: ENV['SERVER_PROXY_CERT_FILE'], destination: File.join("~", ENV['CONTAINER_CERT_DIR'])
-#  config.vm.provision "file", source: ENV['SERVER_KEY_FILE'], destination: File.join("~", ENV['CONTAINER_PRIVATE_DIR'])
-#  config.vm.provision "file", source: ENV['SERVER_PROXY_KEY_FILE'], destination: File.join("~", ENV['CONTAINER_PRIVATE_DIR'])
-#  config.vm.provision "file", source: ENV['CRL_FILE'], destination: File.join("~", ENV['CONTAINER_CERT_BASE'])
   config.vm.provision "file", source: "etc", destination: "~/etc"
-
-  config.vm.provision "file", source: "envoy/extensions/pillar", destination: "~/srv/salt_ext/pillar"
-  config.vm.provision "file", source: "config/bootloader", destination: "~/var/lib/tftpboot"
-  config.vm.provision "file", source: "extensions/file_ext_authorize", destination: "~/opt/file_ext_authorize"
   config.vm.provision "file", source: "config/file_ext_authorize.service", destination: "~/etc/systemd/system/file_ext_authorize.service"
+  config.vm.provision "file", source: "config/bootloader", destination: "~/var/lib/tftpboot"
+  config.vm.provision "file", source: "envoy/extensions/pillar", destination: "~/srv/salt_ext/pillar"
   config.vm.provision "file", source: "envoy/salt", destination: "~/srv/salt"
   config.vm.provision "file", source: "envoy/pillar", destination: "~/srv/pillar"
   config.vm.provision "file", source: "envoy/reactor", destination: "~/srv/reactor"
+  config.vm.provision "file", source: "extensions/file_ext_authorize", destination: "~/opt/file_ext_authorize"
   config.vm.provision "file", source: "config/file_ext_authorize.conf", destination: "~/opt/file_ext_authorize/file_ext_authorize.conf"
 
   if ENV.has_key?("CLIENT_ID") and ENV.has_key?("CLIENT_SECRET")
     ambassador_client_id = ENV["CLIENT_ID"]
     ambassador_client_secret = ENV["CLIENT_SECRET"]
   end
-
   ambassador_ca = File.join(ENV['CONTAINER_CERT_DIR'], File.basename(ENV['CA_CERT_FILE']))
   ambassador_crl = File.join(ENV['CONTAINER_CERT_BASE'], File.basename(ENV['CRL_FILE']))
   ambassador_key = File.join(ENV['CONTAINER_PRIVATE_DIR'], File.basename(ENV['SERVER_KEY_FILE']))
@@ -123,20 +104,12 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "file", source: "etc", destination: "~/etc"
 
-  config.vm.provision "move config", type: "shell", env: {
-  #todo most likely not needed
-    "CONTAINER_USERNAME" => ENV['CONTAINER_USERNAME'],
-    "CONTAINER_NAME" => ENV['CONTAINER_NAME'],
-    "CONTAINER_FQDN" => ENV['CONTAINER_FQDN'],
-    "CONTAINER_CERT_DIR" => ENV['CONTAINER_CERT_DIR'],
-    "CONTAINER_PRIVATE_DIR" => ENV['CONTAINER_PRIVATE_DIR'],
-    "CONTAINER_CERT_BASE" => ENV['CONTAINER_CERT_BASE']
-    } do |s|
+  config.vm.provision "move config", type: "shell" do |s|
     s.inline = <<-SHELL
          sudo rsync -avzh etc/ /etc
          sudo rsync -avzh opt/ /opt
          sudo rsync -avzh var/ /var
-         sudo rsync -avzh src/ /src
+         sudo rsync -avzh srv/ /srv
     SHELL
   end
 
@@ -155,12 +128,12 @@ Vagrant.configure("2") do |config|
   config.vm.provision "install", type: "shell", env: {
     "CID" => ENV['CONTAINER_FQDN'],
     "CERT_BASEDIR" => ENV['CONTAINER_CERT_BASE'],
-    "CA" => ENV['AMBASSADOR_CA'],
-    "CRL" => ENV['AMBASSADOR_CRL'],
-    "KEY" => ENV['AMBASSADOR_KEY'],
-    "PROXY_KEY" => ENV['AMBASSADOR_KEY'],
-    "CERT" => ENV['AMBASSADOR_CERT'],
-    "PROXY_CERT" => ENV['AMBASSADOR_CERT']
+    "CA" => ambassador_ca,
+    "CRL" => ambassador_crl,
+    "KEY" => ambassador_key,
+    "PROXY_KEY" => ambassador_proxy_key,
+    "CERT" => ambassador_cert,
+    "PROXY_CERT" => ambassador_proxy_cert
     } do |s|
     s.path = "run.sh"
   end

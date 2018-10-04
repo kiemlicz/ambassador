@@ -41,9 +41,6 @@ env:
       SALTENV=dev
       PILLARENV=dev
     - DOCKER_IMAGE=debian-stretch
-      TEST_FQDN=ambassadortest.com
-      TEST_CASE=ambassador-run
-    - DOCKER_IMAGE=debian-stretch
       TEST_CASE=salt-master-run
       SALTENV=dev
       PILLARENV=orch

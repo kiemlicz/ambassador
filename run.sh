@@ -43,7 +43,7 @@ readonly SALTSTACK_STRETCH_REPO_URL="deb http://repo.saltstack.com/apt/debian/9/
 readonly SALTSTACK_STRETCH_REPO_KEY_URL="https://repo.saltstack.com/apt/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub"
 
 #don't edit these
-readonly CIP=${CIP-$(hostname -i)} #fixme confirm this usage in ambassador's containers
+readonly CIP=${CIP-$(ip r s | grep "scope link src" | cut -d' ' -f9)}
 readonly PUPPET_SERVER_PKG=$PUPPET_STRETCH_SERVER_PKG
 readonly FOREMAN_PUPPET_SERVER=$FOREMAN_PUPPET_SERVER_URL/$PUPPET_SERVER_PKG
 readonly FOREMAN_REPO_ENTRY=$FOREMAN_STRETCH_REPO_URL
@@ -146,39 +146,6 @@ chmod 640 $FOREMAN_KEY
 chmod 640 $FOREMAN_PROXY_KEY
 
 echo "running foreman-installer (nameserver=$CIF, domain=$(dnsdomainname), fqdn=$CID, IP=$CIP)"
-
-if [ -f /.dockerenv ]; then
-    echo "dynflow bogus argument workaround"
-    # terrible workaround for http://projects.theforeman.org/issues/23656
-    cat << EOF > /etc/default/dynflowd
-FOREMAN_USER=foreman
-BUNDLER_EXT_HOME=/usr/share/foreman
-RAILS_ENV=production
-FOREMAN_LOGGING=warn
-FOREMAN_LOGGING_SQL=warn
-FOREMAN_TASK_PARAMS=' '
-FOREMAN_LOG_DIR=/var/log/foreman
-
-RUBY_GC_MALLOC_LIMIT=4000100
-RUBY_GC_MALLOC_LIMIT_MAX=16000100
-RUBY_GC_MALLOC_LIMIT_GROWTH_FACTOR=1.1
-RUBY_GC_OLDMALLOC_LIMIT=16000100
-RUBY_GC_OLDMALLOC_LIMIT_MAX=16000100
-
-#Set the number of executors you want to run
-#EXECUTORS_COUNT=1
-
-#Set memory limit for executor process, before it's restarted automatically
-#EXECUTOR_MEMORY_LIMIT=2gb
-
-#Set delay before first memory polling to let executor initialize (in sec)
-#EXECUTOR_MEMORY_MONITOR_DELAY=7200 #default: 2 hours
-
-#Set memory polling interval, process memory will be checked every N seconds.
-#EXECUTOR_MEMORY_MONITOR_INTERVAL=60
-
-EOF
-fi
 
 #install process divided into two steps as oauth token needs to be present for PXE and salt setup
 #http://projects.theforeman.org/issues/16241

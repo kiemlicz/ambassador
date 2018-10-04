@@ -38,8 +38,4 @@ salt-master-run)
     docker_compose_update
     docker-compose -f .travis/docker-compose.yml --project-directory=. --no-ansi up --no-start
     ;;
-ambassador-run)
-    docker_update
-    docker build --build-arg=FQDN="$TEST_FQDN" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/run/Dockerfile .
-    ;;
 esac
