@@ -141,7 +141,7 @@ readonly FOREMAN_PROXY_CERT=$PROXY_CERT
 readonly FOREMAN_PROXY_KEY=$PROXY_KEY
 
 groupadd foreman
-chgrp foreman $FOREMAN_PROXY_KEY
+chgrp foreman $FOREMAN_PROXY_KEY $FOREMAN_KEY
 chmod 640 $FOREMAN_KEY
 chmod 640 $FOREMAN_PROXY_KEY
 
