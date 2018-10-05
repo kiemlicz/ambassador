@@ -231,6 +231,9 @@ EOF
 
 # makes gitfs work...
 salt-run fileserver.clear_cache
+#rebind to new hostname (LXC could have obtained the address using old hostname)
+dhclient -r
+dhclient eth0
 
 systemctl enable foreman foreman-proxy salt-master salt-api dnsmasq file_ext_authorize
 systemctl restart foreman foreman-proxy salt-master salt-api dnsmasq file_ext_authorize ruby-foreman-tasks
