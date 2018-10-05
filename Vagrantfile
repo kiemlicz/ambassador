@@ -50,16 +50,6 @@ Vagrant.configure("2") do |config|
     SHELL
   end
 
-  config.vm.provision "file", source: "etc", destination: "~/etc"
-  config.vm.provision "file", source: "config/file_ext_authorize.service", destination: "~/etc/systemd/system/file_ext_authorize.service"
-  config.vm.provision "file", source: "config/bootloader", destination: "~/var/lib/tftpboot"
-  config.vm.provision "file", source: "envoy/extensions/pillar", destination: "~/srv/salt_ext/pillar"
-  config.vm.provision "file", source: "envoy/salt", destination: "~/srv/salt"
-  config.vm.provision "file", source: "envoy/pillar", destination: "~/srv/pillar"
-  config.vm.provision "file", source: "envoy/reactor", destination: "~/srv/reactor"
-  config.vm.provision "file", source: "extensions/file_ext_authorize", destination: "~/opt/file_ext_authorize"
-  config.vm.provision "file", source: "config/file_ext_authorize.conf", destination: "~/opt/file_ext_authorize/file_ext_authorize.conf"
-
   if ENV.has_key?("CLIENT_ID") and ENV.has_key?("CLIENT_SECRET")
     ambassador_client_id = ENV["CLIENT_ID"]
     ambassador_client_secret = ENV["CLIENT_SECRET"]
@@ -104,6 +94,14 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "file", source: "etc", destination: "~/etc"
   config.vm.provision "file", source: "var", destination: "~/var"
+  config.vm.provision "file", source: "config/file_ext_authorize.service", destination: "~/etc/systemd/system/file_ext_authorize.service"
+  config.vm.provision "file", source: "config/bootloader", destination: "~/var/lib/tftpboot"
+  config.vm.provision "file", source: "envoy/extensions/pillar", destination: "~/srv/salt_ext/pillar"
+  config.vm.provision "file", source: "envoy/salt", destination: "~/srv/salt"
+  config.vm.provision "file", source: "envoy/pillar", destination: "~/srv/pillar"
+  config.vm.provision "file", source: "envoy/reactor", destination: "~/srv/reactor"
+  config.vm.provision "file", source: "extensions/file_ext_authorize", destination: "~/opt/file_ext_authorize"
+  config.vm.provision "file", source: "config/file_ext_authorize.conf", destination: "~/opt/file_ext_authorize/file_ext_authorize.conf"
 
   config.vm.provision "move config", type: "shell" do |s|
     s.inline = <<-SHELL
