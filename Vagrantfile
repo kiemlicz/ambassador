@@ -99,10 +99,11 @@ Vagrant.configure("2") do |config|
   materialize(ERB.new(File.read("config/foreman/salt.erb")).result(binding), "etc/foreman-proxy/settings.d/salt.yml")
   materialize(ERB.new(File.read("config/proxydhcp.erb")).result(binding), "etc/dnsmasq.d/proxydhcp.conf")
 
-  #apache2 during installation removes contents of /etc/apache2/sites-available/, storing in tmp, for now logic is disabled
-  #materialize(ERB.new(File.read("config/apache2/30-saltfs.erb")).result(binding), "tmp_var/tmp/30-saltfs.conf")
+  #apache2 during installation removes contents of /etc/apache2/sites-available/
+  materialize(ERB.new(File.read("config/apache2/30-saltfs.erb")).result(binding), "var/tmp/30-saltfs.conf")
 
   config.vm.provision "file", source: "etc", destination: "~/etc"
+  config.vm.provision "file", source: "var", destination: "~/var"
 
   config.vm.provision "move config", type: "shell" do |s|
     s.inline = <<-SHELL
@@ -131,9 +132,9 @@ Vagrant.configure("2") do |config|
     "CA" => ambassador_ca,
     "CRL" => ambassador_crl,
     "KEY" => ambassador_key,
-    "PROXY_KEY" => ambassador_proxy_key,
+    "PROXY_KEY" => ambassador_key,
     "CERT" => ambassador_cert,
-    "PROXY_CERT" => ambassador_proxy_cert
+    "PROXY_CERT" => ambassador_cert
     } do |s|
     s.path = "run.sh"
   end
