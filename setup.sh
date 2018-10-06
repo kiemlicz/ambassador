@@ -200,6 +200,9 @@ readonly container_prep_time=$(echo "$run_start_ts - $setup_start_ts" | bc)
 readonly run_time=$(echo "$run_stop_ts - $run_start_ts" | bc)
 readonly total_time=$(echo "$run_stop_ts - $setup_start_ts" | bc)
 
+#cleanup
+rm -rf ./etc ./var
+
 echo "Container preparation time: ${container_prep_time}[s]"
 echo "Installation time: ${run_time}[s]"
 echo "Total time: ${total_time}[s] "
