@@ -37,26 +37,26 @@ Vagrant.configure("2") do |config|
     master.vm.provision "file", source: "etc", destination: "~/etc"
     master.vm.provision "file", source: "../envoy", destination: "~/envoy"
     master.vm.provision "file", source: "config/reactor.conf", destination: "~/etc/salt/master.d/reactor.conf"
-    config.vm.provision "file", source: ENV['DEPLOY_PRIV_FILE'], destination: File.join("etc/salt/deploykeys/", ambassador_envoy_deploy_priv)
-    config.vm.provision "file", source: ENV['DEPLOY_PUB_FILE'], destination: File.join("etc/salt/deploykeys/", ambassador_envoy_deploy_pub)
+    master.vm.provision "file", source: ENV['DEPLOY_PRIV_FILE'], destination: File.join("etc/salt/deploykeys/", ambassador_envoy_deploy_priv)
+    master.vm.provision "file", source: ENV['DEPLOY_PUB_FILE'], destination: File.join("etc/salt/deploykeys/", ambassador_envoy_deploy_pub)
     master.vm.provision "file", source: "config/top.sls", destination: "~/envoy/salt/base/top.sls"
 
     master.vm.provision "init", type: "shell" do |s|
       s.inline = <<-SHELL
         apt-get update
-        apt-get install -y rsync
+        apt-get install -y rsync zsh
 
         mkdir -p /etc/salt/
         rsync -avzh etc/ /etc
         cp -r envoy /srv/
 
+        mkdir -p /srv/salt
         ln -s /srv/envoy/salt/base /srv/salt/base
         ln -s /srv/envoy/salt/dev /srv/salt/dev
         ln -s /srv/envoy/reactor /srv/reactor
 
-        cat << EOF > /etc/salt/autosign.conf
-            test-slave*
-        EOF
+        echo "test-slave*" > /etc/salt/autosign.conf
+
       SHELL
     end
     master.vm.provision "install salt", type: "shell" do |s|
