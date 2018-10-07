@@ -50,10 +50,11 @@ Vagrant.configure("2") do |config|
         rsync -avzh etc/ /etc
         cp -r envoy /srv/
 
-        mkdir -p /srv/salt
+        mkdir -p /srv/salt /srv/pillar
         ln -s /srv/envoy/salt/base /srv/salt/base
         ln -s /srv/envoy/salt/dev /srv/salt/dev
         ln -s /srv/envoy/reactor /srv/reactor
+        touch /srv/pillar/top.sls
 
         echo "test-slave*" > /etc/salt/autosign.conf
 
