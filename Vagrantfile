@@ -124,6 +124,10 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  config.vm.provision "install", type: "shell" do |s|
+    s.path = "setup_salt.sh"
+  end
+
   config.vm.provision "install", type: "shell", env: {
     "CID" => ENV['CONTAINER_FQDN'],
     "CERT_BASEDIR" => ENV['CONTAINER_CERT_BASE'],
@@ -134,7 +138,7 @@ Vagrant.configure("2") do |config|
     "CERT" => ambassador_cert,
     "PROXY_CERT" => ambassador_cert
     } do |s|
-    s.path = "run.sh"
+    s.path = "setup_foreman.sh"
   end
 
 end

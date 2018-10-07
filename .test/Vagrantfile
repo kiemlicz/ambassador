@@ -6,8 +6,8 @@ require 'fileutils'
 
 Vagrant.configure("2") do |config|
 
-  master_node = "test_master"
-  slave_node = "test_slave"
+  master_node = "test-master"
+  slave_node = "test-slave"
 
   def materialize(render, filename)
     FileUtils.mkdir_p(File.dirname(filename))
@@ -16,12 +16,32 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  ambassador_salt_api_interfaces="0.0.0.0"
+  #ambassador_client_id=
+  #ambassador_client_secret=
+
   config.vm.define master_node do |master|
     master.vm.box = "debian/stretch64"
     master.vm.hostname = master_node
     master.vm.provider :lxc do |lxc|
         lxc.container_name = :machine
         lxc.backingstore = 'best'
+    end
+    materialize(ERB.new(File.read("../config/salt/ambassador_common.erb")).result(binding), "etc/salt/master.d/ambassador_common.conf")
+    materialize(ERB.new(File.read("../config/salt/ambassador_ext_pillar.erb")).result(binding), "etc/salt/master.d/ambassador_ext_pillar.conf")
+    materialize(ERB.new(File.read("../config/salt/ambassador_roots.erb")).result(binding), "etc/salt/master.d/ambassador_roots.conf")
+    materialize(ERB.new(File.read("../config/salt/reactor.erb")).result(binding), "etc/salt/master.d/reactor.conf")
+    config.vm.provision "file", source: "etc", destination: "~/etc"
+    master.vm.provision "init", type: "shell" do |s|
+      s.inline = <<-SHELL
+        apt-get update
+        apt-get install -y rsync
+        mkdir -p /etc/salt/
+        rsync -avzh etc/ /etc
+      SHELL
+    end
+    master.vm.provision "init", type: "shell" do |s|
+        s.path = "../setup_salt.sh"
     end
   end
 
@@ -31,6 +51,19 @@ Vagrant.configure("2") do |config|
     slave.vm.provider :lxc do |lxc|
         lxc.container_name = :machine
         lxc.backingstore = 'best'
+    end
+    slave.vm.provision "file", source: "config/minion.conf", destination: "~/minion.conf"
+    slave.vm.provision "init", type: "shell" do |s|
+      s.inline = <<-SHELL
+          dhclient -r
+          dhclient eth0
+          apt-get update
+          apt-get install -y curl
+          mkdir -p /etc/salt/minion.d/
+          mv minion.conf /etc/salt/minion.d/minion.conf
+          curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com
+          sh /tmp/bootstrap-salt.sh -n -X stable
+      SHELL
     end
   end
 
