@@ -20,7 +20,7 @@ Vagrant.configure("2") do |config|
   ambassador_client_id=ENV['CLIENT_ID']
   ambassador_client_secret=ENV['CLIENT_SECRET']
   ambassador_git_pillar_url=ENV['GIT_PILLAR_URL']
-  ambassador_envoy_deploy_priv=File.basenname(ENV['DEPLOY_PRIV_FILE'])
+  ambassador_envoy_deploy_priv=File.basename(ENV['DEPLOY_PRIV_FILE'])
   ambassador_envoy_deploy_pub=File.basename(ENV['DEPLOY_PUB_FILE'])
 
   config.vm.define master_node do |master|
