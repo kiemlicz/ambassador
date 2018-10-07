@@ -1,0 +1,37 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+require 'erb'
+require 'fileutils'
+
+Vagrant.configure("2") do |config|
+
+  master_node = "test_master"
+  slave_node = "test_slave"
+
+  def materialize(render, filename)
+    FileUtils.mkdir_p(File.dirname(filename))
+    File.open(filename, "w") do |f|
+      f.write render
+    end
+  end
+
+  config.vm.define master_node do |master|
+    master.vm.box = "debian/stretch64"
+    master.vm.hostname = master_node
+    master.vm.provider :lxc do |lxc|
+        lxc.container_name = :machine
+        lxc.backingstore = 'best'
+    end
+  end
+
+  config.vm.define slave_node do |slave|
+    slave.vm.box = "debian/stretch64"
+    slave.vm.hostname = slave_node
+    slave.vm.provider :lxc do |lxc|
+        lxc.container_name = :machine
+        lxc.backingstore = 'best'
+    end
+  end
+
+end

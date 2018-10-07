@@ -173,8 +173,6 @@ fi
 
 ##### build container
 
-. util/vm/lxc_functions #remove
-
 readonly run_start_ts=$(date +%s.%N)
 
 vagrant up --provider=lxc
