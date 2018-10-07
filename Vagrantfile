@@ -72,8 +72,8 @@ Vagrant.configure("2") do |config|
 
     materialize(ERB.new(File.read("config/salt/ambassador_gitfs_deploykeys.erb")).result(binding), "etc/salt/master.d/ambassador_gitfs_deploykeys.conf")
 
-    config.vm.provision "file", source: ENV['DEPLOY_PUB_FILE'], destination: "/etc/salt/deploykeys/"
-    config.vm.provision "file", source: ENV['DEPLOY_PRIV_FILE'], destination: "/etc/salt/deploykeys/"
+    config.vm.provision "file", source: ENV['DEPLOY_PUB_FILE'], destination: File.join("etc/salt/deploykeys/", ambassador_envoy_deploy_pub)
+    config.vm.provision "file", source: ENV['DEPLOY_PRIV_FILE'], destination: File.join("etc/salt/deploykeys/", ambassador_envoy_deploy_priv)
   end
 
   if ENV['USE_ROOTS'] == "true"

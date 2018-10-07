@@ -1,0 +1,7 @@
+autosign_file: /etc/salt/autosign.conf
+ext_pillar_first: True
+ext_pillar:
+  - git:
+    - <%=ambassador_git_pillar_url%>:
+      - env: dev
+      - root: pillar
