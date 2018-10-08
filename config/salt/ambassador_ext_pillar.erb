@@ -4,7 +4,7 @@ ext_pillar:
   - cmd_json: cat /var/cache/salt/master/file_ext/%s/gdrive_token
   - privgit:
     - main:
-        env: custom
+        env: base
         root: pillar
 
 # so that filesystem can override gitfs
