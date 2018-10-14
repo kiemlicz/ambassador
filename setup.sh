@@ -107,6 +107,11 @@ export readonly USERS=${ALLOWED_USERS-"$USER"}
 readonly setup_start_ts=$(date +%s.%N)
 
 ##### validate
+
+if [[ $EUID -eq 0 ]]; then
+   echo "Warning: script is running as root"
+fi
+
 if [ "$AUTO_CERT_GENERATION" = false ] && ([ -z $CA_CERT_FILE ] || [ -z $SERVER_CERT_FILE ] || [ -z $SERVER_KEY_FILE ] || [ -z $CRL_FILE ]); then
     echo "Provide all: ca cert, server cert, server key and crl file or use auto-generation method"
     exit 1
