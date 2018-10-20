@@ -48,17 +48,12 @@ def run():
       "influxdb",
       "redis.client",
       "mongodb.client",
+      "redis.server",
     ],
     # Artful image has hard time whereas Debian does not: https://github.com/docker/for-linux/issues/230
     'not (G@virtual_subtype:Docker and G@oscodename:artful)': [
       "docker",
       "docker.compose",
-    ],
-    'I@redis:setup_type:cluster': [
-      "redis.server.cluster"
-    ],
-    'I@redis:setup_type:single': [
-      "redis.server.single"
     ],
     'I@mongodb:setup_type:cluster': [
       "mongodb.server.cluster"
