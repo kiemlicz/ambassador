@@ -19,7 +19,9 @@ echo "scanning output"
 result=$(awk '/^Failed:/ {if($2 != "0") print "fail"}' output)
 
 if [[ "$result" == "fail" ]] || [[ $salt_call_ret_val -ne 0 ]]; then
+    echo "found failures"
     exit 3
 fi
-
+#fixme why
+pip install --upgrade && pip install --upgrade testinfra
 py.test --sudo /opt/infra/$2*.py
