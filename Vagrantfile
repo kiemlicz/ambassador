@@ -43,8 +43,9 @@ Vagrant.configure("2") do |config|
 
         # remove accepting locale on server so that no locale generation is needed
         sed -i -e 's/\(^AcceptEnv LANG.*\)/#\1/g' /etc/ssh/sshd_config
-        sed -i "/^127.0.1.1 /s/$CONTAINER_NAME/$CONTAINER_FQDN $CONTAINER_NAME/" /etc/hosts
-
+        CIP=$(ip r s | grep "scope link src" | cut -d' ' -f9)
+        sed -i "s/127.0.1.1/#127.0.1.1/" /etc/hosts
+        echo "$CIP  $CONTAINER_FQDN $CONTAINER_NAME" >> /etc/hosts
         #configure resolvconf utility so that proper nameserver exists, otherwise only 127.0.0.1 may appear
         echo 'TRUNCATE_NAMESERVER_LIST_AFTER_LOOPBACK_ADDRESS=no' > /etc/default/resolvconf
     SHELL
