@@ -24,7 +24,6 @@ RUN echo $(grep $(hostname) /etc/hosts | cut -f1) $hostname >> /etc/hosts && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -n -M -N -X stable $salt_ver && \
     ln -s /srv/envoy/salt /srv/salt && \
-    ln -s /srv/envoy/extensions /srv/salt_ext && \
 # workaround for (needed only when installed via Dockerfile)
 # https://github.com/saltstack/salt/issues/37056
     rm -rf /var/run/salt/master/master_event_pub.ipc && \
