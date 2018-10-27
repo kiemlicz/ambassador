@@ -20,7 +20,7 @@ RUN apt-get update && apt-get remove -y gnupg iproute2 && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -n -d stable $SALT_VER && \
     ln -sf /dev/stdout /var/log/salt/minion && \
-    pip install --upgrade && pip install --upgrade testinfra
+    pip install --upgrade testinfra importlib
 
 ENV SALTENV=$SALTENV
 ENV PILLARENV=$PILLARENV
