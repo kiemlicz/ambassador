@@ -6,7 +6,7 @@ if [ -z "$DOCKER_IMAGE" ]; then
     exit 1
 fi
 
-COMPOSE_VER="1.19.0"
+COMPOSE_VER="1.22.0"
 
 docker_compose_update() {
     local docker_compose_version=$COMPOSE_VER

@@ -6,27 +6,21 @@ minions:
 redis:
   setup_type: cluster
   masters:
-    - id: minion1.local
+    - name: master1
       port: 6379
-    - id: minion2.local
+    - name: master2
       port: 6379
-    - id: minion3.local
+    - name: master3
       port: 6379
   slaves:
-    - id: minion1.local
-      of_master:
-        id: minion2.local
-        port: 6379
+    - name: slave1
+      of_master: master2
       port: 6380
-    - id: minion2.local
-      of_master:
-        id: minion3.local
-        port: 6379
+    - name: slave2
+      of_master: master3
       port: 6380
-    - id: minion3.local
-      of_master:
-        id: minion1.local
-        port: 6379
+    - name: slave3
+      of_master: master1
       port: 6380
 
 mongodb:
