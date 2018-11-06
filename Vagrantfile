@@ -85,6 +85,7 @@ Vagrant.configure("2") do |config|
   materialize(ERB.new(File.read("config/salt/ambassador_common.erb")).result(binding), "etc/salt/master.d/ambassador_common.conf")
   materialize(ERB.new(File.read("config/salt/ambassador_ext_pillar.erb")).result(binding), "etc/salt/master.d/ambassador_ext_pillar.conf")
   materialize(ERB.new(File.read("config/salt/ambassador_salt_foreman.erb")).result(binding), "etc/salt/master.d/ambassador_salt_foreman.conf")
+  materialize(ERB.new(File.read("config/salt/ambassador_queue.erb")).result(binding), "etc/salt/master.d/ambassador_queue.conf")
   materialize(ERB.new(File.read("config/salt/reactor.erb")).result(binding), "etc/salt/master.d/reactor.conf")
   materialize(ERB.new(File.read("config/salt/foreman.erb")).result(binding), "etc/salt/foreman.yaml")
   materialize(ERB.new(File.read("config/foreman/salt.erb")).result(binding), "etc/foreman-proxy/settings.d/salt.yml")

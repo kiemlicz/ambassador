@@ -1,0 +1,10 @@
+runner_queue:
+  queue: runner_queue
+  backend: sqlite
+
+schedule:
+  runner_queue:
+    function: queue.process_runner
+    minutes: 1
+    kwargs:
+      quantity: 2
