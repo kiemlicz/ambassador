@@ -1,10 +1,5 @@
 interface: <%=ambassador_salt_api_interfaces%>
 
-extension_modules: /srv/salt_ext
-
-runner_dirs:
-  - /srv/salt_ext/runners
-
 gitfs_provider: pygit2
 #prevents printing strange environments
 gitfs_saltenv_whitelist:
@@ -18,6 +13,11 @@ fileserver_backend:
 
 pillar_opts: True
 
+file_recv: True
+
+use_superseded:
+  - module.run
+
 google_api:
   client_id: "<%=ambassador_client_id%>"
   client_secret: "<%=ambassador_client_secret%>"
@@ -25,7 +25,8 @@ google_api:
   authorization_base_url: "https://accounts.google.com/o/oauth2/v2/auth"
   redirect_uri: "urn:ietf:wg:oauth:2.0:oob"
 
-
+#event_return: rawfile_json
+#rawfile_json.filename: /var/log/salt/events
 #log_level: debug
 #log_level_logfile: debug
 #on_demand_ext_pillar:
