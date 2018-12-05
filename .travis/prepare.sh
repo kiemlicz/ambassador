@@ -27,15 +27,53 @@ docker_update() {
     sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
 }
 
+kubectl_install() {
+    curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/darwin/amd64/kubectl
+    chmod +x kubectl
+    sudo mv kubectl /usr/local/bin/
+}
+
+minikube_install() {
+    curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.30.0/minikube-linux-amd64
+    chmod +x minikube
+    sudo mv minikube /usr/local/bin/
+    sudo minikube start --vm-driver=none
+    minikube update-context
+    #wait until nodes report as ready
+    JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; \
+    until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
+}
 
 case "$TEST_CASE" in
 salt-masterless-run)
     docker_update
     docker build --build-arg=SALT_VER=$SALT_VER --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" --build-arg=SALTENV="$SALTENV" --build-arg=PILLARENV="$PILLARENV" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/masterless/Dockerfile .
     ;;
-salt-master-run)
+salt-master-run-swarm)
     docker_update
     docker_compose_update
     docker-compose -f .travis/docker-compose.yml --project-directory=. --no-ansi up --no-start
+    ;;
+salt-master-run-k8s)
+    kubectl_install
+    minikube_install
+    # build images that are used for provisioning (salt master's and minion's)
+    # only one of each is required per one node cluster
+    docker build \
+        --build-arg=SALT_VER=$SALT_VER \
+        --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" \
+        --build-arg=SALTENV="$SALTENV" \
+        --build-arg=PILLARENV="$PILLARENV" \
+        --build-arg=hostname="master.local" \
+        -t salt_master \
+        -f .travis/"$DOCKER_IMAGE"/master/Dockerfile .
+    docker build \
+        --build-arg=SALT_VER=$SALT_VER \
+        --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" \
+        --build-arg=SALTENV="$SALTENV" \
+        --build-arg=PILLARENV="$PILLARENV" \
+        --build-arg=hostname="minion.local" \
+        -t salt_minion \
+        -f .travis/"$DOCKER_IMAGE"/minion/Dockerfile .
     ;;
 esac

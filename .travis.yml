@@ -2,7 +2,7 @@ language: python
 
 sudo: required
 
-dist: trusty
+dist: xenial
 
 services:
   - docker
@@ -40,17 +40,17 @@ env:
       TEST_CASE=salt-masterless-run
       SALTENV=dev
       PILLARENV=dev
-    - DOCKER_IMAGE=debian-stretch
-      TEST_CASE=salt-master-run
-      SALTENV=dev
-      PILLARENV=orch
-# xenial cluster tests are disabled as salt-minion detects supervisord as systemd in docker and fails...
-#    - DOCKER_IMAGE=ubuntu-xenial
-#      TEST_CASE=salt-master-run
+#    todo
+#    - DOCKER_IMAGE=debian-stretch
+#      TEST_CASE=salt-master-run-k8s
 #      SALTENV=dev
 #      PILLARENV=orch
+    - DOCKER_IMAGE=debian-stretch
+      TEST_CASE=salt-master-run-swarm
+      SALTENV=dev
+      PILLARENV=orch
     - DOCKER_IMAGE=ubuntu-bionic
-      TEST_CASE=salt-master-run
+      TEST_CASE=salt-master-run-swarm
       SALTENV=dev
       PILLARENV=orch
 
