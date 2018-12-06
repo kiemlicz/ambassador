@@ -1,6 +1,5 @@
 FROM debian:stretch
 
-ARG hostname
 ARG saltenv
 ARG pillarenv
 ARG log_level
@@ -19,16 +18,11 @@ COPY .travis/reactor /srv/reactor
 COPY .travis/salt/dev/top.sls /srv/envoy/salt/base/
 COPY .travis/config/no_daemon_env /etc/default/salt-master
 
-RUN echo $(grep $(hostname) /etc/hosts | cut -f1) $hostname >> /etc/hosts && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get install -y curl supervisor procps && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -n -M -N -X stable $salt_ver && \
-    ln -s /srv/envoy/salt /srv/salt && \
-# workaround for (needed only when installed via Dockerfile)
-# https://github.com/saltstack/salt/issues/37056
-    rm -rf /var/run/salt/master/master_event_pub.ipc && \
-    rm -rf /var/run/salt/master/master_event_pull.ipc
+    ln -s /srv/envoy/salt /srv/salt
 
 EXPOSE 4505:4505 4506:4506
 

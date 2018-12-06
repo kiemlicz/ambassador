@@ -49,7 +49,7 @@ salt-masterless-run)
     docker_update
     docker build --build-arg=SALT_VER=$SALT_VER --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" --build-arg=SALTENV="$SALTENV" --build-arg=PILLARENV="$PILLARENV" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/masterless/Dockerfile .
     ;;
-salt-master-run-swarm)
+salt-master-run-compose)
     docker_update
     docker_compose_update
     docker-compose -f .travis/docker-compose.yml --project-directory=. --no-ansi up --no-start
@@ -64,16 +64,11 @@ salt-master-run-k8s)
         --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" \
         --build-arg=SALTENV="$SALTENV" \
         --build-arg=PILLARENV="$PILLARENV" \
-        --build-arg=hostname="master.local" \
         -t salt_master \
         -f .travis/"$DOCKER_IMAGE"/master/Dockerfile .
     docker build \
         --build-arg=SALT_VER=$SALT_VER \
-        --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" \
-        --build-arg=SALTENV="$SALTENV" \
-        --build-arg=PILLARENV="$PILLARENV" \
-        --build-arg=hostname="minion.local" \
         -t salt_minion \
-        -f .travis/"$DOCKER_IMAGE"/minion/Dockerfile .
+        -f .travis/"$DOCKER_IMAGE"/minion/k8s/Dockerfile .
     ;;
 esac

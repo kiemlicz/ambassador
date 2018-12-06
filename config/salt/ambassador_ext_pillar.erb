@@ -6,6 +6,15 @@ ext_pillar:
     - main:
         env: base
         root: pillar
+#  - kubectl:
+#      config: "/tmp/admin.conf"
+#      queries:
+#        - kind: statefulsets
+#          name: redis-cluster
+#          key: "redis:kubernetes"
+#        - kind: pod
+#          selector: app=redis-cluster
+#          key: "redis:kubernetes:pods"
 
 # so that filesystem can override gitfs
 ext_pillar_first: True

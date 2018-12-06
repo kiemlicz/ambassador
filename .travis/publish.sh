@@ -18,7 +18,7 @@ case "$TEST_CASE" in
 salt-masterless-run)
     docker_push "ambassador-salt-masterless-run-$TRAVIS_JOB_NUMBER"
     ;;
-salt-master-run-swarm|salt-master-run-k8s)
+salt-master-run-compose|salt-master-run-k8s)
     echo "salt-master-run publish is disabled"
     ;;
 esac

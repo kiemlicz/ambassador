@@ -6,7 +6,6 @@ services:
       context: .
       dockerfile: .travis/$DOCKER_IMAGE/master/Dockerfile
       args:
-        hostname: master.local
         saltenv: $SALTENV
         pillarenv: $PILLARENV
         salt_ver: $SALT_VER
@@ -26,9 +25,8 @@ services:
     image: salt_minion
     build:
       context: .
-      dockerfile: .travis/$DOCKER_IMAGE/minion/Dockerfile
+      dockerfile: .travis/$DOCKER_IMAGE/minion/compose/Dockerfile
       args:
-        hostname: minion1.local
         salt_ver: $SALT_VER
     hostname: minion1
     domainname: local
@@ -43,9 +41,8 @@ services:
     image: salt_minion
     build:
       context: .
-      dockerfile: .travis/$DOCKER_IMAGE/minion/Dockerfile
+      dockerfile: .travis/$DOCKER_IMAGE/minion/compose/Dockerfile
       args:
-        hostname: minion2.local
         salt_ver: $SALT_VER
     hostname: minion2
     domainname: local
@@ -60,9 +57,8 @@ services:
     image: salt_minion
     build:
       context: .
-      dockerfile: .travis/$DOCKER_IMAGE/minion/Dockerfile
+      dockerfile: .travis/$DOCKER_IMAGE/minion/compose/Dockerfile
       args:
-        hostname: minion3.local
         salt_ver: $SALT_VER
     hostname: minion3
     domainname: local

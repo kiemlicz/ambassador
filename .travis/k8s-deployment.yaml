@@ -1,33 +1,77 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: provisioning
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: salt-master
+  namespace: provisioning
+  labels:
+    app: salt-master
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: salt-master
+  template:
+    metadata:
+      labels:
+        app: salt-master
+    spec:
+      hostname: master
+      containers:
+        - name: salt-master
+          image: salt_master:latest
+          ports:
+            - containerPort: 4505
+            - containerPort: 4506
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: salt-master
+  namespace: provisioning
+spec:
+  selector:
+    app: salt-master
+  ports:
+    - protocol: TCP
+      name: pubsub
+      port: 4505
+      targetPort: 4505
+    - protocol: TCP
+      name: reqreply
+      port: 4506
+      targetPort: 4506
+---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: salt
   namespace: provisioning
   labels:
-    app: salt
+    app: salt-minion
 spec:
   selector:
     matchLabels:
-      name: salt
+      name: salt-minion
   template:
     metadata:
       labels:
-        name: salt
+        name: salt-minion
     spec:
       containers:
-        - name: salt-master
-          image: salt_master:latest
+        - name: salt-minion
+          image: salt_minion:latest
           volumeMounts:
-            - name: varlog
-              mountPath: /var/log
-            - name: varlibdockercontainers
-              mountPath: /var/lib/docker/containers
-              readOnly: true
+            - name: dockersock
+              mountPath: /var/run/docker.sock
       terminationGracePeriodSeconds: 30
       volumes:
-        - name: varlog
+        - name: dockersock
           hostPath:
-            path: /var/log
-        - name: varlibdockercontainers
-          hostPath:
-            path: /var/lib/docker/containers
+            path: /var/run/docker.sock
+            type: Socket

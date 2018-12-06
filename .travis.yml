@@ -40,17 +40,16 @@ env:
       TEST_CASE=salt-masterless-run
       SALTENV=dev
       PILLARENV=dev
-#    todo
-#    - DOCKER_IMAGE=debian-stretch
-#      TEST_CASE=salt-master-run-k8s
-#      SALTENV=dev
-#      PILLARENV=orch
     - DOCKER_IMAGE=debian-stretch
-      TEST_CASE=salt-master-run-swarm
+      TEST_CASE=salt-master-run-k8s
+      SALTENV=dev
+      PILLARENV=orch
+    - DOCKER_IMAGE=debian-stretch
+      TEST_CASE=salt-master-run-compose
       SALTENV=dev
       PILLARENV=orch
     - DOCKER_IMAGE=ubuntu-bionic
-      TEST_CASE=salt-master-run-swarm
+      TEST_CASE=salt-master-run-compose
       SALTENV=dev
       PILLARENV=orch
 
