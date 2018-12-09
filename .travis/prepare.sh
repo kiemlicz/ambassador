@@ -39,7 +39,8 @@ minikube_install() {
     sudo mv minikube /usr/local/bin/
     sudo minikube start --vm-driver=none
     sudo minikube update-context
-    echo "Waiting for nodes"
+    echo "Waiting for nodes:"
+    kubectl get nodes
     #wait until nodes report as ready
     JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; \
     until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
