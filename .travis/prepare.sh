@@ -40,6 +40,7 @@ minikube_install() {
     sudo minikube start --vm-driver=none
     sudo minikube update-context
     sudo chown travis -R /home/travis/.kube
+    sudo chown travis -R /home/travis/.minikube
     echo "Waiting for nodes:"
     kubectl get nodes
     #wait until nodes report as ready
