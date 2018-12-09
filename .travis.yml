@@ -11,6 +11,7 @@ services:
 env:
   global:
     - SALT_VER="" # latest
+    - CHANGE_MINIKUBE_NONE_USER=true
   matrix:
     - DOCKER_IMAGE=debian-sid
       TEST_CASE=salt-masterless-run
