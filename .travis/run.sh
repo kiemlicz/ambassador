@@ -12,6 +12,10 @@ salt-master-run-compose)
 salt-master-run-k8s)
     # --exit-code-from master isn't the way to go as implies --abort-on-container-exit
     kubectl apply -f .travis/k8s-deployment.yaml
-    # fixme wait until given pods are running
+    while kubectl get pods -o jsonpath='{range .items[?(@.metadata.labels.app == "salt-master" )]}{@.status.phase}' 2>&1 | grep -q "Running"; do
+        echo "k8s still works:"
+        kubectl get pods
+        sleep 60
+    done
     ;;
 esac
