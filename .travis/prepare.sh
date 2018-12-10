@@ -39,8 +39,6 @@ minikube_install() {
     sudo mv minikube /usr/local/bin/
     sudo minikube start --vm-driver=none
     minikube update-context
-#    sudo chown travis -R /home/travis/.kube
-#    sudo chown travis -R /home/travis/.minikube
     echo "Waiting for nodes:"
     kubectl get nodes
     #wait until nodes report as ready
@@ -62,6 +60,8 @@ salt-master-run-compose)
 salt-master-run-k8s)
     kubectl_install
     minikube_install
+    #create PV paths manually
+    mkdir -p /mnt/data/r0 /mnt/data/r1 /mnt/data/r2 /mnt/data/r3 /mnt/data/r4 /mnt/data/r5
     # build images that are used for provisioning (salt master's and minion's)
     # only one of each is required per one node cluster
     docker build \

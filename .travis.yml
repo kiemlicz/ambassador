@@ -11,7 +11,7 @@ services:
 env:
   global:
     - SALT_VER="" # latest
-    - CHANGE_MINIKUBE_NONE_USER=true
+    - CHANGE_MINIKUBE_NONE_USER=true # adjusts minikube permissions when driver=none
   matrix:
     - DOCKER_IMAGE=debian-sid
       TEST_CASE=salt-masterless-run

@@ -1,3 +1,4 @@
+# to be used for k8s counterpart of docker-compose
 update_mine:
   salt.function:
   - name: mine.update

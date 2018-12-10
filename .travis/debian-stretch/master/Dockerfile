@@ -17,6 +17,7 @@ COPY .travis/pillar /srv/pillar
 COPY .travis/reactor /srv/reactor
 COPY .travis/salt/dev/top.sls /srv/envoy/salt/base/
 COPY .travis/config/no_daemon_env /etc/default/salt-master
+COPY .travis/k8s /opt/k8s
 
 RUN apt-get update && \
     apt-get install -y curl supervisor procps && \

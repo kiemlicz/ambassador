@@ -12,5 +12,6 @@ salt-master-run-compose)
 salt-master-run-k8s)
     # --exit-code-from master isn't the way to go as implies --abort-on-container-exit
     kubectl apply -f .travis/k8s-deployment.yaml
+    # fixme wait until given pods are running
     ;;
 esac
