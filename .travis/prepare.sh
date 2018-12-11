@@ -47,10 +47,24 @@ minikube_install() {
     echo "minikube setup complete"
 }
 
+docker_build() {
+    if [ -z $1 ]; then
+        >&2 echo "Dockerfile path missing"
+        exit 4
+    fi
+    docker build \
+        --build-arg=SALT_VER=$SALT_VER \
+        --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" \
+        --build-arg=SALTENV="$SALTENV" \
+        --build-arg=PILLARENV="$PILLARENV" \
+        -t "${2-$DOCKER_IMAGE}" \
+        -f $1 .
+}
+
 case "$TEST_CASE" in
 salt-masterless-run)
     docker_update
-    docker build --build-arg=SALT_VER=$SALT_VER --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" --build-arg=SALTENV="$SALTENV" --build-arg=PILLARENV="$PILLARENV" -t "$DOCKER_IMAGE" -f .travis/"$DOCKER_IMAGE"/masterless/Dockerfile .
+    docker_build .travis/"$DOCKER_IMAGE"/masterless/Dockerfile
     ;;
 salt-master-run-compose)
     docker_update
@@ -64,16 +78,7 @@ salt-master-run-k8s)
     sudo mkdir -p /mnt/data/r0 /mnt/data/r1 /mnt/data/r2 /mnt/data/r3 /mnt/data/r4 /mnt/data/r5
     # build images that are used for provisioning (salt master's and minion's)
     # only one of each is required per one node cluster
-    docker build \
-        --build-arg=SALT_VER=$SALT_VER \
-        --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" \
-        --build-arg=SALTENV="$SALTENV" \
-        --build-arg=PILLARENV="$PILLARENV" \
-        -t salt_master \
-        -f .travis/"$DOCKER_IMAGE"/master/Dockerfile .
-    docker build \
-        --build-arg=SALT_VER=$SALT_VER \
-        -t salt_minion \
-        -f .travis/"$DOCKER_IMAGE"/minion/k8s/Dockerfile .
+    docker_build .travis/"$DOCKER_IMAGE"/master/Dockerfile salt_master
+    docker_build .travis/"$DOCKER_IMAGE"/minion/k8s/Dockerfile salt_minion
     ;;
 esac
