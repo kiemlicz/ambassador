@@ -3,6 +3,7 @@ FROM debian:stretch
 ARG saltenv
 ARG pillarenv
 ARG log_level
+ARG kubectl_ver
 # "" == latest
 ARG salt_ver=""
 
@@ -21,11 +22,16 @@ COPY .travis/k8s /opt/k8s
 
 RUN apt-get update && \
     apt-get install -y curl supervisor procps && \
+    curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_ver/bin/linux/amd64/kubectl && \
+    chmod +x kubectl && \
+    mv kubectl /usr/local/bin/ && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -n -M -N -X stable $salt_ver && \
     ln -s /srv/envoy/salt /srv/salt
 
 EXPOSE 4505:4505 4506:4506
+
+VOLUME /etc/kubernetes
 
 ENV SALTENV=$saltenv
 ENV PILLARENV=$pillarenv

@@ -2,14 +2,14 @@
 update_mine:
   salt.function:
   - name: mine.update
-  - tgt: {{ pillar['tgt'] }}
+  - tgt: {{ pillar['event']['data']['id'] }}
 
 highstate:
   salt.state:
-  - tgt: {{ pillar['tgt'] }}
+  - tgt: {{ pillar['event']['data']['id'] }}
   - highstate: True
   - saltenv: {{ saltenv }}
   - pillarenv: {{ pillarenv }}
   - require:
-    - salt: mine
+    - salt: update_mine
 

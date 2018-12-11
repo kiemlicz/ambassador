@@ -17,10 +17,12 @@ salt-master-run-k8s)
     kubectl wait -n provisioning deployment/salt-master --for condition=available --timeout=120s
     echo "Deployment ready:"
     kubectl get all -n provisioning
-    while kubectl get pods -o jsonpath='{range .items[?(@.metadata.labels.app == "salt-master" )]}{@.status.phase}' 2>&1 | grep -q "Running"; do
-        echo "k8s still works:"
-        kubectl get all --all-namespaces
-        sleep 60
-    done
+    kubectl wait --for=delete deployment/salt-master --timeout=60m -n provisioning
+    echo "Deployment finished"
+#    while kubectl get pods -o jsonpath='{range .items[?(@.metadata.labels.app == "salt-master" )]}{@.status.phase}' 2>&1 | grep -q "Running"; do
+#        echo "k8s still works:"
+#        kubectl get all --all-namespaces
+#        sleep 60
+#    done
     ;;
 esac

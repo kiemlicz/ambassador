@@ -7,6 +7,8 @@ if [ -z "$DOCKER_IMAGE" ]; then
 fi
 
 COMPOSE_VER="1.22.0"
+KUBECTL_VER="v1.13.0"
+MINIKUBE_VER="v0.30.0"
 
 docker_compose_update() {
     local docker_compose_version=$COMPOSE_VER
@@ -28,13 +30,13 @@ docker_update() {
 }
 
 kubectl_install() {
-    curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.13.0/bin/linux/amd64/kubectl
+    curl -LO https://storage.googleapis.com/kubernetes-release/release/$KUBECTL_VER/bin/linux/amd64/kubectl
     chmod +x kubectl
     sudo mv kubectl /usr/local/bin/
 }
 
 minikube_install() {
-    curl -Lo minikube https://storage.googleapis.com/minikube/releases/v0.30.0/minikube-linux-amd64
+    curl -Lo minikube https://storage.googleapis.com/minikube/releases/$MINIKUBE_VER/minikube-linux-amd64
     chmod +x minikube
     sudo mv minikube /usr/local/bin/
     sudo minikube start --vm-driver=none
@@ -53,10 +55,11 @@ docker_build() {
         exit 4
     fi
     docker build \
-        --build-arg=SALT_VER=$SALT_VER \
-        --build-arg=LOG_LEVEL="${LOG_LEVEL-info}" \
-        --build-arg=SALTENV="$SALTENV" \
-        --build-arg=PILLARENV="$PILLARENV" \
+        --build-arg=salt_ver=$SALT_VER \
+        --build-arg=log_level="${LOG_LEVEL-info}" \
+        --build-arg=saltenv="$SALTENV" \
+        --build-arg=pillarenv="$PILLARENV" \
+        --build-arg=kubectl_ver="$KUBECTL_VER" \
         -t "${2-$DOCKER_IMAGE}" \
         -f $1 .
 }

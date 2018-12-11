@@ -28,6 +28,14 @@ spec:
           ports:
             - containerPort: 4505
             - containerPort: 4506
+          volumeMounts:
+          - mountPath: /etc/kubernetes
+            name: kubeconfig
+      volumes:
+        - name: kubeconfig
+          hostPath:
+            path: /home/travis/.kube
+            # todo this mount doesn't work
 ---
 kind: Service
 apiVersion: v1
