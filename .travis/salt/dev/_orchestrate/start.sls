@@ -10,7 +10,7 @@ salt_minion_started:
   salt.runner:
     - name: event_ext.send_when
     - tag: 'salt/orchestrate/k8s/ready'
-    - condition: __slot__:salt:condition.pillar_eq("redis:kubernetes:status:numberAvailable", "redis:kubernetes:status:numberReady")
+    - condition: __slot__:salt:condition.pillar_eq("salt:kubernetes:status:numberAvailable", "salt:kubernetes:status:numberReady")
     - data: {}
     - require:
         - salt: refresh_pillar

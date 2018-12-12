@@ -35,7 +35,6 @@ spec:
         - name: kubeconfig
           hostPath:
             path: /home/travis/.kube
-            # todo this mount doesn't work
 ---
 kind: Service
 apiVersion: v1

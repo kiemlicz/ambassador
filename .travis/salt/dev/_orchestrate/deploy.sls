@@ -4,7 +4,7 @@
         salt.runner:
             - name: salt.cmd
             - fun: cmd.run
-            - args:
-                - kubectl apply -f {{ deployment_file }}
+            - "kubectl apply -f {{ deployment_file }}"
+            # fixme prepare args for cmd.run...
     {% endif %}
 {% endfor %}
