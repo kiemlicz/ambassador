@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-set -e
+
+k8s_log_error() {
+    echo "Error during kubernetes deployment"
+    kubectl get all --all-namespaces
+}
 
 case "$TEST_CASE" in
 salt-masterless-run)
@@ -12,17 +16,13 @@ salt-master-run-compose)
     docker-compose -f .travis/docker-compose.yml --project-directory=. --no-ansi up --no-build --no-recreate
     ;;
 salt-master-run-k8s)
+    trap k8s_log_error EXIT TERM INT
     kubectl apply -f .travis/k8s-deployment.yaml
     # wait until salt-master and minion containers are running
     kubectl wait -n provisioning deployment/salt-master --for condition=available --timeout=120s
     echo "Deployment ready:"
     kubectl get all -n provisioning
-    kubectl wait --for=delete deployment/salt-master --timeout=60m -n provisioning
+    kubectl wait -n provisioning --for=delete deployment/salt-master --timeout=60m
     echo "Deployment finished"
-#    while kubectl get pods -o jsonpath='{range .items[?(@.metadata.labels.app == "salt-master" )]}{@.status.phase}' 2>&1 | grep -q "Running"; do
-#        echo "k8s still works:"
-#        kubectl get all --all-namespaces
-#        sleep 60
-#    done
     ;;
 esac
