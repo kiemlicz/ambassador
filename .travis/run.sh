@@ -4,6 +4,8 @@
 k8s_log_error() {
     echo "Error during kubernetes deployment"
     kubectl get all --all-namespaces
+    echo "Events:"
+    kubectl get events --all-namespaces
 }
 
 case "$TEST_CASE" in
