@@ -1,7 +1,15 @@
+# sync newer docker_engine
+sync_modules:
+    salt.function:
+        - name: saltutil.sync_all
+        - tgt: '*'
+
 refresh_pillar:
     salt.function:
         - name: saltutil.refresh_pillar
         - tgt: '*'
+        - require:
+            - salt: sync_modules
 
 # every minion corresponds to k8s node
 # wait for all minion, then publish event to start deployment
