@@ -90,6 +90,9 @@ spec:
     spec:
       accessModes: [ "ReadWriteOnce" ]
       storageClassName: "local-storage"
+      resources:
+        requests:
+          storage: 256Mi
 ---
 apiVersion: v1
 kind: PersistentVolume
