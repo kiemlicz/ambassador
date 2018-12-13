@@ -6,5 +6,8 @@
             - arg:
               - cmd.run
               - "kubectl apply -f {{ deployment_file }}"
+            - kwarg:
+                env:
+                  - KUBECONFIG: {{ salt.saltutil.runner('config.get', 'kubeconfig') }}
     {% endif %}
 {% endfor %}
