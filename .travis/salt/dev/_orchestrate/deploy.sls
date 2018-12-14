@@ -8,6 +8,6 @@
               - "kubectl apply -f {{ deployment_file }}"
             - kwarg:
                 env:
-                  - KUBECONFIG: {{ salt.saltutil.runner('config.get', 'kubeconfig') }}
+                  - KUBECONFIG: {{ salt['saltutil.runner'](name='config.get', arg=['kubeconfig']) }}
     {% endif %}
 {% endfor %}
