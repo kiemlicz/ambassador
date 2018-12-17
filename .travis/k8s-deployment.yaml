@@ -31,10 +31,16 @@ spec:
           volumeMounts:
           - mountPath: /etc/kubernetes
             name: kubeconfig
+          - mountPath: /var/log/salt/
+            name: varlogsalt
       volumes:
         - name: kubeconfig
           hostPath:
             path: /home/travis/.kube
+        - name: varlogsalt
+          hostPath:
+            path: /var/log/salt/
+            type: Directory
 ---
 kind: Service
 apiVersion: v1
@@ -76,12 +82,18 @@ spec:
           volumeMounts:
             - name: dockersock
               mountPath: /var/run/docker.sock
+            - name: varlogsalt
+              mountPath: /var/log/salt/
       terminationGracePeriodSeconds: 30
       volumes:
         - name: dockersock
           hostPath:
             path: /var/run/docker.sock
             type: Socket
+        - name: varlogsalt
+          hostPath:
+            path: /var/log/salt/
+            type: Directory
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -126,44 +138,81 @@ metadata:
   labels:
     addonmanager.kubernetes.io/mode: Reconcile
 data:
-  containers.input.conf: |-
+  fluent.conf: |-
+    #<system>
+    #  log_level debug
+    #</system>
+    # minion is present by default in fluentd's kubernetes.conf
     <source>
+      @id master
       @type tail
-      path /var/log/containers/*.log
-      pos_file /var/log/fluentd-containers.log.pos
-      time_format %Y-%m-%dT%H:%M:%S.%NZ
-      tag kubernetes.*
-      format json
-      read_from_head true
+      format multiline
+      format_firstline /^(?<time>[^ ]* [^ ]*)[^\[]*\[[^\]]*\]\[(?<severity>[^ \]]*) *\][^\[]*\[[^\]]*\] (?<message>.*)$/
+      format1 /^(?<message>\d*\s*[a-zA-Z_]*\s*.*)/
+      time_format %Y-%m-%d %H:%M:%S,%N
+      path /var/log/salt/master
+      pos_file /var/log/fluentd-saltmaster.pos
+      #pos_file /tmp/fluentd-saltmaster.pos
+      tag salt-master
     </source>
-  system.input.conf: |-
+
     <source>
       @id minion
       @type tail
-      format /^(?<time>[^ ]* [^ ,]*)[^\[]*\[[^\]]*\]\[(?<severity>[^ \]]*) *\] (?<message>.*)$/
-      time_format %Y-%m-%d %H:%M:%S
+      format multiline
+      format_firstline /^(?<time>[^ ]* [^ ]*)[^\[]*\[[^\]]*\]\[(?<severity>[^ \]]*) *\][^\[]*\[[^\]]*\] (?<message>.*)$/
+      format1 /^(?<message>\d*\s*[a-zA-Z_]*\s*.*)/
+      time_format %Y-%m-%d %H:%M:%S,%N
       path /var/log/salt/minion
-      pos_file /var/log/salt.pos
-      tag salt
+      pos_file /var/log/fluentd-saltminion.pos
+      #pos_file /tmp/fluentd-saltminion.pos
+      tag salt-minion
     </source>
-  output.conf: |-
-    <match fluent.**>
-      @type null
-    </match>
-    <filter kubernetes.**>
-      @type kubernetes_metadata
-    </filter>
+
+    #<source>
+    #  @id masterevents
+    #  @type tail
+    #  <format>
+    #    @type json
+    #  </format>
+    #  path /var/log/salt/events
+    #  pos_file /var/log/saltmasterevents.pos
+    #  tag salt
+    #</source>
+
     <match **>
-      type copy
-      <store>
-        # for debug (see /var/log/td-agent.log)
-        type stdout
-      </store>
-      <store>
-        type syslog
+      @type forward
+      send_timeout 60s
+      recover_wait 10s
+      hard_timeout 60s
+
+      <server>
+        name rsyslog-service
         host rsyslog-service.provisioning
-        port 514
-      </store>
+        port 24224
+        weight 60
+      </server>
+
+    </match>
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: fluentd-aggregator-cm
+  namespace: provisioning
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+data:
+  fluent.conf: |-
+    #<system>
+    #      log_level debug
+    #</system>
+    <source>
+      @type forward
+      port 24224
+    </source>
+    <match **>
+      @type stdout
     </match>
 ---
 apiVersion: extensions/v1beta1
@@ -187,7 +236,7 @@ spec:
       serviceAccountName: fluentd
       containers:
         - name: fluentd
-          image: fluent/fluentd-kubernetes-daemonset:v1.2.5-debian-syslog
+          image: fluent/fluentd-kubernetes-daemonset:v1.3-debian-syslog
           env:
             - name:  SYSLOG_HOST
               value: "rsyslog-service.provisioning"
@@ -205,8 +254,8 @@ spec:
             - name: varlibdockercontainers
               mountPath: /var/lib/docker/containers
               readOnly: true
-      #            - name: fluentd-cm
-      #              mountPath: /fluentd/etc
+            - name: fluentd-cm
+              mountPath: /fluentd/etc/
       terminationGracePeriodSeconds: 30
       volumes:
         - name: varlog
@@ -215,9 +264,9 @@ spec:
         - name: varlibdockercontainers
           hostPath:
             path: /var/lib/docker/containers
-#        - name: fluentd-cm
-#          configMap:
-#            name: fluentd-cm
+        - name: fluentd-cm
+          configMap:
+            name: fluentd-cm
 ---
 apiVersion: v1
 kind: Service
@@ -236,6 +285,10 @@ spec:
       port: 514
       targetPort: 514
       protocol: UDP
+    - name: fluentd
+      port: 24224
+      targetPort: 24224
+      protocol: TCP
 ---
 apiVersion: apps/v1beta1
 kind: Deployment
@@ -253,12 +306,24 @@ spec:
       labels:
         app: rsyslog
     spec:
+      serviceAccount: fluentd
+      serviceAccountName: fluentd
       containers:
         - name: rsyslog
-          image: rsyslog/syslog_appliance_alpine:latest
+          image: fluent/fluentd-kubernetes-daemonset:v1.3-debian-syslog
           imagePullPolicy: "Always"
           ports:
-            - name: incoming-logs
-              containerPort: 514
+            - name: in-logs
+              containerPort: 24224
+            - name: in-logs-http
+              containerPort: 9880
+          volumeMounts:
+            - name: fluentd-aggregator-cm
+              mountPath: /fluentd/etc/
+      volumes:
+        - name: fluentd-aggregator-cm
+          configMap:
+            name: fluentd-aggregator-cm
 
 #https://github.com/fluent/fluentd-kubernetes-daemonset/blob/master/templates/conf/kubernetes.conf.erb
+#https://github.com/fluent/fluentd-kubernetes-daemonset/blob/master/docker-image/v0.12/debian-syslog/conf/kubernetes.conf
