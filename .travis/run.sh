@@ -8,10 +8,24 @@ k8s_log_error() {
     kubectl get events --all-namespaces
 }
 
+still_running() {
+    minutes=0
+    limit=60
+    while docker ps | grep -q $1; do
+        echo -n -e " \b"
+        if [ $minutes == $limit ]; then
+            break;
+        fi
+        minutes=$((minutes+1))
+        sleep 60
+    done
+}
+
 case "$TEST_CASE" in
 salt-masterless-run)
     # privileged mode is necessary for e.g. setting: net.ipv4.ip_forward or running docker in docker
-    docker run --name "ambassador-salt-masterless-run-$TRAVIS_JOB_NUMBER" --privileged "$DOCKER_IMAGE"
+    name="ambassador-salt-masterless-run-$TRAVIS_JOB_NUMBER"
+    docker run --name $name --privileged "$DOCKER_IMAGE"
     ;;
 salt-master-run-compose)
     # --exit-code-from master isn't the way to go as implies --abort-on-container-exit

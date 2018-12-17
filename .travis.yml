@@ -64,7 +64,9 @@ before_install:
   - .travis/prepare.sh
 
 script:
-  - travis_wait 60 .travis/run.sh
+  - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+  - .travis/run.sh
+  - kill %1
   - .travis/after.sh
 
 after_failure:
