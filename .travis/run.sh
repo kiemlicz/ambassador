@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -e
 
 k8s_log_error() {
     echo "Error during kubernetes deployment"
@@ -37,8 +38,8 @@ salt-master-run-k8s)
     echo "trap setup complete"
     kubectl apply -f .travis/k8s-deployment.yaml
     # wait until salt-master and minion containers are running
-    kubectl wait -n provisioning deployment/salt-master --for condition=available --timeout=120s
-    kubectl wait -n provisioning deployment/rsyslog --for condition=available --timeout=120s
+    kubectl wait -n provisioning deployment/salt-master --for condition=available --timeout=240s
+    kubectl wait -n provisioning deployment/rsyslog --for condition=available --timeout=240s
     echo "Deployment ready:"
     kubectl get all -n provisioning
     logger=$(kubectl get pod -l app=rsyslog -n provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
