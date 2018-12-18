@@ -25,6 +25,7 @@ RUN apt-get update && \
     curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_ver/bin/linux/amd64/kubectl && \
     chmod +x kubectl && \
     mv kubectl /usr/bin/ && \
+    chmod 600 /etc/salt/autosign.conf && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -n -M -N -X $salt_ver && \
     ln -s /srv/envoy/salt /srv/salt
