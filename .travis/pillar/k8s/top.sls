@@ -1,3 +1,3 @@
-k8s:
+base:
   '*':
     - redis
