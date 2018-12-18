@@ -24,7 +24,8 @@ spec:
       hostname: master
       containers:
         - name: salt-master
-          image: salt_master:latest
+          image: salt_master
+          imagePullPolicy: Never
           ports:
             - containerPort: 4505
             - containerPort: 4506
@@ -78,7 +79,8 @@ spec:
     spec:
       containers:
         - name: salt-minion
-          image: salt_minion:latest
+          image: salt_minion
+          imagePullPolicy: Never
           volumeMounts:
             - name: dockersock
               mountPath: /var/run/docker.sock

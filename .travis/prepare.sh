@@ -41,6 +41,7 @@ minikube_install() {
     sudo mv minikube /usr/local/bin/
     sudo minikube start --vm-driver=none
     minikube update-context
+    eval $(minikube docker-env)
     echo "Waiting for nodes:"
     kubectl get nodes
     #wait until nodes report as ready
