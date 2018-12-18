@@ -4,8 +4,7 @@ ARG saltenv
 ARG pillarenv
 ARG log_level
 ARG kubectl_ver
-# "" == latest
-ARG salt_ver=""
+ARG salt_ver
 
 COPY envoy /srv/envoy
 COPY .travis/entrypoint_master_run.sh /opt/
@@ -27,7 +26,7 @@ RUN apt-get update && \
     chmod +x kubectl && \
     mv kubectl /usr/bin/ && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
-    sh /tmp/bootstrap-salt.sh -n -M -N -X stable $salt_ver && \
+    sh /tmp/bootstrap-salt.sh -n -M -N -X $salt_ver && \
     ln -s /srv/envoy/salt /srv/salt
 
 EXPOSE 4505:4505 4506:4506

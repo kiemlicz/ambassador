@@ -1,10 +1,9 @@
 FROM debian:stretch
 
-ARG LOG_LEVEL
-ARG SALTENV
-ARG PILLARENV
-# "" == latest
-ARG SALT_VER=""
+ARG log_level
+ARG saltenv
+ARG pillarenv
+ARG salt_ver
 
 COPY envoy /srv/envoy
 COPY .travis/entrypoint_masterless_run.sh /opt/
@@ -15,11 +14,11 @@ COPY .travis/salt/top.sls /srv/envoy/salt/base/
 RUN apt-get update && apt-get install -y curl python python-pip procps && \
     ln -s /srv/envoy/salt /srv/salt && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
-    sh /tmp/bootstrap-salt.sh -n stable $SALT_VER && \
+    sh /tmp/bootstrap-salt.sh -n $salt_ver && \
     ln -sf /dev/stdout /var/log/salt/minion
 
-ENV SALTENV=$SALTENV
-ENV PILLARENV=$PILLARENV
-ENV LOG_LEVEL=$LOG_LEVEL
+ENV SALTENV=$saltenv
+ENV PILLARENV=$pillarenv
+ENV LOG_LEVEL=$log_level
 
 ENTRYPOINT /opt/entrypoint_masterless_run.sh $SALTENV $PILLARENV $LOG_LEVEL

@@ -4,8 +4,7 @@ ARG hostname
 ARG saltenv
 ARG pillarenv
 ARG log_level
-# "" == latest
-ARG salt_ver=""
+ARG salt_ver
 
 COPY envoy /srv/envoy
 COPY .travis/entrypoint_master_run.sh /opt/
@@ -23,7 +22,7 @@ RUN echo $(grep $(hostname) /etc/hosts | cut -f1) $hostname >> /etc/hosts && \
     apt-get install -y --reinstall gnupg2 && \
     apt-get install -y curl dirmngr python-pip supervisor procps iproute2 && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
-    sh /tmp/bootstrap-salt.sh -n -d -M -N -X stable $salt_ver && \
+    sh /tmp/bootstrap-salt.sh -n -d -M -N -X $salt_ver && \
     ln -s /srv/envoy/salt /srv/salt && \
 # workaround for (needed only when installed via Dockerfile)
 # https://github.com/saltstack/salt/issues/37056
