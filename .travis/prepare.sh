@@ -46,6 +46,8 @@ minikube_install() {
     #wait until nodes report as ready
     JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; \
     until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
+    echo "Adding:"
+    echo $(minikube docker-env)
     eval $(minikube docker-env)
     echo "minikube setup complete"
 }
