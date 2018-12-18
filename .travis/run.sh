@@ -7,6 +7,10 @@ k8s_log_error() {
     kubectl get all --all-namespaces
     echo "Events:"
     kubectl get events --all-namespaces
+    echo "Salt master info"
+    kubectl describe pod -l app=salt-master -n provisioning
+    echo "Salt minion info"
+    kubectl describe pod -l name=salt-minion -n provisioning
 }
 
 still_running() {
@@ -35,11 +39,10 @@ salt-master-run-compose)
 salt-master-run-k8s)
     echo "Starting kubernetes deployment"
     trap k8s_log_error EXIT TERM INT
-    echo "trap setup complete"
     kubectl apply -f .travis/k8s-deployment.yaml
     # wait until salt-master and minion containers are running
-    kubectl wait -n provisioning deployment/salt-master --for condition=available --timeout=240s
-    kubectl wait -n provisioning deployment/rsyslog --for condition=available --timeout=240s
+    kubectl wait -n provisioning deployment/salt-master --for condition=available --timeout=5m
+    kubectl wait -n provisioning deployment/rsyslog --for condition=available --timeout=5m
     echo "Deployment ready:"
     kubectl get all -n provisioning
     logger=$(kubectl get pod -l app=rsyslog -n provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
