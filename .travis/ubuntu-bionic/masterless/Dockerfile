@@ -16,7 +16,7 @@ RUN apt-get update && apt-get remove -y gnupg iproute2 && \
     apt-get install -y curl dirmngr python-pip && \
     ln -s /srv/envoy/salt /srv/salt && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
-    sh /tmp/bootstrap-salt.sh -n -d $salt_ver && \
+    sh /tmp/bootstrap-salt.sh -n -d -X $salt_ver && \
     ln -sf /dev/stdout /var/log/salt/minion
 
 ENV SALTENV=$saltenv

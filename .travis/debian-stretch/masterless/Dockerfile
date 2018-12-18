@@ -14,7 +14,7 @@ COPY .travis/salt/top.sls /srv/envoy/salt/base/
 RUN apt-get update && apt-get install -y curl python python-pip procps && \
     ln -s /srv/envoy/salt /srv/salt && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
-    sh /tmp/bootstrap-salt.sh -n $salt_ver && \
+    sh /tmp/bootstrap-salt.sh -n -X $salt_ver && \
     ln -sf /dev/stdout /var/log/salt/minion
 
 ENV SALTENV=$saltenv
