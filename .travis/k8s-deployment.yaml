@@ -40,7 +40,7 @@ spec:
         - name: varlogsalt
           hostPath:
             path: /var/log/salt/
-            type: Directory
+            type: DirectoryOrCreate
 ---
 kind: Service
 apiVersion: v1
@@ -93,7 +93,7 @@ spec:
         - name: varlogsalt
           hostPath:
             path: /var/log/salt/
-            type: Directory
+            type: DirectoryOrCreate
 ---
 apiVersion: v1
 kind: ServiceAccount
