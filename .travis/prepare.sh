@@ -43,14 +43,16 @@ minikube_install() {
     minikube update-context
     echo "Waiting for nodes:"
     kubectl get nodes
-    ls -al ~
-    sudo ls -al ~
-    echo "--"
-    ls -al ~/.minikube/
-    sudo ls -al ~/.minikube/
     #wait until nodes report as ready
     JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; \
     until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
+    cp ~/.minikube/ca.crt ~/.kube/
+    cp ~/.minikube/client.crt ~/.kube/
+    cp ~/.minikube/client.key ~/.kube/
+    cp ~/.kube/config ~/.kube/config_for_salt
+    sed -i 's;/home/travis/.minikube/ca.crt;/etc/kubernetes/ca.crt;g' ~/.kube/config_for_salt
+    sed -i 's;/home/travis/.minikube/client.crt;/etc/kubernetes/client.crt;g' ~/.kube/config_for_salt
+    sed -i 's;/home/travis/.minikube/client.key;/etc/kubernetes/client.key;g' ~/.kube/config_for_salt
     echo "minikube setup complete"
 }
 
@@ -80,6 +82,7 @@ salt-master-run-compose)
     docker-compose -f .travis/docker-compose.yml --project-directory=. --no-ansi up --no-start
     ;;
 salt-master-run-k8s)
+    # todo update to specific docker-ce version apt-get install docker-ce=18.06.1~ce~3-0~debian
     kubectl_install
     minikube_install
     #create PV paths manually
