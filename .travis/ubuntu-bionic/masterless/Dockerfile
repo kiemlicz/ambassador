@@ -8,7 +8,7 @@ ARG salt_ver
 COPY envoy /srv/envoy
 COPY .travis/entrypoint_masterless_run.sh /opt/
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/pillar /srv/pillar
+COPY .travis/pillar/$pillarenv /srv/pillar
 COPY .travis/salt/top.sls /srv/envoy/salt/base/
 
 RUN apt-get update && apt-get remove -y gnupg iproute2 && \
@@ -20,7 +20,6 @@ RUN apt-get update && apt-get remove -y gnupg iproute2 && \
     ln -sf /dev/stdout /var/log/salt/minion
 
 ENV SALTENV=$saltenv
-ENV PILLARENV=$pillarenv
 ENV LOG_LEVEL=$log_level
 
-ENTRYPOINT /opt/entrypoint_masterless_run.sh $SALTENV $PILLARENV $LOG_LEVEL
+ENTRYPOINT /opt/entrypoint_masterless_run.sh $SALTENV $LOG_LEVEL

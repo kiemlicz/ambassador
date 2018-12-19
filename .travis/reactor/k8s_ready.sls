@@ -4,4 +4,3 @@ k8s_orchestrate:
       - mods:
         - _orchestrate.deploy
       - saltenv: {{ salt['environ.get']("SALTENV") }}
-      - pillarenv: {{ salt['environ.get']("PILLARENV") }}

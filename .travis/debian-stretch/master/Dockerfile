@@ -35,6 +35,5 @@ EXPOSE 4505:4505 4506:4506
 VOLUME /etc/kubernetes
 
 ENV SALTENV=$saltenv
-ENV PILLARENV="base"
 ENV LOG_LEVEL=$log_level
 ENTRYPOINT [ "/opt/entrypoint_master_run.sh" ]

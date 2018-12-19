@@ -8,7 +8,6 @@
           - mods:
             - redis.server._orchestrate.start
           - saltenv: {{ salt['environ.get']("SALTENV") }}
-          - pillarenv: {{ salt['environ.get']("PILLARENV") }}
           - pillar:
               docker_event: {{ data|json_encode_dict }}
   {% elif data['data']['status'] == 'stop' or data['data']['status'] == 'kill' %}
@@ -18,7 +17,6 @@
           - mods:
             - redis.server._orchestrate.stop
           - saltenv: {{ salt['environ.get']("SALTENV") }}
-          - pillarenv: {{ salt['environ.get']("PILLARENV") }}
           - pillar:
               docker_event: {{ data|json_encode_dict }}
   {% endif %}

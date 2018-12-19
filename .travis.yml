@@ -44,7 +44,7 @@ env:
     - DOCKER_IMAGE=debian-stretch
       TEST_CASE=salt-master-run-k8s
       SALTENV=dev
-      PILLARENV=orch
+      PILLARENV=k8s
     - DOCKER_IMAGE=debian-stretch
       TEST_CASE=salt-master-run-compose
       SALTENV=dev

@@ -12,7 +12,7 @@ COPY .travis/scan_events.py /opt/
 COPY .travis/config/master.conf /etc/salt/master.d/master.conf
 COPY .travis/config/reactor_master.conf /etc/salt/master.d/reactor.conf
 COPY .travis/config/supervisord_master.conf /etc/supervisor/conf.d/supervisord.conf
-COPY .travis/pillar /srv/pillar
+COPY .travis/pillar/$pillarenv /srv/pillar
 COPY .travis/reactor /srv/reactor
 COPY .travis/salt/dev/top.sls /srv/envoy/salt/base/
 COPY .travis/config/no_daemon_env /etc/default/salt-master
@@ -32,6 +32,5 @@ RUN echo $(grep $(hostname) /etc/hosts | cut -f1) $hostname >> /etc/hosts && \
 EXPOSE 4505:4505 4506:4506
 
 ENV SALTENV=$saltenv
-ENV PILLARENV=$pillarenv
 ENV LOG_LEVEL=$log_level
 ENTRYPOINT [ "/opt/entrypoint_master_run.sh" ]
