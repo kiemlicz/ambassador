@@ -43,6 +43,11 @@ minikube_install() {
     minikube update-context
     echo "Waiting for nodes:"
     kubectl get nodes
+    ls -al ~
+    sudo ls -al ~
+    echo "--"
+    ls -al ~/.minikube/
+    sudo ls -al ~/.minikube/
     #wait until nodes report as ready
     JSONPATH='{range .items[*]}{@.metadata.name}:{range @.status.conditions[*]}{@.type}={@.status};{end}{end}'; \
     until kubectl get nodes -o jsonpath="$JSONPATH" 2>&1 | grep -q "Ready=True"; do sleep 1; done
