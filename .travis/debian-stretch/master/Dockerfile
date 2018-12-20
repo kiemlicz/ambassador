@@ -9,12 +9,13 @@ ARG salt_ver
 COPY envoy /srv/envoy
 COPY .travis/entrypoint_master_run.sh /opt/
 COPY .travis/scan_events.py /opt/
+COPY .travis/tests /opt/tests
 COPY .travis/config/master.conf /etc/salt/master.d/master.conf
 COPY .travis/config/autosign.conf /etc/salt/autosign.conf
-COPY .travis/config/reactor_master.conf /etc/salt/master.d/reactor.conf
+COPY .travis/config/reactor_$pillarenv.conf /etc/salt/master.d/reactor.conf
 COPY .travis/config/supervisord_master.conf /etc/supervisor/conf.d/supervisord.conf
+COPY .travis/config/reactor/$pillarenv /srv/reactor
 COPY .travis/pillar/$pillarenv /srv/pillar
-COPY .travis/reactor /srv/reactor
 COPY .travis/salt/dev/top.sls /srv/envoy/salt/base/
 COPY .travis/salt/dev/_orchestrate /srv/envoy/salt/dev/_orchestrate
 COPY .travis/config/no_daemon_env /etc/default/salt-master

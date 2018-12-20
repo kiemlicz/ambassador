@@ -41,13 +41,14 @@ salt-master-run-k8s)
     trap k8s_log_error EXIT TERM INT
     kubectl apply -f .travis/k8s-deployment.yaml
     # wait until salt-master and minion containers are running
-    kubectl wait -n provisioning deployment/salt-master --for condition=available --timeout=3m
-    kubectl wait -n provisioning deployment/rsyslog --for condition=available --timeout=3m
+    #kubectl wait -n provisioning deployment/salt-master --for condition=available --timeout=3m
+    kubectl wait -n provisioning deployment/rsyslog --for condition=available --timeout=2m
     echo "Deployment ready:"
     kubectl get all -n provisioning
     logger=$(kubectl get pod -l app=rsyslog -n provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
-    #kubectl wait -n provisioning --for=delete deployment/salt-master --timeout=60m
-    kubectl logs -n provisioning $logger -f
+    kubectl logs -n provisioning $logger -f &
+    #fixme extend this wait for OR conditions
+    kubectl wait -n provisioning --for=delete pod/salt-master --timeout=60m
     echo "Deployment finished"
     ;;
 esac

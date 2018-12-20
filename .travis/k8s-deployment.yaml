@@ -4,44 +4,36 @@ kind: Namespace
 metadata:
   name: provisioning
 ---
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: v1
+kind: Pod
 metadata:
   name: salt-master
   namespace: provisioning
   labels:
     app: salt-master
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: salt-master
-  template:
-    metadata:
-      labels:
-        app: salt-master
-    spec:
-      hostname: master
-      containers:
-        - name: salt-master
-          image: salt_master
-          imagePullPolicy: Never
-          ports:
-            - containerPort: 4505
-            - containerPort: 4506
-          volumeMounts:
-          - mountPath: /etc/kubernetes
-            name: kubeconfig
-          - mountPath: /var/log/salt/
-            name: varlogsalt
-      volumes:
-        - name: kubeconfig
-          hostPath:
-            path: /home/travis/.kube
-        - name: varlogsalt
-          hostPath:
-            path: /var/log/salt/
-            type: DirectoryOrCreate
+  hostname: master
+  restartPolicy: Never
+  containers:
+    - name: salt-master
+      image: salt_master
+      imagePullPolicy: Never
+      ports:
+        - containerPort: 4505
+        - containerPort: 4506
+      volumeMounts:
+      - mountPath: /etc/kubernetes
+        name: kubeconfig
+      - mountPath: /var/log/salt/
+        name: varlogsalt
+  volumes:
+    - name: kubeconfig
+      hostPath:
+        path: /home/travis/.kube
+    - name: varlogsalt
+      hostPath:
+        path: /var/log/salt/
+        type: DirectoryOrCreate
 ---
 kind: Service
 apiVersion: v1
