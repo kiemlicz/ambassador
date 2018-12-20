@@ -1,4 +1,4 @@
-empty:
+base:
   '*':
     - empty
     

@@ -1,4 +1,4 @@
-gui:
+base:
   '*':
     - base
     - repositories

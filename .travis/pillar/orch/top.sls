@@ -1,4 +1,4 @@
-orch:
+base:
   '*':
     - base
     - pkgs_dev

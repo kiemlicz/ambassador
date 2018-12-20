@@ -1,4 +1,4 @@
-dev:
+base:
   '*':
     - base
     - pkgs_dev
