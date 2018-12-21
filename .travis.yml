@@ -64,7 +64,7 @@ before_install:
   - .travis/prepare.sh
 
 script:
-  - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+  - while sleep 9m; do echo "=====[ $SECONDS seconds still running ]=====\nEvents:$(kubectl get events --all-namespaces)\nStatus:$(kubectl get all --all-namespaces)"; done &
   - .travis/run.sh
   - kill %1
   - .travis/after.sh
