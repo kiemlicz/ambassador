@@ -47,7 +47,8 @@ salt-master-run-k8s)
     kubectl get all -n provisioning
     logger=$(kubectl get pod -l app=rsyslog -n provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
     kubectl logs -n provisioning $logger -f &
-    #fixme extend this wait for OR conditions
+    while sleep 5m; do echo -e "\nEvents:$(kubectl get events --all-namespaces)\nStatus:$(kubectl get all --all-namespaces)"; done &
+    #fixme extend this wait for OR conditions because when ERROR this won't detect
     kubectl wait -n provisioning --for=delete pod/salt-master --timeout=60m
     echo "Deployment finished"
     ;;
