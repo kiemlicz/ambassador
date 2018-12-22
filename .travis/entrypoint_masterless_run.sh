@@ -6,8 +6,8 @@ echo "starting (args = $@)"
 
 # workaround for salt's service state
 # somehow in masterless config the service provider cannot be overriden
-echo -e '#!/bin/bash\necho "N 5"' > /sbin/runlevel
-chmod 775 /sbin/runlevel
+#echo -e '#!/bin/bash\necho "N 5"' > /sbin/runlevel
+#chmod 775 /sbin/runlevel
 service salt-minion restart
 #debug may be useful for travis (-l debug)
 salt-call --local state.highstate saltenv=$1 -l ${2-info} --no-color --out-file output
