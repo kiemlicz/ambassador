@@ -8,7 +8,7 @@ fi
 
 COMPOSE_VER="1.22.0"
 KUBECTL_VER="v1.13.0"
-MINIKUBE_VER="v0.31.0"
+MINIKUBE_VER="v0.32.0"
 
 docker_compose_update() {
     local docker_compose_version=$COMPOSE_VER
