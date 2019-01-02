@@ -35,11 +35,11 @@ users:
             - "AAAAB3NzaC1yc2EAAAADAQABAAABAQC+wNUrLZrf4lQATkgW8N0wYPIHsTh2LJhL3mctkiLQNPhEX9FU8Y8K3mFROOsl5usJg/EzxLGap4ZLuy5ued7EFIODzZFWok9ewVthG3meeByrrfissUX/fcnaMQGpu0wrbm/xVpMXXTg3jKPzx1rkqzNZfswQ1UyIxlCQUkWhAGoDO0H1I1RDdKwNsQ7jG1/2d3qOQkw5jT2RlI2EhzSiLnI5MRs7QAfzZOGH135q039BzwoLsukNiCYtiAd3aVO8xTh/Q3jP/kvosObQ6jWzGUtbABl8lSlMiS8ocefG1q1XWOPxv3eS8wS/TUQOV+2rXxXXigTJbkyX8GEzcUG1"
           enc: "ssh-rsa"
       ssh:
-        - name: home
+        home:
           privkey_location: {{ home_dir }}/.ssh/id_rsa
           pubkey_location: {{ home_dir }}/.ssh/id_rsa.pub
           override: True
-        - name: dotfile
+        dotfile:
           privkey: |
             -----BEGIN RSA PRIVATE KEY-----
             MIIEpAIBAAKCAQEA14zSYevcHvxjiBqvZL5RwfMcDZ94l9f6aNvKhDqvFHpHII7M
