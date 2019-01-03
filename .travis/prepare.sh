@@ -86,7 +86,7 @@ salt-master-run-k8s)
     kubectl_install
     minikube_install
     #create PV paths manually
-    sudo mkdir -p /mnt/data/r0 /mnt/data/r1 /mnt/data/r2 /mnt/data/r3 /mnt/data/r4 /mnt/data/r5
+    sudo mkdir -p /mnt/data/r0 /mnt/data/r1 /mnt/data/r2 /mnt/data/r3 /mnt/data/r4 /mnt/data/r5 /mnt/data/r6
     # build images that are used for provisioning (salt master's and minion's)
     # only one of each is required per one node cluster
     docker_build .travis/"$DOCKER_IMAGE"/master/Dockerfile salt_master
