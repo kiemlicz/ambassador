@@ -48,8 +48,12 @@ salt-master-run-k8s)
     logger=$(kubectl get pod -l app=rsyslog -n provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
     kubectl logs -n provisioning $logger -f &
     while sleep 5m; do echo -e "\nEvents:$(kubectl get events --all-namespaces)\nStatus:$(kubectl get all --all-namespaces)"; done &
-    #fixme extend this wait for OR conditions because when ERROR this won't detect
-    kubectl wait -n provisioning --for=delete pod/salt-master --timeout=60m
+
+    #kubectl wait won't detect if the pod failed
+    #kubectl wait -n provisioning --for=delete pod/salt-master --timeout=60m
+    while kubectl get pod -n provisioning salt-master -o jsonpath="'{range @.status.conditions[?(@.type=='Ready')]}{@.status}{end}'" | grep "True"; do
+        sleep 1m
+    done
     echo "Deployment finished"
     ;;
 esac
