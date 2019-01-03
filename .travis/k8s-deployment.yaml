@@ -29,7 +29,8 @@ spec:
   volumes:
     - name: kubeconfig
       hostPath:
-        path: /home/travis/.kube
+        path: /home/travis/.kube/
+        type: Directory
     - name: varlogsalt
       hostPath:
         path: /var/log/salt/
@@ -171,6 +172,17 @@ data:
       path /var/log/salt/events
       pos_file /var/log/fluentd-saltmasterevents.pos
       tag salt-master-events
+    </source>
+
+    <source>
+      @id masterscan
+      @type tail
+      format multiline
+      format_firstline /^(?<severity>[^ \]]*):\S+:(?<message>.*)$/
+      format1 /^(?<message>\d*\s*[a-zA-Z_]*\s*.*)/
+      path /var/log/salt/scan
+      pos_file /var/log/fluentd-saltmasterscan.pos
+      tag salt-master-scan
     </source>
 
     <match **>
