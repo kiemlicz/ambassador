@@ -22,7 +22,7 @@ spec:
         - containerPort: 4505
         - containerPort: 4506
       volumeMounts:
-      - mountPath: /etc/kubernetes
+      - mountPath: /etc/kubernetes/
         name: kubeconfig
       - mountPath: /var/log/salt/
         name: varlogsalt
@@ -146,7 +146,6 @@ data:
       time_format %Y-%m-%d %H:%M:%S,%N
       path /var/log/salt/master
       pos_file /var/log/fluentd-saltmaster.pos
-      #pos_file /tmp/fluentd-saltmaster.pos
       tag salt-master
     </source>
 
@@ -159,20 +158,20 @@ data:
       time_format %Y-%m-%d %H:%M:%S,%N
       path /var/log/salt/minion
       pos_file /var/log/fluentd-saltminion.pos
-      #pos_file /tmp/fluentd-saltminion.pos
       tag salt-minion
     </source>
 
-    #<source>
-    #  @id masterevents
-    #  @type tail
-    #  <format>
-    #    @type json
-    #  </format>
-    #  path /var/log/salt/events
-    #  pos_file /var/log/saltmasterevents.pos
-    #  tag salt
-    #</source>
+    <source>
+      @id masterevents
+      @type tail
+      <parse>
+        @type json
+        json_parser json
+      </parse>
+      path /var/log/salt/events
+      pos_file /var/log/fluentd-saltmasterevents.pos
+      tag salt-master-events
+    </source>
 
     <match **>
       @type forward

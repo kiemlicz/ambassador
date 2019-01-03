@@ -54,6 +54,7 @@ salt-master-run-k8s)
     while kubectl get pod -n provisioning salt-master -o jsonpath="'{range @.status.conditions[?(@.type=='Ready')]}{@.status}{end}'" | grep -q "True"; do
         sleep 1m
     done
+    sleep 1m # for fluentd...
     echo "Deployment finished"
     ;;
 esac
