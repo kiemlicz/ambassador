@@ -10,7 +10,7 @@ services:
         context: $CONTEXT
         salt_ver: $SALT_VER
         log_level: $LOG_LEVEL
-    hostname: master
+    hostname: salt-master
     domainname: local
     privileged: true
     ports:
