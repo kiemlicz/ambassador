@@ -38,7 +38,6 @@ def run():
       "sbt",
       "erlang",
       "rebar",
-      "intellij",
       "grafana",
       "virtualbox",
       "projects",
