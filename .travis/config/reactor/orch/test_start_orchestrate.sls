@@ -7,7 +7,6 @@ start_orchestration:
       - pillar:
           targets: {{ data['minions'] }}
       - saltenv: {{ salt['environ.get']("SALTENV") }}
-      - pillarenv: {{ salt['environ.get']("PILLARENV") }}
 
 # states (mods) are executed serially
 # sls corresponding to mongodb.server.cluster._orchestrate.orch will be executed only when redis.server.cluster._orchestrate.orch "ret"s

@@ -8,7 +8,7 @@
 highstate_finished:
   runner.wait.until:
     - args:
-      - expected_minions_list: {{ salt['pillar.get']("minions", pillarenv=salt['environ.get']("PILLARENV")) }}
+      - expected_minions_list: {{ salt['pillar.get']("minions") }}
       - triggering_minion: {{ data['id'] }}
       - action_type: "highstate"
       - fun_args: {{ data['fun_args'] }}

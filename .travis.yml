@@ -16,49 +16,49 @@ env:
     - DOCKER_IMAGE=debian-sid
       TEST_CASE=salt-masterless-run
       SALTENV=base
-      PILLARENV=base
+      CONTEXT=base
     - DOCKER_IMAGE=debian-sid
       TEST_CASE=salt-masterless-run
       SALTENV=dev
-      PILLARENV=dev
+      CONTEXT=dev
     - DOCKER_IMAGE=debian-stretch
       TEST_CASE=salt-masterless-run
       SALTENV=base
-      PILLARENV=base
+      CONTEXT=base
     - DOCKER_IMAGE=debian-stretch
       TEST_CASE=salt-masterless-run
       SALTENV=base
-      PILLARENV=gui
+      CONTEXT=gui
     - DOCKER_IMAGE=debian-stretch
       TEST_CASE=salt-masterless-run
       SALTENV=dev
-      PILLARENV=dev
+      CONTEXT=dev
     - DOCKER_IMAGE=ubuntu-bionic
       TEST_CASE=salt-masterless-run
       SALTENV=base
-      PILLARENV=base
+      CONTEXT=base
     - DOCKER_IMAGE=ubuntu-bionic
       TEST_CASE=salt-masterless-run
       SALTENV=dev
-      PILLARENV=dev
+      CONTEXT=dev
     - DOCKER_IMAGE=debian-stretch
       TEST_CASE=salt-master-run-k8s
       SALTENV=dev
-      PILLARENV=k8s
+      CONTEXT=k8s
     - DOCKER_IMAGE=debian-stretch
       TEST_CASE=salt-master-run-compose
       SALTENV=dev
-      PILLARENV=orch
+      CONTEXT=orch
     - DOCKER_IMAGE=ubuntu-bionic
       TEST_CASE=salt-master-run-compose
       SALTENV=dev
-      PILLARENV=orch
+      CONTEXT=orch
 
 matrix:
   fast_finish: true
   allow_failures: # only unstable distro-based tests are allowed to fail
-    - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=base PILLARENV=base
-    - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=dev PILLARENV=dev
+    - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=base CONTEXT=base
+    - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=dev CONTEXT=dev
 
 before_install:
   - .travis/prepare.sh

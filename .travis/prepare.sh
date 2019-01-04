@@ -65,7 +65,7 @@ docker_build() {
         --build-arg=salt_ver=$SALT_VER \
         --build-arg=log_level="${LOG_LEVEL-info}" \
         --build-arg=saltenv="$SALTENV" \
-        --build-arg=pillarenv="$PILLARENV" \
+        --build-arg=context="$CONTEXT" \
         --build-arg=kubectl_ver="$KUBECTL_VER" \
         -t "${2-$DOCKER_IMAGE}" \
         -f $1 .

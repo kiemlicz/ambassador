@@ -1,8 +1,7 @@
 FROM ubuntu:xenial
 
-ARG hostname
 ARG saltenv
-ARG pillarenv
+ARG context
 ARG log_level
 ARG salt_ver
 
@@ -13,13 +12,12 @@ COPY .travis/config/master.conf /etc/salt/master.d/master.conf
 COPY .travis/config/autosign.conf /etc/salt/autosign.conf
 COPY .travis/config/reactor_master.conf /etc/salt/master.d/reactor.conf
 COPY .travis/config/supervisord_master.conf /etc/supervisor/conf.d/supervisord.conf
-COPY .travis/pillar/$pillarenv /srv/pillar
+COPY .travis/pillar/ /srv/pillar
 COPY .travis/reactor /srv/reactor
 COPY .travis/salt/dev/top.sls /srv/envoy/salt/base/
 COPY .travis/config/no_daemon_env /etc/default/salt-master
 
-RUN echo $(grep $(hostname) /etc/hosts | cut -f1) $hostname >> /etc/hosts && \
-    apt-get update && \
+RUN apt-get update && \
     apt-get install -y curl supervisor procps iproute2 && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -n -d -M -N -X $salt_ver && \

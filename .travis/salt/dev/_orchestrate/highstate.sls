@@ -9,7 +9,6 @@ highstate:
   - tgt: {{ pillar['event']['data']['id'] }}
   - highstate: True
   - saltenv: {{ saltenv }}
-  - pillarenv: {{ pillarenv }}
   - require:
     - salt: update_mine
 

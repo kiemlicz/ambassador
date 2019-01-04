@@ -7,7 +7,7 @@ services:
       dockerfile: .travis/$DOCKER_IMAGE/master/Dockerfile
       args:
         saltenv: $SALTENV
-        pillarenv: $PILLARENV
+        context: $CONTEXT
         salt_ver: $SALT_VER
         log_level: $LOG_LEVEL
     hostname: master

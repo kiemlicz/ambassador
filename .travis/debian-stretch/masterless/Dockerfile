@@ -2,13 +2,13 @@ FROM debian:stretch
 
 ARG log_level
 ARG saltenv
-ARG pillarenv
+ARG context
 ARG salt_ver
 
 COPY envoy /srv/envoy
 COPY .travis/entrypoint_masterless_run.sh /opt/
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/pillar/$pillarenv /srv/pillar/base/
+COPY .travis/pillar/ /srv/pillar/
 COPY .travis/salt/top.sls /srv/envoy/salt/base/
 
 RUN apt-get update && apt-get install -y curl python python-pip procps && \

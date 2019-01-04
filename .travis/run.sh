@@ -30,7 +30,7 @@ case "$TEST_CASE" in
 salt-masterless-run)
     # privileged mode is necessary for e.g. setting: net.ipv4.ip_forward or running docker in docker
     name="ambassador-salt-masterless-run-$TRAVIS_JOB_NUMBER"
-    docker run --name $name --privileged "$DOCKER_IMAGE"
+    docker run --name $name --hostname "$SALTENV-host" --privileged "$DOCKER_IMAGE"
     ;;
 salt-master-run-compose)
     # --exit-code-from master isn't the way to go as implies --abort-on-container-exit
