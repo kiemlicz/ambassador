@@ -97,7 +97,7 @@ Vagrant.configure("2") do |config|
   config.vm.provision "file", source: "etc", destination: "~/etc"
   config.vm.provision "file", source: "var", destination: "~/var"
   config.vm.provision "file", source: "config/file_ext_authorize.service", destination: "~/etc/systemd/system/file_ext_authorize.service"
-  config.vm.provision "file", source: "config/bootloader", destination: "~/var/lib/tftpboot"
+  config.vm.provision "file", source: "config/bootloader", destination: "~/srv/tftp"
   config.vm.provision "file", source: "envoy/salt", destination: "~/srv/salt"
   config.vm.provision "file", source: "envoy/pillar", destination: "~/srv/pillar"
   config.vm.provision "file", source: "envoy/reactor", destination: "~/srv/reactor"
