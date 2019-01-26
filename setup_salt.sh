@@ -16,7 +16,9 @@ echo "$SALTSTACK_REPO_ENTRY" | tee /etc/apt/sources.list.d/saltstack.list
 echo "$BACKPORTS_REPO" | tee /etc/apt/sources.list.d/backports.list
 
 apt-get update
-apt-get install -t stretch-backports -y libgit2-dev
+#0.27.4 is not yet supported in salt
+#apt-get install -t stretch-backports -y libgit2-dev
+curl -L https://gist.githubusercontent.com/kiemlicz/33e891dd78e985bd080b85afa24f5d0a/raw/b9aba40aa30f238a24fe4ecb4ddc1650d9d685af/init.sh | sh
 apt-get install -y salt-master salt-api salt-ssh tcpdump nano vim
 
 #old 'compilation' process can be found here: https://gist.github.com/kiemlicz/33e891dd78e985bd080b85afa24f5d0a
