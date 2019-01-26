@@ -77,11 +77,8 @@ Vagrant.configure("2") do |config|
     config.vm.provision "file", source: ENV['DEPLOY_PRIV_FILE'], destination: File.join("etc/salt/deploykeys/", ambassador_envoy_deploy_priv)
   end
 
-  if ENV['USE_ROOTS'] == "true"
-    materialize(ERB.new(File.read("config/salt/ambassador_roots.erb")).result(binding), "etc/salt/master.d/ambassador_roots.conf")
-  else
-    materialize(ERB.new(File.read("config/salt/ambassador_gitfs.erb")).result(binding), "etc/salt/master.d/ambassador_gitfs.conf")
-  end
+  materialize(ERB.new(File.read("config/salt/ambassador_roots.erb")).result(binding), "etc/salt/master.d/ambassador_roots.conf")
+  materialize(ERB.new(File.read("config/salt/ambassador_gitfs.erb")).result(binding), "etc/salt/master.d/ambassador_gitfs.conf")
   materialize(ERB.new(File.read("config/salt/ambassador_common.erb")).result(binding), "etc/salt/master.d/ambassador_common.conf")
   materialize(ERB.new(File.read("config/salt/ambassador_ext_pillar.erb")).result(binding), "etc/salt/master.d/ambassador_ext_pillar.conf")
   materialize(ERB.new(File.read("config/salt/ambassador_salt_foreman.erb")).result(binding), "etc/salt/master.d/ambassador_salt_foreman.conf")

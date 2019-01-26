@@ -23,9 +23,6 @@ trap tear_down_container EXIT TERM INT
 while [[ $# -gt 0 ]]; do
     arg="$1"
     case $arg in
-        -r|--roots)
-        ROOTS=true
-        ;;
         -c|--cert-gen)
         GEN_CERT=true
         ;;
@@ -91,7 +88,6 @@ while [[ $# -gt 0 ]]; do
 done
 
 readonly AUTO_CERT_GENERATION=${GEN_CERT-false}
-export readonly USE_ROOTS=${ROOTS-false}
 export readonly CONTAINER_NAME=${CN-ambassador}
 export readonly CONTAINER_CERT_BASE=/etc/foreman/ssl
 export readonly CONTAINER_CERT_DIR=$CONTAINER_CERT_BASE/certs
