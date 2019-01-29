@@ -13,19 +13,6 @@ k8s_log_error() {
     kubectl describe pod -l name=salt-minion -n provisioning
 }
 
-still_running() {
-    minutes=0
-    limit=60
-    while docker ps | grep -q $1; do
-        echo -n -e " \b"
-        if [ $minutes == $limit ]; then
-            break;
-        fi
-        minutes=$((minutes+1))
-        sleep 60
-    done
-}
-
 case "$TEST_CASE" in
 salt-masterless-run)
     # privileged mode is necessary for e.g. setting: net.ipv4.ip_forward or running docker in docker
@@ -34,7 +21,7 @@ salt-masterless-run)
     ;;
 salt-master-run-compose)
     # --exit-code-from master isn't the way to go as implies --abort-on-container-exit
-    docker-compose -f .travis/docker-compose.yml --project-directory=. --no-ansi up --no-build --no-recreate
+    docker-compose -f .travis/docker-compose.yml --project-directory=. up --no-build --no-recreate
     ;;
 salt-master-run-k8s)
     echo "Starting kubernetes deployment"

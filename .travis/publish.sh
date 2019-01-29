@@ -5,12 +5,12 @@
 docker_push() {
     echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     if [ $TRAVIS_TEST_RESULT -eq 0 ]; then
-        docker commit $1 kiemlicz/ambassador:$1
-        docker push kiemlicz/ambassador:$1
+        docker commit $1 $DOCKER_USERNAME/ambassador:$1
+        docker push $DOCKER_USERNAME/ambassador:$1
 
     else
-        docker commit $1 kiemlicz/ambassador:"$1-failed"
-        docker push kiemlicz/ambassador:"$1-failed"
+        docker commit $1 $DOCKER_USERNAME/ambassador:"$1-failed"
+        docker push $DOCKER_USERNAME/ambassador:"$1-failed"
     fi
 }
 

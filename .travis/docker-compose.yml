@@ -4,11 +4,10 @@ services:
     image: salt_master
     build:
       context: .
-      dockerfile: .travis/$DOCKER_IMAGE/master/Dockerfile
+      dockerfile: .travis/$DOCKER_IMAGE/Dockerfile
+      taget: master-compose-test
       args:
         saltenv: $SALTENV
-        context: $CONTEXT
-        salt_ver: $SALT_VER
         log_level: $LOG_LEVEL
     hostname: salt-master
     domainname: local
@@ -25,9 +24,8 @@ services:
     image: salt_minion
     build:
       context: .
-      dockerfile: .travis/$DOCKER_IMAGE/minion/compose/Dockerfile
-      args:
-        salt_ver: $SALT_VER
+      dockerfile: .travis/$DOCKER_IMAGE/Dockerfile
+      taget: minion-compose-test
     hostname: minion1
     domainname: local
     privileged: true
@@ -41,9 +39,8 @@ services:
     image: salt_minion
     build:
       context: .
-      dockerfile: .travis/$DOCKER_IMAGE/minion/compose/Dockerfile
-      args:
-        salt_ver: $SALT_VER
+      dockerfile: .travis/$DOCKER_IMAGE/Dockerfile
+      taget: minion-compose-test
     hostname: minion2
     domainname: local
     privileged: true
@@ -57,9 +54,8 @@ services:
     image: salt_minion
     build:
       context: .
-      dockerfile: .travis/$DOCKER_IMAGE/minion/compose/Dockerfile
-      args:
-        salt_ver: $SALT_VER
+      dockerfile: .travis/$DOCKER_IMAGE/Dockerfile
+      taget: minion-compose-test
     hostname: minion3
     domainname: local
     privileged: true

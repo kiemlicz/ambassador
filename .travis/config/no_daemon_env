@@ -1,2 +1,0 @@
-#required by supervisord, salt master/minion must be run in foreground
-DAEMON_ARGS=""
