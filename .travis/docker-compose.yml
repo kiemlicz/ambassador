@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: .travis/$DOCKER_IMAGE/Dockerfile
-      taget: master-compose-test
+      target: master-compose-test
       args:
         saltenv: $SALTENV
         log_level: $LOG_LEVEL
@@ -25,7 +25,7 @@ services:
     build:
       context: .
       dockerfile: .travis/$DOCKER_IMAGE/Dockerfile
-      taget: minion-compose-test
+      target: minion-compose-test
     hostname: minion1
     domainname: local
     privileged: true
@@ -40,7 +40,7 @@ services:
     build:
       context: .
       dockerfile: .travis/$DOCKER_IMAGE/Dockerfile
-      taget: minion-compose-test
+      target: minion-compose-test
     hostname: minion2
     domainname: local
     privileged: true
@@ -55,7 +55,7 @@ services:
     build:
       context: .
       dockerfile: .travis/$DOCKER_IMAGE/Dockerfile
-      taget: minion-compose-test
+      target: minion-compose-test
     hostname: minion3
     domainname: local
     privileged: true
