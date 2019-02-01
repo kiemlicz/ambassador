@@ -1,5 +1,5 @@
-FROM kiemlicz/envoy:debian-stretch-salt-minion AS test-base-minion
-FROM kiemlicz/envoy:debian-stretch-salt-master AS test-base-master
+FROM kiemlicz/envoy-minion-debian-stretch AS test-base-minion
+FROM kiemlicz/envoy-master-debian-stretch AS test-base-master
 
 
 FROM test-base-master AS master-compose-test

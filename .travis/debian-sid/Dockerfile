@@ -1,4 +1,4 @@
-FROM kiemlicz/envoy:debian-sid-salt-minion AS test-base-minion
+FROM kiemlicz/envoy-minion-debian-sid AS test-base-minion
 
 
 FROM test-base-minion AS masterless-test

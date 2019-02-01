@@ -1,5 +1,5 @@
-FROM kiemlicz/envoy:ubuntu-bionic-salt-minion AS test-base-minion
-FROM kiemlicz/envoy:ubuntu-bionic-salt-master AS test-base-master
+FROM kiemlicz/envoy-minion-ubuntu-bionic AS test-base-minion
+FROM kiemlicz/envoy-master-ubuntu-bionic AS test-base-master
 
 
 FROM test-base-master AS master-compose-test
