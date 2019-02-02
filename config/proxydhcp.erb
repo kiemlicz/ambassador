@@ -1,6 +1,6 @@
 # Don't function as a DNS server
 port=0
-tftp-root=/srv/tftp
+tftp-root=<%=ambassador_tftp_root%>
 log-dhcp
 
 # Disable re-use of the DHCP servername and filename fields as extra

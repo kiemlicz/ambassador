@@ -4,6 +4,7 @@
 require 'csv'
 require 'erb'
 require 'fileutils'
+require 'resolv'
 
 Vagrant.configure("2") do |config|
   config.vm.box = "debian/stretch64"
@@ -55,6 +56,8 @@ Vagrant.configure("2") do |config|
     ambassador_client_id = ENV["CLIENT_ID"]
     ambassador_client_secret = ENV["CLIENT_SECRET"]
   end
+
+  ambassador_cert_base = ENV['CONTAINER_CERT_BASE']
   ambassador_ca = File.join(ENV['CONTAINER_CERT_DIR'], File.basename(ENV['CA_CERT_FILE']))
   ambassador_crl = File.join(ENV['CONTAINER_CERT_BASE'], File.basename(ENV['CRL_FILE']))
   ambassador_key = File.join(ENV['CONTAINER_PRIVATE_DIR'], File.basename(ENV['SERVER_KEY_FILE']))
@@ -64,7 +67,12 @@ Vagrant.configure("2") do |config|
   ambassador_gw = `ip route show`[/default.*/][/\d+\.\d+\.\d+\.\d+/]
   ambassador_salt_api_port = "9191"
   ambassador_salt_api_interfaces = "0.0.0.0"
+  ambassador_salt_user = "saltuser"
+  ambassador_salt_password = "saltpassword"
   ambassador_fqdn = ENV['CONTAINER_FQDN']
+  ambassador_ip = Resolv.getaddress(ENV['CONTAINER_FQDN'])
+  ambassador_tftp_root = ENV['TFTP_ROOT']
+  ambassador_domain = `dnsdomainname`
 
   if ENV.has_key?('DEPLOY_PUB_FILE') and ENV.has_key?('DEPLOY_PRIV_FILE')
        # todo what is the visibility scope, is it like in bash?
@@ -86,6 +94,7 @@ Vagrant.configure("2") do |config|
   materialize(ERB.new(File.read("config/salt/reactor.erb")).result(binding), "etc/salt/master.d/reactor.conf")
   materialize(ERB.new(File.read("config/salt/foreman.erb")).result(binding), "etc/salt/foreman.yaml")
   materialize(ERB.new(File.read("config/foreman/salt.erb")).result(binding), "etc/foreman-proxy/settings.d/salt.yml")
+  materialize(ERB.new(File.read("config/foreman/foreman-answers.erb")).result(binding), "etc/foreman-installer/scenarios.d/foreman-answers.yaml")
   materialize(ERB.new(File.read("config/proxydhcp.erb")).result(binding), "etc/dnsmasq.d/proxydhcp.conf")
 
   #apache2 during installation removes contents of /etc/apache2/sites-available/
@@ -134,7 +143,9 @@ Vagrant.configure("2") do |config|
     "KEY" => ambassador_key,
     "PROXY_KEY" => ambassador_key,
     "CERT" => ambassador_cert,
-    "PROXY_CERT" => ambassador_cert
+    "PROXY_CERT" => ambassador_cert,
+    "SALT_USER" => ambassador_salt_user,
+    "SALT_PASSWORD" => ambassador_salt_password
     } do |s|
     s.path = "setup_foreman.sh"
   end

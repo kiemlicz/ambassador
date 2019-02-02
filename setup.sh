@@ -99,6 +99,7 @@ readonly CONTAINER_OS_MAJOR=stretch
 readonly CONTAINER_BACKING_STORE=best
 readonly CONTAINER_STOP_AFTER=${CONTAINER_STOP-false}
 export readonly USERS=${ALLOWED_USERS-"$USER"}
+export readonly TFTP_ROOT="/srv/tftp"
 
 readonly setup_start_ts=$(date +%s.%N)
 
