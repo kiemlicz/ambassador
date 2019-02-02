@@ -92,7 +92,6 @@ Vagrant.configure("2") do |config|
   materialize(ERB.new(File.read("config/salt/reactor.erb")).result(binding), "etc/salt/master.d/reactor.conf")
   materialize(ERB.new(File.read("config/salt/foreman.erb")).result(binding), "etc/salt/foreman.yaml")
   materialize(ERB.new(File.read("config/foreman/salt.erb")).result(binding), "etc/foreman-proxy/settings.d/salt.yml")
-  materialize(ERB.new(File.read("config/foreman/foreman-answers.erb")).result(binding), "etc/foreman-installer/scenarios.d/foreman-answers.yaml")
   materialize(ERB.new(File.read("config/proxydhcp.erb")).result(binding), "etc/dnsmasq.d/proxydhcp.conf")
 
   #apache2 during installation removes contents of /etc/apache2/sites-available/

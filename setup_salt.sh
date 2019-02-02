@@ -25,7 +25,7 @@ apt-get install -y salt-master salt-api salt-ssh tcpdump nano vim
 
 #somehow these dependencies are already present, that's why use of --upgrade
 #as long as this is not released https://github.com/saltstack/salt/issues/44601 CherryPy max supported version is 11.2.0
-pip install --upgrade pyOpenSSL pygit2 docker-py cherrypy jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib google-auth
+pip install --upgrade pyOpenSSL pygit2==0.27.3 docker-py cherrypy jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib google-auth
 #pip 10 is not backward compatible
 #pip install --upgrade pip
 
