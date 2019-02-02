@@ -96,6 +96,8 @@ chgrp foreman $FOREMAN_PROXY_KEY $FOREMAN_KEY
 chmod 640 $FOREMAN_KEY
 chmod 640 $FOREMAN_PROXY_KEY
 
+mkdir -p /var/lib/foreman-proxy
+
 echo "running foreman-installer (nameserver=$CIF, domain=$(dnsdomainname), fqdn=$CID, IP=$CIP)"
 
 #install process divided into two steps as oauth token needs to be present for PXE and salt setup
