@@ -149,11 +149,15 @@ readonly CRED=$(foreman-installer \
     --enable-foreman-proxy-plugin-salt \
     --foreman-proxy-plugin-salt-api=true \
     --foreman-proxy-plugin-salt-api-url=https://$CID:9191 \
+    --enable-foreman-cli-remote-execution \
+    --enable-foreman-plugin-remote-execution \
+    --enable-foreman-proxy-plugin-remote-execution-ssh \
     --enable-foreman-plugin-discovery \
     --enable-foreman-proxy-plugin-discovery | sed -n 's/.*Initial credentials are \([[:alpha:]]*\) \/ \([[:alnum:]]*\)/\1:\2/p')
 
-#this plugin causes a lot of problems, disabled temporarily
+#this plugin causes a lot of problems, sometimes it's better to disable
 #foreman-installer \
+#    --enable-foreman-cli-remote-execution \
 #    --enable-foreman-plugin-remote-execution \
 #    --enable-foreman-proxy-plugin-remote-execution-ssh
 
