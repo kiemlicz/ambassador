@@ -190,8 +190,8 @@ EOF
 dhclient -r
 dhclient eth0
 
-systemctl enable foreman foreman-proxy dnsmasq file_ext_authorize
-systemctl restart foreman foreman-proxy dnsmasq file_ext_authorize ruby-foreman-tasks
+systemctl enable foreman foreman-proxy dynflowd dnsmasq file_ext_authorize
+systemctl restart foreman foreman-proxy dynflowd dnsmasq file_ext_authorize ruby-foreman-tasks
 
 echo "User: $FOREMAN_GUI_USER"
 echo "Password: $FOREMAN_GUI_PASSWORD"
