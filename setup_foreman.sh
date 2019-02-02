@@ -99,6 +99,9 @@ chmod 640 $FOREMAN_PROXY_KEY
 echo "running foreman-installer (nameserver=$CIF, domain=$(dnsdomainname), fqdn=$CID, IP=$CIP)"
 
 readonly CRED=$(foreman-installer \
+    --foreman-proxy-tftp=true \
+    --foreman-proxy-tftp-servername=$CIP \
+    --foreman-proxy-dns=true \
     --foreman-proxy-dns-interface=$(ip route get 8.8.8.8 | head -n1 | cut -d' ' -f5) \
     --foreman-proxy-dns-zone=$(dnsdomainname) \
     --foreman-proxy-dns-reverse=$(host -i $CIP | cut -d' ' -f1 | cut -d. -f2-7) \

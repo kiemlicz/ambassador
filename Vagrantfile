@@ -4,7 +4,6 @@
 require 'csv'
 require 'erb'
 require 'fileutils'
-require 'resolv'
 
 Vagrant.configure("2") do |config|
   config.vm.box = "debian/stretch64"
@@ -70,7 +69,6 @@ Vagrant.configure("2") do |config|
   ambassador_salt_user = "saltuser"
   ambassador_salt_password = "saltpassword"
   ambassador_fqdn = ENV['CONTAINER_FQDN']
-  ambassador_ip = Resolv.getaddress(ENV['CONTAINER_FQDN'])
   ambassador_tftp_root = ENV['TFTP_ROOT']
   ambassador_domain = `dnsdomainname`
 

@@ -83,12 +83,6 @@ foreman_proxy:
   template_url: http://<%=ambassador_fqdn%>:8000
   logs: true
   logs_listen_on: https
-  tftp: true
-  tftp_listen_on: https
-  tftp_managed: true
-  tftp_manage_wget: true
-  tftp_root: "<%=ambassador_tftp_root%>"
-  tftp_servername: <%=ambassador_ip%>
   dhcp: false
   libvirt_network: default
   libvirt_connection: qemu:///system
