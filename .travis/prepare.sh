@@ -35,9 +35,16 @@ salt-master-run-compose)
     docker-compose -f .travis/docker-compose.yml --project-directory=. up --no-start
     ;;
 salt-master-run-k8s)
-    # todo update to specific docker-ce version apt-get install docker-ce=18.06.1~ce~3-0~debian
-    kubectl_install
-    minikube_install
+    sudo apt-get update && sudo apt-get install -y curl
+    sudo cp .travis/config/masterless.conf /etc/salt/minion.d/
+    sudo ln -s $TRAVIS_BUILD_DIR/envoy/salt /srv/salt
+    curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com
+    sudo sh /tmp/bootstrap-salt.sh -X -n stable
+
+    sudo salt-call --local state.apply kubernetes.client saltenv=server
+
+#    kubectl_1install
+#    minikube_install
     #create PV paths manually
     sudo mkdir -p /mnt/data/r0 /mnt/data/r1 /mnt/data/r2 /mnt/data/r3 /mnt/data/r4 /mnt/data/r5 /mnt/data/r6
     # build images that are used for provisioning (salt master's and minion's)
