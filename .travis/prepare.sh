@@ -39,9 +39,11 @@ salt-master-run-k8s)
     sudo mkdir -p /etc/salt/minion.d/
     sudo cp .travis/config/masterless.conf /etc/salt/minion.d/
     sudo ln -s $TRAVIS_BUILD_DIR/envoy/salt /srv/salt
+    sudo ln -s $TRAVIS_BUILD_DIR/.travis/pillar /srv/pillar
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com
     sudo sh /tmp/bootstrap-salt.sh -n stable
     sudo salt-call --local saltutil.sync_all
+    echo "ID: $(salt-call --local grains.get id)"
     sudo salt-call --local state.apply kubernetes.client saltenv=server
     sudo salt-call --local state.apply kubernetes.minikube saltenv=server
 
