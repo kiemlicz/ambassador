@@ -41,11 +41,11 @@ salt-master-run-k8s)
     sudo ln -s $TRAVIS_BUILD_DIR/envoy/salt /srv/salt
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com
     sudo sh /tmp/bootstrap-salt.sh -n stable
-
+    sudo salt-call --local saltutil.sync_all
     sudo salt-call --local state.apply kubernetes.client saltenv=server
+    sudo salt-call --local state.apply kubernetes.minikube saltenv=server
 
-#    kubectl_1install
-#    minikube_install
+    minikube_ready
     #create PV paths manually
     sudo mkdir -p /mnt/data/r0 /mnt/data/r1 /mnt/data/r2 /mnt/data/r3 /mnt/data/r4 /mnt/data/r5 /mnt/data/r6
     # build images that are used for provisioning (salt master's and minion's)
