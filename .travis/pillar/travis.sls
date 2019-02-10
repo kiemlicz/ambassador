@@ -1,4 +1,4 @@
 pkgs:
   dist_upgrade: False
-  os_packages:
-    - python-pip
+  versions:
+    - "python-pip: 9.0.1-2"
