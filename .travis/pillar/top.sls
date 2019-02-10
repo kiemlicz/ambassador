@@ -20,5 +20,5 @@ base:
     - orchestrate
   'salt-*':
     - redis
-  'travis':
+  'travis-*':
     - travis
