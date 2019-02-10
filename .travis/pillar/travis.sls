@@ -1,4 +1,5 @@
 pkgs:
   dist_upgrade: False
-  versions:
-    - "python-pip: 9.0.1-2"
+
+docker:
+    version: "18.06.1~ce~3-0~ubuntu"
