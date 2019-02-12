@@ -1,4 +1,6 @@
 base:
+  '*':
+    - all
   'base-host':
     - base
     - pkgs_base
