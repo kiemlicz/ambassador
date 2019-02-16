@@ -1,0 +1,24 @@
+# Default values for salt.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+nameOverride: ""
+fullnameOverride: "salt-provisioning"
+
+saltMaster:
+  replicaCount: 1
+
+  image:
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    name: salt-master
+
+saltMinion:
+  image:
+    tag: latest
+    pullPolicy: IfNotPresent
+
+  service:
+    name: salt-minion

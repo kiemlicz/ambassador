@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ include "salt.fullname" . }}-saltpki
+  namespace: {{ include "salt.fullname" . }}
+  labels:
+    name: {{ include "salt.fullname" . }}-saltpki
+spec:
+  capacity:
+    storage: 5Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: {{ .Values.storageClassName }}
+  local:
+    path: {{ .Values.volume.pki }}
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values: {{ .Values.volume.affinity.hostnames }}

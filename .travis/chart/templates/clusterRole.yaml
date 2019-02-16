@@ -1,0 +1,17 @@
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: {{ include "salt.fullname" . }}
+rules:
+  - apiGroups:
+      - ""
+      - "apps"
+    resources:
+      - pods
+      - namespaces
+      - statefulsets
+      - daemonsets
+    verbs:
+      - get
+      - list
+      - watch

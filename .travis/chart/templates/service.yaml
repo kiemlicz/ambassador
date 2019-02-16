@@ -1,0 +1,22 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Values.saltMaster.service.name }}
+  namespace: {{ include "salt.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "salt.name" . }}
+    helm.sh/chart: {{ include "salt.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Values.saltMaster.service.name }}
+spec:
+  selector:
+    app: {{ .Values.saltMaster.service.name }}
+  ports:
+    - protocol: TCP
+      name: pubsub
+      port: 4505
+      targetPort: 4505
+    - protocol: TCP
+      name: reqreply
+      port: 4506
+      targetPort: 4506

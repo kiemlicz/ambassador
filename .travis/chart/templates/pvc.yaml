@@ -1,0 +1,17 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "salt.fullname" . }}-saltpki
+  namespace: {{ include "salt.fullname" . }}
+spec:
+  storageClassName: {{ .Values.storageClassName }}
+  {{- if .Values.volume.enable }}
+  selector:
+    matchLabels:
+      name: {{ include "salt.fullname" . }}-saltpki
+  {{- end }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Mi

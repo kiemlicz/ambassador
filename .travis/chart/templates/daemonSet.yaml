@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ .Values.saltMinion.service.name }}
+  namespace: {{ include "salt.fullname" . }}
+  labels:
+    app: {{ .Values.saltMinion.service.name }}
+spec:
+  selector:
+    matchLabels:
+      name: {{ .Values.saltMinion.service.name }}
+  template:
+    metadata:
+      labels:
+        name: {{ .Values.saltMinion.service.name }}
+    spec:
+      serviceAccount: {{ include "salt.fullname" . }}
+      serviceAccountName: {{ include "salt.fullname" . }}
+      {{- if .Values.registry.enable }}
+      imagePullSecrets:
+        - name: {{ include "salt.fullname" . }}-registry-credentials
+      {{- end }}
+      containers:
+        - name: {{ .Values.saltMinion.service.name }}
+          image: {{ .Values.saltMinion.image.repository }}:{{ .Values.saltMinion.image.tag }}
+          readinessProbe:
+            exec:
+              command:
+                - cat
+                - /tmp/salt/healthz
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          volumeMounts:
+            - name: dockersock
+              mountPath: /var/run/docker.sock
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: dockersock
+          hostPath:
+            path: /var/run/docker.sock
+            type: Socket

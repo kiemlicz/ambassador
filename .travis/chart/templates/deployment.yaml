@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.saltMaster.service.name }}
+  namespace: {{ include "salt.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "salt.name" . }}
+    helm.sh/chart: {{ include "salt.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+    app: {{ .Values.saltMaster.service.name }}
+spec:
+  replicas: {{ .Values.saltMaster.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Values.saltMaster.service.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.saltMaster.service.name }}
+    spec:
+      serviceAccount: {{ include "salt.fullname" . }}
+      serviceAccountName: {{ include "salt.fullname" . }}
+    {{- if .Values.registry.enable }}
+      imagePullSecrets:
+        - name: {{ include "salt.fullname" . }}-registry-credentials
+    {{- end }}
+      volumes:
+        - name: saltpki
+          persistentVolumeClaim:
+            claimName: {{ include "salt.fullname" . }}-saltpki
+      containers:
+        - name: {{ .Values.saltMaster.service.name }}
+          image: {{ .Values.saltMaster.image.repository }}:{{ .Values.saltMaster.image.tag }}
+          ports:
+            - containerPort: 4505
+            - containerPort: 4506
+          volumeMounts:
+            - mountPath: /etc/salt/pki/master
+              name: saltpki
+              readOnly: false
