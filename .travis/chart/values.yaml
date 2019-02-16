@@ -1,15 +1,20 @@
-# Default values for salt.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
 nameOverride: ""
 fullnameOverride: "salt-provisioning"
+
+logging:
+  image:
+    repository: "fluent/fluentd-kubernetes-daemonset"
+    tag: "v1.3-debian-syslog"
+  service:
+    name: "fluentd"
+    aggregatorName: "rsyslog"
 
 saltMaster:
   replicaCount: 1
 
   image:
     tag: latest
+    repository: "salt_master"
     pullPolicy: IfNotPresent
 
   service:
@@ -18,7 +23,20 @@ saltMaster:
 saltMinion:
   image:
     tag: latest
+    repository: "salt_minion"
     pullPolicy: IfNotPresent
 
   service:
     name: salt-minion
+
+storageClassName: "local"
+
+registry:
+  enable: false
+
+volume:
+  enable: true
+  pki: "/mnt/data/saltpki"
+  affinity:
+    hostnames:
+      - minikube

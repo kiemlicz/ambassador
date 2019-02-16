@@ -20,3 +20,25 @@ spec:
       name: reqreply
       port: 4506
       targetPort: 4506
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.logging.service.aggregatorName }}
+  namespace: {{ include "salt.fullname" . }}
+spec:
+  selector:
+    app: {{ .Values.logging.service.aggregatorName }}
+  ports:
+    - name: tcp-syslog
+      port: 514
+      targetPort: 514
+      protocol: TCP
+    - name: udp-syslog
+      port: 514
+      targetPort: 514
+      protocol: UDP
+    - name: fluentd
+      port: 24224
+      targetPort: 24224
+      protocol: TCP

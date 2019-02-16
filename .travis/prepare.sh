@@ -35,21 +35,14 @@ salt-master-run-compose)
     docker-compose -f .travis/docker-compose.yml --project-directory=. up --no-start
     ;;
 salt-master-run-k8s)
-    sudo apt-get update && sudo apt-get install -y curl
-    sudo mkdir -p /etc/salt/minion.d/
-    sudo cp .travis/config/masterless.conf /etc/salt/minion.d/
-    sudo ln -s $TRAVIS_BUILD_DIR/envoy/salt /srv/salt
-    sudo ln -s $TRAVIS_BUILD_DIR/.travis/pillar /srv/pillar
-    curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com
-    sudo sh /tmp/bootstrap-salt.sh -n stable
+    salt_install
     sudo salt-call --local saltutil.sync_all
     echo "ID: $(salt-call --local grains.get id)"
-    sudo salt-call --local state.apply kubernetes.client saltenv=server
-    sudo salt-call --local state.apply kubernetes.minikube saltenv=server
+    minikube_install
 
-    minikube_ready
+    echo "hostname: $(hostname)"
     #create PV paths manually
-    sudo mkdir -p /mnt/data/r0 /mnt/data/r1 /mnt/data/r2 /mnt/data/r3 /mnt/data/r4 /mnt/data/r5 /mnt/data/r6
+    sudo mkdir -p /mnt/data/r0 /mnt/data/r1 /mnt/data/r2 /mnt/data/r3 /mnt/data/r4 /mnt/data/r5 /mnt/data/r6 /mnt/data/saltpki
     # build images that are used for provisioning (salt master's and minion's)
     # only one of each is required per one node cluster
     docker_build master-k8s-test salt_master

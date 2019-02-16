@@ -1,0 +1,94 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Values.logging.service.name }}-cm
+  namespace: {{ include "salt.fullname" . }}
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+data:
+  fluent.conf: |-
+    #<system>
+    #  log_level debug
+    #</system>
+    # minion is present by default in fluentd's kubernetes.conf
+    <source>
+      @id master
+      @type tail
+      format multiline
+      format_firstline /^(?<time>[^ ]* [^ ]*)[^\[]*\[[^\]]*\]\[(?<severity>[^ \]]*) *\][^\[]*\[[^\]]*\] (?<message>.*)$/
+      format1 /^(?<message>\d*\s*[a-zA-Z_]*\s*.*)/
+      time_format %Y-%m-%d %H:%M:%S,%N
+      path /var/log/salt/master
+      pos_file /var/log/fluentd-saltmaster.pos
+      tag salt-master
+    </source>
+
+    <source>
+      @id minion
+      @type tail
+      format multiline
+      format_firstline /^(?<time>[^ ]* [^ ]*)[^\[]*\[[^\]]*\]\[(?<severity>[^ \]]*) *\][^\[]*\[[^\]]*\] (?<message>.*)$/
+      format1 /^(?<message>\d*\s*[a-zA-Z_]*\s*.*)/
+      time_format %Y-%m-%d %H:%M:%S,%N
+      path /var/log/salt/minion
+      pos_file /var/log/fluentd-saltminion.pos
+      tag salt-minion
+    </source>
+
+    <source>
+      @id masterevents
+      @type tail
+      <parse>
+        @type json
+        json_parser json
+      </parse>
+      path /var/log/salt/events
+      pos_file /var/log/fluentd-saltmasterevents.pos
+      tag salt-master-events
+    </source>
+
+    <source>
+      @id masterscan
+      @type tail
+      format multiline
+      format_firstline /^(?<severity>[^ \]]*):\S+:(?<message>.*)$/
+      format1 /^(?<message>\d*\s*[a-zA-Z_]*\s*.*)/
+      path /var/log/salt/scan
+      pos_file /var/log/fluentd-saltmasterscan.pos
+      tag salt-master-scan
+    </source>
+
+    <match **>
+      @type forward
+      send_timeout 60s
+      recover_wait 10s
+      hard_timeout 60s
+
+      <server>
+        name rsyslog-service
+        host rsyslog-service.provisioning
+        port 24224
+        weight 60
+      </server>
+
+    </match>
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Values.logging.service.name }}-aggregator-cm
+  namespace: {{ include "salt.fullname" . }}
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+data:
+  fluent.conf: |-
+    #<system>
+    #      log_level debug
+    #</system>
+    <source>
+      @type forward
+      port 24224
+    </source>
+    <match **>
+      @type stdout
+    </match>

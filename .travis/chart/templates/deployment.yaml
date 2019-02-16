@@ -29,6 +29,10 @@ spec:
         - name: saltpki
           persistentVolumeClaim:
             claimName: {{ include "salt.fullname" . }}-saltpki
+        - name: varlogsalt
+          hostPath:
+            path: /var/log/salt/
+            type: DirectoryOrCreate
       containers:
         - name: {{ .Values.saltMaster.service.name }}
           image: {{ .Values.saltMaster.image.repository }}:{{ .Values.saltMaster.image.tag }}
@@ -39,3 +43,40 @@ spec:
             - mountPath: /etc/salt/pki/master
               name: saltpki
               readOnly: false
+            - mountPath: /var/log/salt/
+              name: varlogsalt
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.logging.service.aggregatorName }}
+  namespace: {{ include "salt.fullname" . }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.logging.service.aggregatorName }}
+  template:
+    metadata:
+      name: {{ .Values.logging.service.aggregatorName }}
+      labels:
+        app: {{ .Values.logging.service.aggregatorName }}
+    spec:
+      serviceAccount: {{ .Values.logging.service.name }}
+      serviceAccountName: {{ .Values.logging.service.name }}
+      containers:
+        - name: {{ .Values.logging.service.aggregatorName }}
+          image: {{ .Values.logging.image.repository }}:{{ .Values.logging.image.tag }}
+          imagePullPolicy: "Always"
+          ports:
+            - name: in-logs
+              containerPort: 24224
+            - name: in-logs-http
+              containerPort: 9880
+          volumeMounts:
+            - name: {{ .Values.logging.service.name }}-aggregator-cm
+              mountPath: /fluentd/etc/
+      volumes:
+        - name: {{ .Values.logging.service.name }}-aggregator-cm
+          configMap:
+            name: {{ .Values.logging.service.name }}-aggregator-cm
