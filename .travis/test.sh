@@ -8,9 +8,9 @@ k8s_log_error() {
     echo "Events:"
     kubectl get events --all-namespaces
     echo "Salt master info"
-    kubectl describe pod -l app=salt-master -n provisioning
+    kubectl describe pod -l app=salt-master -n salt-provisioning
     echo "Salt minion info"
-    kubectl describe pod -l name=salt-minion -n provisioning
+    kubectl describe pod -l name=salt-minion -n salt-provisioning
 }
 
 case "$TEST_CASE" in
@@ -32,16 +32,18 @@ salt-master-run-k8s)
 
     # wait until salt-master and minion containers are running and ready (ready == minion synchronized)
     kubectl wait -n salt-provisioning pod -l name=salt-minion --for condition=ready --timeout=5m
-
     echo "Deployment ready:"
-    kubectl get all -n provisioning
-    logger=$(kubectl get pod -l app=rsyslog -n provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
-    kubectl logs -n provisioning $logger -f &
+    kubectl get all -n salt-provisioning
+
+    logger=$(kubectl get pod -l app=rsyslog -n salt-provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+    kubectl logs -n salt-provisioning $logger -f &
     while sleep 5m; do echo -e "\nEvents:$(kubectl get events --all-namespaces)\nStatus:$(kubectl get all --all-namespaces)"; done &
+
+    # tests here
 
     #kubectl wait won't detect if the pod failed
     #kubectl wait -n provisioning --for=delete pod/salt-master --timeout=60m
-    while kubectl get pod -n provisioning salt-master -o jsonpath="'{range @.status.conditions[?(@.type=='Ready')]}{@.status}{end}'" | grep -q "True"; do
+    while kubectl get pod -n salt-provisioning salt-master -o jsonpath="'{range @.status.conditions[?(@.type=='Ready')]}{@.status}{end}'" | grep -q "True"; do
         sleep 1m
     done
     sleep 1m # for fluentd...

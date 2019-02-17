@@ -7,7 +7,8 @@ salt-master-run-compose)
     ;;
 salt-master-run-k8s)
     echo "scanning k8s salt-master"
-    ret=$(kubectl get pod -n provisioning salt-master -o jsonpath="'{range @.status.containerStatuses[?(@.name=='salt-master')]}{@.state.terminated.exitCode}{end}'" | tr -d "'")
+    # todo under the deployment this won't work
+    ret=$(kubectl get pod -n salt-provisioning -l app=salt-master -o jsonpath="'{range @.status.containerStatuses[?(@.name=='salt-master')]}{@.state.terminated.exitCode}{end}'" | tr -d "'")
     echo "salt-master exit code: $ret"
     exit $ret
     ;;

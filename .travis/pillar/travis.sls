@@ -1,5 +1,7 @@
 pkgs:
   dist_upgrade: False
+  os_packages:
+    - socat
   pip_packages:
     - kubernetes
 
