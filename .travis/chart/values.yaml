@@ -15,7 +15,7 @@ saltMaster:
   image:
     tag: latest
     repository: "salt_master"
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
 
   service:
     name: salt-master
@@ -24,7 +24,7 @@ saltMinion:
   image:
     tag: latest
     repository: "salt_minion"
-    pullPolicy: IfNotPresent
+    pullPolicy: Never
 
   service:
     name: salt-minion

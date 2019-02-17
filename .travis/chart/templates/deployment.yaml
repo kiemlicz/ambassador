@@ -35,7 +35,8 @@ spec:
             type: DirectoryOrCreate
       containers:
         - name: {{ .Values.saltMaster.service.name }}
-          image: {{ .Values.saltMaster.image.repository }}:{{ .Values.saltMaster.image.tag }}
+          image: {{ .Values.saltMaster.image.repository }}
+          imagePullPolicy: Never
           ports:
             - containerPort: 4505
             - containerPort: 4506

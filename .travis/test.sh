@@ -36,6 +36,7 @@ salt-master-run-k8s)
     kubectl get all -n salt-provisioning
 
     logger=$(kubectl get pod -l app=rsyslog -n salt-provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+    echo "logs from: $logger"
     kubectl logs -n salt-provisioning $logger -f &
     while sleep 5m; do echo -e "\nEvents:$(kubectl get events --all-namespaces)\nStatus:$(kubectl get all --all-namespaces)"; done &
 
@@ -43,7 +44,7 @@ salt-master-run-k8s)
 
     #kubectl wait won't detect if the pod failed
     #kubectl wait -n provisioning --for=delete pod/salt-master --timeout=60m
-    while kubectl get pod -n salt-provisioning salt-master -o jsonpath="'{range @.status.conditions[?(@.type=='Ready')]}{@.status}{end}'" | grep -q "True"; do
+    while kubectl get pod -n salt-provisioning -l app=salt-master -o jsonpath="'{range @.status.conditions[?(@.type=='Ready')]}{@.status}{end}'" | grep -q "True"; do
         sleep 1m
     done
     sleep 1m # for fluentd...
