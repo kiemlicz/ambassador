@@ -38,20 +38,8 @@ salt-master-run-k8s)
     salt_install
     sudo salt-call --local saltutil.sync_all
     echo "ID: $(salt-call --local grains.get id)"
-    #minikube_install
-    sudo salt-call --local state.apply kubernetes.client saltenv=server
-    sudo salt-call --local state.apply kubernetes.minikube saltenv=server
-    sudo salt-call --local state.apply kubernetes.helm saltenv=server
-
-    ls -al /home/travis/.kube/
-    ls -al /home/travis/.minikube/
-    echo "--"
-    sudo ls -al /root/
-
-    cat /home/travis/.kube/config
-
+    minikube_install
     echo "hostname: $(hostname)"
-    minikube_ready
     #create PV paths manually
     sudo mkdir -p /mnt/data/r0 /mnt/data/r1 /mnt/data/r2 /mnt/data/r3 /mnt/data/r4 /mnt/data/r5 /mnt/data/r6 /mnt/data/saltpki
     # build images that are used for provisioning (salt master's and minion's)
