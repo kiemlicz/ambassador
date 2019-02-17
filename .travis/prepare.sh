@@ -43,9 +43,11 @@ salt-master-run-k8s)
     sudo salt-call --local state.apply kubernetes.minikube saltenv=server
     sudo salt-call --local state.apply kubernetes.helm saltenv=server
 
-    ls -alR /home/travis/
+    ls -al /home/travis/.kube/
+    ls -al /home/travis/.minikube/
     echo "--"
-    sudo ls -alR /root
+    sudo ls -al /root/.kube/
+    sudo ls -al /root/.minikube/
 
     cat /home/travis/.kube/config
     cat /root/.kube/config
