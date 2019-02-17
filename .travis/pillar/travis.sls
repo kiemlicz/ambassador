@@ -7,5 +7,11 @@ docker:
     version: "18.06.1~ce~3-0~ubuntu"
 
 kubernetes:
-  minikube:
-    user: travis
+  config:
+    locations:
+      - "/root/.kube/config"
+      - "/home/travis/.kube/config"
+  user: travis
+
+helm:
+  owner: travis
