@@ -38,7 +38,17 @@ salt-master-run-k8s)
     salt_install
     sudo salt-call --local saltutil.sync_all
     echo "ID: $(salt-call --local grains.get id)"
-    minikube_install
+    #minikube_install
+    sudo salt-call --local state.apply kubernetes.client saltenv=server
+    sudo salt-call --local state.apply kubernetes.minikube saltenv=server
+    sudo salt-call --local state.apply kubernetes.helm saltenv=server
+
+    ls -alR /home/travis/
+    echo "--"
+    sudo ls -alR /root
+
+    cat /home/travis/.kube/config
+    cat /root/.kube/config
 
     echo "hostname: $(hostname)"
     #create PV paths manually
