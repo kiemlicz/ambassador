@@ -9,7 +9,6 @@ docker:
 kubernetes:
   config:
     locations:
-      - "/root/.kube/config"
       - "/home/travis/.kube/config"
   user: travis
 

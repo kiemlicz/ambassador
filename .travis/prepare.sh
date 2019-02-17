@@ -46,13 +46,12 @@ salt-master-run-k8s)
     ls -al /home/travis/.kube/
     ls -al /home/travis/.minikube/
     echo "--"
-    sudo ls -al /root/.kube/
-    sudo ls -al /root/.minikube/
+    sudo ls -al /root/
 
     cat /home/travis/.kube/config
-    cat /root/.kube/config
 
     echo "hostname: $(hostname)"
+    minikube_ready
     #create PV paths manually
     sudo mkdir -p /mnt/data/r0 /mnt/data/r1 /mnt/data/r2 /mnt/data/r3 /mnt/data/r4 /mnt/data/r5 /mnt/data/r6 /mnt/data/saltpki
     # build images that are used for provisioning (salt master's and minion's)
