@@ -5,12 +5,14 @@ set -e
 k8s_log_error() {
     echo -e "\n####################\n\nERROR DURING KUBERNETES DEPLOYMENT\n\n####################\n"
     kubectl get all --all-namespaces
-    echo "[ERROR]Events:"
+    echo -e "\n[ERROR]Events:"
     kubectl get events --all-namespaces
-    echo "[ERROR]Salt master info"
+    echo -e "\n[ERROR]Salt master info"
     kubectl describe pod -l app=salt-master -n salt-provisioning
-    echo "[ERROR]Salt minion info"
+    echo -e "\n[ERROR]Salt minion info"
     kubectl describe pod -l name=salt-minion -n salt-provisioning
+    echo -e "\n[ERROR]Fluentd info"
+    kubectl describe pod -l name=fluentd -n salt-provisioning
 }
 
 case "$TEST_CASE" in
