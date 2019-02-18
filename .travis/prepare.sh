@@ -7,6 +7,7 @@ if [ -z "$DOCKER_IMAGE" ]; then
 fi
 
 source envoy/.travis/common.sh
+KUBECTL_VER="v1.13.0"
 
 docker_build() {
     if [ -z $1 ]; then

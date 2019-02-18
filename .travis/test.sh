@@ -7,12 +7,8 @@ k8s_log_error() {
     kubectl get all --all-namespaces
     echo -e "\n[ERROR]Events:"
     kubectl get events --all-namespaces
-    echo -e "\n[ERROR]Salt master info"
-    kubectl describe pod -l app=salt-master -n salt-provisioning
-    echo -e "\n[ERROR]Salt minion info"
-    kubectl describe pod -l name=salt-minion -n salt-provisioning
-    echo -e "\n[ERROR]Fluentd info"
-    kubectl describe pod -l name=fluentd -n salt-provisioning
+    echo -e "\n[ERROR] Pods info"
+    kubectl describe pods -n salt-provisioning
 }
 
 case "$TEST_CASE" in
@@ -30,7 +26,7 @@ salt-master-run-k8s)
     trap k8s_log_error EXIT TERM INT
 
     #kubectl apply -f .travis/k8s-deployment.yaml
-    helm install .travis/chart
+    helm install .travis/chart -n salt
 
     # wait until salt-master and minion containers are running and ready (ready == minion synchronized)
     kubectl wait -n salt-provisioning pod -l name=salt-minion --for condition=ready --timeout=5m

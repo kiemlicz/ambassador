@@ -65,8 +65,8 @@ data:
       hard_timeout 60s
 
       <server>
-        name rsyslog-service
-        host rsyslog-service.provisioning
+        name {{ .Values.logging.service.aggregatorName }}
+        host {{ .Values.logging.service.aggregatorName }}.{{ include "salt.fullname" . }}
         port 24224
         weight 60
       </server>
