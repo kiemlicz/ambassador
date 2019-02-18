@@ -3,7 +3,7 @@
 set -e
 
 k8s_log_error() {
-    echo -n "\n####################\n\nERROR DURING KUBERNETES DEPLOYMENT\n\n####################\n"
+    echo -e "\n####################\n\nERROR DURING KUBERNETES DEPLOYMENT\n\n####################\n"
     kubectl get all --all-namespaces
     echo "[ERROR]Events:"
     kubectl get events --all-namespaces
