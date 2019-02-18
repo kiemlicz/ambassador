@@ -3,13 +3,13 @@
 set -e
 
 k8s_log_error() {
-    echo "Error during kubernetes deployment"
+    echo -n "\n####################\n\nERROR DURING KUBERNETES DEPLOYMENT\n\n####################\n"
     kubectl get all --all-namespaces
-    echo "Events:"
+    echo "[ERROR]Events:"
     kubectl get events --all-namespaces
-    echo "Salt master info"
+    echo "[ERROR]Salt master info"
     kubectl describe pod -l app=salt-master -n salt-provisioning
-    echo "Salt minion info"
+    echo "[ERROR]Salt minion info"
     kubectl describe pod -l name=salt-minion -n salt-provisioning
 }
 

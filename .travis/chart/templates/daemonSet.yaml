@@ -74,6 +74,12 @@ spec:
               value: {{ .Values.logging.service.aggregatorName }}.provisioning
             - name:  SYSLOG_PORT
               value: "514"
+          resources:
+            limits:
+              memory: 200Mi
+            requests:
+              cpu: 100m
+              memory: 200Mi
           volumeMounts:
             - name: varlog
               mountPath: /var/log
