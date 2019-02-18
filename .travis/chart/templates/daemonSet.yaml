@@ -23,6 +23,7 @@ spec:
       containers:
         - name: {{ .Values.saltMinion.service.name }}
           image: {{ .Values.saltMinion.image.repository }}
+          imagePullPolicy: {{ .Values.saltMinion.image.pullPolicy }}
           readinessProbe:
             exec:
               command:
