@@ -42,7 +42,10 @@ salt-master-run-k8s)
     while sleep 5m; do echo -e "\nEvents:$(kubectl get events --all-namespaces)\nStatus:$(kubectl get all --all-namespaces)"; done &
 
     # tests here
-
+    echo " ==== "
+    # remove
+    kubectl get pod -n salt-provisioning -l app=salt-master -o jsonpath="'{range @.status.conditions[?(@.type=='Ready')]}{@.status}{end}'"
+    echo " ==== "
     #kubectl wait won't detect if the pod failed
     #kubectl wait -n provisioning --for=delete pod/salt-master --timeout=60m
     while kubectl get pod -n salt-provisioning -l app=salt-master -o jsonpath="'{range @.status.conditions[?(@.type=='Ready')]}{@.status}{end}'" | grep -q "True"; do
