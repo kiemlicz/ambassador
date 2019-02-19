@@ -28,14 +28,17 @@ salt-master-run-k8s)
     #kubectl apply -f .travis/k8s-deployment.yaml
     helm install .travis/chart -n salt
 
+    # wait for logger first
+    kubectl wait -n salt-provisioning pod -l app=rsyslog --for condition=ready --timeout=5m
+    logger=$(kubectl get pod -l app=rsyslog -n salt-provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+    echo -e "\nlogs from: $logger"
+    kubectl logs -n salt-provisioning $logger -f &
+
     # wait until salt-master and minion containers are running and ready (ready == minion synchronized)
     kubectl wait -n salt-provisioning pod -l name=salt-minion --for condition=ready --timeout=5m
     echo "Deployment ready:"
     kubectl get all -n salt-provisioning
 
-    logger=$(kubectl get pod -l app=rsyslog -n salt-provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
-    echo "logs from: $logger"
-    kubectl logs -n salt-provisioning $logger -f &
     while sleep 5m; do echo -e "\nEvents:$(kubectl get events --all-namespaces)\nStatus:$(kubectl get all --all-namespaces)"; done &
 
     # tests here
