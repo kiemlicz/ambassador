@@ -9,7 +9,6 @@ ARG log_level
 
 COPY .travis/entrypoint_master_run.sh /opt/
 COPY .travis/scan_events.py /opt/
-COPY .travis/tests /opt/tests
 COPY .travis/config/master.conf /etc/salt/master.d/master.conf
 COPY .travis/config/autosign.conf /etc/salt/autosign.conf
 COPY .travis/config/reactor_orch.conf /etc/salt/master.d/reactor.conf
