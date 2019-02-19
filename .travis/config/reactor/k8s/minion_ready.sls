@@ -7,12 +7,13 @@ compose_ready:
         - saltenv: {{ salt['environ.get']("SALTENV") }}
         - pillar:
             event: {{ data|json_encode_dict }}
-{% elif data['id'] is match('salt-\S+') %}
+{% elif data['id'] is match('salt-minion-\S+') %}
 k8s_ready:
-    runner.state.orchestrate:
+    local.state.sls:
+        - tgt: {{ data['id'] }}
         - args:
             - mods:
-                - _orchestrate.start
+                - minion
             - saltenv: {{ salt['environ.get']("SALTENV") }}
             - pillar:
                   docker_event: {{ data|json_encode_dict }}
