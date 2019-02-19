@@ -39,7 +39,6 @@ COPY .travis/config/reactor/k8s /srv/reactor
 COPY .travis/pillar/ /srv/pillar/
 COPY .travis/salt/dev/top.sls /srv/salt/base/
 COPY .travis/salt/dev/_orchestrate /srv/salt/dev/_orchestrate
-COPY .travis/k8s /opt/k8s
 
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_ver/bin/linux/amd64/kubectl && \
     chmod +x kubectl && \
