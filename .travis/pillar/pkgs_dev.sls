@@ -19,7 +19,7 @@
                    "openssh-server", "openssh-client", "openvpn", "insserv",
                    "build-essential", "git", "zsh", "curl", "ethtool", "ntp", "python-pip",
                    "silversearcher-ag", "exuberant-ctags", "tig", "software-properties-common",
-		           "ca-certificates", "gnupg2", "erlang"],
+		           "ca-certificates", "gnupg2"],
       },
       'bionic': {
         'os_packages': ["aptitude", "apt-transport-https",
@@ -27,7 +27,7 @@
                    "openssh-server", "openssh-client", "openvpn",
                    "build-essential", "git", "zsh", "curl", "ethtool", "ntp", "python-pip",
                    "silversearcher-ag", "exuberant-ctags", "tig", "software-properties-common",
-		           "ca-certificates", "gnupg2", "erlang"],
+		           "ca-certificates", "gnupg2"],
       }
     }, grain='oscodename')) %}
 
