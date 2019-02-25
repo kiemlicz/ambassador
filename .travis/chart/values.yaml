@@ -29,7 +29,9 @@ saltMinion:
   service:
     name: salt-minion
 
-storageClassName: "local"
+storage:
+  enable: true
+  className: "local"
 
 registry:
   enable: false

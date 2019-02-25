@@ -1,7 +1,9 @@
+{{ if .Values.storage.enable }}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-  name: {{ .Values.storageClassName }}
+  name: {{ .Values.storage.className }}
   namespace: {{ include "salt.fullname" . }}
 provisioner: kubernetes.io/no-provisioner
 volumeBindingMode: WaitForFirstConsumer
+{{- end }}

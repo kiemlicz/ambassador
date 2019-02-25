@@ -92,3 +92,15 @@ data:
     <match **>
       @type stdout
     </match>
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ .Values.saltMaster.service.name }}-pillar-cm
+  namespace: {{ include "salt.fullname" . }}
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+data:
+  init.sls: |-
+    salt:
+      kubernetes: {{ "{{" }} salt['sdb.get']("sdb://k8s/daemon_set?name={{ .Values.saltMinion.service.name }}") {{ "}}" }}

@@ -4,7 +4,7 @@ metadata:
   name: {{ include "salt.fullname" . }}-saltpki
   namespace: {{ include "salt.fullname" . }}
 spec:
-  storageClassName: {{ .Values.storageClassName }}
+  storageClassName: {{ .Values.storage.className }}
   {{- if .Values.volume.enable }}
   selector:
     matchLabels:

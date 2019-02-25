@@ -29,13 +29,17 @@ spec:
         - name: saltpki
           persistentVolumeClaim:
             claimName: {{ include "salt.fullname" . }}-saltpki
+        - name: pillar
+          configMap:
+            name: {{ .Values.saltMaster.service.name }}-pillar-cm
+            defaultMode: 0644
         - name: varlogsalt
           hostPath:
             path: /var/log/salt/
             type: DirectoryOrCreate
       containers:
         - name: {{ .Values.saltMaster.service.name }}
-          image: {{ .Values.saltMaster.image.repository }}
+          image: {{ .Values.saltMaster.image.repository }}:{{.Values.saltMaster.image.tag }}
           imagePullPolicy: {{ .Values.saltMaster.image.pullPolicy }}
           ports:
             - containerPort: 4505
@@ -46,6 +50,9 @@ spec:
               readOnly: false
             - mountPath: /var/log/salt/
               name: varlogsalt
+            - mountPath: /srv/pillar/overrides
+              name: pillar
+              readOnly: true
 ---
 apiVersion: apps/v1beta1
 kind: Deployment

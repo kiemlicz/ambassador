@@ -22,7 +22,7 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Values.saltMinion.service.name }}
-          image: {{ .Values.saltMinion.image.repository }}
+          image: {{ .Values.saltMinion.image.repository }}:{{ .Values.saltMinion.image.tag  }}
           imagePullPolicy: {{ .Values.saltMinion.image.pullPolicy }}
           readinessProbe:
             exec:

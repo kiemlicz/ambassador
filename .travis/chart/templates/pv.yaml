@@ -1,3 +1,4 @@
+{{ if .Values.volume.enable  }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
@@ -12,7 +13,7 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: {{ .Values.storageClassName }}
+  storageClassName: {{ .Values.storage.className }}
   local:
     path: {{ .Values.volume.pki }}
   nodeAffinity:
@@ -22,3 +23,4 @@ spec:
             - key: kubernetes.io/hostname
               operator: In
               values: {{ .Values.volume.affinity.hostnames }}
+{{- end }}
