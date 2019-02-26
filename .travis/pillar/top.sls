@@ -20,7 +20,5 @@ base:
     - pkgs_dev
     - one_user
     - orchestrate
-  'salt-*':
-    - redis
   'travis-*':
     - travis

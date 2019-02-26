@@ -37,4 +37,4 @@ repositories:
                           'priority': '999'
                         }]
     },
-  }, grain='oscodename')) }}
+  }, grain='oscodename'))|tojson }}

@@ -9,4 +9,4 @@ repositories:
           'key_url': 'https://dl.google.com/linux/linux_signing_key.pub'
       }]
      },
-  }, grain='oscodename') }}
+  }, grain='oscodename')|tojson }}

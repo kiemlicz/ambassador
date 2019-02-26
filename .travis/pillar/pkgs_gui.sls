@@ -42,4 +42,4 @@ pkgs:
             'somehost': {
               'os_packages': default_pkgs.os_packages + ["firmware-iwlwifi"]
               },
-            }, grain='host', merge=default_pkgs) }}
+            }, grain='host', merge=default_pkgs)|tojson }}
