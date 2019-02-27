@@ -103,7 +103,6 @@ Vagrant.configure("2") do |config|
   config.vm.provision "file", source: "config/bootloader", destination: "~/srv/tftp"
   config.vm.provision "file", source: "envoy/salt", destination: "~/srv/salt"
   config.vm.provision "file", source: "envoy/pillar", destination: "~/srv/pillar"
-  config.vm.provision "file", source: "envoy/reactor", destination: "~/srv/reactor"
   config.vm.provision "file", source: "extensions/file_ext_authorize", destination: "~/opt/file_ext_authorize"
   config.vm.provision "file", source: "config/file_ext_authorize.conf", destination: "~/opt/file_ext_authorize/file_ext_authorize.conf"
 
