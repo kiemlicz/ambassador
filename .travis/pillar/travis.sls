@@ -3,6 +3,8 @@ pkgs:
   os_packages:
     - socat
   pip_packages:
+    - pyyaml
+    - cryptography
     - kubernetes
 
 docker:
