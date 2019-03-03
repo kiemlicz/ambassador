@@ -33,7 +33,7 @@ salt_install_pip() {
     sudo ln -s $TRAVIS_BUILD_DIR/envoy/salt /srv/salt
     sudo ln -s $TRAVIS_BUILD_DIR/.travis/pillar /srv/pillar
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com
-    sudo sh /tmp/bootstrap-salt.sh -n stable -P
+    sudo sh /tmp/bootstrap-salt.sh -P -n stable
 }
 
 case "$TEST_CASE" in
