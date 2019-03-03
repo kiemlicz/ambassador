@@ -16,7 +16,7 @@ COPY .travis/salt/top.sls /srv/salt/base/
 # workaround for salt's service state
 # somehow in masterless config the service provider cannot be overriden
 # https://github.com/saltstack/salt/issues/33256
-RUN echo -e '#!/bin/bash\necho "N 5"' > /sbin/runlevel && \
+RUN printf '#!/bin/bash\necho "N 5"' > /sbin/runlevel && \
     chmod 775 /sbin/runlevel
 
 ENTRYPOINT salt-call --local state.highstate saltenv=$SALTENV -l $LOG_LEVEL
