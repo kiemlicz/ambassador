@@ -1,5 +1,5 @@
 pkgs:
-  pip_packages:
+  pip3_packages:
     - google-auth
-    - pyasn1-modules
     - google-auth-oauthlib
+    - pyasn1-modules
