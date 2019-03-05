@@ -18,10 +18,9 @@ docker_build() {
         --build-arg=salt_ver=$SALT_VER \
         --build-arg=log_level="${LOG_LEVEL-info}" \
         --build-arg=saltenv="$SALTENV" \
-        --build-arg=context="$CONTEXT" \
         --build-arg=kubectl_ver="$KUBECTL_VER" \
-        -t "${2-$DOCKER_IMAGE}" \
         --target $1 \
+        -t "${2-$DOCKER_IMAGE}" \
         -f .travis/"$DOCKER_IMAGE"/Dockerfile .
 }
 

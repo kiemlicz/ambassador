@@ -15,7 +15,7 @@ case "$TEST_CASE" in
 salt-masterless-run)
     # privileged mode is necessary for e.g. setting: net.ipv4.ip_forward or running docker in docker
     name="ambassador-salt-masterless-run-$TRAVIS_JOB_NUMBER"
-    docker run --name $name --hostname "$SALTENV-host" --privileged "$DOCKER_IMAGE" 2>&1 | tee output
+    docker run --name $name --hostname "$CONTEXT-host" --privileged "$DOCKER_IMAGE" 2>&1 | tee output
     result=$(awk '/^Failed:/ {if($2 != "0") print "fail"}' output)
     if [[ "$result" == "fail" ]]; then
         echo "found failures"
