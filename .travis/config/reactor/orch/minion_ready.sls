@@ -6,7 +6,7 @@ compose_ready:
             - _orchestrate.highstate
         - saltenv: {{ salt['environ.get']("SALTENV") }}
         - pillar:
-            event: {{ data|json_encode_dict }}
+            event: {{ data|tojson }}
 {% elif data['id'] is match('salt-\S+') %}
 k8s_ready:
     runner.state.orchestrate:
@@ -15,5 +15,5 @@ k8s_ready:
                 - _orchestrate.start
             - saltenv: {{ salt['environ.get']("SALTENV") }}
             - pillar:
-                  docker_event: {{ data|json_encode_dict }}
+                  docker_event: {{ data|tojson }}
 {% endif %}

@@ -3,7 +3,7 @@
 set -e
 
 k8s_log_error() {
-    echo -e "\n####################\n\nERROR DURING KUBERNETES DEPLOYMENT\n\n####################\n"
+    echo -e "\n####################\n\nERROR DURING KUBERNETES DEPLOYMENT\n$(date)\n####################\n"
     kubectl get all --all-namespaces
     echo -e "\n[ERROR]Events:"
     kubectl get events --all-namespaces
@@ -27,7 +27,7 @@ salt-master-run-compose)
     docker-compose -f .travis/docker-compose.yml --project-directory=. up --no-build --no-recreate
     ;;
 salt-master-run-k8s)
-    echo "Starting kubernetes deployment"
+    echo -e "Starting kubernetes deployment\n$(date)\n"
     trap k8s_log_error EXIT TERM INT
 
     #kubectl apply -f .travis/k8s-deployment.yaml
