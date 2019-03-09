@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Values.saltMaster.service.name }}
-  namespace: {{ include "salt.fullname" . }}
+  namespace: {{ .Values.namespace }}
   labels:
     app.kubernetes.io/name: {{ include "salt.name" . }}
     helm.sh/chart: {{ include "salt.chart" . }}
@@ -21,22 +21,28 @@ spec:
     spec:
       serviceAccount: {{ include "salt.fullname" . }}
       serviceAccountName: {{ include "salt.fullname" . }}
-    {{- if .Values.registry.enable }}
+{{- if .Values.registry.enable }}
       imagePullSecrets:
         - name: {{ include "salt.fullname" . }}-registry-credentials
-    {{- end }}
+{{- end }}
       volumes:
-        - name: saltpki
-          persistentVolumeClaim:
-            claimName: {{ include "salt.fullname" . }}-saltpki
         - name: pillar
           configMap:
             name: {{ .Values.saltMaster.service.name }}-pillar-cm
             defaultMode: 0644
-        - name: varlogsalt
-          hostPath:
-            path: /var/log/salt/
-            type: DirectoryOrCreate
+{{ if .Values.persistence.enable }}
+        - name: saltpki
+          persistentVolumeClaim:
+            claimName: {{ include "salt.fullname" . }}-saltpki
+        - name: saltqueue
+          persistentVolumeClaim:
+            claimName: {{ include "salt.fullname" . }}-saltqueue
+{{- else }}
+        - name: saltpki
+          emptyDir: {}
+        - name: saltqueue
+          emptyDir: {}
+{{- end }}
       containers:
         - name: {{ .Values.saltMaster.service.name }}
           image: {{ .Values.saltMaster.image.repository }}:{{.Values.saltMaster.image.tag }}
@@ -48,43 +54,9 @@ spec:
             - mountPath: /etc/salt/pki/master
               name: saltpki
               readOnly: false
-            - mountPath: /var/log/salt/
-              name: varlogsalt
+            - mountPath: /var/cache/salt/master/queues
+              name: saltqueue
+              readOnly: false
             - mountPath: /srv/pillar/overrides
               name: pillar
               readOnly: true
----
-apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: {{ .Values.logging.service.aggregatorName }}
-  namespace: {{ include "salt.fullname" . }}
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: {{ .Values.logging.service.aggregatorName }}
-  template:
-    metadata:
-      name: {{ .Values.logging.service.aggregatorName }}
-      labels:
-        app: {{ .Values.logging.service.aggregatorName }}
-    spec:
-      serviceAccount: {{ .Values.logging.service.name }}
-      serviceAccountName: {{ .Values.logging.service.name }}
-      containers:
-        - name: {{ .Values.logging.service.aggregatorName }}
-          image: {{ .Values.logging.image.repository }}:{{ .Values.logging.image.tag }}
-          imagePullPolicy: "Always"
-          ports:
-            - name: in-logs
-              containerPort: 24224
-            - name: in-logs-http
-              containerPort: 9880
-          volumeMounts:
-            - name: {{ .Values.logging.service.name }}-aggregator-cm
-              mountPath: /fluentd/etc/
-      volumes:
-        - name: {{ .Values.logging.service.name }}-aggregator-cm
-          configMap:
-            name: {{ .Values.logging.service.name }}-aggregator-cm

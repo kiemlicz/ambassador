@@ -1,17 +1,37 @@
+{{ if .Values.persistence.enable }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: {{ include "salt.fullname" . }}-saltpki
-  namespace: {{ include "salt.fullname" . }}
+  namespace: {{ .Values.namespace }}
 spec:
   storageClassName: {{ .Values.storage.className }}
-  {{- if .Values.volume.enable }}
+{{- if .Values.volume.enable }}
   selector:
     matchLabels:
       name: {{ include "salt.fullname" . }}-saltpki
-  {{- end }}
+{{- end }}
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
       storage: 5Mi
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "salt.fullname" . }}-saltqueue
+  namespace: {{ .Values.namespace }}
+spec:
+  storageClassName: {{ .Values.storage.className }}
+{{- if .Values.volume.enable }}
+  selector:
+    matchLabels:
+      name: {{ include "salt.fullname" . }}-saltqueue
+{{- end }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 128Mi
+{{- end }}

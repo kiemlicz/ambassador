@@ -1,20 +1,13 @@
 nameOverride: ""
 fullnameOverride: "salt-provisioning"
-
-logging:
-  image:
-    repository: "fluent/fluentd-kubernetes-daemonset"
-    tag: "v1.3-debian-syslog"
-  service:
-    name: "fluentd"
-    aggregatorName: "rsyslog"
+namespace: "salt-provisioning"
 
 saltMaster:
   replicaCount: 1
 
   image:
     tag: latest
-    repository: "salt_master"
+    repository: "salt-master"
     pullPolicy: Never
 
   service:
@@ -23,7 +16,7 @@ saltMaster:
 saltMinion:
   image:
     tag: latest
-    repository: "salt_minion"
+    repository: "salt-minion"
     pullPolicy: Never
 
   service:
@@ -31,14 +24,19 @@ saltMinion:
 
 storage:
   enable: true
+  reclaimPolicy: Retain
   className: "local"
 
 registry:
   enable: false
 
+persistence:
+  enable: true
+
 volume:
   enable: true
   pki: "/mnt/data/saltpki"
+  queue: "/mnt/data/saltqueue"
   affinity:
     hostnames:
       - minikube

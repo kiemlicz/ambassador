@@ -1,7 +1,7 @@
 version: '3.4'
 services:
   master:
-    image: salt_master
+    image: salt-master
     build:
       context: .
       dockerfile: .travis/$DOCKER_IMAGE/Dockerfile
@@ -21,7 +21,7 @@ services:
           - master.local
 #      hostnet: {}
   minion1:
-    image: salt_minion
+    image: salt-minion
     build:
       context: .
       dockerfile: .travis/$DOCKER_IMAGE/Dockerfile
@@ -36,7 +36,7 @@ services:
         aliases:
           - minion1.local
   minion2:
-    image: salt_minion
+    image: salt-minion
     build:
       context: .
       dockerfile: .travis/$DOCKER_IMAGE/Dockerfile
@@ -51,7 +51,7 @@ services:
         aliases:
           - minion2.local
   minion3:
-    image: salt_minion
+    image: salt-minion
     build:
       context: .
       dockerfile: .travis/$DOCKER_IMAGE/Dockerfile

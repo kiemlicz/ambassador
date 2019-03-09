@@ -16,7 +16,7 @@ spec:
   restartPolicy: Never
   containers:
     - name: salt-master
-      image: salt_master
+      image: salt-master
       imagePullPolicy: Never
       ports:
         - containerPort: 4505
@@ -72,7 +72,7 @@ spec:
     spec:
       containers:
         - name: salt-minion
-          image: salt_minion
+          image: salt-minion
           imagePullPolicy: Never
           volumeMounts:
             - name: dockersock

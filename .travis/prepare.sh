@@ -7,7 +7,7 @@ if [ -z "$DOCKER_IMAGE" ]; then
 fi
 
 source envoy/.travis/common.sh
-KUBECTL_VER="v1.13.0"
+KUBECTL_VER="v1.13.4"
 
 docker_build() {
     if [ -z $1 ]; then
@@ -41,10 +41,10 @@ salt-master-run-k8s)
     minikube_install
     echo "hostname: $(hostname)"
     #create PV paths manually
-    sudo mkdir -p /mnt/data/r0 /mnt/data/r1 /mnt/data/r2 /mnt/data/r3 /mnt/data/r4 /mnt/data/r5 /mnt/data/r6 /mnt/data/saltpki
+    sudo mkdir -p /mnt/data/saltpki /mnt/data/saltqueue
     # build images that are used for provisioning (salt master's and minion's)
     # only one of each is required per one node cluster
-    docker_build master-k8s-test salt_master
-    docker_build minion-k8s-test salt_minion
+    docker_build master-k8s-test salt-master
+    docker_build minion-k8s-test salt-minion
     ;;
 esac
