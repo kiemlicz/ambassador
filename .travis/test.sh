@@ -30,14 +30,13 @@ salt-master-run-k8s)
     echo -e "Starting kubernetes deployment\n$(date)\n"
     trap k8s_log_error EXIT TERM INT
 
-    #kubectl apply -f .travis/k8s-deployment.yaml
     helm install .travis/chart -n salt
 
     # wait for logger first
-    kubectl wait -n salt-provisioning pod -l app=rsyslog --for condition=ready --timeout=5m
-    logger=$(kubectl get pod -l app=rsyslog -n salt-provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+    kubectl wait -n salt-provisioning pod -l app=logstash --for condition=ready --timeout=5m
+    logger=$(kubectl get pod -l app=logstash -n salt-provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
     echo -e "\nlogs from: $logger"
-    kubectl logs -n salt-provisioning $logger -f &
+    kubectl -n salt-provisioning logs -f $logger &
 
     # wait until salt-master and minion containers are running and ready (ready == minion synchronized)
     kubectl wait -n salt-provisioning pod -l name=salt-minion --for condition=ready --timeout=5m

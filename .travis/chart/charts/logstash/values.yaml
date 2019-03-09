@@ -192,7 +192,7 @@ filters:
 outputs:
   main: |-
     output {
-      stdout { codec => json }
+      stdout { }
       #elasticsearch {
       #  hosts => ["${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}"]
       #  manage_template => false

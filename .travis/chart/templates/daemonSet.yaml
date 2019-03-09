@@ -29,7 +29,7 @@ spec:
               command:
                 - cat
                 - /tmp/salt/healthz
-            initialDelaySeconds: 5
+            initialDelaySeconds: 15
             periodSeconds: 5
           volumeMounts:
             - name: dockersock
