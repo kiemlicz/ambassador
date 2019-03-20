@@ -25,10 +25,6 @@ docker_build() {
 }
 
 case "$TEST_CASE" in
-salt-masterless-run)
-    docker_update
-    docker_build masterless-test
-    ;;
 salt-master-run-compose)
     docker_update
     docker_compose_update

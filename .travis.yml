@@ -13,34 +13,6 @@ env:
     - SALT_VER="" # latest
     - CHANGE_MINIKUBE_NONE_USER=true # adjusts minikube permissions when driver=none
   matrix:
-    - DOCKER_IMAGE=debian-sid
-      TEST_CASE=salt-masterless-run
-      SALTENV=base
-      CONTEXT=base
-    - DOCKER_IMAGE=debian-sid
-      TEST_CASE=salt-masterless-run
-      SALTENV=dev
-      CONTEXT=dev
-    - DOCKER_IMAGE=debian-stretch
-      TEST_CASE=salt-masterless-run
-      SALTENV=base
-      CONTEXT=base
-    - DOCKER_IMAGE=debian-stretch
-      TEST_CASE=salt-masterless-run
-      SALTENV=base
-      CONTEXT=gui
-    - DOCKER_IMAGE=debian-stretch
-      TEST_CASE=salt-masterless-run
-      SALTENV=dev
-      CONTEXT=dev
-    - DOCKER_IMAGE=ubuntu-bionic
-      TEST_CASE=salt-masterless-run
-      SALTENV=base
-      CONTEXT=base
-    - DOCKER_IMAGE=ubuntu-bionic
-      TEST_CASE=salt-masterless-run
-      SALTENV=dev
-      CONTEXT=dev
     - DOCKER_IMAGE=debian-stretch
       TEST_CASE=salt-master-run-k8s
       SALTENV=dev
@@ -56,9 +28,9 @@ env:
 
 matrix:
   fast_finish: true
-  allow_failures: # only unstable distro-based tests are allowed to fail
-    - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=base CONTEXT=base
-    - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=dev CONTEXT=dev
+#  allow_failures: # only unstable distro-based tests are allowed to fail
+#    - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=base CONTEXT=base
+#    - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=dev CONTEXT=dev
 
 before_install:
   - .travis/prepare.sh
