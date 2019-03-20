@@ -3,7 +3,6 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: {{ include "salt.fullname" . }}-saltpki
-  namespace: {{ .Values.namespace }}
 spec:
   storageClassName: {{ .Values.storage.className }}
 {{- if .Values.volume.enable }}
@@ -21,7 +20,6 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: {{ include "salt.fullname" . }}-saltqueue
-  namespace: {{ .Values.namespace }}
 spec:
   storageClassName: {{ .Values.storage.className }}
 {{- if .Values.volume.enable }}

@@ -2,7 +2,6 @@ apiVersion: apps/v1beta2
 kind: StatefulSet
 metadata:
   name: {{ template "logstash.fullname" . }}
-  namespace: {{ .Values.namespace }}
   labels:
     app: {{ template "logstash.name" . }}
     chart: {{ template "logstash.chart" . }}

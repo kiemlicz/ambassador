@@ -20,7 +20,7 @@ salt-master-run-k8s)
     echo -e "Starting kubernetes deployment\n$(date)\n"
     trap k8s_log_error EXIT TERM INT
 
-    helm install .travis/chart -n salt
+    helm install .travis/chart -n salt --namespace salt-provisioning
 
     # wait for logger first
     kubectl wait -n salt-provisioning pod -l app=logstash --for condition=ready --timeout=5m

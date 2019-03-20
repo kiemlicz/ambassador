@@ -2,7 +2,6 @@ kind: Service
 apiVersion: v1
 metadata:
   name: {{ .Values.saltMaster.service.name }}
-  namespace: {{ .Values.namespace }}
   labels:
     app.kubernetes.io/name: {{ include "salt.name" . }}
     helm.sh/chart: {{ include "salt.chart" . }}

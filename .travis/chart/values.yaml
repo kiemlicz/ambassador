@@ -1,6 +1,5 @@
 nameOverride: ""
 fullnameOverride: "salt-provisioning"
-namespace: "salt-provisioning"
 
 saltMaster:
   replicaCount: 1

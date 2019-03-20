@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: {{ .Values.saltMinion.service.name }}
-  namespace: {{ .Values.namespace }}
   labels:
     app: {{ .Values.saltMinion.service.name }}
 spec:
