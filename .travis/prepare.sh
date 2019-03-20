@@ -24,6 +24,30 @@ docker_build() {
         -f .travis/"$DOCKER_IMAGE"/Dockerfile .
 }
 
+salt_install() {
+    sudo apt-get update && sudo apt-get install -y curl
+    sudo mkdir -p /etc/salt/minion.d/
+    sudo cp ${1-".travis/config/masterless.conf"} /etc/salt/minion.d/
+    sudo ln -s $TRAVIS_BUILD_DIR/envoy/salt /srv/salt
+    sudo ln -s $TRAVIS_BUILD_DIR/.travis/pillar /srv/pillar
+    curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com
+    sudo sh /tmp/bootstrap-salt.sh -x python3 -n stable
+}
+
+minikube_ready() {
+    echo "Waiting for nodes..."
+    kubectl get nodes
+    kubectl wait nodes/minikube --for condition=ready
+    echo "minikube setup complete"
+}
+
+minikube_install() {
+    sudo salt-call --local state.apply kubernetes.client saltenv=server
+    sudo salt-call --local state.apply kubernetes.minikube saltenv=server
+    sudo salt-call --local state.apply kubernetes.helm saltenv=server
+    minikube_ready
+}
+
 case "$TEST_CASE" in
 salt-master-run-compose)
     docker_update
