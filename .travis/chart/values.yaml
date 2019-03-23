@@ -39,3 +39,57 @@ volume:
   affinity:
     hostnames:
       - minikube
+
+logstash:
+  fullnameOverride: "logstash"
+  livenessProbe:
+    httpGet:
+      path: /
+      port: monitor
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 60
+    failureThreshold: 6
+    successThreshold: 1
+  readinessProbe:
+    httpGet:
+      path: /
+      port: monitor
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 60
+    failureThreshold: 6
+    successThreshold: 1
+  persistence:
+    enabled: false
+  service:
+    ports:
+      syslog-udp:
+        port: 1514
+        targetPort: syslog-udp
+        protocol: UDP
+      beats:
+        port: 5044
+        targetPort: beats
+        protocol: TCP
+  ports:
+    - name: syslog-udp
+      containerPort: 1514
+      protocol: UDP
+    - name: beats
+      containerPort: 5044
+      protocol: TCP
+  inputs:
+    main: |-
+      input {
+        udp {
+          port => 1514
+          codec => json
+        }
+      }
+
+  outputs:
+    main: |-
+      output {
+        stdout { }
+      }

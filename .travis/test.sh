@@ -20,6 +20,7 @@ salt-master-run-k8s)
     echo -e "Starting kubernetes deployment\n$(date)\n"
     trap k8s_log_error EXIT TERM INT
 
+    helm dependency update .travis/chart
     helm install .travis/chart -n salt --namespace salt-provisioning
 
     # wait for logger first
@@ -35,13 +36,14 @@ salt-master-run-k8s)
 
     while sleep 5m; do echo -e "\nEvents:$(kubectl get events --all-namespaces)\nStatus:$(kubectl get all --all-namespaces)"; done &
 
-    # tests here if any, wait for any event
-    #kubectl wait won't detect if the pod failed
-    #kubectl wait -n provisioning --for=delete pod/salt-master --timeout=60m
-    #while kubectl get pod -n salt-provisioning -l app=salt-master -o jsonpath="'{range @.status.conditions[?(@.type=='Ready')]}{@.status}{end}'" | grep -q "True"; do
-    #    sleep 1m
-    #done
-    #sleep 1m # for fluentd...
+    echo "Should accept new minion"
+    kubectl -n salt-provisioning delete pod -l name=salt-minion
+    kubectl -n salt-provisioning wait pod -l name=salt-minion --for condition=ready --timeout=5m
+
+    echo "Should work after master crash"
+    kubectl -n salt-provisioning delete pod -l name=salt-master
+    kubectl -n salt-provisioning wait pod -l name=salt-master --for condition=ready --timeout=5m
+    kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt '*' test.ping | grep True
 
     echo "Deployment finished"
     ;;

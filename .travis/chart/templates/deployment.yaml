@@ -17,6 +17,7 @@ spec:
     metadata:
       labels:
         app: {{ .Values.saltMaster.service.name }}
+        name: {{ .Values.saltMaster.service.name }}
     spec:
       serviceAccount: {{ include "salt.fullname" . }}
       serviceAccountName: {{ include "salt.fullname" . }}
@@ -46,6 +47,11 @@ spec:
         - name: {{ .Values.saltMaster.service.name }}
           image: {{ .Values.saltMaster.image.repository }}:{{.Values.saltMaster.image.tag }}
           imagePullPolicy: {{ .Values.saltMaster.image.pullPolicy }}
+          readinessProbe:
+            tcpSocket:
+              port: 4505
+            initialDelaySeconds: 15
+            periodSeconds: 20
           ports:
             - containerPort: 4505
             - containerPort: 4506
