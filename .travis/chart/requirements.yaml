@@ -1,7 +1,4 @@
 dependencies:
-  - name: common
-    version: 0.1.0
-    repository: common
   - name: logstash
     version: 0.1.0
     repository: logstash
