@@ -1,4 +1,4 @@
-language: python
+language: bash
 
 sudo: required
 
@@ -25,12 +25,6 @@ env:
 #      TEST_CASE=salt-master-run-compose
 #      SALTENV=dev
 #      CONTEXT=orch
-
-matrix:
-  fast_finish: true
-#  allow_failures: # only unstable distro-based tests are allowed to fail
-#    - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=base CONTEXT=base
-#    - env: DOCKER_IMAGE=debian-sid TEST_CASE=salt-masterless-run SALTENV=dev CONTEXT=dev
 
 before_install:
   - .travis/prepare.sh
