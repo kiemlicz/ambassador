@@ -42,6 +42,7 @@ COPY .travis/config/master.conf /etc/salt/master.d/master.conf
 COPY .travis/config/autosign.conf /etc/salt/autosign.conf
 COPY .travis/config/reactor_k8s.conf /etc/salt/master.d/reactor.conf
 COPY .travis/config/reactor/k8s /srv/reactor
+COPY .travis/thorium/ /srv/thorium/
 COPY .travis/pillar/ /srv/pillar/
 COPY .travis/salt/ /srv/salt/
 # sync via _log_handlers does nothing... forcing override of installed packages
