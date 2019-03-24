@@ -1,11 +1,11 @@
-{{ if .Values.persistence.enable }}
+{{ if .Values.persistence.enabled }}
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: {{ include "salt.fullname" . }}-saltpki
 spec:
   storageClassName: {{ .Values.storage.className }}
-{{- if .Values.volume.enable }}
+{{- if .Values.volume.enabled }}
   selector:
     matchLabels:
       name: {{ include "salt.fullname" . }}-saltpki
@@ -22,7 +22,7 @@ metadata:
   name: {{ include "salt.fullname" . }}-saltqueue
 spec:
   storageClassName: {{ .Values.storage.className }}
-{{- if .Values.volume.enable }}
+{{- if .Values.volume.enabled }}
   selector:
     matchLabels:
       name: {{ include "salt.fullname" . }}-saltqueue

@@ -22,18 +22,18 @@ saltMinion:
     name: salt-minion
 
 storage:
-  enable: true
+  enabled: true
   reclaimPolicy: Retain
   className: "local"
 
 registry:
-  enable: false
+  enabled: false
 
 persistence:
-  enable: true
+  enabled: true
 
 volume:
-  enable: true
+  enabled: true
   pki: "/mnt/data/saltpki"
   queue: "/mnt/data/saltqueue"
   affinity:

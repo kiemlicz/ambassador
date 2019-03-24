@@ -8,7 +8,11 @@ k8s_log_error() {
     echo -e "\n[ERROR]Events:"
     kubectl get events --all-namespaces
     echo -e "\n[ERROR] Pods info"
-    kubectl describe pods -n salt-provisioning
+    kubectl -n salt-provisioning describe pods
+    echo -e "\n[ERROR] Master logs"
+    kubectl -n salt-provisioning logs -l name=salt-master
+    echo -e "\n[ERROR] Minion logs"
+    kubectl -n salt-provisioning logs -l name=salt-minion
 }
 
 case "$TEST_CASE" in
@@ -44,7 +48,9 @@ salt-master-run-k8s)
     kubectl -n salt-provisioning delete pod -l name=salt-master
     kubectl -n salt-provisioning wait pod -l name=salt-master --for condition=ready --timeout=5m
     kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt-key -L
+    echo "Listing who's up"
     kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt-run manage.up
+    echo "Pinging minions"
     kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt '*' test.ping
 
     echo "Deployment finished"

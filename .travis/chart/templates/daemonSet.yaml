@@ -15,7 +15,7 @@ spec:
     spec:
       serviceAccount: {{ include "salt.fullname" . }}
       serviceAccountName: {{ include "salt.fullname" . }}
-      {{- if .Values.registry.enable }}
+      {{- if .Values.registry.enabled }}
       imagePullSecrets:
         - name: {{ include "salt.fullname" . }}-registry-credentials
       {{- end }}

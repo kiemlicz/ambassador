@@ -1,4 +1,4 @@
-{{ if .Values.volume.enable  }}
+{{ if .Values.volume.enabled  }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:

@@ -21,7 +21,7 @@ spec:
     spec:
       serviceAccount: {{ include "salt.fullname" . }}
       serviceAccountName: {{ include "salt.fullname" . }}
-{{- if .Values.registry.enable }}
+{{- if .Values.registry.enabled }}
       imagePullSecrets:
         - name: {{ include "salt.fullname" . }}-registry-credentials
 {{- end }}
@@ -30,7 +30,7 @@ spec:
           configMap:
             name: {{ .Values.saltMaster.service.name }}-pillar-cm
             defaultMode: 0644
-{{ if .Values.persistence.enable }}
+{{ if .Values.persistence.enabled }}
         - name: saltpki
           persistentVolumeClaim:
             claimName: {{ include "salt.fullname" . }}-saltpki
