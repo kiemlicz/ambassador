@@ -48,8 +48,8 @@ salt-master-run-k8s)
     kubectl -n salt-provisioning delete pod -l name=salt-master
     kubectl -n salt-provisioning wait pod -l name=salt-master --for condition=ready --timeout=5m
     kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt-key -L
-    sleep 60
-    echo "Listing who's up"
+    sleep 120
+    echo "After 2min sleep: listing who's up"
     kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt-run manage.up
     echo "Pinging minions"
     kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt '*' test.ping
