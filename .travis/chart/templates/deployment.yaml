@@ -31,16 +31,16 @@ spec:
             name: {{ .Values.saltMaster.service.name }}-pillar-cm
             defaultMode: 0644
 {{ if .Values.persistence.enabled }}
-        - name: saltpki
-          persistentVolumeClaim:
-            claimName: {{ include "salt.fullname" . }}-saltpki
         - name: saltqueue
           persistentVolumeClaim:
             claimName: {{ include "salt.fullname" . }}-saltqueue
-{{- else }}
         - name: saltpki
-          emptyDir: {}
+          persistentVolumeClaim:
+            claimName: {{ include "salt.fullname" . }}-saltpki
+{{- else }}
         - name: saltqueue
+          emptyDir: {}
+        - name: saltpki
           emptyDir: {}
 {{- end }}
       containers:

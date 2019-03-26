@@ -22,8 +22,8 @@ saltMinion:
     name: salt-minion
 
 storage:
-  enabled: true
-  reclaimPolicy: Retain
+  enabled: false
+  createClass: false
   className: "local"
 
 registry:
@@ -31,14 +31,26 @@ registry:
 
 persistence:
   enabled: true
+  saltpkiSelector:
+    matchLabels:
+      name: salt-provisioning-salt-provisioning-saltpki
+  saltqueueSelector:
+    matchLabels:
+      name: salt-provisioning-salt-provisioning-saltqueue
 
 volume:
   enabled: true
+  reclaimPolicy: Retain
   pki: "/mnt/data/saltpki"
   queue: "/mnt/data/saltqueue"
-  affinity:
-    hostnames:
-      - minikube
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: kubernetes.io/hostname
+              operator: In
+              values:
+                - minikube
 
 logstash:
   fullnameOverride: "logstash"

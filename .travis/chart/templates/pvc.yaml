@@ -4,12 +4,10 @@ apiVersion: v1
 metadata:
   name: {{ include "salt.fullname" . }}-saltpki
 spec:
+{{ if .Values.storage.enabled }}
   storageClassName: {{ .Values.storage.className }}
-{{- if .Values.volume.enabled }}
-  selector:
-    matchLabels:
-      name: {{ include "salt.fullname" . }}-saltpki
-{{- end }}
+{{ end }}
+  selector: {{ .Values.persistence.saltpkiSelector | toYaml | nindent 4 }}
   accessModes:
     - ReadWriteOnce
   resources:
@@ -21,12 +19,10 @@ apiVersion: v1
 metadata:
   name: {{ include "salt.fullname" . }}-saltqueue
 spec:
+{{ if .Values.storage.enabled }}
   storageClassName: {{ .Values.storage.className }}
-{{- if .Values.volume.enabled }}
-  selector:
-    matchLabels:
-      name: {{ include "salt.fullname" . }}-saltqueue
-{{- end }}
+{{ end }}
+  selector: {{ .Values.persistence.saltqueueSelector | toYaml | nindent 4 }}
   accessModes:
     - ReadWriteOnce
   resources:

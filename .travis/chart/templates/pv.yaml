@@ -1,49 +1,41 @@
-{{ if .Values.volume.enabled  }}
+{{ if .Values.volume.enabled }}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ include "salt.fullname" . }}-saltpki
+  name: {{ include "salt.fullname" . }}-{{ .Release.Namespace }}-saltpki
   labels:
-    name: {{ include "salt.fullname" . }}-saltpki
+    name: {{ include "salt.fullname" . }}-{{ .Release.Namespace }}-saltpki
 spec:
   capacity:
     storage: 5Mi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
-  persistentVolumeReclaimPolicy: {{ .Values.storage.reclaimPolicy }}
+  persistentVolumeReclaimPolicy: {{ .Values.volume.reclaimPolicy }}
+{{ if .Values.storage.enabled }}
   storageClassName: {{ .Values.storage.className }}
+{{ end }}
   local:
     path: {{ .Values.volume.pki }}
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values: {{ .Values.volume.affinity.hostnames }}
+  nodeAffinity: {{ .Values.volume.nodeAffinity | toYaml | nindent 4 }}
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: {{ include "salt.fullname" . }}-saltqueue
+  name: {{ include "salt.fullname" . }}-{{ .Release.Namespace }}-saltqueue
   labels:
-    name: {{ include "salt.fullname" . }}-saltqueue
+    name: {{ include "salt.fullname" . }}-{{ .Release.Namespace }}-saltqueue
 spec:
   capacity:
     storage: 128Mi
   volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
-  persistentVolumeReclaimPolicy: {{ .Values.storage.reclaimPolicy }}
+  persistentVolumeReclaimPolicy: {{ .Values.volume.reclaimPolicy }}
+{{ if .Values.storage.enabled }}
   storageClassName: {{ .Values.storage.className }}
+{{ end }}
   local:
     path: {{ .Values.volume.queue }}
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-        - matchExpressions:
-            - key: kubernetes.io/hostname
-              operator: In
-              values: {{ .Values.volume.affinity.hostnames }}
+  nodeAffinity: {{ .Values.volume.nodeAffinity | toYaml | nindent 4 }}
 {{- end }}

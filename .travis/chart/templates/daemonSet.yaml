@@ -21,14 +21,14 @@ spec:
       {{- end }}
       containers:
         - name: {{ .Values.saltMinion.service.name }}
-          image: {{ .Values.saltMinion.image.repository }}:{{ .Values.saltMinion.image.tag  }}
+          image: {{ .Values.saltMinion.image.repository }}:{{ .Values.saltMinion.image.tag }}
           imagePullPolicy: {{ .Values.saltMinion.image.pullPolicy }}
           readinessProbe:
             exec:
               command:
                 - cat
                 - /tmp/salt/healthz
-            initialDelaySeconds: 15
+            initialDelaySeconds: 30
             periodSeconds: 5
           volumeMounts:
             - name: dockersock
