@@ -11,13 +11,13 @@ source .travis/common.sh
 case "$1" in
 dry)
     docker_update
-    docker_build "envoy-minion-$DOCKER_IMAGE:$TAG" salt-minion
-    docker_build "envoy-master-$DOCKER_IMAGE:$TAG" salt-master
-    docker_build "envoy-dry-test-$DOCKER_IMAGE:$TAG" dry-test
+    docker_build salt-minion "envoy-minion-$DOCKER_IMAGE:$TAG"
+    docker_build salt-master "envoy-master-$DOCKER_IMAGE:$TAG"
+    docker_build dry-test "envoy-dry-test-$DOCKER_IMAGE:$TAG"
     ;;
 masterless)
     docker_update
-    docker_build "masterless-test-$DOCKER_IMAGE:$TAG" masterless-test
+    docker_build masterless-test "masterless-test-$DOCKER_IMAGE:$TAG"
     ;;
 salt-master-run-compose)
     docker_update
