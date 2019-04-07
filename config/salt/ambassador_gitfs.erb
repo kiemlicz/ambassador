@@ -16,7 +16,7 @@ gitfs_saltenv:
     - mountpoint: salt://
 
 gitfs_remotes:
-  - https://github.com/kiemlicz/envoy.git:
+  - https://github.com/kiemlicz/ambassador.git:
      - name: add_reactor
      - saltenv:
         - base:
@@ -25,7 +25,7 @@ gitfs_remotes:
           - root: reactor
         - server:
           - root: reactor
-  - https://github.com/kiemlicz/envoy.git:
+  - https://github.com/kiemlicz/ambassador.git:
     - name: add_base
     - saltenv:
         - base:
@@ -34,14 +34,14 @@ gitfs_remotes:
           - root: salt/base
         - server:
           - root: salt/base
-  - https://github.com/kiemlicz/envoy.git:
+  - https://github.com/kiemlicz/ambassador.git:
     - name: add_dev
     - saltenv:
         - dev:
           - root: salt/dev
         - server:
           - root: salt/dev
-  - https://github.com/kiemlicz/envoy.git:
+  - https://github.com/kiemlicz/ambassador.git:
     - name: add_server
     - saltenv:
         - server:

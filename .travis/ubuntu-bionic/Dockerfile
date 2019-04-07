@@ -81,7 +81,7 @@ COPY .travis/config/reactor/orch /srv/reactor
 COPY .travis/pillar/ /srv/pillar/
 COPY .travis/salt/ /srv/salt/
 COPY .travis/salt/dev/top.sls /srv/salt/base/
-COPY envoy/salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/
+COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/
 
 RUN chmod 600 /etc/salt/autosign.conf && \
     salt-run saltutil.sync_all
