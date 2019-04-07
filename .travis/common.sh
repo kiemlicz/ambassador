@@ -52,7 +52,7 @@ salt_install() {
     sudo mkdir -p /etc/salt/minion.d/
     sudo cp ${1-".travis/config/masterless.conf"} /etc/salt/minion.d/
     sudo ln -s $TRAVIS_BUILD_DIR/envoy/salt /srv/salt
-    sudo ln -s $TRAVIS_BUILD_DIR/.travis/pillar /srv/pillar
+    sudo ln -s $TRAVIS_BUILD_DIR/.travis/pillar/k8s /srv/pillar
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com
     sudo sh /tmp/bootstrap-salt.sh -x python3 -n stable
 }
