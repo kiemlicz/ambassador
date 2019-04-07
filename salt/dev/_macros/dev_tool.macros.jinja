@@ -1,0 +1,55 @@
+{% from "_common/repo.jinja" import repository, preferences with context %}
+
+{% macro add_environmental_variable(var_name, var_value, exports_file) %}
+  {% if grains['os'] != 'Windows' %}
+  file.append:
+    - name: {{ exports_file }}
+    - text: export {{ var_name }}={{ var_value }}
+  {% else %}
+  environ.setenv:
+    - name: {{ var_name }}
+    - value: {{ var_value }}
+  {% endif %}
+{% endmacro %}
+
+{% macro add_to_path(environ_variable, path_inside, exports_file) %}
+  envops.manage_path:
+    - name: {{ environ_variable }}
+    - directory_inside: {{ path_inside }}
+    - exports_file: {{ exports_file }}
+{% endmacro %}
+
+{% macro link_to_bin(link_location, target_link, owner) %}
+  file.symlink:
+    - name: {{ link_location }}
+    - target: {{ target_link }}
+    - user: {{ owner }}
+    - makedirs: True
+{% endmacro %}
+
+{% macro repo_pkg_service(state_id, conf_dict, run=True) %}
+{{ repo_pkg(state_id, conf_dict) }}
+{% if run %}
+  service.running:
+    - name: {{ conf_dict.service_name }}
+    - enable: True
+    - require:
+      - pkg: {{ conf_dict.pkg_name }}
+{% endif %}
+{% endmacro %}
+
+{% macro repo_pkg(state_id, conf_dict) %}
+{{ repository(state_id ~ "_repository", conf_dict, enabled=(conf_dict.names is defined or conf_dict.repo_id is defined),
+   require=[{'sls': "os"}], require_in=[{'pkg': conf_dict.pkg_name}]) }}
+{{ state_id }}:
+{% if conf_dict.version is not defined %}
+  pkg.latest:
+    - name: {{ conf_dict.pkg_name }}
+    - refresh: True
+{% else %}
+  pkg.installed:
+    - name: {{ conf_dict.pkg_name }}
+    - version: {{ conf_dict.version }}
+    - refresh: True
+{% endif %}
+{% endmacro %}

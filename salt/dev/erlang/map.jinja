@@ -1,0 +1,27 @@
+{# {% import_yaml "defaults.yaml" as defaults %} #}
+
+{% set os = salt['grains.get']('lsb_distrib_id') %}
+{% set dist_codename = salt['grains.get']('lsb_distrib_codename') %}
+{% set erlang = salt['grains.filter_by']({
+    'RedHat': {
+      'pkg_name': "erlang",
+      'repo_id': "erlang-solutions",
+      'humanname': "CentOS $releasever - $basearch - Erlang Solutions",
+      'baseurl': "https://packages.erlang-solutions.com/rpm/centos/$releasever/$basearch",
+      'gpgkey': "https://packages.erlang-solutions.com/rpm/erlang_solutions.asc",
+    },
+    'Debian': {
+      'file': '/etc/apt/sources.list.d/erlang.list',
+      'names': ["deb http://packages.erlang-solutions.com/" + os.lower() +  " " + dist_codename + " contrib"],
+      'apt_preferences_file': '/etc/apt/preferences.d/erlang.pref',
+      'apt_preferences_source': 'salt://erlang/erlang.pref',
+      'key_url': "http://packages.erlang-solutions.com/" + os.lower() + "/erlang_solutions.asc",
+      'pkg_name': "erlang",
+      'pin': "release o=Erlang Solutions Ltd.",
+      'priority': "999",
+    },
+  }, merge=salt['grains.filter_by']({
+    'sid': {
+      'names': ["deb http://packages.erlang-solutions.com/" + os.lower() +  " stretch contrib"],
+    }
+  }, grain='oscodename', merge=salt['pillar.get']('erlang'))) %}

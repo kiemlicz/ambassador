@@ -2,6 +2,8 @@
 
 set -e
 
+source .travis/common.sh
+
 k8s_log_error() {
     echo -e "\n####################\n\nERROR DURING KUBERNETES DEPLOYMENT\n$(date)\n####################\n"
     kubectl get all --all-namespaces
@@ -15,10 +17,37 @@ k8s_log_error() {
     kubectl -n salt-provisioning logs -l name=salt-minion
 }
 
-case "$TEST_CASE" in
+case "$1" in
+dry)
+    while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+    docker run --privileged "envoy-dry-test-$DOCKER_IMAGE:$TAG"
+    result=$?
+    kill %1
+    # in order to return proper exit code instead of always 0 (of kill command)
+    exit $result
+    ;;
+masterless)
+    # privileged mode is necessary for e.g. setting: net.ipv4.ip_forward or running docker in docker
+    name="ambassador-salt-masterless-run-$TRAVIS_JOB_NUMBER"
+    while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+    docker run --name $name --hostname "$CONTEXT-host" --privileged "masterless-test-$DOCKER_IMAGE:$TAG" 2>&1 | tee output
+    exit_code=$?
+    kill %1
+    if [[ "$exit_code" != 0 ]]; then
+        echo "found failures"
+        exit $exit_code
+    fi
+    result=$(awk '/^Failed:/ {if($2 != "0") print "fail"}' output)
+    if [[ "$result" == "fail" ]]; then
+        echo "found failures"
+        exit 3
+    fi
+    ;;
 salt-master-run-compose)
     # --exit-code-from master isn't the way to go as implies --abort-on-container-exit
     docker-compose -f .travis/docker-compose.yml --project-directory=. up --no-build --no-recreate
+    echo "scanning compose's containers"
+    exit $(docker-compose -f .travis/docker-compose.yml --project-directory=. ps -q | xargs docker inspect -f '{{ .State.ExitCode }}' | grep -v 0 | wc -l | tr -d ' ')
     ;;
 salt-master-run-k8s)
     echo -e "Starting kubernetes deployment\n$(date)\n"

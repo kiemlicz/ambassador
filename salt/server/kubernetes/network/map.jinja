@@ -1,0 +1,15 @@
+{% from "kubernetes/map.jinja" import kubernetes as kubernetes_defaults with context %}
+
+{% set kubernetes = salt['grains.filter_by']({
+  'default': {
+    'network': {
+      'provider': 'flannel',
+      'cidr': "10.244.0.0/16",
+      'source': "https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
+    },
+    'nodes': {
+      'cidr': "192.168.0.0/16",
+      'port': 6443,
+    }
+  },
+}, merge=kubernetes_defaults) %}

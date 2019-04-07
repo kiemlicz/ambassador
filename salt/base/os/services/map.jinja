@@ -1,0 +1,21 @@
+{% set services = salt['grains.filter_by']({
+  'default': {
+    'list':[],
+  },
+  'Debian': {
+    'list':[],
+  },
+}, merge=salt['grains.filter_by']({
+  'sid': {
+    'list': [],
+  },
+  'stretch': {
+    'list': [],
+  },
+  'xenial': {
+    'list': []
+  },
+  'bionic':{
+    'list': []
+  },
+}, grain='oscodename', merge=salt['pillar.get']('services'))) %}

@@ -1,0 +1,23 @@
+{# if the IP is not specified, then this method is used (it doesn't return loopback unless all methods fail) #}
+{# intended to be run on minion, not on master (as runner) #}
+{# in case of mine.get - configure own alias for cidr #}
+{# while refactoring - mind other mine.get usages (linke in mongodb/.../replicate.sls) #}
+
+{% macro ip(subnet=None, id=None, mine_fun='network.ip_addrs') -%}
+{%- if id is none -%}
+  {%- set result = salt[mine_fun](cidr=subnet) -%}
+{%- else -%}
+  {%- set ips = salt['mine.get'](id, mine_fun).values()[0] -%}
+  {%- if subnet is none -%}
+    {%- set result = ips -%}
+  {%- else -%}
+    {%- set result = [] -%}
+    {%- for ip in ips -%}
+      {%- if salt['network.ip_in_subnet'](ip, cidr=subnet) -%}
+        {%- do result.append(ip) -%}
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endif -%}
+{%- endif -%}
+{{ result|first|default("127.0.0.1") }}
+{%- endmacro %}

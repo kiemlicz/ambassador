@@ -1,0 +1,42 @@
+{% macro redis_master_id(ip, port, container_id=None) -%}
+{% if container_id is defined -%}
+{{ salt['docker.run'](container_id, 'redis-cli -h ' + ip + ' -p ' + port|string + ' CLUSTER MYID') }}
+{% else -%}
+{{ salt['cmd.run']('redis-cli -h ' + ip + ' -p ' + port|string + ' CLUSTER MYID') }}
+{% endif -%}
+{%- endmacro %}
+
+{% macro redis_configure(redis, ip, port, instance_number, service) -%}
+
+redis_config_{{ ip }}_{{ port }}:
+  file_ext.managed:
+    - name: /etc/redis/redis-{{ instance_number }}.conf
+    - source: {{ redis.config.source }}
+    - makedirs: True
+    - template: jinja
+    - context:
+      redis:
+        ip: {{ ip }}
+        port: {{ port }}
+        daemonize: {{ redis.daemonize }}
+        setup_type: {{ redis.setup_type }}
+        config:
+          dir: {{ redis.config.dir }}-{{ instance_number }}
+          pid: "/var/run/redis-" ~ {{ instance_number }} ~ "/redis-server.pid"
+    - require:
+      - file_ext: {{ redis.config.init_location }}
+{% if salt['grains.get']("init") != 'systemd' %}
+  file.symlink:
+    - name: /etc/init.d/redis-server-{{ instance_number }}
+    - target: {{ redis.config.init_location }}
+    - require:
+      - file_ext: /etc/redis/redis-{{ instance_number }}.conf
+    - watch_in:
+      - service: {{ service }}
+{% endif %}
+  service.running:
+    - name: {{ service }}
+    - enable: True
+    - watch:
+      - file_ext: /etc/redis/redis-server-{{ instance_number }}.conf
+{%- endmacro %}

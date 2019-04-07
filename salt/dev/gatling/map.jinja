@@ -1,0 +1,21 @@
+{% set version = '2.3.1' %}
+{% set url = 'https://repo1.maven.org/maven2/io/gatling/highcharts/gatling-charts-highcharts-bundle/' + version + '/gatling-charts-highcharts-bundle-' + version + '-bundle.zip' %}
+{% set gatling = salt['grains.filter_by']({
+  'default': {
+    'download_url': url,
+    'destination_dir': '/opt',
+    'generic_link': '/opt/default-gatling',
+    'owner': 'root',
+    'exports_file': '/etc/zsh/zshrc',
+    'environ_variable': 'GATLING_HOME',
+    'path_inside': 'bin',
+  },
+  'Windows': {
+    'download_url': url,
+    'destination_dir': 'C:\Program Files',
+    'generic_link': 'C:\Program Files\default-gatling',
+    'owner': 'root',
+    'environ_variable': 'GATLING_HOME',
+    'path_inside': 'bin'
+  },
+}, merge=salt['pillar.get']('gatling')) %}

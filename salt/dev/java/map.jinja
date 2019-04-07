@@ -1,0 +1,75 @@
+{% set version_major = salt['pillar.get']("java:version_major", default="11") %}
+
+{% set java8 = salt['grains.filter_by']({
+    'RedHat': {
+        'pkg_name': "java-" ~ version_major ~ "-openjdk",
+        'ext_pkgs': [],
+        'exports_file': '/etc/zsh/zshrc',
+        'environ_variable': 'JAVA_HOME',
+        'path_inside': 'bin',
+        'generic_link': '$(readlink -f /usr/bin/java | sed "s:\(jre\)*/bin/java::")',
+    },
+    'Debian': {
+        'names': [
+          "deb http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main",
+          "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu xenial main"
+        ],
+        'file': '/etc/apt/sources.list.d/webupd8team-java.list',
+        'exports_file': '/etc/zsh/zshrc',
+        'environ_variable': 'JAVA_HOME',
+        'path_inside': 'bin',
+        'generic_link': '$(readlink -f /usr/bin/java | sed "s:\(jre\)*/bin/java::")',
+        'keyid': "EEA14886",
+        'keyserver': "hkp://keyserver.ubuntu.com:80",
+        'pkg_name': "oracle-java" ~ version_major ~ "-installer",
+        'ext_pkgs': [
+          "oracle-java" ~ version_major ~ "-unlimited-jce-policy"
+        ]
+    },
+}, merge=salt['grains.filter_by']({
+   'zesty': {
+        'names': [
+           "deb http://ppa.launchpad.net/webupd8team/java/ubuntu zesty main",
+           "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu zesty main"
+         ],
+   },
+   'artful': {
+        'names': [
+           "deb http://ppa.launchpad.net/webupd8team/java/ubuntu artful main",
+           "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu artful main"
+         ],
+   },
+   'bionic': {
+        'names': [
+           "deb http://ppa.launchpad.net/webupd8team/java/ubuntu bionic main",
+           "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu bionic main"
+         ],
+   },
+}, grain='oscodename', merge=salt['pillar.get']('java'))) %}
+
+{% set java11 = salt['grains.filter_by']({
+    'RedHat': {
+        'pkg_name': "java-" ~ version_major ~ "-openjdk",
+        'ext_pkgs': [],
+        'exports_file': '/etc/zsh/zshrc',
+        'environ_variable': 'JAVA_HOME',
+        'path_inside': 'bin',
+        'generic_link': '$(readlink -f /usr/bin/java | sed "s:\(jre\)*/bin/java::")',
+    },
+    'Debian': {
+        'names': [
+           "deb http://ppa.launchpad.net/linuxuprising/java/ubuntu bionic main"
+        ],
+        'file': '/etc/apt/sources.list.d/linuxuprising-java.list',
+        'exports_file': '/etc/zsh/zshrc',
+        'environ_variable': 'JAVA_HOME',
+        'path_inside': 'bin',
+        'generic_link': '$(readlink -f /usr/bin/java | sed "s:\(jre\)*/bin/java::")',
+        'keyid': "73C3DB2A",
+        'keyserver': "hkp://keyserver.ubuntu.com:80",
+        'pkg_name': "oracle-java" ~ version_major ~ "-installer",
+        'ext_pkgs': []
+    },
+}, merge=salt['pillar.get']('java')) %}
+
+{% set default_java = { "8": java8, "11": java11 }[version_major] %}

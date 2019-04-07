@@ -1,0 +1,21 @@
+{% set vagrant = salt['grains.filter_by']({
+  'RedHat': {
+    'sources': [{'vagrant': "https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.rpm"}],
+    'owner': 'root',
+  },
+  'Debian': {
+    'requisites': ["nfs-common", "nfs-kernel-server"],
+    'sources': [{'vagrant': "https://releases.hashicorp.com/vagrant/2.2.2/vagrant_2.2.2_x86_64.deb"}],
+    'owner': 'root',
+    'plugins': [{
+        'name': "vagrant-libvirt",
+        'pkgs': ["qemu", "libvirt-dev", "ebtables", "dnsmasq-base", "libxslt-dev", "libxml2-dev", "zlib1g-dev", "ruby-dev"],
+    }, {
+        'name': "vagrant-lxc",
+    }]
+  },
+}, merge=salt['grains.filter_by']({
+  'sid': {
+
+  }
+}, grain='oscodename', merge=salt['pillar.get']('vagrant'))) %}

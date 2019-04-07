@@ -1,0 +1,21 @@
+{% set os = salt['grains.get']('lsb_distrib_id') %}
+{% set dist_codename = salt['grains.get']('lsb_distrib_codename') %}
+{# ubuntu uses "/debian" as well #}
+{% set virtualbox = salt['grains.filter_by']({
+    'RedHat': {
+        'repo_id': "virtualbox",
+        'baseurl': "http://download.virtualbox.org/virtualbox/rpm/fedora/$releasever/$basearch",
+        'gpgkey': "https://www.virtualbox.org/download/oracle_vbox.asc",
+        'pkg_name': "virtualbox-5.2",
+    },
+    'Debian': {
+        'file': '/etc/apt/sources.list.d/virtualbox.list',
+        'names': ["deb http://download.virtualbox.org/virtualbox/debian " + dist_codename + " contrib"],
+        'key_url': "https://www.virtualbox.org/download/oracle_vbox_2016.asc",
+        'pkg_name': "virtualbox-5.2",
+    }
+}, merge=salt['grains.filter_by']({
+    'sid': {
+        'names': ["deb http://download.virtualbox.org/virtualbox/debian stretch contrib"],
+    }
+}, grain='oscodename', merge=salt['pillar.get']('virtualbox'))) %}

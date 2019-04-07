@@ -1,0 +1,12 @@
+{% set url = "https://download.jetbrains.com/idea/ideaIC-2019.1.tar.gz" %}
+{% set intellij = salt['grains.filter_by']({
+    'default': {
+        'download_url': url,
+        'destination_dir': '/opt',
+        'generic_link': '/opt/default-idea',
+        'owner': 'root',
+        'owner_link_location': '/root/bin/idea',
+    },
+    'Windows': {
+    },
+}, merge=salt['pillar.get']('intellij')) %}

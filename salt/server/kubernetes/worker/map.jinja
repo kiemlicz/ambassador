@@ -1,0 +1,9 @@
+{% from "kubernetes/map.jinja" import kubernetes as kubernetes_defaults with context %}
+
+{% set kubernetes = salt['grains.filter_by']({
+  'default': {
+     'worker': {
+
+     }
+  },
+}, merge=kubernetes_defaults) %}

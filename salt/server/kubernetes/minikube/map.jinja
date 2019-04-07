@@ -1,0 +1,13 @@
+{% from "kubernetes/map.jinja" import kubernetes as kubernetes_defaults with context %}
+
+
+{% set kubernetes = salt['grains.filter_by']({
+  'default': {
+     'minikube': {
+       'driver': "none",
+       'url': "https://storage.googleapis.com/minikube/releases/v0.34.1/minikube-linux-amd64",
+       'location': "/usr/local/bin/minikube",
+       'skip_verify': True,
+     }
+  },
+}, merge=kubernetes_defaults) %}

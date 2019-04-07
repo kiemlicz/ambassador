@@ -1,0 +1,6 @@
+APT::Periodic::Enable "{{ settings.enabled }}";
+APT::Periodic::Update-Package-Lists "{{ settings.update_package_lists }}";
+APT::Periodic::Download-Upgradeable-Packages "{{ settings.download_upgradeable_packages }}";
+APT::Periodic::Unattended-Upgrade "{{ settings.unattended_upgrade }}";
+APT::Periodic::AutocleanInterval "{{ settings.auto_clean_interval }}";
+APT::Periodic::Verbose "{{ settings.verbose }}";

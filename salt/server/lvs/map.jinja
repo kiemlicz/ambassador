@@ -1,0 +1,10 @@
+{% from "keepalived/map.jinja" import keepalived with context %}
+
+
+{% set lvs = salt['grains.filter_by']({
+    'default': {
+      'pkg_name': "ipvsadm",
+      'module': "ip_vs",
+      'persist_module': True,
+    },
+}, merge=salt['pillar.get']('lvs')) %}

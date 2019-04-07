@@ -1,0 +1,47 @@
+{% from "_common/util.jinja" import retry with context %}
+
+
+{% macro repository(id, repo, enabled=True, require=[], require_in=[], refresh=True) %}
+{% if enabled %}
+{{ id }}:
+  pkgrepo_ext.managed:
+  {% if repo.names is defined %}
+    - names: {{ repo.names|tojson }}
+    - file: {{ repo.file }}
+  {% if repo.key_text is defined %}
+    - key_text: {{ repo.key_text|yaml_encode }}
+  {% elif repo.keyid is defined %}
+    - keyid: {{ repo.keyid }}
+    - keyserver: {{ repo.keyserver }}
+    - clean: True
+  {% elif repo.key_url is defined %}
+    - key_url: {{ repo.key_url }}
+  {% endif %}
+    - refresh: {{ refresh }}
+  {% else %}
+    - name: {{ repo.repo_id }}
+    - baseurl: {{ repo.baseurl }}
+    - humanname: {{ repo.humanname|default(repo.repo_id) }}
+    - gpgcheck: {{ 1 if repo.gpgkey is defined else 0 }}
+  {% if repo.gpgkey is defined %}
+    - gpgkey: {{ repo.gpgkey }}
+  {% endif %}
+  {% endif %}
+{{ retry()| indent(4) }}
+    - require: {{ require }}
+    - require_in: {{ require_in }}
+{% endif %}
+{% endmacro %}
+
+{% macro preferences(id, conf, preferences_source, preferences_file) %}
+{{ id }}:
+  file.managed:
+    - name: {{ preferences_file }}
+    - source: {{ preferences_source }}
+    - template: jinja
+    - makedirs: True
+    - create: True
+    - context:
+      pin: {{ conf.pin }}
+      priority : {{ conf.priority }}
+{% endmacro %}

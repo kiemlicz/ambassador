@@ -1,0 +1,24 @@
+{% set os = salt['grains.get']('lsb_distrib_id') %}
+{% set dist_codename = salt['grains.get']('lsb_distrib_codename') %}
+
+{% set influxdb = salt['grains.filter_by']({
+    'RedHat': {
+        'baseurl': "https://repos.influxdata.com/rhel/\$releasever/\$basearch/stable",
+        'repo_id': "influxdb",
+        'gpgkey': "https://repos.influxdata.com/influxdb.key",
+        'pkg_name': "influxdb",
+        'service_name': "influxdb",
+    },
+    'Debian': {
+        'names': [
+            "deb https://repos.influxdata.com/" ~ os.lower() ~ " " ~ dist_codename ~ " stable"
+        ],
+        'file': '/etc/apt/sources.list.d/influxdb.list',
+        'key_url': "https://repos.influxdata.com/influxdb.key",
+        'pkg_name': "influxdb",
+        'service_name': "influxdb"
+    },
+    'Windows': {
+
+    },
+}, merge=salt['pillar.get']('influxdb')) %}

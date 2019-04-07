@@ -1,0 +1,33 @@
+{% set repositories = salt['grains.filter_by']({
+    'default': {
+        'list':[],
+        'preferences': [],
+    },
+    'Debian': {
+        'preferences_source': 'salt://os/repositories/template.pref',
+        'list':[],
+        'preferences': [],
+    },
+}, merge=salt['grains.filter_by']({
+    'sid': {
+        'list': [],
+        'preferences': []
+    },
+    'stretch': {
+        'list': [],
+        'preferences': []
+    },
+    'jessie': {
+        'list': [],
+        'preferences': []
+    },
+    'xenial': {
+      'list': []
+    },
+    'zesty': {
+        'list': []
+    },
+    'artful':{
+          'list': []
+        },
+}, grain='oscodename', merge=salt['pillar.get']('repositories'))) %}

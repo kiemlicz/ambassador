@@ -1,0 +1,23 @@
+{# {% import_yaml "defaults.yaml" as defaults %} #}
+
+{% set version = '3.6.0' %}
+{% set url = 'http://ftp.ps.pl/pub/apache/maven/maven-3/' + version + '/binaries/apache-maven-' + version + '-bin.tar.gz' %}
+{% set maven = salt['grains.filter_by']({
+    'default': {
+        'download_url': url,
+        'destination_dir': '/opt',
+        'generic_link': '/opt/default-maven',
+        'owner': 'root',
+        'exports_file': '/etc/zsh/zshrc',
+        'environ_variable': 'M2_HOME',
+        'path_inside': 'bin',
+    },
+    'Windows': {
+        'download_url': url,
+        'destination_dir': 'C:\Program Files',
+        'generic_link': 'C:\Program Files\default-maven',
+        'owner': 'root',
+        'environ_variable': 'M2_HOME',
+        'path_inside': 'bin'
+    },
+}, merge=salt['pillar.get']('maven')) %}

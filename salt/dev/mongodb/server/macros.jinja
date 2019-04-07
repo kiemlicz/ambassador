@@ -1,0 +1,46 @@
+{% macro mongodb_configure(mongodb, bind, discriminator) -%}
+
+{% set service = mongodb.config.service + '@' + bind.port|string %}
+
+mongodb_config_{{ bind.ip }}_{{ bind.port }}:
+  file_ext.managed:
+    - name: /etc/{{ discriminator }}.conf
+    - source: {{ mongodb.config.source }}
+    - makedirs: True
+    - template: jinja
+    - context:
+      bind: {{ bind|tojson }}
+      mongodb: {{ mongodb|tojson }}
+      discriminator: {{ discriminator }}
+    - require:
+      - file_ext: {{ mongodb.config.init_location }}
+  file.directory:
+    - names:
+      - {{ mongodb.config.db_path }}/{{ discriminator }}
+      - {{ mongodb.config.pid_path }}
+      - {{ mongodb.config.log_path }}
+    - user: {{ mongodb.user }}
+    - group: {{ mongodb.group }}
+    - makedirs: True
+    - require:
+      - file_ext: /etc/{{ discriminator }}.conf
+
+mongodb_start_{{ bind.ip }}_{{ bind.port }}:
+{% if salt['grains.get']("init") != 'systemd' %}
+{% set service = discriminator %}
+  file.symlink:
+    - name: /etc/init.d/{{ discriminator }}
+    - target: {{ mongodb.config.init_location }}
+    - require:
+      - file: mongodb_config_{{ bind.ip }}_{{ bind.port }}
+    - watch_in:
+      - service: {{ service }}
+{% endif %}
+  service.running:
+    - name: {{ service }}
+{% if salt['grains.get']("virtual_subtype") != "Docker" %}
+    - enable: True
+{% endif %}
+    - require:
+      - file: mongodb_config_{{ bind.ip }}_{{ bind.port }}
+{%- endmacro %}

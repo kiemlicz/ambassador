@@ -1,0 +1,20 @@
+{% set keepalived = salt['grains.filter_by']({
+    'default': {
+      'pkg_name': 'keepalived',
+      'service': 'keepalived',
+      'configs': {
+        'root': {
+          'location': "/etc/keepalived/keepalived.conf",
+          'source': "salt://keepalived/configs/keepalived.conf",
+        },
+        'instances': {
+          'location': "/etc/keepalived/keepalived.d/instances.conf",
+          'source': "salt://keepalived/configs/instances.conf",
+        },
+        'virtual_servers': {
+          'location': "/etc/keepalived/keepalived.d/virtual_server.conf",
+          'source': "salt://keepalived/configs/virtual_server.conf",
+        }
+      },
+    },
+}, merge=salt['pillar.get']('keepalived')) %}

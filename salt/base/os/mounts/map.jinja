@@ -1,0 +1,5 @@
+{% set mounts = salt['grains.filter_by']({
+    'default': {
+      'list': [],
+    },
+}, merge=salt['pillar.get']('mounts')) %}

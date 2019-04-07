@@ -1,0 +1,12 @@
+{% import_yaml "kannel/defaults.yaml" as defaults %}
+
+{% set kannel = salt['grains.filter_by']({
+    'Debian': {
+        'pkgs': ["kannel"],
+        'service_name': salt['grains.filter_by']({
+            'default': 'kannel',
+        }, grain='oscodename'),
+    },
+    'Windows': {
+    }
+}, merge=salt['pillar.get']('kannel', default=defaults.kannel, merge=True)) %}

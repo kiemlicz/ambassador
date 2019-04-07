@@ -1,0 +1,12 @@
+{% from "kubernetes/map.jinja" import kubernetes as kubernetes_defaults with context %}
+
+{% set kubernetes = salt['grains.filter_by']({
+  'default': {
+     'master': {
+       'reset': False,
+       'isolate': True,
+       'upload_config': True,
+       'token_script': "salt://kubernetes/master/token.sh"
+     }
+  },
+}, merge=kubernetes_defaults) %}

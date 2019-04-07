@@ -6,49 +6,19 @@ if [ -z "$DOCKER_IMAGE" ]; then
     exit 1
 fi
 
-source envoy/.travis/common.sh
-KUBECTL_VER="v1.13.4"
+source .travis/common.sh
 
-docker_build() {
-    if [ -z $1 ]; then
-        >&2 echo "Dockerfile target missing"
-        exit 4
-    fi
-    docker build \
-        --build-arg=salt_ver=$SALT_VER \
-        --build-arg=log_level="${LOG_LEVEL-info}" \
-        --build-arg=saltenv="$SALTENV" \
-        --build-arg=kubectl_ver="$KUBECTL_VER" \
-        --target $1 \
-        -t "${2-$DOCKER_IMAGE}" \
-        -f .travis/"$DOCKER_IMAGE"/Dockerfile .
-}
-
-salt_install() {
-    sudo apt-get update && sudo apt-get install -y curl
-    sudo mkdir -p /etc/salt/minion.d/
-    sudo cp ${1-".travis/config/masterless.conf"} /etc/salt/minion.d/
-    sudo ln -s $TRAVIS_BUILD_DIR/envoy/salt /srv/salt
-    sudo ln -s $TRAVIS_BUILD_DIR/.travis/pillar /srv/pillar
-    curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com
-    sudo sh /tmp/bootstrap-salt.sh -x python3 -n stable
-}
-
-minikube_ready() {
-    echo "Waiting for nodes..."
-    kubectl get nodes
-    kubectl wait nodes/minikube --for condition=ready
-    echo "minikube setup complete"
-}
-
-minikube_install() {
-    sudo salt-call --local state.apply kubernetes.client saltenv=server
-    sudo salt-call --local state.apply kubernetes.minikube saltenv=server
-    sudo salt-call --local state.apply kubernetes.helm saltenv=server
-    minikube_ready
-}
-
-case "$TEST_CASE" in
+case "$1" in
+dry)
+    docker_update
+    docker_build "envoy-minion-$DOCKER_IMAGE:$TAG" salt-minion
+    docker_build "envoy-master-$DOCKER_IMAGE:$TAG" salt-master
+    docker_build "envoy-dry-test-$DOCKER_IMAGE:$TAG" dry-test
+    ;;
+masterless)
+    docker_update
+    docker_build "masterless-test-$DOCKER_IMAGE:$TAG" masterless-test
+    ;;
 salt-master-run-compose)
     docker_update
     docker_compose_update

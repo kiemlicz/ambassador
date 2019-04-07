@@ -1,0 +1,3 @@
+Package: *
+Pin: release o=Erlang Solutions Ltd.
+Pin-Priority: 999

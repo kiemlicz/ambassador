@@ -1,0 +1,6 @@
+{% set minion = salt['grains.filter_by']({
+    'default': {
+        'health_file': "/tmp/salt/healthz",
+        'event_tag': "salt/minion/" ~ grains['id'] ~ "/envoy_ready",
+    },
+}, merge=salt['pillar.get']('minion')) %}

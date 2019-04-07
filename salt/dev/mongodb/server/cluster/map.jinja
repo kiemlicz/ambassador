@@ -1,0 +1,28 @@
+{% from "mongodb/server/single/map.jinja" import mongodb as mongodb_single with context %}
+
+{% set host_id = salt['grains.get']('id') %}
+
+{% set mongodb = salt['grains.filter_by']({
+    'Debian': {
+        'shards': [{
+          'id': host_id,
+          'ip': '127.0.0.1',
+          'port': 27017,
+        }],
+        'replicas': [{
+          'master': "True",
+          'replica_name': "",
+          'id': host_id,
+          'ip': '127.0.0.1',
+          'port': 28017,
+        }],
+    },
+}, merge=salt['grains.filter_by']({
+  'systemd': {
+    'config': {
+      'init_location': '/lib/systemd/system/mongod@.service',
+    }
+  }
+}, grain='init', merge=salt['pillar.get']('mongodb')))  %}
+
+{% do mongodb.update(mongodb_single) %}

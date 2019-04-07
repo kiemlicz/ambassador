@@ -1,8 +1,74 @@
-FROM kiemlicz/envoy-minion-debian-stretch AS test-base-minion
-FROM kiemlicz/envoy-master-debian-stretch AS test-base-master
+FROM debian:stretch-slim AS salt-base
+# "" == latest
+ARG salt_ver=""
+
+COPY salt /srv/salt
+
+RUN apt-get update && apt-get install -y curl && \
+    curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
+    sh /tmp/bootstrap-salt.sh -x python3 -X -n stable $salt_ver
 
 
-FROM test-base-master AS master-compose-test
+FROM salt-base AS salt-minion
+# hostname from `docker run -h` must be used as minion ID
+
+ENTRYPOINT [ "/usr/bin/salt-minion" ]
+CMD []
+
+
+FROM salt-base AS salt-master
+
+RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list.d/backports.list && \
+    apt-get update && \
+    apt-get install -t stretch-backports -y libgit2-dev && \
+    apt-get install -y python3-pip libffi-dev git && \
+    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 20 && \
+    pip install --upgrade pyOpenSSL pygit2 docker-py cherrypy jinja2 PyYAML requests_oauthlib google-auth && \
+    apt-get install -y salt-master
+
+# the salt-master should be installed but not running
+EXPOSE 4505:4505 4506:4506
+
+ENTRYPOINT [ "/usr/bin/salt-master" ]
+CMD []
+
+
+FROM salt-base AS dry-test
+
+COPY .travis/reactor /srv/reactor
+COPY .travis/pillar/dry-test/ /srv/pillar/
+COPY .travis/salt/dry-test-top.sls /srv/salt/base/top.sls
+COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
+COPY .travis/config/pillar.conf /etc/salt/minion.d/pillar.conf
+COPY .travis/envoy_test.py /opt/
+
+RUN salt-call --local saltutil.sync_all
+
+ENTRYPOINT [ "python3", "/opt/envoy_test.py" ]
+
+
+FROM salt-base AS masterless-test
+
+ARG log_level="info"
+ARG saltenv
+
+ENV SALTENV=$saltenv
+ENV LOG_LEVEL=$log_level
+
+COPY .travis/pillar/masterless/ /srv/pillar/
+COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
+COPY .travis/salt/masterless-test-top.sls /srv/salt/base/top.sls
+
+# workaround for salt's service state
+# somehow in masterless config the service provider cannot be overriden
+# https://github.com/saltstack/salt/issues/33256
+RUN printf '#!/bin/bash\necho "N 5"' > /sbin/runlevel && \
+    chmod 775 /sbin/runlevel
+
+ENTRYPOINT salt-call --local state.highstate saltenv=$SALTENV -l $LOG_LEVEL
+
+
+FROM salt-master AS master-compose-test
 
 ARG saltenv
 ARG log_level
@@ -27,7 +93,7 @@ RUN chmod 600 /etc/salt/autosign.conf && \
 ENTRYPOINT [ "/opt/entrypoint_master_run.sh" ]
 
 
-FROM test-base-master AS master-k8s-test
+FROM salt-master AS master-k8s-test
 
 ARG saltenv
 ARG log_level
@@ -57,12 +123,12 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_
 ENTRYPOINT [ "/opt/entrypoint_master_run.sh" ]
 
 
-FROM test-base-minion as minion-compose-test
+FROM salt-minion as minion-compose-test
 
 COPY .travis/config/minion.conf /etc/salt/minion.d/minion.conf
 
 
-FROM test-base-minion as minion-k8s-test
+FROM salt-minion as minion-k8s-test
 
 COPY .travis/config/minion.conf /etc/salt/minion.d/minion.conf
 COPY envoy/salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/

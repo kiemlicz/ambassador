@@ -1,21 +1,9 @@
 #!/usr/bin/env bash
 
+source .travis/common.sh
 
-# $1 container name
-docker_push() {
-    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    if [ $TRAVIS_TEST_RESULT -eq 0 ]; then
-        docker commit $1 $DOCKER_USERNAME/ambassador:$1
-        docker push $DOCKER_USERNAME/ambassador:$1
+docker tag "envoy-minion-$DOCKER_IMAGE:$TAG" "$DOCKER_USERNAME/envoy-minion-$DOCKER_IMAGE:$TAG"
+docker tag "envoy-master-$DOCKER_IMAGE:$TAG" "$DOCKER_USERNAME/envoy-master-$DOCKER_IMAGE:$TAG"
 
-    else
-        docker commit $1 $DOCKER_USERNAME/ambassador:"$1-failed"
-        docker push $DOCKER_USERNAME/ambassador:"$1-failed"
-    fi
-}
-
-case "$TEST_CASE" in
-salt-master-run-compose|salt-master-run-k8s)
-    echo "salt-master-run publish is disabled"
-    ;;
-esac
+docker_push "$DOCKER_USERNAME/envoy-minion-$DOCKER_IMAGE:$TAG"
+docker_push "$DOCKER_USERNAME/envoy-master-$DOCKER_IMAGE:$TAG"

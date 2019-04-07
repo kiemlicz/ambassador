@@ -1,0 +1,12 @@
+Unattended-Upgrade::Origins-Pattern {
+        {%- for pattern in settings.origins_patterns %}
+        "{{ pattern }}";
+        {%- endfor %}
+};
+Unattended-Upgrade::Package-Blacklist {
+        {%- for package in settings.package_blacklist %}
+        "{{ package }}";
+        {%- endfor %}
+};
+
+Unattended-Upgrade::Mail "{{ settings.mail }}";

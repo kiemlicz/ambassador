@@ -1,0 +1,12 @@
+{% set docker = salt['grains.filter_by']({
+  'RedHat': {
+
+  },
+  'Debian': {
+    'name': "/etc/salt/minion.d/engines.conf",
+    'source': "salt://docker/events/engines.conf"
+  },
+  'Windows': {
+
+  },
+}, merge=salt['pillar.get']('docker:events')) %}
