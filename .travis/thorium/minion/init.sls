@@ -3,6 +3,6 @@ statreg:
 
 keydel:
   key.timeout:
-    - delete: 20
+    - delete: 30
     - require:
       - status: statreg
