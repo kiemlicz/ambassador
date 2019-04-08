@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-COMPOSE_VER="1.22.0"
-KUBECTL_VER="v1.13.4"
 if [ -z "$TRAVIS_TAG" ]; then
     TAG="latest"
 else
