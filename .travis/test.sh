@@ -72,13 +72,15 @@ salt-master-run-k8s)
     echo -e "\nShould accept new minion\n"
     kubectl -n salt-provisioning delete pod -l name=salt-minion
     kubectl -n salt-provisioning wait pod -l name=salt-minion --for condition=ready --timeout=5m
+    echo "Pinging minions"
+    kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt '*' test.ping
 
     echo -e "\nShould work after master crash\n"
     kubectl -n salt-provisioning delete pod -l name=salt-master
     kubectl -n salt-provisioning wait pod -l name=salt-master --for condition=ready --timeout=5m
 
     sleep 120
-    echo "After 2 min sleep: listing who's up"
+    echo "\nAfter 2 min sleep: listing who's up"
     kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt-key -L
     echo "Pinging minions"
     kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt '*' test.ping
