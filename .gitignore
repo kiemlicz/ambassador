@@ -4,3 +4,5 @@
 .runner/
 .vagrant/
 .local/
+venv/
+.kitchen/
