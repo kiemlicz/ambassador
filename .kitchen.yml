@@ -1,3 +1,53 @@
 driver:
-  name: vagrant #ec2, dokken, libvirt
-  # provider: virtualbox
+  name: vagrant
+  vagrantfiles:
+    - .test/Vagrantfile
+
+provisioner:
+  name: salt_solo
+  salt_install: bootstrap
+  salt_bootstrap_url: https://bootstrap.saltstack.com
+  salt_version: latest
+  require_chef: false
+  is_file_root: true
+  salt_copy_filter:
+    - .kitchen.yml
+    - .travis.yml
+    - README.md
+    - requisites.sh
+    - setup.sh
+    - setup_foreman.sh
+    - setup_salt.sh
+    - upload_templates.py
+    - Vagrantfile
+    - util/
+    - requisites/
+    - extensions/
+    - config/
+    - .travis/
+  state_top:
+    server:
+      "*":
+        - os
+        - samba
+        - mail
+        - lxc
+        - users
+        - java
+        - scala
+        - sbt
+        - maven
+        - virtualbox
+        - docker
+        - kvm
+
+platforms:
+  - name: debian
+    driver_config:
+      run_command: /lib/systemd/systemd
+
+suites:
+  - name: default
+
+
+
