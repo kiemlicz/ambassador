@@ -1,8 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-require 'csv'
-require 'erb'
 
 common_vagrantfile = File.expand_path('../Vagrantfile.common', __FILE__)
 load common_vagrantfile if File.exists?(common_vagrantfile)
@@ -19,33 +17,8 @@ Vagrant.configure("2") do |config|
     end
   end
 
-  config.vm.provision "init", type: "shell", env: {
-    "CONTAINER_USERNAME" => ENV['CONTAINER_USERNAME'],
-    "CONTAINER_NAME" => ENV['CONTAINER_NAME'],
-    "CONTAINER_FQDN" => ENV['CONTAINER_FQDN']
-    } do |s|
-    s.inline = <<-SHELL
-        sudo mkdir -p /etc/sudoers.d/
-        echo 'Cmnd_Alias SALT = /usr/bin/salt, /usr/bin/salt-key\nforeman-proxy ALL = NOPASSWD: SALT\nDefaults:foreman-proxy !requiretty' > /etc/sudoers.d/salt; chmod 440 /etc/sudoers.d/salt
-
-        if [ "$CONTAINER_USERNAME" != "root" ]; then
-            echo 'ubuntu ALL=NOPASSWD:ALL' > /etc/sudoers.d/ubuntu; chmod 440 /etc/sudoers.d/ubuntu
-        fi
-
-        #todo how to achieve passwordless sudo -u postgres, below doesn't work
-        #echo 'postgres ALL=NOPASSWD:ALL' > /etc/sudoers.d/postgres; chmod 440 /etc/sudoers.d/postgres
-
-        # remove accepting locale on server so that no locale generation is needed
-        sed -i -e 's/\(^AcceptEnv LANG.*\)/#\1/g' /etc/ssh/sshd_config
-        CIP=$(ip r s | grep "scope link src" | cut -d' ' -f9)
-        sed -i "s/127.0.1.1/#127.0.1.1/" /etc/hosts
-        echo "$CIP  $CONTAINER_FQDN $CONTAINER_NAME" >> /etc/hosts
-        #configure resolvconf utility so that proper nameserver exists, otherwise only 127.0.0.1 may appear
-        echo 'TRUNCATE_NAMESERVER_LIST_AFTER_LOOPBACK_ADDRESS=no' > /etc/default/resolvconf
-    SHELL
-  end
-
   if ENV.has_key?("CLIENT_ID") and ENV.has_key?("CLIENT_SECRET")
+    # todo what is the visibility scope, is it like in bash?
     ambassador_client_id = ENV["CLIENT_ID"]
     ambassador_client_secret = ENV["CLIENT_SECRET"]
   end
@@ -67,77 +40,28 @@ Vagrant.configure("2") do |config|
   ambassador_domain = `dnsdomainname`
 
   if ENV.has_key?('DEPLOY_PUB_FILE') and ENV.has_key?('DEPLOY_PRIV_FILE')
-       # todo what is the visibility scope, is it like in bash?
+    # todo what is the visibility scope, is it like in bash?
     ambassador_envoy_deploy_pub = File.basename(ENV['DEPLOY_PUB_FILE'])
     ambassador_envoy_deploy_priv = File.basename(ENV['DEPLOY_PRIV_FILE'])
-
-    materialize(ERB.new(File.read("config/salt/ambassador_gitfs_deploykeys.erb")).result(binding), "etc/salt/master.d/ambassador_gitfs_deploykeys.conf")
-
+    # todo the ambassador_gitfs_deploykeys.conf will contain bogus paths if DEPLOY_PUB/PRIV_FILE is not defined
     config.vm.provision "file", source: ENV['DEPLOY_PUB_FILE'], destination: File.join("etc/salt/deploykeys/", ambassador_envoy_deploy_pub)
     config.vm.provision "file", source: ENV['DEPLOY_PRIV_FILE'], destination: File.join("etc/salt/deploykeys/", ambassador_envoy_deploy_priv)
   end
 
-  materialize(ERB.new(File.read("config/salt/ambassador_roots.erb")).result(binding), "etc/salt/master.d/ambassador_roots.conf")
-  materialize(ERB.new(File.read("config/salt/ambassador_gitfs.erb")).result(binding), "etc/salt/master.d/ambassador_gitfs.conf")
-  materialize(ERB.new(File.read("config/salt/ambassador_common.erb")).result(binding), "etc/salt/master.d/ambassador_common.conf")
-  materialize(ERB.new(File.read("config/salt/ambassador_ext_pillar.erb")).result(binding), "etc/salt/master.d/ambassador_ext_pillar.conf")
-  materialize(ERB.new(File.read("config/salt/ambassador_salt_foreman.erb")).result(binding), "etc/salt/master.d/ambassador_salt_foreman.conf")
-  materialize(ERB.new(File.read("config/salt/ambassador_queue.erb")).result(binding), "etc/salt/master.d/ambassador_queue.conf")
-  materialize(ERB.new(File.read("config/salt/reactor.erb")).result(binding), "etc/salt/master.d/reactor.conf")
-  materialize(ERB.new(File.read("config/salt/foreman.erb")).result(binding), "etc/salt/foreman.yaml")
-  materialize(ERB.new(File.read("config/foreman/salt.erb")).result(binding), "etc/foreman-proxy/settings.d/salt.yml")
-  materialize(ERB.new(File.read("config/proxydhcp.erb")).result(binding), "etc/dnsmasq.d/proxydhcp.conf")
+  materialize_recursively("config/guest", ".target", binding)
 
-  #apache2 during installation removes contents of /etc/apache2/sites-available/
-  materialize(ERB.new(File.read("config/apache2/30-saltfs.erb")).result(binding), "var/tmp/30-saltfs.conf")
-
-  config.vm.provision "file", source: "etc", destination: "~/etc"
-  config.vm.provision "file", source: "var", destination: "~/var"
-  config.vm.provision "file", source: "config/file_ext_authorize.service", destination: "~/etc/systemd/system/file_ext_authorize.service"
-  config.vm.provision "file", source: "config/bootloader", destination: "~/srv/tftp"
+  config.vm.provision "file", source: ".target", destination: "~/target"
   config.vm.provision "file", source: "salt", destination: "~/srv/salt"
-  #config.vm.provision "file", source: "pillar", destination: "~/srv/pillar"
   config.vm.provision "file", source: "extensions/file_ext_authorize", destination: "~/opt/file_ext_authorize"
-  config.vm.provision "file", source: "config/file_ext_authorize.conf", destination: "~/opt/file_ext_authorize/file_ext_authorize.conf"
 
   config.vm.provision "move config", type: "shell" do |s|
     s.inline = <<-SHELL
-         sudo rsync -avzh etc/ /etc
-         sudo rsync -avzh opt/ /opt
-         sudo rsync -avzh var/ /var
-         sudo rsync -avzh srv/ /srv
+         sudo rsync -avzh target/* /
     SHELL
   end
+end
 
-  CSV.parse_line(ENV['USERS']).each do |u|
-    config.vm.provision "#{u} key", type: "shell", env: {"CONTAINER_USERNAME" => ENV['CONTAINER_USERNAME']} do |s|
-        ssh_pub_key = File.readlines("#{Dir.home(u)}/.ssh/id_rsa.pub").first.strip
-        s.inline = <<-SHELL
-            user_dir=$(eval echo "~$CONTAINER_USERNAME")
-            mkdir -p $user_dir/.ssh/
-            echo #{ssh_pub_key} >> $user_dir/.ssh/authorized_keys
-            #todo  verify permissions of authorized_keys
-        SHELL
-    end
-  end
-
-  config.vm.provision "install salt", type: "shell" do |s|
-    s.path = "setup_salt.sh"
-  end
-
-  config.vm.provision "install foreman", type: "shell", env: {
-    "CID" => ENV['CONTAINER_FQDN'],
-    "CERT_BASEDIR" => ENV['CONTAINER_CERT_BASE'],
-    "CA" => ambassador_ca,
-    "CRL" => ambassador_crl,
-    "KEY" => ambassador_key,
-    "PROXY_KEY" => ambassador_key,
-    "CERT" => ambassador_cert,
-    "PROXY_CERT" => ambassador_cert,
-    "SALT_USER" => ambassador_salt_user,
-    "SALT_PASSWORD" => ambassador_salt_password
-    } do |s|
-    s.path = "setup_foreman.sh"
-  end
-
+vagrantfiles = %w[../Vagrantfile.foreman ../Vagrantfile.salt]
+vagrantfiles.each do |vagrantfile|
+  load File.expand_path(vagrantfile) if File.exists?(vagrantfile)
 end

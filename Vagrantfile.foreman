@@ -1,5 +1,3 @@
-
-
 Vagrant.configure("2") do |config|
 
   config.vm.provision "foreman requisites", type: "shell", env: {
@@ -8,8 +6,6 @@ Vagrant.configure("2") do |config|
     "CONTAINER_FQDN" => ENV['CONTAINER_FQDN']
     } do |s|
     s.inline = <<-SHELL
-        sudo apt-get update
-        sudo apt-get install -y rsync
         sudo mkdir -p /etc/sudoers.d/
         echo 'Cmnd_Alias SALT = /usr/bin/salt, /usr/bin/salt-key\nforeman-proxy ALL = NOPASSWD: SALT\nDefaults:foreman-proxy !requiretty' > /etc/sudoers.d/salt; chmod 440 /etc/sudoers.d/salt
 

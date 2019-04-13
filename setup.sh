@@ -140,9 +140,9 @@ readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
 
 if [ "$AUTO_CERT_GENERATION" = true ]; then
     . util/sec/cert_functions
-    mkdir -p etc/foreman/ssl/private
-    mkdir -p etc/foreman/ssl/certs
-    SSL_BASE=etc/foreman/ssl
+    mkdir -p .target/etc/foreman/ssl/private
+    mkdir -p .target/etc/foreman/ssl/certs
+    SSL_BASE=.target/etc/foreman/ssl
     SSL_CERT_DIR=$SSL_BASE/certs
     SSL_PRIVATE_DIR=$SSL_BASE/private
     #further ssl/ca-certificates installation doesn't clear /etc/ssl/private/certs contents
@@ -201,7 +201,7 @@ readonly run_time=$(echo "$run_stop_ts - $run_start_ts" | bc)
 readonly total_time=$(echo "$run_stop_ts - $setup_start_ts" | bc)
 
 #cleanup
-rm -rf ./etc ./var
+rm -rf ./.target
 
 echo "Container preparation time: ${container_prep_time}[s]"
 echo "Installation time: ${run_time}[s]"

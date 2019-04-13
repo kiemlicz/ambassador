@@ -6,3 +6,4 @@
 .local/
 venv/
 .kitchen/
+.target/

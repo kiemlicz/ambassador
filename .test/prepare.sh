@@ -54,7 +54,7 @@ substenv_file AMBASSADOR .test/config/ambassador_ext_pillar.conf > $CONTAINER_MA
 # container under test
 
 # create test container
-create_container config/network.conf $CONTAINER_SLAVE_NAME
+create_container .test/network.conf $CONTAINER_SLAVE_NAME
 
 # setup container
 chroot $CONTAINER_SLAVE_ROOTFS sh -c "mkdir /root/.ssh/"
