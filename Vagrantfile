@@ -3,7 +3,9 @@
 
 require 'csv'
 require 'erb'
-require 'fileutils'
+
+common_vagrantfile = File.expand_path('../Vagrantfile.common', __FILE__)
+load common_vagrantfile if File.exists?(common_vagrantfile)
 
 Vagrant.configure("2") do |config|
   config.vm.box = "debian/stretch64"
@@ -13,13 +15,7 @@ Vagrant.configure("2") do |config|
     node.vm.provider :lxc do |lxc|
       lxc.container_name = :machine
       lxc.backingstore = 'best'
-    end
-  end
-
-  def materialize(render, filename)
-    FileUtils.mkdir_p(File.dirname(filename))
-    File.open(filename, "w") do |f|
-      f.write render
+      lxc.fetch_ip_tries = 30
     end
   end
 
@@ -29,8 +25,6 @@ Vagrant.configure("2") do |config|
     "CONTAINER_FQDN" => ENV['CONTAINER_FQDN']
     } do |s|
     s.inline = <<-SHELL
-        sudo apt-get update
-        sudo apt-get install -y rsync
         sudo mkdir -p /etc/sudoers.d/
         echo 'Cmnd_Alias SALT = /usr/bin/salt, /usr/bin/salt-key\nforeman-proxy ALL = NOPASSWD: SALT\nDefaults:foreman-proxy !requiretty' > /etc/sudoers.d/salt; chmod 440 /etc/sudoers.d/salt
 

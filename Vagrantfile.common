@@ -1,0 +1,21 @@
+require 'fileutils'
+
+Vagrant.configure("2") do |config|
+  def materialize(render, filename)
+    FileUtils.mkdir_p(File.dirname(filename))
+    File.open(filename, "w") do |f|
+      f.write render
+    end
+  end
+
+  config.vm.provision "common tools", type: "shell", env: {
+    "CONTAINER_USERNAME" => ENV['CONTAINER_USERNAME'],
+    "CONTAINER_NAME" => ENV['CONTAINER_NAME'],
+    "CONTAINER_FQDN" => ENV['CONTAINER_FQDN']
+    } do |s|
+    s.inline = <<-SHELL
+        sudo apt-get update
+        sudo apt-get install -y rsync
+    SHELL
+  end
+end

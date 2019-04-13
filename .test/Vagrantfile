@@ -2,19 +2,15 @@
 # vi: set ft=ruby :
 
 require 'erb'
-require 'fileutils'
+
+common_vagrantfile = File.expand_path('../../Vagrantfile.common', __FILE__)
+load common_vagrantfile if File.exists?(common_vagrantfile)
 
 Vagrant.configure("2") do |config|
 
   master_node = "test-master"
   slave_node = "test-slave"
 
-  def materialize(render, filename)
-    FileUtils.mkdir_p(File.dirname(filename))
-    File.open(filename, "w") do |f|
-      f.write render
-    end
-  end
 
   ambassador_salt_api_interfaces="0.0.0.0"
   ambassador_client_id=ENV['CLIENT_ID']
