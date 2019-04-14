@@ -1,7 +1,7 @@
 driver:
   name: vagrant
-  vagrantfiles:
-    - .test/Vagrantfile
+#  vagrantfiles:
+#    - .test/Vagrantfile
 
 provisioner:
   name: salt_solo

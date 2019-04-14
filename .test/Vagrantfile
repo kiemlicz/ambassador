@@ -1,84 +1,9 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-require 'erb'
-
 common_vagrantfile = File.expand_path('../../Vagrantfile.common', __FILE__)
 load common_vagrantfile if File.exists?(common_vagrantfile)
 
 Vagrant.configure("2") do |config|
-
-  master_node = "test-master"
-  slave_node = "test-slave"
-
-
-  ambassador_salt_api_interfaces="0.0.0.0"
-  ambassador_client_id=ENV['CLIENT_ID']
-  ambassador_client_secret=ENV['CLIENT_SECRET']
-  ambassador_git_pillar_url=ENV['GIT_PILLAR_URL']
-  ambassador_envoy_deploy_priv=File.basename(ENV['DEPLOY_PRIV_FILE'])
-  ambassador_envoy_deploy_pub=File.basename(ENV['DEPLOY_PUB_FILE'])
-
-  config.vm.define master_node do |master|
-    master.vm.box = "debian/stretch64"
-    master.vm.hostname = master_node
-    master.vm.provider :lxc do |lxc|
-        lxc.container_name = :machine
-        lxc.backingstore = 'best'
-    end
-    materialize(ERB.new(File.read("../config/salt/ambassador_gitfs_deploykeys.erb")).result(binding), "etc/salt/master.d/ambassador_gitfs_deploykeys.conf")
-    materialize(ERB.new(File.read("../config/salt/ambassador_common.erb")).result(binding), "etc/salt/master.d/ambassador_common.conf")
-    materialize(ERB.new(File.read("../config/salt/ambassador_roots.erb")).result(binding), "etc/salt/master.d/ambassador_roots.conf")
-    materialize(ERB.new(File.read("config/ambassador_test.erb")).result(binding), "etc/salt/master.d/ambassador_test.conf")
-    master.vm.provision "file", source: "etc", destination: "~/etc"
-    master.vm.provision "file", source: "../salt", destination: "~/salt"
-    master.vm.provision "file", source: "config/reactor.conf", destination: "~/etc/salt/master.d/reactor.conf"
-    master.vm.provision "file", source: ENV['DEPLOY_PRIV_FILE'], destination: File.join("etc/salt/deploykeys/", ambassador_envoy_deploy_priv)
-    master.vm.provision "file", source: ENV['DEPLOY_PUB_FILE'], destination: File.join("etc/salt/deploykeys/", ambassador_envoy_deploy_pub)
-    master.vm.provision "file", source: "config/top.sls", destination: "~/salt/base/top.sls"
-
-    master.vm.provision "init", type: "shell" do |s|
-      s.inline = <<-SHELL
-        apt-get update
-        apt-get install -y rsync zsh
-
-        mkdir -p /etc/salt/
-        rsync -avzh etc/ /etc
-        cp -r salt/ /srv/
-
-        mkdir -p /srv/pillar
-#        ln -s /srv/envoy/reactor /srv/reactor
-        touch /srv/pillar/top.sls
-
-        echo "test-slave*" > /etc/salt/autosign.conf
-
-      SHELL
-    end
-    master.vm.provision "install salt", type: "shell" do |s|
-        s.path = "../setup_salt.sh"
-    end
-  end
-
-  config.vm.define slave_node do |slave|
-    slave.vm.box = "debian/stretch64"
-    slave.vm.hostname = slave_node
-    slave.vm.provider :lxc do |lxc|
-        lxc.container_name = :machine
-        lxc.backingstore = 'best'
-    end
-    slave.vm.provision "file", source: "config/minion.conf", destination: "~/minion.conf"
-    slave.vm.provision "init", type: "shell" do |s|
-      s.inline = <<-SHELL
-          dhclient -r
-          dhclient eth0
-          apt-get update
-          apt-get install -y curl
-          mkdir -p /etc/salt/minion.d/
-          mv minion.conf /etc/salt/minion.d/minion.conf
-          curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com
-          sh /tmp/bootstrap-salt.sh -n -X stable
-      SHELL
-    end
-  end
 
 end
