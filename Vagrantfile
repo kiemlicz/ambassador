@@ -62,6 +62,7 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "install salt", type: "shell" do |s|
     s.path = "setup_salt.sh"
+    s.args = ["salt-master", "salt-api", "salt-ssh"]
   end
 
   config.vm.provision "foreman requisites", type: "shell", env: {
