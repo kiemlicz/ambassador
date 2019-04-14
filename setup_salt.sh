@@ -31,5 +31,5 @@ pip install --upgrade pyOpenSSL pygit2==0.27.3 docker-py cherrypy jinja2 Flask e
 dhclient -r
 dhclient eth0
 
-systemctl enable "$@"
-systemctl restart "$@"
+systemctl enable "$@" || true
+systemctl restart "$@" || true

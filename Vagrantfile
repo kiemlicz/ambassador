@@ -48,7 +48,8 @@ Vagrant.configure("2") do |config|
     config.vm.provision "file", source: ENV['DEPLOY_PRIV_FILE'], destination: File.join("etc/salt/deploykeys/", ambassador_envoy_deploy_priv)
   end
 
-  materialize_recursively("config/guest", ".target", binding)
+  materialize_recursively("config/salt", ".target", binding)
+  materialize_recursively("config/foreman", ".target", binding)
 
   config.vm.provision "file", source: ".target", destination: "~/target"
   config.vm.provision "file", source: "salt", destination: "~/srv/salt"
