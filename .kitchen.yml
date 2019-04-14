@@ -1,5 +1,8 @@
 driver:
-  name: vagrant
+#  name: vagrant
+#  provider: lxc
+  # this looks like Vbox (still)
+  provider: libvirt
 #  vagrantfiles:
 #    - .test/Vagrantfile
 
