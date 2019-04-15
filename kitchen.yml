@@ -1,7 +1,7 @@
 driver:
   name: libvirt
 #  provider: lxc
-#  provider: libvirt
+  provider: libvirt
 
 provisioner:
   name: salt_solo
@@ -43,6 +43,8 @@ provisioner:
 
 platforms:
   - name: debian
+    driver:
+      box: "debian/stretch64"
     driver_config:
       run_command: /lib/systemd/systemd
 
