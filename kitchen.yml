@@ -9,7 +9,8 @@ provisioner:
   salt_bootstrap_url: https://bootstrap.saltstack.com
   salt_version: latest
   require_chef: false
-  is_file_root: true
+  is_file_root: false
+  local_salt_root: salt
   salt_copy_filter:
     - kitchen.yml
     - .travis.yml
@@ -40,6 +41,17 @@ provisioner:
         - virtualbox
         - docker
         - kvm
+  pillars:
+    top.sls:
+      base:
+        '*':
+          - base
+          - pkgs_base
+          - one_user
+  pillar-from-files:
+    base.sls: .travis/pillar/masterless/base.sls
+    pkgs_base.sls: .travis/pillar/masterless/pkgs_base.sls
+    one_user.sls: .travis/pillar/masterless/one_user.sls
 
 platforms:
   - name: debian
