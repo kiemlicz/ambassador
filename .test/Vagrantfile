@@ -1,9 +1,0 @@
-# -*- mode: ruby -*-
-# vi: set ft=ruby :
-
-common_vagrantfile = File.expand_path('../../Vagrantfile.common', __FILE__)
-load common_vagrantfile if File.exists?(common_vagrantfile)
-
-Vagrant.configure("2") do |config|
-
-end

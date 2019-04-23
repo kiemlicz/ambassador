@@ -1,4 +1,5 @@
-local: true
+file_client: local
+master_type: disable
 root_dir: <%= config[:root_path] %>
 
 mine_functions:
@@ -10,24 +11,22 @@ use_superseded:
 
 file_recv: True
 
-file_roots:
-  base:
-    - <%= os_join(config[:root_path], config[:salt_file_root], 'base') %>
-    - <%= os_join(config[:root_path], 'srv', 'reactor') %>
-  dev:
-    - <%= os_join(config[:root_path], config[:salt_file_root], 'dev') %>
-    - <%= os_join(config[:root_path], config[:salt_file_root], 'base') %>
-    - <%= os_join(config[:root_path], 'srv', 'reactor') %>
-  server:
-    - <%= os_join(config[:root_path], config[:salt_file_root], 'server') %>
-    - <%= os_join(config[:root_path], config[:salt_file_root], 'dev') %>
-    - <%= os_join(config[:root_path], config[:salt_file_root], 'base') %>
-    - <%= os_join(config[:root_path], 'srv', 'reactor') %>
+gitfs_provider: pygit2
+gitfs_saltenv_whitelist:
+  - base
+  - dev
+  - server
+
+fileserver_backend:
+  - roots
+  - git
 
 pillar_roots:
-<%= config[:salt_env] %>:
-- <%= os_join(config[:root_path], config[:salt_pillar_root]) %>
-- <%= os_join(config[:root_path], config[:salt_spm_root], 'pillar') %>
+  <%= config[:salt_env] %>:
+  - <%= os_join(config[:root_path], config[:salt_pillar_root]) %>
+  - <%= os_join(config[:root_path], config[:salt_spm_root], 'pillar') %>
+
+ext_pillar_first: True
 
 <% if windows_os? %>
 file_client: local

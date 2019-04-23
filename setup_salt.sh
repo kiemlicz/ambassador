@@ -9,7 +9,7 @@ readonly SALTSTACK_REPO_KEY=$SALTSTACK_STRETCH_REPO_KEY_URL
 
 apt-get update
 apt-get upgrade -y -o DPkg::Options::=--force-confold
-apt-get install -y ca-certificates wget host curl gnupg2 sudo apt-transport-https libffi-dev git python3-pip zlib1g-dev tcpdump nano vim
+apt-get install -y ca-certificates wget host curl gnupg2 sudo apt-transport-https libffi-dev git python3-pip zlib1g-dev
 
 update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 20
 
