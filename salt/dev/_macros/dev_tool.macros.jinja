@@ -34,7 +34,11 @@
     - name: {{ conf_dict.service_name }}
     - enable: True
     - require:
+{% if conf_dict.pkg_name is defined %}
       - pkg: {{ conf_dict.pkg_name }}
+{% else %}
+      - pkg: {{ state_id }}
+{% endif %}
 {% endif %}
 {% endmacro %}
 
