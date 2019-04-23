@@ -65,7 +65,12 @@
     - refresh: True
 {% else %}
   pkg.installed:
+{% if conf_dict.pkg_name is defined %}
     - name: {{ conf_dict.pkg_name }}
+{% else %}
+    - name: {{ state_id }}
+    - pkgs: {{ conf_dict.pkg_names|tojson }}
+{% endif %}
     - version: {{ conf_dict.version }}
     - refresh: True
 {% endif %}
