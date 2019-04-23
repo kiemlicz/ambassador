@@ -17,6 +17,7 @@
         'names': ["deb [arch=amd64] https://download.docker.com/linux/" ~ os.lower() ~ " " ~ dist_codename ~ " stable"],
         'key_url': "https://download.docker.com/linux/" ~ os.lower() ~ "/gpg",
         'pkg_names': ["docker-ce", "docker-ce-cli", "containerd.io"],
+        'required_pkgs': ["bridge-utils"],
         'service_name': "docker",
         'config': '/etc/docker/daemon.json',
     },

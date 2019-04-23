@@ -41,6 +41,14 @@
 {% macro repo_pkg(state_id, conf_dict) %}
 {{ repository(state_id ~ "_repository", conf_dict, enabled=(conf_dict.names is defined or conf_dict.repo_id is defined),
    require=[{'sls': "os"}], require_in=[{'pkg': conf_dict.pkg_name}]) }}
+{% if conf_dict.required_pkgs is defined and conf_dict.required_pkgs %}
+{{ state_id }}_requisites:
+  pkg.latest:
+    - pkgs: {{ conf_dict.required_pkgs }}
+    - refresh: True
+    - require_in:
+      - pkg: {{ state_id }}
+{% endif %}
 {{ state_id }}:
 {% if conf_dict.version is not defined %}
   pkg.latest:
