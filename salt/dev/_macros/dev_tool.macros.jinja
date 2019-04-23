@@ -48,7 +48,7 @@
 {% if conf_dict.required_pkgs is defined and conf_dict.required_pkgs %}
 {{ state_id }}_requisites:
   pkg.latest:
-    - pkgs: {{ conf_dict.required_pkgs }}
+    - pkgs: {{ conf_dict.required_pkgs|tojson }}
     - refresh: True
     - require_in:
       - pkg: {{ state_id }}
@@ -60,7 +60,7 @@
     - name: {{ conf_dict.pkg_name }}
 {% else %}
     - name: {{ state_id }}
-    - pkgs: {{ conf_dict.pkg_names }}
+    - pkgs: {{ conf_dict.pkg_names|tojson }}
 {% endif %}
     - refresh: True
 {% else %}
