@@ -37,7 +37,7 @@ platforms:
         - remote: 'echo "deb http://ftp.debian.org/debian stretch-backports main" | sudo tee /etc/apt/sources.list.d/backports.list'
         - remote: 'sudo apt-get update'
         - remote: 'sudo apt-get upgrade -y -o DPkg::Options::=--force-confold'
-        - remote: 'sudo apt-get install -y ca-certificates wget host curl gnupg2 sudo apt-transport-https libffi-dev git python3-pip zlib1g-dev python3-pip'
+        - remote: 'sudo apt-get install -y ca-certificates wget host curl gnupg2 sudo apt-transport-https libffi-dev git python3-pip zlib1g-dev'
         - remote: 'sudo apt-get install -t stretch-backports -y libgit2-dev'
         - remote: 'sudo pip3 install --upgrade pyOpenSSL pygit2==0.27.3 docker-py cherrypy jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib google-auth'
     driver:
