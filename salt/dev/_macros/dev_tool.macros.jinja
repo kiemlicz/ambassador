@@ -44,7 +44,11 @@
 {{ state_id }}:
 {% if conf_dict.version is not defined %}
   pkg.latest:
+{% if conf_dict.pkg_name is defined %}
     - name: {{ conf_dict.pkg_name }}
+{% else %}
+    - pkgs: {{ conf_dict.pkg_names }}
+{% endif %}
     - refresh: True
 {% else %}
   pkg.installed:

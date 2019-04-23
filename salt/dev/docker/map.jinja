@@ -16,7 +16,7 @@
         'file': '/etc/apt/sources.list.d/docker.list',
         'names': ["deb [arch=amd64] https://download.docker.com/linux/" ~ os.lower() ~ " " ~ dist_codename ~ " stable"],
         'key_url': "https://download.docker.com/linux/" ~ os.lower() ~ "/gpg",
-        'pkg_name': "docker-ce",
+        'pkg_names': ["docker-ce", "docker-ce-cli", "containerd.io"],
         'service_name': "docker",
         'config': '/etc/docker/daemon.json',
     },
