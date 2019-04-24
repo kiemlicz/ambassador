@@ -33,8 +33,8 @@ assert_env "SALT_USER is not set" $SALT_USER
 assert_env "SALT_PASSWORD is not set" $SALT_PASSWORD
 
 #edit versions
-readonly FOREMAN_STRETCH_REPO_URL="deb http://deb.theforeman.org/ stretch 1.20"
-readonly FOREMAN_STRETCH_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.20"
+readonly FOREMAN_STRETCH_REPO_URL="deb http://deb.theforeman.org/ stretch 1.21"
+readonly FOREMAN_STRETCH_PLUGINS_REPO_URL="deb http://deb.theforeman.org/ plugins 1.21"
 readonly FOREMAN_STRETCH_REPO_KEY="https://deb.theforeman.org/pubkey.gpg"
 readonly PUPPET_STRETCH_SERVER_PKG="puppet5-release-stretch.deb"
 readonly FOREMAN_PUPPET_SERVER_URL="https://apt.puppetlabs.com"
