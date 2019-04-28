@@ -136,6 +136,9 @@ readonly OAUTH_SECRET=$(cat /etc/foreman/settings.yaml | grep :oauth_consumer_se
 # https://theforeman.org/manuals/1.12/index.html#5.2ComputeResources
 readonly CRED=$(foreman-installer \
     --enable-foreman-proxy \
+    --foreman-proxy-register-in-foreman=true \
+    --foreman-proxy-registered-name="$CID" \
+    --foreman-proxy-registered-proxy-url="https://$CID:8443/" \
     --foreman-proxy-tftp=true \
     --foreman-proxy-tftp-servername=$CIP \
     --foreman-proxy-dns=true \
@@ -150,12 +153,12 @@ readonly CRED=$(foreman-installer \
     --enable-foreman-plugin-salt \
     --enable-foreman-proxy-plugin-salt \
     --foreman-proxy-plugin-salt-api=true \
-    --foreman-proxy-plugin-salt-api-url=https://$CID:9191 \
-    --enable-foreman-plugin-discovery \
-    --enable-foreman-proxy-plugin-discovery | sed -n 's/.*Initial credentials are \([[:alpha:]]*\) \/ \([[:alnum:]]*\)/\1:\2/p')
+    --foreman-proxy-plugin-salt-api-url=https://$CID:9191 | sed -n 's/.*Initial credentials are \([[:alpha:]]*\) \/ \([[:alnum:]]*\)/\1:\2/p')
 
-#this plugin causes a lot of problems, sometimes it's better to disable
+#these plugins causes a lot of problems, sometimes it's better to disable
 #foreman-installer \
+#    --enable-foreman-plugin-discovery \
+#    --enable-foreman-proxy-plugin-discovery
 #    --enable-foreman-cli-remote-execution \
 #    --enable-foreman-plugin-remote-execution \
 #    --enable-foreman-proxy-plugin-remote-execution-ssh
