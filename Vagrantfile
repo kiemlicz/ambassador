@@ -50,11 +50,9 @@ Vagrant.configure("2") do |config|
 
   materialize_recursively("config/salt", ".target", binding)
   materialize_recursively("config/foreman", ".target", binding)
-
   config.vm.provision "file", source: ".target", destination: "~/target"
-  config.vm.provision "file", source: "salt", destination: "~/srv/salt"
-  config.vm.provision "file", source: "extensions/file_ext_authorize", destination: "~/opt/file_ext_authorize"
-
+  config.vm.provision "file", source: "salt", destination: "~/target/srv/salt"
+  config.vm.provision "file", source: "extensions/file_ext_authorize", destination: "~/target/opt/file_ext_authorize"
   config.vm.provision "move config", type: "shell" do |s|
     s.inline = <<-SHELL
          sudo rsync -avzh target/* /

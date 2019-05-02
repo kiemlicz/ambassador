@@ -4,7 +4,7 @@ import os
 import posixpath
 
 import salt.config
-import salt.utils.locales
+import salt.utils.data
 import salt.version
 from salt.exceptions import CommandExecutionError
 from salt.ext import six
@@ -91,7 +91,7 @@ def managed(name,
 
     if not source:
         return delegate_to_file_managed(source, contents)
-    source = salt.utils.locales.sdecode(source)
+    source = salt.utils.data.decode(source)
     if urlparse(source).scheme != 'gdrive':
         return delegate_to_file_managed(source, contents)
 
@@ -224,7 +224,7 @@ def recurse(name,
         _ret = delegate_to_file_directory(path)
         merge_ret(path, _ret)
 
-    source = salt.utils.locales.sdecode(source)
+    source = salt.utils.data.decode(source)
     if urlparse(source).scheme != 'gdrive':
         return delegate_to_file_recurse()
 

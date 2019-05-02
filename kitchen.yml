@@ -1,7 +1,6 @@
 driver:
   name: vagrant
-#  provider: lxc
-  provider: libvirt
+  provider: libvirt  # viable options: libvirt, lxc
 
 provisioner:
   name: salt_solo
