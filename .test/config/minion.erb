@@ -21,6 +21,21 @@ fileserver_backend:
   - roots
   - git
 
+
+file_roots:
+  base:
+    - <%= os_join(config[:root_path], 'srv', 'salt', 'base') %>
+    - <%= os_join(config[:root_path], 'srv', 'reactor') %>
+  dev:
+    - <%= os_join(config[:root_path], 'srv', 'salt', 'dev') %>
+    - <%= os_join(config[:root_path], 'srv', 'salt', 'base') %>
+    - <%= os_join(config[:root_path], 'srv', 'reactor') %>
+  server:
+    - <%= os_join(config[:root_path], 'srv', 'salt', 'server') %>
+    - <%= os_join(config[:root_path], 'srv', 'salt', 'dev') %>
+    - <%= os_join(config[:root_path], 'srv', 'salt', 'base') %>
+    - <%= os_join(config[:root_path], 'srv', 'reactor') %>
+
 pillar_roots:
   <%= config[:salt_env] %>:
   - <%= os_join(config[:root_path], config[:salt_pillar_root]) %>

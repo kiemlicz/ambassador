@@ -303,8 +303,10 @@ def _list_children(auth_http, parent_meta):
         }
         if extra_params is not None:
             request_params.update(extra_params)
-        r = json.loads(
-            auth_http.request('GET', 'https://www.googleapis.com/drive/v3/files', fields=request_params).data)
+        response = auth_http.request('GET', 'https://www.googleapis.com/drive/v3/files', fields=request_params)
+        if response.status < 200 or response.status >= 400:
+            raise CommandExecutionError("Cannot list files (drive/v3/files): {}".format(request_params))
+        r = json.loads(salt.utils.data.decode(response.data))
         _assert_incomplete_search(r)
         return r
 
@@ -328,7 +330,7 @@ def _get_file(auth_http, file_meta, mime_type='text/plain'):
 
     def _do_get(url, params={}):
         response = auth_http.request('GET', url, fields=params)
-        if response.status >= 400:
+        if response.status < 200 or response.status >= 400:
             raise CommandExecutionError('Unable to download file (url: {}), reason: {}'.format(url, response.data))
         return response.data
 

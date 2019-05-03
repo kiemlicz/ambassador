@@ -10,10 +10,18 @@ provisioner:
   salt_version: latest
   require_chef: false
   is_file_root: true
+  salt_file_root: /srv
   salt_minion_config_template: .test/config/minion.erb
   salt_minion_config_dropin_files:
     - .local/pillar.conf
   salt_copy_filter:
+    - .idea
+    - .kitchen
+    - .vagrant
+    - venv
+    - .git
+    - .gitignore
+    - .gitmodules
     - config
     - extensions
     - requisites
@@ -40,7 +48,7 @@ platforms:
         - remote: 'sudo apt-get install -t stretch-backports -y libgit2-dev'
         - remote: 'sudo pip3 install --upgrade pyOpenSSL pygit2==0.27.3 docker-py cherrypy jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib google-auth'
     driver:
-      box: "debian/stretch64"
+      box: "debian9" # "debian/stretch64", using custom image as stock one is 10G fs size only
     driver_config:
       run_command: /lib/systemd/systemd
 
