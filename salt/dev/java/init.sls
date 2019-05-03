@@ -1,7 +1,7 @@
 {% from "java/map.jinja" import default_java as java with context %}
 {% from "java/map.jinja" import version_major with context %}
 {% from "_macros/dev_tool.macros.jinja" import add_environmental_variable,add_to_path with context %}
-{% from "_common/util.jinja" import retry with context %}
+{% from "_common/util.jinja" import pkg_latest_opts  with context %}
 {% from "_common/repo.jinja" import repository with context %}
 
 
@@ -30,8 +30,7 @@ java:
   pkg.latest:
     - name: {{ java.pkg_name }}
     - pkgs: {{ ([ java.pkg_name ] + java.ext_pkgs)|tojson }}
-    - refresh: True
-{{ retry(attempts=3)| indent(4) }}
+{{ pkg_latest_opts(attempts=3) | indent(4) }}
     - require:
       - sls: os
       - pkgrepo_ext: {{ java_repo_id }}

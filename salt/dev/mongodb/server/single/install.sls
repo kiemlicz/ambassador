@@ -1,5 +1,6 @@
 {% from "mongodb/server/single/map.jinja" import mongodb with context %}
 {% from "_common/repo.jinja" import repository with context %}
+{% from "_common/util.jinja" import pkg_latest_opts with context %}
 
 
 #mongodb client is installed without adding mongodb repo - thus causes conflicts with official mongo repo
@@ -13,7 +14,7 @@ exclude:
 mongodb:
   pkg.latest:
     - name: {{ mongodb.pkg_name }}
-    - refresh: True
+{{ pkg_latest_opts() | indent(4) }}
     - require:
       - sls: os
   file_ext.managed:

@@ -1,5 +1,5 @@
 {% from "os/pkgs/map.jinja" import pkgs, pip_provider with context %}
-{% from "_common/util.jinja" import retry with context %}
+{% from "_common/util.jinja" import retry, pkg_latest_opts with context %}
 
 {% if pkgs.dist_upgrade %}
 dist-upgrade:
@@ -18,7 +18,7 @@ pkgs:
   pkg.latest:
     - name: os_packages
     - pkgs: {{ pkgs.os_packages|tojson }}
-    - refresh: True
+{{ pkg_latest_opts() | indent(4) }}
     - reload_modules: True
     - require:
       - sls: os.locale

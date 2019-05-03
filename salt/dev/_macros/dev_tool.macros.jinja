@@ -1,4 +1,5 @@
 {% from "_common/repo.jinja" import repository, preferences with context %}
+{% from "_common/util.jinja" import pkg_latest_opts with context %}
 
 {% macro add_environmental_variable(var_name, var_value, exports_file) %}
   {% if grains['os'] != 'Windows' %}
@@ -49,7 +50,7 @@
 {{ state_id }}_requisites:
   pkg.latest:
     - pkgs: {{ conf_dict.required_pkgs|tojson }}
-    - refresh: True
+{{ pkg_latest_opts() | indent(4) }}
     - require:
       - pkgrepo_ext: "{{ state_id }}_repository"
     - require_in:
@@ -64,7 +65,7 @@
     - name: {{ state_id }}
     - pkgs: {{ conf_dict.pkg_names|tojson }}
 {% endif %}
-    - refresh: True
+{{ pkg_latest_opts() | indent(4) }}
     - require:
       - pkgrepo_ext: "{{ state_id }}_repository"
 {% else %}

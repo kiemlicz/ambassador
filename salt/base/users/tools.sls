@@ -1,3 +1,5 @@
+{% from "_common/util.jinja" import pkg_latest_opts with context %}
+
 {% for username, user in salt['pillar.get']("users", {}).items() if user.tools is defined %}
 
 {{ username }}_setup_oh_my_zsh:
@@ -37,7 +39,7 @@
 {{ username }}_powerline_requirements:
   pkg.latest:
     - pkgs: {{ user.tools.powerline.required_pkgs|tojson }}
-    - refresh: True
+{{ pkg_latest_opts() | indent(4) }}
     - require:
       - user: {{ username }}
 

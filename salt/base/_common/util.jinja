@@ -17,3 +17,8 @@
     interval: {{ interval }}
     splay: 15
 {% endmacro %}
+
+{% macro pkg_latest_opts(attempts=5, interval=30) %}
+- refresh: True
+{{ retry(attempts, interval) }}
+{% endmacro %}

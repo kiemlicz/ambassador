@@ -1,5 +1,5 @@
 {% from "redis/client/map.jinja" import redis_client as redis with context %}
-
+{% from "_common/util.jinja" import pkg_latest_opts with context %}
 
 include:
   - os
@@ -8,6 +8,6 @@ include:
 redis_client:
   pkg.latest:
     - name: {{ redis.pkg_name }}
-    - refresh: True
+{{ pkg_latest_opts() | indent(4) }}
     - require:
       - sls: os

@@ -1,5 +1,6 @@
 {% from "virtualbox/map.jinja" import virtualbox with context %}
 {% from "_common/repo.jinja" import repository with context %}
+{% from "_common/util.jinja" import pkg_latest_opts with context %}
 
 
 include:
@@ -12,6 +13,6 @@ include:
 virtualbox:
   pkg.latest:
     - name: {{ virtualbox.pkg_name }}
-    - refresh: True
+{{ pkg_latest_opts() | indent(4) }}
     - require:
       - sls: os

@@ -1,5 +1,5 @@
 {% from "erlang/map.jinja" import erlang with context %}
-{% from "_common/util.jinja" import retry with context %}
+{% from "_common/util.jinja" import pkg_latest_opts with context %}
 {% from "_common/repo.jinja" import repository, preferences with context %}
 
 
@@ -20,6 +20,6 @@ include:
 erlang:
   pkg.latest:
     - name: {{ erlang.pkg_name }}
-    - refresh: True
+{{ pkg_latest_opts() | indent(4) }}
     - require:
       - pkgrepo_ext: {{ erlang_repo_id }}

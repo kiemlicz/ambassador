@@ -1,11 +1,12 @@
 {% from "lxc/map.jinja" import lxc with context %}
+{% from "_common/util.jinja" import pkg_latest_opts with context %}
 
 
 lxc:
   pkg.latest:
     - name: lxc_install
     - pkgs: {{ lxc.pkgs|tojson }}
-    - refresh: True
+{{ pkg_latest_opts() | indent(4) }}
     - require:
       - sls: os
   file.managed:

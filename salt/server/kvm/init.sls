@@ -1,4 +1,5 @@
 {% from "kvm/map.jinja" import kvm with context %}
+{% from "_common/util.jinja" import pkg_latest_opts with context %}
 
 
 include:
@@ -9,7 +10,7 @@ kvm:
   pkg.latest:
     - name: kvm_packages
     - pkgs: {{ kvm.prerequisites|tojson }}
-    - refresh: True
+{{ pkg_latest_opts() | indent(4) }}
     - require:
       - sls: os
   group.present:
