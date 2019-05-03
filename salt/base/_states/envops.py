@@ -3,7 +3,7 @@ import fileinput
 import sys
 import re
 import logging
-import salt.utils as utils
+import salt.utils.platform
 
 
 def manage_path(name, directory_inside, exports_file):
@@ -25,7 +25,7 @@ def manage_path(name, directory_inside, exports_file):
         log.info("Unspecified directory_inside parameter - converting to empty string")
         directory_inside = ''
 
-    if utils.is_windows():
+    if salt.utils.platform.is_windows():
         return __states__['win_path.exists'](os.path.join("%{0}%".format(name), directory_inside))
     else:
         #first check that this export is already present
