@@ -5,9 +5,9 @@
 
 {{ repository("kube_repository", kubernetes) }}
 kubeadm:
-    pkg.latest:
-      - pkgs: {{ kubernetes.pkgs|tojson }}
+  pkg.latest:
+    - pkgs: {{ kubernetes.pkgs|tojson }}
 {{ pkg_latest_opts() | indent(4) }}
-      - require:
-        - pkgrepo_ext: kube_repository
-        - service: docker
+    - require:
+      - pkgrepo_ext: kube_repository
+      - service: docker
