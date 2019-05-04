@@ -53,7 +53,10 @@ platforms:
 #      customize:
 #        host: some-host
 #        username: user
+#        id_ssh_key_file: /home/user/.ssh/id_rsa
 #        uri: "qemu+ssh://otherHost/system"
+#      ssh:
+#        insert_key: false
     driver_config:
       run_command: /lib/systemd/systemd
 
