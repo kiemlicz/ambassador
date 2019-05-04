@@ -8,3 +8,5 @@ venv/
 .kitchen/
 .target/
 Gemfile.lock
+# local overrides for kitchen tests
+kitchen.local.yml
