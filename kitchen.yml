@@ -49,6 +49,11 @@ platforms:
         - remote: 'sudo pip3 install --upgrade pyOpenSSL pygit2==0.27.3 docker-py cherrypy jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib google-auth'
     driver:
       box: "debian9" # "debian/stretch64", using custom image as stock one is 10G fs size only
+# use customize block for libvirt to specify remote libvirt
+#      customize:
+#        host: some-host
+#        username: user
+#        uri: "qemu+ssh://otherHost/system"
     driver_config:
       run_command: /lib/systemd/systemd
 
