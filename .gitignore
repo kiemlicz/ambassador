@@ -10,3 +10,4 @@ venv/
 Gemfile.lock
 # local overrides for kitchen tests
 kitchen.local.yml
+requirements.lock
