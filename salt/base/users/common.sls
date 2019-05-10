@@ -16,15 +16,18 @@
     - addusers:
       - {{ username }}
 {% endif %}
+
+{% if user.user_dirs is defined and user.user_dirs %}
 {{ username }}_setup_directories:
   file.directory:
     - user: {{ username }}
     - group: {{ username }}
     - mode: 755
     - makedirs: True
-    - names: {{ user.user_dirs|default([])|tojson }}
+    - names: {{ user.user_dirs|tojson }}
     - require:
       - user: {{ username }}
+{% endif %}
 
 {% if user.git is defined %}
 #https://github.com/saltstack/salt/issues/19869
