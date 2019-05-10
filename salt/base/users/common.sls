@@ -5,9 +5,9 @@
 {{ username }}_setup_user:
   user.present:
     - name: {{ username }}
-    - fullname: {{ user.fullname }}
-    - shell: {{ user.shell }}
-    - home: {{ user.home_dir }}
+    - fullname: {{ user.fullname|default(username) }}
+    - shell: {{ user.shell|default("/bin/bash") }}
+    - home: {{ user.home_dir|default("/home/" ~ username) }}
     - require:
       - sls: os # deliberately full sls (in case of urgent pkgs.post_install commands)
 {% if user.groups is defined %}
@@ -22,7 +22,7 @@
     - group: {{ username }}
     - mode: 755
     - makedirs: True
-    - names: {{ user.user_dirs|tojson }}
+    - names: {{ user.user_dirs|default([])|tojson }}
     - require:
       - user: {{ username }}
 
