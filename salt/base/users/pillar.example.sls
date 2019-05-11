@@ -29,11 +29,11 @@ users:
           enc: "ssh-rsa"
         - source: salt://keys/user_key.pub
       ssh:
-        - name: home
+        home:
           privkey_location: {{ home_dir }}/.ssh/id_rsa
           pubkey_location: {{ home_dir }}/.ssh/id_rsa.pub
           override: False
-        - name: dotfile
+        dotfile:
           privkey_location: {{ home_dir }}/.ssh/cfg_ro.key
           pubkey_location: {{ home_dir }}/.ssh/cfg_ro.key.pub
           override: False
