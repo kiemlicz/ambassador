@@ -28,6 +28,9 @@ users:
     known_hosts:
       - bitbucket.org
       - github.com
+    cron:
+      - name: echo 'hello'
+        minute: */2
     sec:
       ssh_authorized_keys:
         - names:

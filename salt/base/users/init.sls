@@ -6,6 +6,7 @@ include:
   - users.vpn
   - users.dotfiles
   - users.backup
+  - users.cron
 
 users-notification:
   test.show_notification:
