@@ -12,7 +12,7 @@ mail:
     - pkgs: {{ mail.pkgs|tojson }}
     - require:
       - sls: os
-{% for config in mail.configs %}
+{% for name, config in mail.configs.items() if config %}
 mail_config_{{ config.location }}:
   file_ext.managed:
     - name: {{ config.location }}

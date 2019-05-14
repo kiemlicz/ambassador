@@ -9,14 +9,16 @@ locale:
 
 mail:
   configs:
-    - location: "/etc/exim4/passwd"
+    passwd:
+      location: "/etc/exim4/passwd"
       source: "salt://mail/templates/passwd"
       user: 'root'
       group: 'Debian-exim'
       mode: '640'
       settings:
         "username@domain.com": "uberpassword"
-    - location: "/etc/email-addresses"
+    email-addresses:
+      location: "/etc/email-addresses"
       source: "salt://mail/templates/email-addresses"
       user: 'root'
       group: 'root'

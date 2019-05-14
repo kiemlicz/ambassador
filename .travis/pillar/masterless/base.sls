@@ -9,7 +9,8 @@ locale:
 
 mail:
   configs:
-    - location: "/etc/exim4/update-exim4.conf.conf"
+    update-exim4.conf.conf:
+      location: "/etc/exim4/update-exim4.conf.conf"
       source: "salt://mail/templates/update-exim4.conf.conf"
       user: 'root'
       group: 'root'
@@ -30,14 +31,16 @@ mail:
         dc_localdelivery: 'mail_spool'
         MAIN_TLS_ENABLE: 1
         disable_ipv6: 'true'
-    - location: "/etc/exim4/passwd"
+    passwd:
+      location: "/etc/exim4/passwd"
       source: "salt://mail/templates/passwd"
       user: 'root'
       group: 'Debian-exim'
       mode: '640'
       settings:
         "username@domain.com": "uberpassword"
-    - location: "/etc/email-addresses"
+    email-addresses:
+      location: "/etc/email-addresses"
       source: "salt://mail/templates/email-addresses"
       user: 'root'
       group: 'root'
