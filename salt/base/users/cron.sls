@@ -9,7 +9,7 @@
     - hour: {{ cron.hour|default('"*"') }}
     - daymonth: {{ cron.daymonth|default('"*"') }}
     - month: {{ cron.month|default('"*"')}}
-    - dayweek: {{ user.backup.dayweek|default('"*"') }}
+    - dayweek: {{ cron.dayweek|default('"*"') }}
     - require:
       - sls: users.common
 
