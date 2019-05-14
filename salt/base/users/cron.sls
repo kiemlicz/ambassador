@@ -5,10 +5,11 @@
   cron.present:
     - name: {{ cron.name }}
     - user: {{ username }}
-    - minute: {{ cron.minute|default("*") }}
-    - hour: {{ cron.hour|default("*") }}
-    - daymonth: {{ cron.daymonth|default("*") }}
-    - dayweek: {{ cron.dayweek|default("*") }}
+    - minute: {{ cron.minute|default('"*"') }}
+    - hour: {{ cron.hour|default('"*"') }}
+    - daymonth: {{ cron.daymonth|default('"*"') }}
+    - month: {{ cron.month|default('"*"')}}
+    - dayweek: {{ user.backup.dayweek|default('"*"') }}
     - require:
       - sls: users.common
 
