@@ -39,6 +39,14 @@
             'mode': '640',
             'settings': {}
           },
+          'passwd.client': {
+            'location': '/etc/exim4/passwd.client',
+            'source': 'salt://mail/templates/passwd.client',
+            'user': 'root',
+            'group': 'Debian-exim',
+            'mode': '640',
+            'settings': {}
+          },
           'email-addresses': {
             'location': '/etc/email-addresses',
             'source': 'salt://mail/templates/email-addresses',
