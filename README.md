@@ -23,7 +23,7 @@ The "installation" process end up with LXC container containing foreman&salt ful
 Simply follow two steps:  
 1. Clone this repo with submodules: `git submodule update --init` ([read more about submodules](https://github.com/kiemlicz/util/wiki/git))
 2. Ensure you have LXC configured: `requisites.sh`
-3. `nohup sudo ./setup.sh -c -n ambassador [-r] [--deploy_priv id_rsa --deploy_pub id_rsa.pub] &`
+3. `./setup.sh -c -n ambassador -u your_username,other_username_allowed_to_ssh_into_ambassador`
 
 # Workflow
 
