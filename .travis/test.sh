@@ -54,16 +54,14 @@ salt-master-run-k8s)
     trap k8s_log_error EXIT TERM INT
 
     helm dependency update .travis/chart
-    helm install .travis/chart -n salt --namespace salt-provisioning
+    helm install .travis/chart -n salt --namespace salt-provisioning --wait --timeout 300
 
-    # wait for logger first
-    kubectl wait -n salt-provisioning pod -l app=logstash --for condition=ready --timeout=5m
+    # wait for logger first, not sure if --wait waits for dependencies
+    #kubectl wait -n salt-provisioning pod -l app=logstash --for condition=ready --timeout=5m
     logger=$(kubectl get pod -l app=logstash -n salt-provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
     echo -e "\nlogs from: $logger"
     kubectl -n salt-provisioning logs -f $logger &
 
-    # wait until salt-master and minion containers are running and ready (ready == minion synchronized)
-    kubectl wait -n salt-provisioning pod -l name=salt-minion --for condition=ready --timeout=5m
     echo "Deployment ready:"
     kubectl get all -n salt-provisioning
 
@@ -80,7 +78,9 @@ salt-master-run-k8s)
     kubectl -n salt-provisioning delete pod -l name=salt-master
     kubectl -n salt-provisioning wait pod -l name=salt-master --for condition=ready --timeout=5m
 
-    sleep 120
+    # the minion must first re-auth to master that got down, will do that after auth_timeout (?) + thorium re-scan
+    # it will finally clean the old keys but honestly, why does it take so long?
+    sleep 180
     echo "\nAfter 2 min sleep: listing who's up"
     kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt-key -L
     kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt-run manage.up
