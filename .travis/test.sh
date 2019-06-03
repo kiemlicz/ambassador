@@ -81,7 +81,7 @@ salt-master-run-k8s)
     # the minion must first re-auth to master that got down, will do that after auth_timeout (?) + thorium re-scan
     # it will finally clean the old keys but honestly, why does it take so long?
     sleep 180
-    echo "\nAfter 2 min sleep: listing who's up"
+    echo "\nAfter 3 min sleep: listing who's up"
     kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt-key -L
     kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt-run manage.up
 # fixme
