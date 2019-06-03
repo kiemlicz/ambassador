@@ -4,14 +4,16 @@ ARG salt_ver=""
 
 COPY salt /srv/salt
 
-RUN apt-get update && apt-get install -y curl iproute2 dumb-init && \
+RUN apt-get update && apt-get install -y curl iproute2 && \
+    curl -o /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64 && \
+    chmod +x /usr/local/bin/dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n stable $salt_ver
 
 
 FROM salt-base AS salt-minion
 
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
 CMD [ "/usr/bin/salt-minion" ]
 
 
@@ -25,7 +27,7 @@ RUN apt-get install -y python3-pip && \
 # the salt-master should be installed but not running
 EXPOSE 4505:4505 4506:4506
 
-ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+ENTRYPOINT ["/usr/local/bin/dumb-init", "--"]
 CMD [ "/usr/bin/salt-master" ]
 
 
