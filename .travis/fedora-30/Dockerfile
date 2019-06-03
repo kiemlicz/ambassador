@@ -4,15 +4,15 @@ ARG salt_ver=""
 
 COPY salt /srv/salt
 
-RUN dnf -y --nogpgcheck update && dnf -y --nogpgcheck install curl procps && \
+RUN dnf -y --nogpgcheck update && dnf -y --nogpgcheck install curl procps dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n stable $salt_ver
 
 
 FROM salt-base AS salt-minion
 
-ENTRYPOINT [ "/usr/bin/salt-minion" ]
-CMD []
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD [ "/usr/bin/salt-minion" ]
 
 
 FROM salt-base AS salt-master
@@ -26,8 +26,8 @@ RUN dnf -y --nogpgcheck install python3-pip git @development-tools redhat-rpm-co
 # the salt-master should be installed but not running
 EXPOSE 4505:4505 4506:4506
 
-ENTRYPOINT [ "/usr/bin/salt-master" ]
-CMD []
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD [ "/usr/bin/salt-master" ]
 
 
 FROM salt-base AS dry-test
@@ -43,3 +43,4 @@ RUN salt-call --local saltutil.sync_all
 
 #don't understand why not python3
 ENTRYPOINT [ "python", "/opt/envoy_test.py" ]
+CMD []

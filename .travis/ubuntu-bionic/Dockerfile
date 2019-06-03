@@ -4,15 +4,15 @@ ARG salt_ver=""
 
 COPY salt /srv/salt
 
-RUN apt-get update && apt-get install -y curl dirmngr iproute2 && \
+RUN apt-get update && apt-get install -y curl dirmngr iproute2 dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n stable $salt_ver
 
 
 FROM salt-base AS salt-minion
 
-ENTRYPOINT [ "/usr/bin/salt-minion" ]
-CMD []
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD [ "/usr/bin/salt-minion" ]
 
 
 FROM salt-base AS salt-master
@@ -25,8 +25,8 @@ RUN apt-get install -y python3-pip && \
 # the salt-master should be installed but not running
 EXPOSE 4505:4505 4506:4506
 
-ENTRYPOINT [ "/usr/bin/salt-master" ]
-CMD []
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD [ "/usr/bin/salt-master" ]
 
 
 FROM salt-base AS dry-test
@@ -41,6 +41,7 @@ COPY .travis/envoy_test.py /opt/
 RUN salt-call --local saltutil.sync_all
 
 ENTRYPOINT [ "python3", "/opt/envoy_test.py" ]
+CMD []
 
 
 FROM salt-base AS masterless-test
@@ -61,7 +62,7 @@ COPY .travis/salt/masterless-test-top.sls /srv/salt/base/top.sls
 RUN printf '#!/bin/bash\necho "N 5"' > /sbin/runlevel && \
     chmod 775 /sbin/runlevel
 
-ENTRYPOINT salt-call --local state.highstate saltenv=$SALTENV -l $LOG_LEVEL
+CMD salt-call --local state.highstate saltenv=$SALTENV -l $LOG_LEVEL
 
 
 FROM salt-master AS master-compose-test
@@ -86,7 +87,7 @@ COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt
 RUN chmod 600 /etc/salt/autosign.conf && \
     salt-run saltutil.sync_all
 
-ENTRYPOINT [ "/opt/entrypoint_master_run.sh" ]
+CMD [ "/opt/entrypoint_master_run.sh" ]
 
 
 FROM salt-minion as minion-compose-test

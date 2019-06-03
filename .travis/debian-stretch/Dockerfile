@@ -4,7 +4,7 @@ ARG salt_ver=""
 
 COPY salt /srv/salt
 
-RUN apt-get update && apt-get install -y curl && \
+RUN apt-get update && apt-get install -y curl dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n stable $salt_ver
 
@@ -12,8 +12,8 @@ RUN apt-get update && apt-get install -y curl && \
 FROM salt-base AS salt-minion
 # hostname from `docker run -h` must be used as minion ID
 
-ENTRYPOINT [ "/usr/bin/salt-minion" ]
-CMD []
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD [ "/usr/bin/salt-minion" ]
 
 
 FROM salt-base AS salt-master
@@ -31,8 +31,8 @@ RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/s
 # the salt-master should be installed but not running
 EXPOSE 4505:4505 4506:4506
 
-ENTRYPOINT [ "/usr/bin/salt-master" ]
-CMD []
+ENTRYPOINT ["/usr/bin/dumb-init", "--"]
+CMD [ "/usr/bin/salt-master" ]
 
 
 FROM salt-base AS dry-test
@@ -47,6 +47,7 @@ COPY .travis/envoy_test.py /opt/
 RUN salt-call --local saltutil.sync_all
 
 ENTRYPOINT [ "python3", "/opt/envoy_test.py" ]
+CMD []
 
 
 FROM salt-base AS masterless-test
@@ -67,7 +68,7 @@ COPY .travis/salt/masterless-test-top.sls /srv/salt/base/top.sls
 RUN printf '#!/bin/bash\necho "N 5"' > /sbin/runlevel && \
     chmod 775 /sbin/runlevel
 
-ENTRYPOINT salt-call --local state.highstate saltenv=$SALTENV -l $LOG_LEVEL
+CMD salt-call --local state.highstate saltenv=$SALTENV -l $LOG_LEVEL
 
 
 FROM salt-master AS master-compose-test
@@ -92,7 +93,7 @@ COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt
 RUN chmod 600 /etc/salt/autosign.conf && \
     salt-run saltutil.sync_all
 
-ENTRYPOINT [ "/opt/entrypoint_master_run.sh" ]
+CMD [ "/opt/entrypoint_master_run.sh" ]
 
 
 FROM salt-master AS master-k8s-test
@@ -122,7 +123,7 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_
     chmod 600 /etc/salt/autosign.conf && \
     salt-run saltutil.sync_all
 
-ENTRYPOINT [ "/opt/entrypoint_master_run.sh" ]
+CMD [ "/opt/entrypoint_master_run.sh" ]
 
 
 FROM salt-minion as minion-compose-test
