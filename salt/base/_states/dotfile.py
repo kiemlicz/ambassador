@@ -2,25 +2,6 @@ import logging
 import os
 
 
-def _format_comments(comments):
-    '''
-    Return a joined list
-    '''
-    ret = '. '.join(comments)
-    if len(comments) > 1:
-        ret += '.'
-    return ret
-
-
-def _fail(ret, msg, comments=None):
-    ret['result'] = False
-    if comments:
-        msg += '\n\nFailure reason: '
-        msg += _format_comments(comments)
-    ret['comment'] = msg
-    return ret
-
-
 def managed(name, home_dir, username,
            branch, target, identity=None,
            render=False, override=False,
@@ -54,7 +35,7 @@ def managed(name, home_dir, username,
     # todo add context dict
 
     if not os.path.isabs(home_dir):
-        return _fail(ret, 'home_dir \'{0}\' is not an absolute path'.format(home_dir))
+        return __utils__['common.fail'](ret, 'DOTFILE: home_dir \'{0}\' is not an absolute path'.format(home_dir))
 
     run_check_cmd_kwargs = {'runas': username}
     if 'shell' in __grains__:
@@ -78,17 +59,15 @@ def managed(name, home_dir, username,
         if test_mode:
             __opts__['test']=True
         if not rdata['result']:
-            return _fail(ret, "Cloning dotfiles (templates) repo failed", [rdata['comment']])
+            return __utils__['common.fail'](ret, "DOTFILE: Cloning dotfiles (templates) repo failed", [rdata['comment']])
         return tdir
 
     def test_return(files_to_populate):
-        ret['result'] = None
-        ret['comment'] = 'dotfiles (url: {0}, branch: {1}) will be applied'.format(name, branch)
         ret['changes'] = {
             'old': 'Files that will be overriden: {0}'.format([e for e in files_to_populate if os.path.isfile(e)]),
             'new': 'Files that will be affected: {0}'.format(files_to_populate)
         }
-        return ret
+        return __utils__['common.test'](ret, 'DOTFILE: (url: {0}, branch: {1}) will be applied'.format(name, branch))
 
     if not render and "refs/heads/{0}".format(branch) in __salt__['git.remote_refs'](name, heads=True, tags=False, user=username, identity=identity, saltenv=saltenv):
         if __opts__['test']:
@@ -106,18 +85,18 @@ def managed(name, home_dir, username,
             return_data = __states__['git.latest'](name=name, target=git_dir, user=username, bare=True, identity=identity)
             # no branch at this point as this is bare repository
             if not return_data['result']:
-                return _fail(ret, "Cloning dotfiles repo failed", [return_data['comment']])
+                return __utils__['common.fail'](ret, "DOTFILE: Cloning dotfiles repo failed", [return_data['comment']])
             # backup previous files
             return_data = __states__['cmd.run']("mkdir -p {0}/.cfg.bak && "
                                                 "git --git-dir={1} --work-tree={0} checkout {2} 2>&1 | sed -n 's/\(^[[:alnum:]]\)\?\s\+\(\.[[:alnum:]]\+\)/\\2/p' | "
                                                 "xargs -I{{}} mv {{}} {0}/.cfg.bak/{{}}".format(target, git_dir, branch), runas=username)
             if return_data['changes']['retcode'] != 0:
-                return _fail(ret, "Backup of previous dotfiles failed", [return_data['changes']['stderr']])
+                return __utils__['common.fail'](ret, "DOTFILE: Backup of previous dotfiles failed", [return_data['changes']['stderr']])
 
             # as this is bare repo -f must be used
             return_data = __states__['cmd.run']("git --git-dir={0} --work-tree={1} checkout -f {2}".format(git_dir, target, branch), runas=username)
             if return_data['changes']['retcode'] != 0:
-                return _fail(ret, "Dotfiles checkout failed", [return_data['changes']['stderr']])
+                return __utils__['common.fail'](ret, "DOTFILE: Dotfiles checkout failed", [return_data['changes']['stderr']])
 
             __states__['cmd.run']("git --git-dir={0} --work-tree={1} config --local status.showUntrackedFiles no".format(git_dir, target), runas=username)
 
@@ -147,9 +126,6 @@ def managed(name, home_dir, username,
             ret['comment'] = "Templates parsing success"
             ret['changes'].update({'populated files': {'old': '', 'new': populated_files}})
 
-        ret['result'] = True
-        return ret
+        return __utils__['common.success'](ret, "DOTFILE: success with render")
 
-    ret['comment'] = "No changes"
-    ret['result'] = True
-    return ret
+    return __utils__['common.success'](ret, "DOTFILE: success", ["No changes"])

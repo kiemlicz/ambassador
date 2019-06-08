@@ -24,6 +24,15 @@ def success(ret: Dict[str, Any], msg: str, comments: List[str] = None) -> Dict[s
     return ret
 
 
+def test(ret: Dict[str, Any], msg: str, comments: List[str] = None) -> Dict[str, Any]:
+    if comments:
+        msg += _format_comments(comments)
+    log.info(msg)
+    ret['comment'] = msg
+    ret['result'] = None
+    return ret
+
+
 def _format_comments(comments: List[str]) -> str:
     ret = '. '.join(comments)
     if len(comments) > 1:
