@@ -123,6 +123,9 @@ export readonly SERVER_CERT_FILE=$SSL_CERT_DIR/$CONTAINER_FQDN.pem
 export readonly SERVER_PROXY_CERT_FILE=$SSL_CERT_DIR/$CONTAINER_FQDN-proxy.pem
 export readonly CRL_FILE=$SSL_BASE/crl.pem
 
+mkdir -p .target/etc/foreman/
+cp -r $SSL_BASE .target/etc/foreman/
+
 ##### build container
 
 readonly run_start_ts=$(date +%s.%N)
