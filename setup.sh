@@ -23,35 +23,12 @@ trap tear_down_container EXIT TERM INT
 while [[ $# -gt 0 ]]; do
     arg="$1"
     case $arg in
-        -c|--cert-gen)
-        GEN_CERT=true
+        --ssl-base)
+        SSL_BASE="$2"
+        shift # past argument
         ;;
         -n|--name)
         CN="$2"
-        shift # past argument
-        ;;
-        --ca)
-        CA_CERT_FILE="$2"
-        shift # past argument
-        ;;
-        --cert)
-        SERVER_CERT_FILE="$2"
-        shift # past argument
-        ;;
-        --proxy-cert)
-        SERVER_PROXY_CERT_FILE="$2"
-        shift # past argument
-        ;;
-        --key)
-        SERVER_KEY_FILE="$2"
-        shift # past argument
-        ;;
-        --proxy-key)
-        SERVER_PROXY_KEY_FILE="$2"
-        shift # past argument
-        ;;
-        --crl)
-        CRL_FILE="$2"
         shift # past argument
         ;;
         --deploy_priv)
@@ -87,7 +64,6 @@ while [[ $# -gt 0 ]]; do
     shift # past argument or value
 done
 
-readonly AUTO_CERT_GENERATION=${GEN_CERT-false}
 export readonly CONTAINER_NAME=${CN-ambassador}
 export readonly CONTAINER_CERT_BASE=/etc/foreman/ssl
 export readonly CONTAINER_CERT_DIR=$CONTAINER_CERT_BASE/certs
@@ -109,8 +85,8 @@ if [[ $EUID -eq 0 ]]; then
    echo "Warning: script is running as root"
 fi
 
-if [ "$AUTO_CERT_GENERATION" = false ] && ([ -z $CA_CERT_FILE ] || [ -z $SERVER_CERT_FILE ] || [ -z $SERVER_KEY_FILE ] || [ -z $CRL_FILE ]); then
-    echo "Provide all: ca cert, server cert, server key and crl file or use auto-generation method"
+if [ -z "$SSL_BASE" ]; then
+    echo "Provide --ssl-base directory with all keys and certificates"
     exit 1
 fi
 
@@ -133,45 +109,19 @@ if [ ! -f ~/.ssh/id_rsa.pub ]; then
     exit 1
 fi
 
+##### initial
 export readonly CONTAINER_FQDN="$CONTAINER_NAME.$(dnsdomainname)"
 readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
-
-##### initial
-
-if [ "$AUTO_CERT_GENERATION" = true ]; then
-    . util/sec/cert_functions
-    mkdir -p .target/etc/foreman/ssl/private
-    mkdir -p .target/etc/foreman/ssl/certs
-    SSL_BASE=.target/etc/foreman/ssl
-    SSL_CERT_DIR=$SSL_BASE/certs
-    SSL_PRIVATE_DIR=$SSL_BASE/private
-    #further ssl/ca-certificates installation doesn't clear /etc/ssl/private/certs contents
-    echo "generating ca, certs: $SSL_BASE"
-    touch $SSL_BASE/index.txt
-    echo '01' > $SSL_BASE/serial
-    echo '01' > $SSL_BASE/crlnumber
-
-    export readonly CA_PK_FILE=$SSL_PRIVATE_DIR/ca.key.pem
-    export readonly CA_CERT_FILE=$SSL_CERT_DIR/ca.cert.pem
-    export readonly SERVER_KEY_FILE=$SSL_PRIVATE_DIR/$CONTAINER_FQDN.key
-    export readonly SERVER_PROXY_KEY_FILE=$SSL_PRIVATE_DIR/$CONTAINER_FQDN-proxy.key
-    export readonly SERVER_CERT_FILE=$SSL_CERT_DIR/$CONTAINER_FQDN.pem
-    export readonly SERVER_PROXY_CERT_FILE=$SSL_CERT_DIR/$CONTAINER_FQDN-proxy.pem
-    export readonly CRL_FILE=$SSL_BASE/crl.pem
-    gen_rsa_key $CA_PK_FILE
-    gen_x509_cert_self_signed $CA_PK_FILE $CA_CERT_FILE config/ssl/openssl-ca.cnf $SSL_BASE
-    echo "ca generation done, generating server secrets"
-    gen_crl_nonstd $CA_PK_FILE $CA_CERT_FILE $CRL_FILE config/ssl/openssl-ca.cnf $SSL_BASE
-    gen_rsa_key $SERVER_KEY_FILE
-    SERVER_FQDN=$CONTAINER_FQDN gen_csr $SERVER_KEY_FILE /tmp/$CONTAINER_FQDN.csr config/ssl/openssl-server.cnf $SSL_BASE
-    echo "signing server's csr"
-    gen_csr_sign /tmp/$CONTAINER_FQDN.csr $SERVER_CERT_FILE config/ssl/openssl-ca.cnf $SSL_BASE
-    # key/cert for foreman-proxy as well
-    gen_rsa_key $SERVER_PROXY_KEY_FILE
-    SERVER_FQDN=$CONTAINER_FQDN-proxy gen_csr $SERVER_PROXY_KEY_FILE /tmp/$CONTAINER_FQDN-proxy.csr config/ssl/openssl-server.cnf $SSL_BASE
-    echo "signing server's proxy csr"
-    gen_csr_sign /tmp/$CONTAINER_FQDN-proxy.csr $SERVER_PROXY_CERT_FILE config/ssl/openssl-ca.cnf $SSL_BASE
-fi
+# certificates and keys are expected to be found in following locations
+SSL_CERT_DIR=$SSL_BASE/certs
+SSL_PRIVATE_DIR=$SSL_BASE/private
+#export readonly CA_PK_FILE=$SSL_PRIVATE_DIR/ca.key.pem
+export readonly CA_CERT_FILE=$SSL_CERT_DIR/ca.cert.pem
+export readonly SERVER_KEY_FILE=$SSL_PRIVATE_DIR/$CONTAINER_FQDN.key
+export readonly SERVER_PROXY_KEY_FILE=$SSL_PRIVATE_DIR/$CONTAINER_FQDN-proxy.key
+export readonly SERVER_CERT_FILE=$SSL_CERT_DIR/$CONTAINER_FQDN.pem
+export readonly SERVER_PROXY_CERT_FILE=$SSL_CERT_DIR/$CONTAINER_FQDN-proxy.pem
+export readonly CRL_FILE=$SSL_BASE/crl.pem
 
 ##### build container
 
