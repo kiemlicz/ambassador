@@ -10,17 +10,23 @@ source .travis/common.sh
 
 case "$1" in
 dry)
-    docker_update
+    if [ "$TRAVIS" = "true" ]; then
+        docker_update
+    fi
     docker_build salt-minion "envoy-minion-$DOCKER_IMAGE:$TAG"
     docker_build salt-master "envoy-master-$DOCKER_IMAGE:$TAG"
     docker_build dry-test "envoy-dry-test-$DOCKER_IMAGE:$TAG"
     ;;
 masterless)
-    docker_update
+    if [ "$TRAVIS" = "true" ]; then
+        docker_update
+    fi
     docker_build masterless-test "masterless-test-$DOCKER_IMAGE:$TAG"
     ;;
 salt-master-run-compose)
-    docker_update
+    if [ "$TRAVIS" = "true" ]; then
+        docker_update
+    fi
     docker_compose_update
     docker-compose -f .travis/docker-compose.yml --project-directory=. up --no-start
     ;;

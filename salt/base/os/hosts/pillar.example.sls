@@ -1,4 +1,5 @@
 hosts:
-  1.2.3.4:
-    - name1
-    - name2
+  1.2.3.4: [ coolname ]
+  192.168.1.1:
+    - gw
+    - mygw

@@ -33,10 +33,8 @@ CMD [ "/usr/bin/salt-master" ]
 FROM salt-base AS dry-test
 
 COPY .travis/reactor /srv/reactor
-COPY .travis/pillar/dry-test/ /srv/pillar/
 COPY .travis/salt/dry-test-top.sls /srv/salt/base/top.sls
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/config/pillar.conf /etc/salt/minion.d/pillar.conf
 COPY .travis/envoy_test.py /opt/
 
 RUN salt-call --local saltutil.sync_all
