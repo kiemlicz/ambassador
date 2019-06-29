@@ -19,7 +19,7 @@ FROM salt-base AS salt-master
 
 RUN dnf -y --nogpgcheck install python3-pip git @development-tools redhat-rpm-config python3-devel libgit2-devel && \
     alternatives --install /usr/bin/pip pip /usr/bin/pip3 20 && \
-    pip3 install --upgrade pyOpenSSL pygit2 docker-py cherrypy jinja2 PyYAML requests_oauthlib google-auth && \
+    pip3 install --upgrade pathlib pyOpenSSL pygit2 docker-py cherrypy jinja2 PyYAML requests_oauthlib google-auth && \
     dnf -y --nogpgcheck install salt-master
 
 # somehow installed pip3 as pip alternative didn't work
