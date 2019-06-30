@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y curl dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n stable $salt_ver
 
+WORKDIR /srv
+
 
 FROM salt-base AS salt-minion
 
@@ -35,6 +37,8 @@ COPY .travis/reactor /srv/reactor
 COPY .travis/salt/dry-test-top.sls /srv/salt/base/top.sls
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
 COPY .travis/envoy_test.py /opt/
+
+WORKDIR /opt
 
 RUN salt-call --local saltutil.sync_all
 

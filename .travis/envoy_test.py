@@ -101,8 +101,8 @@ class SaltStatesTest(ParametrizedSaltTestCase):
 
 if __name__ == "__main__":
     suite = unittest.TestSuite()
-    for saltenv in ["base", "dev", "server"]:
-        suite.addTest(ParametrizedSaltTestCase.parametrize(SaltStatesTest, saltenv=saltenv))
+    # testing only for 'top-most' saltenv which includes all other saltenvs
+    suite.addTest(ParametrizedSaltTestCase.parametrize(SaltStatesTest, saltenv="server"))
     result = unittest.TextTestRunner(verbosity=2).run(suite)
     if not result.wasSuccessful():
         raise SystemError("Some tests have failed, check logs")
