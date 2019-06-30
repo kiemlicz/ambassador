@@ -1,4 +1,5 @@
-{% set java_type = salt['pillar.get']("java:type", default="oracle") %}
+{# default is openjdk due to https://www.linuxuprising.com/2019/06/new-oracle-java-11-installer-for-ubuntu.html #}
+{% set java_type = salt['pillar.get']("java:type", default="openjdk") %}
 
 {% set version_major = salt['pillar.get']("java:version_major", default="11") %}
 
@@ -69,7 +70,7 @@
         'generic_link': '$(readlink -f /usr/bin/java | sed "s:\(jre\)*/bin/java::")',
         'keyid': "73C3DB2A",
         'keyserver': "hkp://keyserver.ubuntu.com:80",
-        'pkg_name': "oracle-java" ~ version_major ~ "-installer",
+        'pkg_name': "oracle-java" ~ version_major ~ "-installer-local",
         'ext_pkgs': []
     },
 }, merge=salt['pillar.get']('java')) %}
