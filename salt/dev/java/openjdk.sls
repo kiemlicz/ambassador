@@ -7,6 +7,7 @@ include:
   - os
 
 
+# since openjdk may require setup of backports-type repo, setup it using os.repositories state (along with preferences)
 java:
   pkg.latest:
     - name: {{ java.pkg_name }}

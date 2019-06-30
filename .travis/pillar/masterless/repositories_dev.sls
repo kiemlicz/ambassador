@@ -29,12 +29,20 @@ repositories:
                    'file': '/etc/apt/sources.list.d/erlang.list',
                    'names': ["deb http://packages.erlang-solutions.com/" + os.lower() +  " " + dist_codename + " contrib"],
                    'key_url': "http://packages.erlang-solutions.com/" + os.lower() + "/erlang_solutions.asc",
+                }, {
+                   'file': '/etc/apt/sources.list.d/backports.list',
+                   'names': ["deb http://ftp.debian.org/debian stretch-backports main"],
                 }
       ],
       'preferences': [ {
                           'file': '/etc/apt/preferences.d/erlang.pref',
                           'pin': 'release o=Erlang Solutions Ltd.',
                           'priority': '999'
-                        }]
+                        }, {
+                          'file': '/etc/apt/preferences.d/backports.pref',
+                          'pin': 'release o=Debian Backports',
+                          'priority': '800'
+                        }
+                        ]
     },
   }, grain='oscodename'))|tojson }}
