@@ -1,0 +1,46 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  config.vm.box = "debian/stretch64"
+  config.vm.hostname = "zeus"
+
+  config.vm.define "zeus" do |node|
+    node.vm.provider :lxc do |lxc|
+      lxc.container_name = :machine
+      lxc.backingstore = 'best'
+      lxc.fetch_ip_tries = 30
+      lxc.customize "network.type", "veth"
+      lxc.customize "network.link", "virbr1"
+      lxc.customize "network.flags", "up"
+    end
+  end
+
+  config.vm.provision "file", source: "~/local/keys/cfg_ro.key", destination: "~/local/keys/cfg_ro"
+  config.vm.provision "file", source: "~/local/keys/cfg_ro.key.pub", destination: "~/local/keys/cfg_ro.pub"
+  config.vm.provision "file", source: "~/local/keys/pillargpg.gpg", destination: "~/local/keys/pillargpg.gpg"
+  config.vm.provision "file", source: "~/local/keys/pillargpg.gpg.pub", destination: "~/local/keys/pillargpg.gpg.pub"
+  config.vm.provision "salt deps", type: "shell", env: {"SHELL": "/bin/bash"} do |s|
+    s.inline = <<-SHELL
+         mkdir -p /srv/pillar
+         echo "deb http://ftp.debian.org/debian stretch-backports main" | sudo tee /etc/apt/sources.list.d/backports.list
+         sudo apt-get update
+         sudo apt-get upgrade -y -o DPkg::Options::=--force-confold
+         sudo apt-get install -y ca-certificates wget host curl gnupg2 sudo apt-transport-https libffi-dev git python3-pip zlib1g-dev
+         sudo apt-get install -t stretch-backports -y libgit2-dev
+         sudo pip3 install --upgrade pyOpenSSL pygit2==0.27.3 docker-py cherrypy jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib google-auth
+         sudo mkdir -p /etc/salt/gpgkeys
+         sudo chmod 0700 /etc/salt/gpgkeys
+         sudo gpg --homedir /etc/salt/gpgkeys --import /home/vagrant/local/keys/pillargpg.gpg
+         sudo gpg --homedir /etc/salt/gpgkeys --import /home/vagrant/local/keys/pillargpg.gpg.pub
+    SHELL
+  end
+  config.vm.provision :salt do |salt|
+    salt.masterless = true
+    salt.run_highstate = true
+    salt.minion_config = "minion.conf"
+    salt.bootstrap_options = "-x python3"
+    salt.python_version = 3
+  end
+end

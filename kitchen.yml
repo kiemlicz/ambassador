@@ -11,7 +11,7 @@ provisioner:
   require_chef: false
   is_file_root: true
   salt_file_root: /srv
-  salt_minion_config_template: .test/config/minion.erb
+  salt_minion_config_template: .test/minion.erb
   salt_minion_config_dropin_files:
     - .local/pillar.conf
   salt_copy_filter:
@@ -37,28 +37,5 @@ provisioner:
     - Vagrantfile
     - Vagrantfile.common
 
-platforms:
-  - name: debian
-    lifecycle:
-      pre_converge:
-        - remote: 'echo "deb http://ftp.debian.org/debian stretch-backports main" | sudo tee /etc/apt/sources.list.d/backports.list'
-        - remote: 'sudo apt-get update'
-        - remote: 'sudo apt-get upgrade -y -o DPkg::Options::=--force-confold'
-        - remote: 'sudo apt-get install -y ca-certificates wget host curl gnupg2 sudo apt-transport-https libffi-dev git python3-pip zlib1g-dev'
-        - remote: 'sudo apt-get install -t stretch-backports -y libgit2-dev'
-        - remote: 'sudo pip3 install --upgrade pyOpenSSL pygit2==0.27.3 docker-py cherrypy jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib google-auth'
-    driver:
-      box: "debian9" # "debian/stretch64", using custom image as stock one is 10G fs size only
-# use customize block for libvirt to specify remote libvirt
-#      customize:
-#        host: some-host
-#        username: user
-#        id_ssh_key_file: /home/user/.ssh/id_rsa
-#        uri: "qemu+ssh://otherHost/system"
-#      ssh:
-#        insert_key: false
-    driver_config:
-      run_command: /lib/systemd/systemd
-
-suites:
-  - name: default
+# kitchen.local.yml contains platforms definitions
+platforms: []
