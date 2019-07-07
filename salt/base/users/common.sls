@@ -31,10 +31,10 @@
 
 {% if user.git is defined %}
 #https://github.com/saltstack/salt/issues/19869
-{{ username }}_no_home_workaround:
-  environ.setenv:
-    - name: HOME
-    - value: {{ user.home_dir }}
+#{{ username }}_no_home_workaround:
+#  environ.setenv:
+#    - name: HOME
+#    - value: {{ home_dir }}
 {% for k,v in user.git.items() %}
 git_global_config_{{ username }}_{{ k }}:
   git.config_set:

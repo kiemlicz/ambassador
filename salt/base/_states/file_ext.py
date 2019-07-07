@@ -341,11 +341,11 @@ def _get_file(auth_http, file_meta, mime_type='text/plain'):
 
 
 def _gdrive_connection():
-    config = __salt__['config.get']('google_api')
+    config = __salt__['config.get']('google_api', merge="recurse")
     token_url = config['token_url']
     client_id = config['client_id']
     client_secret = config['client_secret']
-    token = __salt__['pillar.get']("gdrive")
+    token = __salt__['config.get']("gdrive", merge="recurse")
     log.debug("Token retrieved: {}".format(token))
 
     if not isinstance(token, dict):
