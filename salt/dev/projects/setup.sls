@@ -22,6 +22,7 @@
     - source: {{ config.source }}
     - user: {{ username }}
     - makedirs: True
+    - skip_verify: True
 {% if config.context is defined %}
     - context: {{ config.context|tojson }}
 {% endif %}
