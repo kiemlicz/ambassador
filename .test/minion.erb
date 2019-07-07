@@ -17,8 +17,10 @@ gitfs_saltenv_whitelist:
   - dev
   - server
 
+# roots is disabled by default in order to test always the lastest changes from gitfs
+# re-enable this with caution (probably old files from Zeus' filesystem may become State Tree)
 fileserver_backend:
-  - roots
+#  - roots
   - git
 
 
