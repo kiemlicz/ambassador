@@ -31,9 +31,9 @@ docker_build() {
         exit 4
     fi
     build_args=(
-        "--build-arg=salt_ver=$SALT_VER",
-        "--build-arg=log_level=${LOG_LEVEL-info}",
-        "--build-arg=saltenv=$SALTENV",
+        "--build-arg=salt_ver=$SALT_VER"
+        "--build-arg=log_level=${LOG_LEVEL-info}"
+        "--build-arg=saltenv=$SALTENV"
         "--build-arg=kubectl_ver=$KUBECTL_VER"
     )
     if [ ! -z $BASE_IMAGE_TAG ]; then

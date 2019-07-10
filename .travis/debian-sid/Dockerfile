@@ -5,7 +5,7 @@ ARG salt_ver=""
 
 COPY salt /srv/salt
 
-RUN apt-get update && apt-get install -y curl dumb-init && \
+RUN apt-get update && apt-get install -y procps curl dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n stable $salt_ver
 
