@@ -46,18 +46,21 @@ jobs:
       script: .travis/test.sh masterless
       env:
         - DOCKER_IMAGE=debian-stretch
+        - BASE_IMAGE_TAG=stretch
         - SALTENV=base
         - CONTEXT=base
     - before_install: .travis/prepare.sh masterless
       script: .travis/test.sh masterless
       env:
         - DOCKER_IMAGE=debian-stretch
+        - BASE_IMAGE_TAG=stretch
         - SALTENV=base
         - CONTEXT=gui
     - before_install: .travis/prepare.sh masterless
       script: .travis/test.sh masterless
       env:
         - DOCKER_IMAGE=debian-stretch
+        - BASE_IMAGE_TAG=stretch
         - SALTENV=dev
         - CONTEXT=dev
     - before_install: .travis/prepare.sh masterless

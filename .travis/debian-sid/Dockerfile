@@ -1,4 +1,5 @@
-FROM debian:sid-slim AS salt-base
+ARG tag="sid-slim"
+FROM debian:$tag AS salt-base
 # "" == latest
 ARG salt_ver=""
 

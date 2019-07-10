@@ -1,4 +1,5 @@
-FROM ubuntu:bionic AS salt-base
+ARG tag="bionic"
+FROM ubuntu:$tag AS salt-base
 # "" == latest
 ARG salt_ver=""
 

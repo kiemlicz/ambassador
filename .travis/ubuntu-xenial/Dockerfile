@@ -1,4 +1,5 @@
-FROM ubuntu:xenial AS salt-base
+ARG tag="xenial"
+FROM ubuntu:$tag AS salt-base
 # "" == latest
 ARG salt_ver=""
 

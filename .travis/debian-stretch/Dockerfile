@@ -1,4 +1,5 @@
-FROM debian:stretch-slim AS salt-base
+ARG tag="stretch-slim"
+FROM debian:$tag AS salt-base
 # "" == latest
 ARG salt_ver=""
 
