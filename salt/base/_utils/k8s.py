@@ -4,7 +4,7 @@ import os
 from salt.exceptions import CommandExecutionError
 
 try:
-    from kubernetes import client, config
+    from kubernetes import client, config, watch
     from kubernetes.client import ApiClient
     from kubernetes.client.rest import ApiException
 
@@ -37,6 +37,7 @@ class K8sClient(object):
         self.client_apps_v1_api = client.AppsV1Api()
         self.client_core_v1_api = client.CoreV1Api()
         self.client_api = ApiClient()
+        self.watch = watch.Watch()
 
     def read(self, kind, namespaced=True, name=None, namespace=None):
         if not namespace:
@@ -49,6 +50,12 @@ class K8sClient(object):
             namespace = self.active_namespace
         method = "list_namespaced_{}".format(kind) if namespaced else "list_{}".format(kind)
         return self._invoke(kind, method, namespaced, label_selector=label_selector, namespace=namespace)
+
+    def watch_start(self, namespace, timeout=60):
+        return self.watch.stream(namespace, timeout)  # todo timeout_seconds ?
+
+    def watch_stop(self):
+        self.watch.stop()
 
     def _invoke(self, kind, method, namespaced, **kwargs):
         try:

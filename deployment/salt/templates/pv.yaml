@@ -5,6 +5,7 @@ metadata:
   name: {{ include "salt.fullname" . }}-{{ .Release.Namespace }}-saltpki
   labels:
     name: {{ include "salt.fullname" . }}-{{ .Release.Namespace }}-saltpki
+    role: saltpki
 spec:
   capacity:
     storage: 5Mi
@@ -25,6 +26,7 @@ metadata:
   name: {{ include "salt.fullname" . }}-{{ .Release.Namespace }}-saltqueue
   labels:
     name: {{ include "salt.fullname" . }}-{{ .Release.Namespace }}-saltqueue
+    role: saltqueue
 spec:
   capacity:
     storage: 128Mi

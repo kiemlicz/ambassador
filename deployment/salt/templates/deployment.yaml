@@ -1,3 +1,4 @@
+{{- $root := . -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,9 +27,19 @@ spec:
         - name: {{ include "salt.fullname" . }}-registry-credentials
 {{- end }}
       volumes:
-        - name: pillar
+{{- range $key, $val := .Values.saltMaster.config }}
+        - name: master-config-{{ $key | replace "." "-" }}
           configMap:
-            name: {{ .Values.saltMaster.service.name }}-pillar-cm
+            name: {{ $root.Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-config-cm
+            defaultMode: 0644
+{{- end }}
+        - name: pillar-overrides
+          configMap:
+            name: {{ .Values.saltMaster.service.name }}-pillar-overrides
+            defaultMode: 0644
+        - name: cloud-providers
+          configMap:
+            name: {{ .Values.saltMaster.service.name }}-cloud-providers-cm
             defaultMode: 0644
 {{ if .Values.persistence.enabled }}
         - name: saltqueue
@@ -45,16 +56,15 @@ spec:
 {{- end }}
       containers:
         - name: {{ .Values.saltMaster.service.name }}
-          image: {{ .Values.saltMaster.image.repository }}:{{.Values.saltMaster.image.tag }}
+          image: {{ .Values.saltMaster.image.repository }}:{{ tpl .Values.saltMaster.image.tag . }}
           imagePullPolicy: {{ .Values.saltMaster.image.pullPolicy }}
-          readinessProbe:
-            tcpSocket:
-              port: 4505
-            initialDelaySeconds: 15
-            periodSeconds: 20
+          readinessProbe: {{ .Values.saltMaster.readinessProbe | toYaml | nindent 12 }}
+          livenessProbe: {{ .Values.saltMaster.livenessProbe | toYaml | nindent 12 }}
           ports:
-            - containerPort: 4505
-            - containerPort: 4506
+            - name: publisher
+              containerPort: 4505
+            - name: reqserver
+              containerPort: 4506
           volumeMounts:
             - mountPath: /etc/salt/pki/master
               name: saltpki
@@ -62,6 +72,15 @@ spec:
             - mountPath: /var/cache/salt/master/queues
               name: saltqueue
               readOnly: false
+            - mountPath: /etc/salt/cloud.providers.d
+              name: cloud-providers
+              readOnly: false
             - mountPath: /srv/pillar/overrides
-              name: pillar
+              name: pillar-overrides
               readOnly: true
+{{- range $key, $val := .Values.saltMaster.config }}
+            - name: master-config-{{ $key | replace "." "-" }}
+              mountPath: /etc/salt/master.d/{{ $key }}
+              subPath: {{ $key }}
+              readOnly: false
+{{- end }}

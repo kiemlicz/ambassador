@@ -7,12 +7,12 @@ spec:
 {{ if .Values.storage.enabled }}
   storageClassName: {{ .Values.storage.className }}
 {{ end }}
-  selector: {{ .Values.persistence.saltpkiSelector | toYaml | nindent 4 }}
+{{ if .Values.persistence.saltPkiSelector }}
+  selector: {{ .Values.persistence.saltPkiSelector | toYaml | nindent 4 }}
+{{ end }}
   accessModes:
     - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Mi
+  resources: {{ .Values.persistence.saltPkiResources | toYaml | nindent 4 }}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
@@ -22,10 +22,10 @@ spec:
 {{ if .Values.storage.enabled }}
   storageClassName: {{ .Values.storage.className }}
 {{ end }}
-  selector: {{ .Values.persistence.saltqueueSelector | toYaml | nindent 4 }}
+{{ if .Values.persistence.saltQueueSelector }}
+  selector: {{ .Values.persistence.saltQueueSelector | toYaml | nindent 4 }}
+{{ end }}
   accessModes:
     - ReadWriteOnce
-  resources:
-    requests:
-      storage: 128Mi
+  resources: {{ .Values.persistence.saltQueueResources | toYaml | nindent 4 }}
 {{- end }}
