@@ -13,7 +13,7 @@ env:
     - COMPOSE_VER="1.22.0"
     - KUBECTL_VER="v1.14.2"
     - REPO_URL=$(git config remote.origin.url)
-    - GH_URL="https://ambassador.github.io/helm-charts"
+    - GH_URL="https://kiemlicz.github.io/ambassador/"
     - TARGET_BRANCH="gh-pages"
 
 jobs:
@@ -96,4 +96,4 @@ jobs:
         - CHANGE_MINIKUBE_NONE_USER=true # adjusts minikube permissions when driver=none
       before_install: .travis/prepare.sh salt-master-run-k8s
       script: .travis/test.sh salt-master-run-k8s
-      #after_success: .travis/publish.sh chart
+      after_success: .travis/publish.sh chart
