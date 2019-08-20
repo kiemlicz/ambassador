@@ -1,8 +1,0 @@
-{% set mongodb_client = salt['grains.filter_by']({
-    'RedHat': {
-        'pkg_name': 'mongodb-clients',
-    },
-    'Debian': {
-        'pkg_name': 'mongodb-clients',
-    },
-}, merge=salt['pillar.get']('mongodb:client')) %}

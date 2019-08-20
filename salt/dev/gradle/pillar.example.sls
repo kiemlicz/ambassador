@@ -1,2 +1,0 @@
-gradle:
-  owner: testuser

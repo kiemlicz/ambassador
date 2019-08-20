@@ -1,3 +1,0 @@
-Package: *
-Pin: {{ pin }}
-Pin-Priority: {{ priority }}
