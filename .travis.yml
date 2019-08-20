@@ -12,6 +12,9 @@ env:
     - SALT_VER="" # latest
     - COMPOSE_VER="1.22.0"
     - KUBECTL_VER="v1.14.2"
+    - REPO_URL=$(git config remote.origin.url)
+    - GH_URL="https://ambassador.github.io/helm-charts"
+    - TARGET_BRANCH="gh-pages"
 
 jobs:
   allow_failures:
