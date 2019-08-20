@@ -7,56 +7,12 @@ saltMaster:
 #  config:
 #    custom.conf: |-
 
-
 saltMinion:
   image:
     tag: latest
     repository: "salt-minion"
     pullPolicy: Never
   # travis uses dedicated image
-  config:
-    custom.conf: |-
-      use_superseded:
-        - module.run
-
-      #tests are run in docker
-      #override provider because in docker container the default one could be impossible to use (e.g. systemd)
-      providers:
-        service: service
-
-      auth_safemode: False
-      ping_interval: 1
-      rejected_retry: True
-
-      engines:
-        - docker_events:
-            docker_url: unix://var/run/docker.sock
-            filters:
-              event:
-                 - create
-                 - start
-                 - stop
-                 - die
-                 - oom
-
-      master: salt-master
-
-      mine_functions:
-        network.interfaces: []
-        network.ip_addrs: []
-
-      log_level: info
-      #log_level_logfile: info
-
-      logstash_udp_handler:
-        host: logstash
-        port: 1514
-        version: 1
-        msg_type: logstash
-
-      beacons:
-        status:
-          - interval: 5
 
 volume:
   enabled: true

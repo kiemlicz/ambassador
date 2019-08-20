@@ -39,14 +39,13 @@ saltMaster:
         - 'salt/minion/*/start':
           - /srv/reactor/minion_ready.sls
 
-{{- if .Values.logstash.enabled }}
-    logstash.conf: |-
+      {{- if .Values.logstash.enabled }}
       logstash_udp_handler:
         host: logstash.logging
         port: 1514
         version: 1
         msg_type: logstash
-{{- end }}
+      {{- end }}
 
   cloudProviders: {}
 
@@ -83,24 +82,17 @@ saltMinion:
         network.interfaces: []
         network.ip_addrs: []
 
-      logstash_udp_handler:
-        host: logstash.logging
-        port: 1514
-        version: 1
-        msg_type: logstash
-
       beacons:
         status:
           - interval: 45
 
-{{- if .Values.logstash.enabled }}
-    logstash.conf: |-
+      {{- if .Values.logstash.enabled }}
       logstash_udp_handler:
         host: logstash.logging
         port: 1514
         version: 1
         msg_type: logstash
-{{- end }}
+      {{- end }}
 
   readinessProbe:
     exec:
