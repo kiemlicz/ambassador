@@ -118,6 +118,7 @@ COPY .travis/thorium/ /srv/thorium/
 COPY .travis/pillar/ /srv/pillar/
 COPY .travis/salt/ /srv/salt/
 # sync via _log_handlers does nothing... forcing override of installed packages
+# todo move to the base master / minion images
 COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/
 
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_ver/bin/linux/amd64/kubectl && \

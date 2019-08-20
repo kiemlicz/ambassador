@@ -140,6 +140,7 @@ volume:
                 - minikube
 
 logstash:
+  enabled: true
   fullnameOverride: "logstash"
   livenessProbe:
     httpGet:
