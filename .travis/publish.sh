@@ -38,18 +38,15 @@ chart)
   cp $BUILD_DIR/* .local/
   cd .local
 
-  # Deploy if there are some changes
-  git diff --quiet
-  if [ $? != 0 ]; then
-       # Add all new files to staging phase and commit the changes
-       git config user.name "Travis CI"
-       git config user.email "travis@travis-ci.org"
-       git add -A .
-       git status
-       git commit -m "Travis deploy $SHA"
-       # We can push.
-       git push "$SSH_REPO"
-  fi
-
+  # todo Deploy if there are some changes, git diff won't detect newly added files (since they are staged)
+  echo "Publishing Charts"
+  # Add all new files to staging phase and commit the changes
+  git config user.name "Travis CI"
+  git config user.email "travis@travis-ci.org"
+  git add -A .
+  git status
+  git commit -m "Travis deploy $SHA"
+  # We can push.
+  git push "$SSH_REPO"
   ;;
 esac
