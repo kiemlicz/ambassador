@@ -44,6 +44,7 @@ salt-master-run-k8s)
     docker_build minion-k8s-test salt-minion
 
     # Temporary dir for storing new packaged charts and index files
+    mkdir $BUILD_DIR
     helm dependency update deployment/salt
     helm package -d $BUILD_DIR deployment/salt
     cd $BUILD_DIR
