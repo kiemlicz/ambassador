@@ -12,9 +12,8 @@ env:
     - SALT_VER="" # latest
     - COMPOSE_VER="1.22.0"
     - KUBECTL_VER="v1.14.2"
-    - REPO_URL=$(git config remote.origin.url)
     - GH_URL="https://kiemlicz.github.io/ambassador/"
-    - TARGET_BRANCH="gh-pages"
+    - BUILD_DIR=".local"
 
 jobs:
   allow_failures:
@@ -97,3 +96,11 @@ jobs:
       before_install: .travis/prepare.sh salt-master-run-k8s
       script: .travis/test.sh salt-master-run-k8s
       after_success: .travis/publish.sh chart
+      deploy:
+        provider: pages
+        skip_cleanup: true
+        github_token: $GITHUB_TOKEN
+        keep_history: true
+        local_dir: ".local"
+#        on:
+#          branch: master

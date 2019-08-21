@@ -42,5 +42,16 @@ salt-master-run-k8s)
     # only one of each is required per one node cluster
     docker_build master-k8s-test salt-master
     docker_build minion-k8s-test salt-minion
+
+    # Temporary dir for storing new packaged charts and index files
+    helm dependency update deployment/salt
+    helm package -d $BUILD_DIR deployment/salt
+    cd $BUILD_DIR
+    # Indexing of charts
+    if [ -f index.yaml ]; then
+      helm repo index --url $GH_URL --merge index.yaml .
+    else
+      helm repo index --url $GH_URL .
+    fi
     ;;
 esac
