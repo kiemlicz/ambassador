@@ -103,5 +103,6 @@ jobs:
         keep_history: true
         local_dir: $BUILD_DIR
         target-branch: gh-pages
+        verbose: true
         on:
           branch: helm-refactor
