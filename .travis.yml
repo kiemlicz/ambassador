@@ -102,5 +102,6 @@ jobs:
         github_token: $GITHUB_TOKEN
         keep_history: true
         local_dir: $BUILD_DIR
-#        on:
-#          branch: master
+        target-branch: gh-pages
+        on:
+          branch: helm-refactor

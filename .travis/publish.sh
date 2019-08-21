@@ -10,4 +10,8 @@ docker)
   docker_push "$DOCKER_USERNAME/envoy-minion-$DOCKER_IMAGE:$TAG"
   docker_push "$DOCKER_USERNAME/envoy-master-$DOCKER_IMAGE:$TAG"
   ;;
+chart)
+  echo "Uploading contents of: $BUILD_DIR"
+  ls -al $BUILD_DIR/
+  ;;
 esac
