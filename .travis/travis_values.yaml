@@ -12,7 +12,6 @@ saltMinion:
     tag: latest
     repository: "salt-minion"
     pullPolicy: Never
-  # travis uses dedicated image
 
 volume:
   enabled: true
