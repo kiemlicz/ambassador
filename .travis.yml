@@ -13,7 +13,7 @@ env:
     - COMPOSE_VER="1.22.0"
     - KUBECTL_VER="v1.14.2"
     - GH_URL="https://kiemlicz.github.io/ambassador/"
-    - BUILD_DIR="out"
+    - BUILD_DIR=".local"
 
 jobs:
   allow_failures:
@@ -105,4 +105,4 @@ jobs:
         target-branch: gh-pages
         verbose: true
         on:
-          branch: helm-refactor
+          branch: master
