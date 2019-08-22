@@ -22,6 +22,7 @@ saltMaster:
 
       engines:
         - thorium: {}
+        - k8s_events: {}
 
       # queue config
       runner_queue:
