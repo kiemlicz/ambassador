@@ -1,12 +1,12 @@
-nameOverride: ""
-fullnameOverride: "salt-provisioning"
+nameOverride: "salt"
+fullnameOverride: ""
 
 saltMaster:
   replicaCount: 1
 
   image:
     repository: "envoy-master-debian-stretch"
-    tag: "{{ .Chart.AppVersion }}"
+    tag: "latest"
     pullPolicy: IfNotPresent
 
   service:
@@ -69,7 +69,7 @@ saltMaster:
 saltMinion:
   image:
     repository: "envoy-minion-debian-stretch"
-    tag: "{{ .Chart.AppVersion }}"
+    tag: "latest"
     pullPolicy: IfNotPresent
 
   service:
