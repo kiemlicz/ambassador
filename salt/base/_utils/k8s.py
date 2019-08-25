@@ -1,3 +1,5 @@
+from __future__ import absolute_import, print_function, unicode_literals
+
 import logging
 import os
 
@@ -48,32 +50,40 @@ class K8sClient(object):
     def list(self, kind, namespaced=True, label_selector=None, namespace=None):
         if not namespace:
             namespace = self.active_namespace
-        method = "list_namespaced_{}".format(kind) if namespaced else "list_{}".format(kind)
+        method = self._list(kind, namespaced)
         return self._invoke(kind, method, namespaced, label_selector=label_selector, namespace=namespace)
 
-    def watch_start(self, namespace, timeout=60):
-        return self.watch.stream(namespace, timeout)  # todo timeout_seconds ?
+    def _list(self, kind, namespaced=True):
+        return "list_namespaced_{}".format(kind) if namespaced else "list_{}".format(kind)
+
+    def watch_start(self, kind, namespaced=True, timeout=60, **kwargs):
+        func = self._get_func(kind, self._list(kind, namespaced))
+        return self.watch.stream(func, _request_timeout=timeout, **kwargs)  # todo timeout_seconds ?
 
     def watch_stop(self):
         self.watch.stop()
 
     def _invoke(self, kind, method, namespaced, **kwargs):
         try:
-            c = self._client(kind)
             if not namespaced:
                 kwargs.pop('namespace')
-            result = getattr(c, method)(**kwargs)
+            result = self._get_func(kind, method)(**kwargs)
             return self.client_api.sanitize_for_serialization(result)
-        except AttributeError as e:
-            log.exception(e)
-            raise CommandExecutionError("Method {} not found".format(method))
         except ApiException as e:
             log.error("unable to fetch: {}".format(kind))
             log.exception(e)
             return None
 
+    def _get_func(self, kind, method):
+        try:
+            c = self._client(kind)
+            return getattr(c, method)
+        except AttributeError as e:
+            log.exception(e)
+            raise CommandExecutionError("Method {} not found".format(method))
+
     def _client(self, kind):
-        if kind == "pod" or kind == "persistent_volume" or kind == "persistent_volume_claim":
+        if kind == "pod" or kind == "persistent_volume" or kind == "persistent_volume_claim" or kind == "namespace":
             return self.client_core_v1_api
         else:
             return self.client_apps_v1_api

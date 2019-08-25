@@ -125,6 +125,7 @@ RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_
     chmod +x kubectl && \
     mv kubectl /usr/bin/ && \
     chmod 600 /etc/salt/autosign.conf && \
+    pip install --upgrade kubernetes && \
     salt-run saltutil.sync_all
 
 CMD [ "/opt/entrypoint_master_run.sh" ]

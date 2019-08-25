@@ -27,7 +27,7 @@ def __virtual__():
 
 def start(timeout=CLIENT_TIMEOUT,
           tag='salt/engines/k8s_events',
-          namespaces=None):
+          watch_def=None):
     c = _get_client()
 
     if __opts__.get('__role') == 'master':
@@ -47,8 +47,9 @@ def start(timeout=CLIENT_TIMEOUT,
             __salt__['event.send'](tag, msg)
 
     try:
-        aggregate_generator = chain([c.watch_start(namespace, timeout) for namespace in namespaces])
-        for event in aggregate_generator:
+        # todo multiple watch_def? chaining may not work
+        for event in c.watch_start(watch_def.pop('kind'), **watch_def):
+            # todo decode
             data = salt.utils.json.loads(event.decode(__salt_system_encoding__, errors='replace'))
             if data['Action']:
                 fire('{0}/{1}'.format(tag, data['Action']), data)
