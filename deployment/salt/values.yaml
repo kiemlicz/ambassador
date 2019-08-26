@@ -124,15 +124,11 @@ persistence:
   saltPkiResources:
     requests:
       storage: 5Mi
-  saltPkiSelector:
-    matchLabels:
-      role: saltpki
+  saltPkiSelector: {}
   saltQueueResources:
     requests:
       storage: 128Mi
-  saltQueueSelector:
-    matchLabels:
-      role: saltqueue
+  saltQueueSelector: {}
 
 volume:
   enabled: false
@@ -149,7 +145,7 @@ volume:
                 - minikube
 
 logstash:
-  enabled: true
+  enabled: false
   fullnameOverride: "logstash"
   livenessProbe:
     httpGet:

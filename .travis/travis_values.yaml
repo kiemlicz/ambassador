@@ -13,6 +13,14 @@ saltMinion:
     repository: "salt-minion"
     pullPolicy: Never
 
+persistence:
+  saltPkiSelector:
+      matchLabels:
+        role: saltpki
+  saltQueueSelector:
+    matchLabels:
+      role: saltqueue
+
 volume:
   enabled: true
   reclaimPolicy: Retain
@@ -26,3 +34,6 @@ volume:
               operator: In
               values:
                 - minikube
+
+logstash:
+  enabled: true
