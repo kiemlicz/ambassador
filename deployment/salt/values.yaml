@@ -41,6 +41,7 @@ saltMaster:
           - /srv/reactor/minion_ready.sls
 
       {{- if .Values.logstash.enabled }}
+      color: False
       logstash_udp_handler:
         host: logstash.logging
         port: 1514
@@ -88,6 +89,7 @@ saltMinion:
           - interval: 45
 
       {{- if .Values.logstash.enabled }}
+      color: False
       logstash_udp_handler:
         host: logstash.logging
         port: 1514
