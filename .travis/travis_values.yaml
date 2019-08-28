@@ -4,14 +4,65 @@ saltMaster:
     repository: "salt-master"
     pullPolicy: Never
   # travis uses dedicated image
-#  config:
-#    custom.conf: |-
+  config:
+    custom.conf: |-
+      #autosign_file: /etc/salt/master.d/autosign
+      #event_return: rawfile_json
+      #rawfile_json.filename: /var/log/salt/events
+      #log_level: debug
+      #log_level_logfile: debug
+
+      engines:
+        - thorium: {}
+        - k8s_events: {}
+
+      # queue config
+      runner_queue:
+        queue: runner_queue
+        backend: sqlite
+
+      schedule:
+        runner_queue:
+          function: queue.process_runner
+          minutes: 1
+          kwargs:
+            quantity: 1
+
+      reactor:
+        - 'salt/minion/*/start':
+          - /srv/reactor/minion_ready.sls
+
+      color: False
+      logstash_udp_handler:
+        host: logstash.salt-provisioning
+        port: 1514
+        version: 1
+        msg_type: logstash
 
 saltMinion:
   image:
     tag: latest
     repository: "salt-minion"
     pullPolicy: Never
+
+  config:
+    custom.conf: |-
+      master: "salt-master"
+
+      mine_functions:
+        network.interfaces: []
+        network.ip_addrs: []
+
+      beacons:
+        status:
+          - interval: 45
+
+      color: False
+      logstash_udp_handler:
+        host: logstash.salt-provisioning
+        port: 1514
+        version: 1
+        msg_type: logstash
 
 persistence:
   saltPkiSelector:
