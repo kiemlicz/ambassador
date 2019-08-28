@@ -33,6 +33,8 @@ saltMaster:
           - /srv/reactor/minion_ready.sls
 
       color: False
+      log_fmt_console: '[%(levelname)-8s] %(message)s'
+      log_fmt_logfile: '%(asctime)s,%(msecs)03d [%(name)-17s][%(levelname)-8s] %(message)s'
       logstash_udp_handler:
         host: logstash.salt-provisioning
         port: 1514
@@ -58,6 +60,8 @@ saltMinion:
           - interval: 45
 
       color: False
+      log_fmt_console: '[%(levelname)-8s] %(message)s'
+      log_fmt_logfile: '%(asctime)s,%(msecs)03d [%(name)-17s][%(levelname)-8s] %(message)s'
       logstash_udp_handler:
         host: logstash.salt-provisioning
         port: 1514
