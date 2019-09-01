@@ -58,7 +58,7 @@ class K8sClient(object):
 
     def watch_start(self, kind, namespaced=True, timeout=60, **kwargs):
         func = self._get_func(kind, self._list(kind, namespaced))
-        return self.watch.stream(func, _request_timeout=timeout, **kwargs)  # todo timeout_seconds ?
+        return self.watch.stream(func, _request_timeout=timeout, **kwargs)
 
     def watch_stop(self):
         self.watch.stop()
@@ -68,11 +68,14 @@ class K8sClient(object):
             if not namespaced:
                 kwargs.pop('namespace')
             result = self._get_func(kind, method)(**kwargs)
-            return self.client_api.sanitize_for_serialization(result)
+            return self.sanitize_for_serialization(result)
         except ApiException as e:
             log.error("unable to fetch: {}".format(kind))
             log.exception(e)
             return None
+
+    def sanitize_for_serialization(self, e):
+        return self.client_api.sanitize_for_serialization(e)
 
     def _get_func(self, kind, method):
         try:

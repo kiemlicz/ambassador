@@ -9,6 +9,8 @@ from __future__ import absolute_import, print_function, unicode_literals
 from itertools import chain
 
 import logging
+import queue
+import threading
 
 import salt.utils.json
 import salt.utils.event
@@ -27,7 +29,7 @@ def __virtual__():
 
 def start(timeout=CLIENT_TIMEOUT,
           tag='salt/engines/k8s_events',
-          watch_def=None):
+          watch_defs=None):
     c = _get_client()
 
     if __opts__.get('__role') == 'master':
@@ -36,6 +38,28 @@ def start(timeout=CLIENT_TIMEOUT,
             __opts__['sock_dir']).fire_event
     else:
         fire_master = None
+
+    def multiplex(generators):
+        q = queue.Queue()
+
+        def run_one(src):
+            for e in src: q.put(e)
+
+        def run_all():
+            threads = []
+            for src in generators:
+                t = threading.Thread(target=run_one, args=(src,))
+                t.start()
+                threads.append(t)
+            for t in threads: t.join()
+            q.put(StopIteration)
+
+        threading.Thread(target=run_all).start()
+
+        while True:
+            e = q.get()
+            if e is StopIteration: return
+            yield e
 
     def fire(tag, msg):
         '''
@@ -47,14 +71,9 @@ def start(timeout=CLIENT_TIMEOUT,
             __salt__['event.send'](tag, msg)
 
     try:
-        # todo multiple watch_def? chaining may not work
-        for event in c.watch_start(watch_def.pop('kind'), **watch_def):
-            # todo decode
-            data = salt.utils.json.loads(event.decode(__salt_system_encoding__, errors='replace'))
-            if data['Action']:
-                fire('{0}/{1}'.format(tag, data['Action']), data)
-            else:
-                fire('{0}/{1}'.format(tag, data['status']), data)
+        all_watch = [(c.sanitize_for_serialization(e) for e in c.watch_start(watch_def.pop('kind'), **watch_def)) for watch_def in watch_defs]
+        for event in multiplex(all_watch):
+            fire('{0}/{1}'.format(tag, event['type']), event)
     except Exception as e:
         log.error("Unable to watch() k8s resources")
         log.exception(e)
