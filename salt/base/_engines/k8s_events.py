@@ -40,26 +40,32 @@ def start(timeout=CLIENT_TIMEOUT,
         fire_master = None
 
     def multiplex(generators):
-        q = queue.Queue()
+        if len(generators) > 1:
+            # multiplex only when needed
+            q = queue.Queue()
 
-        def run_one(src):
-            for e in src: q.put(e)
+            def run_one(src):
+                for e in src: q.put(e)
 
-        def run_all():
-            threads = []
-            for src in generators:
-                t = threading.Thread(target=run_one, args=(src,))
-                t.start()
-                threads.append(t)
-            for t in threads: t.join()
-            q.put(StopIteration)
+            def run_all():
+                threads = []
+                for src in generators:
+                    t = threading.Thread(target=run_one, args=(src,))
+                    t.start()
+                    threads.append(t)
+                for t in threads: t.join()
+                q.put(StopIteration)
 
-        threading.Thread(target=run_all).start()
+            threading.Thread(target=run_all).start()
 
-        while True:
-            e = q.get()
-            if e is StopIteration: return
-            yield e
+            while True:
+                e = q.get()
+                if e is StopIteration: return
+                yield e
+        elif len(generators) == 1:
+            return generators[0]
+        else:
+            return []
 
     def fire(tag, msg):
         '''
