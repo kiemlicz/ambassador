@@ -1,7 +1,7 @@
 setup_master:
   salt.state:
-  - tgt: "kubernetes:master:True"
-  - tgt_type: "grain"
+  - tgt: "{{ pillar['kubernetes']['nodes']['masters'] }}"
+  - tgt_type: "compound"
   - sls:
     - docker
     - docker.events
@@ -10,8 +10,8 @@ setup_master:
 
 setup_workers:
   salt.state:
-  - tgt: "kubernetes:worker:True"
-  - tgt_type: "grain"
+  - tgt: "{{ pillar['kubernetes']['nodes']['workers'] }}"
+  - tgt_type: "compound"
   - sls:
     - docker.events
     - kubernetes.worker

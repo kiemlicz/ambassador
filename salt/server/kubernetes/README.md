@@ -34,8 +34,8 @@ kubernetes:
     nodes:
         cidr: 10.0.0.0/8
 ```
-2. If using Envoy, sync modules first: `salt-run saltutil.sync_all && salt '*' saltutil.sync_all refresh=True`
-3. `salt-run state.orchestrate kubernetes._orchestrate.cluster saltenv=server`
+2. Sync modules first: `salt-run saltutil.sync_all && salt '*' saltutil.sync_all refresh=True`
+3. `salt-run state.orchestrate kubernetes._orchestrate.cluster saltenv=server pillar='{"kubernetes": {"nodes": {"masters": "L@k8s1", "workers": "L@k8s2,k8s3"}}}'`
 
 ### `kubernetes.master`
 Setup Kubernetes master node
