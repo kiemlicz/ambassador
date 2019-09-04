@@ -3,9 +3,9 @@
 
 #load modules ip_vs, ip_vs_rr, ip_vs_wrr, ip_vs_sh, nf_conntrack_ipv4
 
-{% set tokens = salt['mine.get']("kubernetes:master:True", "kubernetes_token", tgt_type="grain") %}
-{% set ips = salt['mine.get']("kubernetes:master:True", "kubernetes_master_ip", tgt_type="grain") %}
-{% set hashes = salt['mine.get']("kubernetes:master:True", "kubernetes_hash", tgt_type="grain") %}
+{% set tokens = salt['mine.get'](pillar['kubernetes']['nodes']['masters'], "kubernetes_token", tgt_type="compound") %}
+{% set ips = salt['mine.get'](pillar['kubernetes']['nodes']['masters'], "kubernetes_master_ip", tgt_type="compound") %}
+{% set hashes = salt['mine.get'](pillar['kubernetes']['nodes']['masters'], "kubernetes_hash", tgt_type="compound") %}
 
 {% if ips and tokens and hashes %}
 {% if kubernetes.worker.reset %}

@@ -7,6 +7,7 @@ setup_master:
     - docker.events
     - kubernetes.master
   - saltenv: {{ saltenv }}
+  - pillar: {{ pillar }}
 
 setup_workers:
   salt.state:
@@ -16,5 +17,6 @@ setup_workers:
     - docker.events
     - kubernetes.worker
   - saltenv: {{ saltenv }}
+  - pillar: {{ pillar }}
   - require:
       - salt: setup_master
