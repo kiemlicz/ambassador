@@ -3,7 +3,7 @@
 
 
 {% if kubernetes.master.reset %}
-kubeadm_reset:
+kubeadm_master_reset:
   cmd.run:
     - name: "echo y | kubeadm reset"
     - require:

@@ -8,6 +8,15 @@
 {% set hashes = salt['mine.get']("kubernetes:master:True", "kubernetes_hash", tgt_type="grain") %}
 
 {% if ips and tokens and hashes %}
+{% if kubernetes.worker.reset %}
+kubeadm_worker_reset:
+  cmd.run:
+    - name: "echo y | kubeadm reset"
+    - require:
+        - pkg: kubeadm
+    - require_in:
+        - cmd: join_master
+{% endif %}
 {% set main_master_id = ips.keys()|sort|first %}
 join_master:
     cmd.run:

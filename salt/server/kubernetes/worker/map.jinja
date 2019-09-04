@@ -3,7 +3,7 @@
 {% set kubernetes = salt['grains.filter_by']({
   'default': {
      'worker': {
-
+        'reset': False
      }
   },
 }, merge=kubernetes_defaults) %}
