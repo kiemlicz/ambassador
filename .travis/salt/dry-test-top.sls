@@ -19,6 +19,7 @@ def run():
       "samba",
       "mail",
       "minion",
+      "minion.upgrade",
     ],
     'G@os_family:Debian': [
       "os.pkgs.unattended"
@@ -71,6 +72,7 @@ def run():
       "kubernetes.minikube",
       "kubernetes.master",
       "kubernetes.worker",
+      "kubernetes.helm",
       "vagrant"
     ]
   }
