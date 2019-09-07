@@ -3,13 +3,10 @@
 
 #load modules ip_vs, ip_vs_rr, ip_vs_wrr, ip_vs_sh, nf_conntrack_ipv4
 
-{% set masters = salt['pillar.get']('kubernetes:nodes:masters')|join(",") %}
-{% if not masters %}
-{{ raise('ERROR: Found no master nodes, workers are unable to join') }}
-{% endif %}
-{% set tokens = salt['mine.get'](masters, "kubernetes_token", tgt_type="list") %}
-{% set ips = salt['mine.get'](masters, "kubernetes_master_ip", tgt_type="list") %}
-{% set hashes = salt['mine.get'](masters, "kubernetes_hash", tgt_type="list") %}
+{% set masters = kubernetes.nodes.masters %}
+{% set tokens = salt['mine.get'](masters|join(","), "kubernetes_token", tgt_type="list") %}
+{% set ips = salt['mine.get'](masters|join(","), "kubernetes_master_ip", tgt_type="list") %}
+{% set hashes = salt['mine.get'](masters|join(","), "kubernetes_hash", tgt_type="list") %}
 
 {% if ips and tokens and hashes %}
 {% if kubernetes.worker.reset %}

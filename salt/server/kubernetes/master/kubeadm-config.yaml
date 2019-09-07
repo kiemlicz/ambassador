@@ -1,0 +1,5 @@
+apiVersion: kubeadm.k8s.io/v1beta2
+kind: ClusterConfiguration
+kubernetesVersion: stable
+{%- set ip = salt['network.ip_addrs'](cidr=kubernetes.nodes.cidr)|first %}
+controlPlaneEndpoint: "{{ salt['pillar.get']("kubernetes:master:lb_ip", ip) }}:{{ salt['pillar.get']("kubernetes:master:lb_port", 6443) }}"

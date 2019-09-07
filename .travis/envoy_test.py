@@ -4,11 +4,15 @@ import itertools
 import os
 import traceback
 import unittest
+import pprint
 from pathlib import Path
 
 import salt.client
 import salt.minion
 from salt.exceptions import CommandExecutionError
+
+
+pp = pprint.PrettyPrinter(indent=4)
 
 
 class ParametrizedSaltTestCase(unittest.TestCase):
@@ -92,7 +96,7 @@ class SaltStatesTest(ParametrizedSaltTestCase):
                     result_sls = caller.cmd("state.show_sls", state, saltenv=env, pillar=self.pillar)
                     self.assertTrue(
                         isinstance(result_sls, dict),
-                        msg="rendering of: {} (saltenv={}), failed with: {}".format(state, env, "".join(result_sls) if isinstance(result_sls, list) else result_sls)
+                        msg="rendering of: {} (saltenv={}), failed with: {}\npillar: {}".format(state, env, "".join(result_sls) if isinstance(result_sls, list) else result_sls, pp.pformat(self.pillar))
                     )
         except CommandExecutionError:
             traceback.print_exc()
