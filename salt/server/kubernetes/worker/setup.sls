@@ -4,9 +4,9 @@
 #load modules ip_vs, ip_vs_rr, ip_vs_wrr, ip_vs_sh, nf_conntrack_ipv4
 
 {% set masters = salt['pillar.get']('kubernetes:nodes:masters')|join(",") %}
-{{ if masters is not defined }}
+{% if masters is not defined %}
 {{ raise('ERROR: Found no master nodes, workers are unable to join') }}
-{{ endif }}
+{% endif %}
 {% set tokens = salt['mine.get'](masters, "kubernetes_token", tgt_type="list") %}
 {% set ips = salt['mine.get'](masters, "kubernetes_master_ip", tgt_type="list") %}
 {% set hashes = salt['mine.get'](masters, "kubernetes_hash", tgt_type="list") %}
