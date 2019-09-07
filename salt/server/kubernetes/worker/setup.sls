@@ -2,8 +2,9 @@
 {% from "kubernetes/network/map.jinja" import kubernetes as kubernetes_network with context %}
 
 #load modules ip_vs, ip_vs_rr, ip_vs_wrr, ip_vs_sh, nf_conntrack_ipv4
+
 {% set masters = salt['pillar.get']('kubernetes:nodes:masters')|join(",") %}
-{{ if not masters }}
+{{ if masters is not defined }}
 {{ raise('ERROR: Found no master nodes, workers are unable to join') }}
 {{ endif }}
 {% set tokens = salt['mine.get'](masters, "kubernetes_token", tgt_type="list") %}
