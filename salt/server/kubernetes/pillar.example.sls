@@ -2,10 +2,15 @@
 #docker:
 #    version: "18.06.1~ce~3-0~ubuntu"
 #    version: "18.06.1~ce~3-0~debian"
-
 kubernetes:
   network:
     provider: flannel
     cidr: "10.244.0.0/16"
   master:
     isolate: True
+  nodes:
+    masters:
+      - k8s1
+    workers:
+      - k8s2
+      - k8s3

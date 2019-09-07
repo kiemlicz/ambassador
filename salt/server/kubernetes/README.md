@@ -15,27 +15,21 @@ use_superseded:
 ```
  - if you want to receive _kubeconfig_ on the _Salt Master_, set: `file_recv: True` in _Salt Master_ config
 
-1. Set grains on minions that should represent workers and masters:
-Masters (`/etc/salt/minion.d/grains.conf`):  
-```
-grains:
-    kubernetes:
-        master: True
-```
-Workers (`/etc/salt/minion.d/grains.conf`):
-```
-grains:
-    kubernetes:
-        worker: True
-```
-Set the CIDR of the Kubernetes Nodes in the pillar:
+1. Set pillar on the Salt Master:
+Specify in the Pillar: master and worker nodes, CIDR of the Kubernetes Nodes k8s interface (for some network plugins you need to specify CIDR as well):
 ```
 kubernetes:
     nodes:
         cidr: 10.0.0.0/8
+        masters:
+           - k8s1
+           - k8s2
+        workers:
+           - k8s3
+           - k8s4
 ```
 2. Sync modules first: `salt-run saltutil.sync_all && salt '*' saltutil.sync_all refresh=True`
-3. `salt-run state.orchestrate kubernetes._orchestrate.cluster saltenv=server pillar='{"kubernetes": {"nodes": {"masters": "L@k8s1", "workers": "L@k8s2,k8s3"}}}'`
+3. `salt-run state.orchestrate kubernetes._orchestrate.cluster saltenv=server pillar='{"kubernetes": {"nodes": {"masters": [k8s1]", "workers": [k8s2,k8s3]}}}'`
 
 ### `kubernetes.master`
 Setup Kubernetes master node

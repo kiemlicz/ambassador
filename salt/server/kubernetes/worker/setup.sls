@@ -2,10 +2,13 @@
 {% from "kubernetes/network/map.jinja" import kubernetes as kubernetes_network with context %}
 
 #load modules ip_vs, ip_vs_rr, ip_vs_wrr, ip_vs_sh, nf_conntrack_ipv4
-
-{% set tokens = salt['mine.get'](pillar['kubernetes']['nodes']['masters'], "kubernetes_token", tgt_type="compound") %}
-{% set ips = salt['mine.get'](pillar['kubernetes']['nodes']['masters'], "kubernetes_master_ip", tgt_type="compound") %}
-{% set hashes = salt['mine.get'](pillar['kubernetes']['nodes']['masters'], "kubernetes_hash", tgt_type="compound") %}
+{% set masters = salt['pillar.get']('kubernetes:nodes:masters')|join(",") %}
+{{ if not masters }}
+{{ raise('ERROR: Found no master nodes, workers are unable to join') }}
+{{ endif }}
+{% set tokens = salt['mine.get'](masters, "kubernetes_token", tgt_type="list") %}
+{% set ips = salt['mine.get'](masters, "kubernetes_master_ip", tgt_type="list") %}
+{% set hashes = salt['mine.get'](masters, "kubernetes_hash", tgt_type="list") %}
 
 {% if ips and tokens and hashes %}
 {% if kubernetes.worker.reset %}
