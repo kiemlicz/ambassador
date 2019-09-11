@@ -1,4 +1,4 @@
-def pillar_eq(key_1: str, key_2: str, fail_if_no_key: bool = True) -> bool:
+def pillar_eq(key_1, key_2, fail_if_no_key=True):
     value_1 = __salt__['pillar.get'](key_1, default=None)
     value_2 = __salt__['pillar.get'](key_2, default=None)
 

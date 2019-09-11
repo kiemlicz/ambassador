@@ -1,5 +1,5 @@
 {% from "minion/map.jinja" import minion with context %}
-{% from "_common/repo.jinja" import repository with context %}
+{% from "_common/util.jinja" import retry with context %}
 {% from "_common/util.jinja" import pkg_latest_opts with context %}
 
 {%- if grains['os_family'] == 'Debian' %}
@@ -20,10 +20,16 @@ disable_service_start:
 
 {%- endif %}
 
-{{ repository("salt_repository", minion) }}
+# this state deliberately doesn't use any macros, utils, filter etc so that we're sure that very old minion is able to execute it
 minion:
+  pkgrepo.managed:
+    - name: {{ minion.name }}
+    - file: {{ minion.file }}
+    - key_url: {{ minion.key_url }}
+    - refresh: True
+{{ retry()| indent(4) }}
   pkg.latest:
-    - pkgs: {{ minion.pkgs|tojson }}
+    - name: {{ minion.pkg }}
     - order: last
 {{ pkg_latest_opts(attempts=3) | indent(4) }}
 

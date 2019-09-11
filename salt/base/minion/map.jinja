@@ -3,18 +3,16 @@
           'baseurl': "https://repo.saltstack.com/py3/redhat/7/$basearch/latest",
           'repo_id': "saltstack",
           'gpgkey': "https://repo.saltstack.com/py3/redhat/7/$basearch/latest/SALTSTACK-GPG-KEY.pub",
-          'pkgs': ["salt-minion"],
+          'pkg': "salt-minion",
           'health_file': "/tmp/salt/healthz",
           'event_tag': "salt/minion/" ~ grains['id'] ~ "/envoy_ready",
           'service': "salt-minion",
       },
       'Debian': {
-          'names': [
-              "deb http://repo.saltstack.com/py3/debian/9/amd64/latest stretch main"
-          ],
+          'name': "deb http://repo.saltstack.com/py3/debian/9/amd64/latest stretch main",
           'file': '/etc/apt/sources.list.d/saltstack.list',
           'key_url': "https://repo.saltstack.com/py3/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub",
-          'pkgs': ["salt-minion"],
+          'pkg': "salt-minion",
           'health_file': "/tmp/salt/healthz",
           'event_tag': "salt/minion/" ~ grains['id'] ~ "/envoy_ready",
           'service': "salt-minion",
