@@ -1,9 +1,6 @@
 {% from "minion/map.jinja" import minion with context %}
-{% from "_common/util.jinja" import retry with context %}
-{% from "_common/util.jinja" import pkg_latest_opts with context %}
 
 {%- if grains['os_family'] == 'Debian' %}
-
 disable_service_start:
   file.managed:
     - name: /usr/sbin/policy-rc.d
@@ -17,8 +14,12 @@ disable_service_start:
     - replace: False
     - prereq:
       - pkg: minion
-
 {%- endif %}
+
+#schedule_restart:
+#  schedule.present:
+#    -
+#    - once: ??
 
 # this state deliberately doesn't use any macros, utils, filter etc so that we're sure that very old minion is able to execute it
 minion:
@@ -27,33 +28,27 @@ minion:
     - file: {{ minion.file }}
     - key_url: {{ minion.key_url }}
     - refresh: True
-{{ retry()| indent(4) }}
   pkg.latest:
     - name: {{ minion.pkg }}
     - order: last
-{{ pkg_latest_opts(attempts=3) | indent(4) }}
+    - require:
+      - pkgrepo: minion
 
-minion_enable:
+
+#this will break at pkg.latest point since it will replace current minion filesystem with newer version
+#it will yield minion unusable till the 'manual' restart, maybe check cron but not the internal salt scheduler that can break with upgrade
+
+minion_service:
   service.enabled:
     - name: {{ minion.service }}
     - require:
       - pkg: minion
 
 {%- if grains['os_family'] == 'Debian' %}
-
 enable_service_start:
   file.absent:
     - name: /usr/sbin/policy-rc.d
     - onchanges:
       - pkg: minion
-
 {%- endif %}
 
-{%- if grains['os'] != 'Windows' %}
-minion_restart:
-  cmd.run:
-    - name: "salt-call service.restart {{ minion.service }}"
-    - bg: True
-    - onchanges:
-      - pkg: minion
-{%- endif %}
