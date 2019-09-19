@@ -45,7 +45,8 @@
 
 {{ username }}_powerline_python2:
   pip.installed:
-    - name: {{ user.tools.powerline.pip }}
+    - name: powerline_python2
+    - pkgs: {{ user.tools.powerline.pip|tojson }}
     - user: {{ username }}
     - install_options:
       - --user
@@ -54,7 +55,8 @@
 
 {{ username }}_powerline_python3:
   pip.installed:
-    - name: {{ user.tools.powerline.pip }}
+    - name: powerline_python3
+    - pkgs: {{ user.tools.powerline.pip|tojson }}
     - user: {{ username }}
     - bin_env: '/usr/bin/pip3'
     - install_options:

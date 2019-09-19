@@ -85,7 +85,9 @@ users:
         url: https://github.com/junegunn/fzf.git
         target: {{ home_dir }}/projects/open-source/fzf
       powerline:
-        pip: powerline-status
+        pip:
+          - powerline-status
+          - powerline-kubernetes
         required_pkgs:
           - python3-pip
           - vim-gtk3
