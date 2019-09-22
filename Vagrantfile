@@ -14,6 +14,7 @@ Vagrant.configure("2") do |config|
       lxc.container_name = :machine
       lxc.backingstore = 'best'
       lxc.fetch_ip_tries = 30
+      lxc.customize 'lxc.start.auto', '1'
     end
   end
 
