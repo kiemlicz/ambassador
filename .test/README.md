@@ -4,7 +4,7 @@ Due to numerous docker limitations tests should be performed in LXC container or
 
 The most common way is to use [kitchen-salt](https://github.com/saltstack/kitchen-salt), the Kitchen plugin that provides Salt provisioner
 
-Following directory contains setup of kitchen test **runner**.  
+Following directory contains setup of kitchen test **runner** (`Vagrantfile` for the test executor).  
 Basically it spawns LXC container (using Vagrant) and provisions it using ambassador (create your own pillar configuration)
 
 Prepare `kitchen.local.yml`
