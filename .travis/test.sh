@@ -39,7 +39,7 @@ masterless)
     name="ambassador-salt-masterless-run-$TRAVIS_JOB_NUMBER"
     while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
     docker run --name $name --hostname "$CONTEXT-host" --privileged "masterless-test-$DOCKER_IMAGE:$TAG" 2>&1 | tee output
-    exit_code=$?
+    exit_code=${PIPESTATUS[0]}  # gets the exit code of first (piped) process
     kill %1
     if [[ "$exit_code" != 0 ]]; then
         echo "found failures"
