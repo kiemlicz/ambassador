@@ -3,6 +3,7 @@ FROM debian:$tag AS salt-base
 # "" == latest
 ARG salt_ver=""
 
+# fixme remove once https://github.com/saltstack/salt-bootstrap/issues/1353 is done
 COPY .travis/debian-buster/bootstrap-salt.sh /tmp
 COPY salt /srv/salt
 
