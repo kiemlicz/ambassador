@@ -23,7 +23,7 @@ log = logging.getLogger(__name__)
 
 def __virtual__():
     salt_version = salt.version.__saltstack_version__.string
-    supported = ["2019.2.0"]
+    supported = ["2019.2.0", "2019.2.1"]
     if salt_version not in supported:
         return False, "Cannot load file.ext, install: salt version {} (detected: {})".format(supported, salt_version)
     return True if HAS_GOOGLE_AUTH else (False, "Cannot load file.ext, install: google-auth, pyasn1-modules and google-auth-oauthlib libraries")
@@ -60,6 +60,7 @@ def managed(name,
             follow_symlinks=True,
             check_cmd=None,
             skip_verify=False,
+            selinux=None,
             win_owner=None,
             win_perms=None,
             win_deny_perms=None,
@@ -85,7 +86,7 @@ def managed(name,
                                           makedirs, dir_mode, context, replace, defaults, backup, show_changes, create,
                                           contents, tmp_dir, tmp_ext, contents_pillar, contents_grains, contents_newline,
                                           contents_delimiter, encoding, encoding_errors, allow_empty, follow_symlinks,
-                                          check_cmd, skip_verify,
+                                          check_cmd, skip_verify, selinux,
                                           win_owner, win_perms, win_deny_perms, win_inheritance, win_perms_reset,
                                           **kwargs)
 
