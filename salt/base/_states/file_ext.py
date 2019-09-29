@@ -19,10 +19,10 @@ except ImportError:
     HAS_GOOGLE_AUTH = False
 
 log = logging.getLogger(__name__)
+salt_version = salt.version.__saltstack_version__.string
 
 
 def __virtual__():
-    salt_version = salt.version.__saltstack_version__.string
     supported = ["2019.2.0", "2019.2.1"]
     if salt_version not in supported:
         return False, "Cannot load file.ext, install: salt version {} (detected: {})".format(supported, salt_version)
@@ -81,7 +81,8 @@ def managed(name,
     '''
 
     def delegate_to_file_managed(source, contents):
-        return __states__['file.managed'](name, source, source_hash, source_hash_name, keep_source, user, group, mode,
+        if "2019.2.1" == salt_version:
+            return __states__['file.managed'](name, source, source_hash, source_hash_name, keep_source, user, group, mode,
                                           attrs, template,
                                           makedirs, dir_mode, context, replace, defaults, backup, show_changes, create,
                                           contents, tmp_dir, tmp_ext, contents_pillar, contents_grains, contents_newline,
@@ -89,6 +90,15 @@ def managed(name,
                                           check_cmd, skip_verify, selinux,
                                           win_owner, win_perms, win_deny_perms, win_inheritance, win_perms_reset,
                                           **kwargs)
+        else:
+            return __states__['file.managed'](name, source, source_hash, source_hash_name, keep_source, user, group, mode,
+                                              attrs, template,
+                                              makedirs, dir_mode, context, replace, defaults, backup, show_changes, create,
+                                              contents, tmp_dir, tmp_ext, contents_pillar, contents_grains, contents_newline,
+                                              contents_delimiter, encoding, encoding_errors, allow_empty, follow_symlinks,
+                                              check_cmd, skip_verify,
+                                              win_owner, win_perms, win_deny_perms, win_inheritance, win_perms_reset,
+                                              **kwargs)
 
     if not source:
         return delegate_to_file_managed(source, contents)
