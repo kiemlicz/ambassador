@@ -60,7 +60,6 @@ def managed(name,
             follow_symlinks=True,
             check_cmd=None,
             skip_verify=False,
-            selinux=None,
             win_owner=None,
             win_perms=None,
             win_deny_perms=None,
@@ -81,24 +80,14 @@ def managed(name,
     '''
 
     def delegate_to_file_managed(source, contents):
-        if "2019.2.1" == salt_version:
-            return __states__['file.managed'](name, source, source_hash, source_hash_name, keep_source, user, group, mode,
+        return __states__['file.managed'](name, source, source_hash, source_hash_name, keep_source, user, group, mode,
                                           attrs, template,
                                           makedirs, dir_mode, context, replace, defaults, backup, show_changes, create,
                                           contents, tmp_dir, tmp_ext, contents_pillar, contents_grains, contents_newline,
                                           contents_delimiter, encoding, encoding_errors, allow_empty, follow_symlinks,
-                                          check_cmd, skip_verify, selinux,
+                                          check_cmd, skip_verify,
                                           win_owner, win_perms, win_deny_perms, win_inheritance, win_perms_reset,
                                           **kwargs)
-        else:
-            return __states__['file.managed'](name, source, source_hash, source_hash_name, keep_source, user, group, mode,
-                                              attrs, template,
-                                              makedirs, dir_mode, context, replace, defaults, backup, show_changes, create,
-                                              contents, tmp_dir, tmp_ext, contents_pillar, contents_grains, contents_newline,
-                                              contents_delimiter, encoding, encoding_errors, allow_empty, follow_symlinks,
-                                              check_cmd, skip_verify,
-                                              win_owner, win_perms, win_deny_perms, win_inheritance, win_perms_reset,
-                                              **kwargs)
 
     if not source:
         return delegate_to_file_managed(source, contents)
