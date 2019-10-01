@@ -17,6 +17,15 @@
        }
     },
     merge=salt['grains.filter_by']({
+      'buster': {
+        'os_packages': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
+                   "nano", "tmux", "tmuxinator", "vim", "sudo", "man-db", "rsync", "mc",
+                   "openssh-server", "openssh-client", "openvpn", "insserv",
+                   "build-essential", "git", "zsh", "curl", "ethtool", "lm-sensors", "ntp", "python3-pip",
+                   "silversearcher-ag", "kde-standard", "xterm", "yakuake", "wireshark", "network-manager-openvpn",
+                   "google-chrome-stable", "firefox-esr", "exuberant-ctags", "tig", "software-properties-common",
+		           "ca-certificates", "gnupg2"],
+      },
       'stretch': {
         'os_packages': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
                    "nano", "tmux", "tmuxinator", "vim", "sudo", "man-db", "rsync", "mc",
