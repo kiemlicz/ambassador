@@ -9,7 +9,9 @@ COPY salt /srv/salt
 
 # somehow _utils/jinja.py doesn't override the installed one https://github.com/saltstack/salt/pull/54780
 # todo once sorted out, remove this workaround
-RUN apt-get update && apt-get install -y procps curl dumb-init && \
+# https://github.com/saltstack/salt/issues/54755 and https://github.com/saltstack/salt/issues/53570
+# todo once sorted out, remove manual python3-pip install
+RUN apt-get update && apt-get install -y procps curl dumb-init python3-pip && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n stable $salt_ver && \
     cp /srv/salt/base/_utils/jinja.py /usr/lib/python3/dist-packages/salt/utils/jinja.py
 
