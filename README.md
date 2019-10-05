@@ -26,7 +26,6 @@ Simply follow two steps:
 3. `./setup.sh -c -n ambassador -u your_username,other_username_allowed_to_ssh_into_ambassador`
 
 # Workflow
-
 Foreman&Salt workflow is best depicted using this (Foreman's) diagram:
 ![](https://theforeman.org/static/images/diagrams/foreman_workflow_final.jpg)
 

@@ -37,5 +37,8 @@ provisioner:
     - Vagrantfile
     - Vagrantfile.common
 
-# kitchen.local.yml contains platforms definitions
+# provide platform definitions in kitchen.local.yml
 platforms: []
+
+# provide suites in kitchen.local.yml
+suites: []

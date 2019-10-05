@@ -60,6 +60,10 @@ Vagrant.configure("2") do |config|
     SHELL
   end
 
+  config.vm.provision "install salt requisites", type: "shell" do |s|
+    s.path = "https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/9bc130ba6800b1df66a3e34901d0c18dca560fd4/setup_salt_requisites.sh"
+  end
+
   config.vm.provision "install salt", type: "shell" do |s|
     s.path = "setup_salt.sh"
     s.args = ["salt-master", "salt-api", "salt-ssh"]
