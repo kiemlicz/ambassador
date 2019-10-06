@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y curl iproute2 && \
     curl -o /usr/local/bin/dumb-init https://github.com/Yelp/dumb-init/releases/download/v1.2.2/dumb-init_1.2.2_amd64 && \
     chmod +x /usr/local/bin/dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
-    sh /tmp/bootstrap-salt.sh -x python3 -X -n stable $salt_ver
+    sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver
 
 WORKDIR /srv
 

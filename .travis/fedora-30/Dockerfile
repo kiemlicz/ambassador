@@ -7,7 +7,7 @@ COPY salt /srv/salt
 
 RUN dnf -y --nogpgcheck update && dnf -y --nogpgcheck install curl procps dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
-    sh /tmp/bootstrap-salt.sh -x python3 -X -n stable $salt_ver
+    sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver
 
 WORKDIR /srv
 

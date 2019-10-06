@@ -9,7 +9,7 @@ services:
 
 env:
   global:
-    - SALT_VER="" # latest
+    - SALT_VER="git 2019.2.1" # use "" for latest stable
     - COMPOSE_VER="1.22.0"
     - KUBECTL_VER="v1.14.2"
     - GH_URL="https://kiemlicz.github.io/ambassador/"
@@ -54,7 +54,6 @@ jobs:
       env:
         - DOCKER_IMAGE=debian-stretch
         - BASE_IMAGE_TAG=stretch
-        - SALT_VER="2019.2.0"
         - SALTENV=base
         - CONTEXT=base
     - before_install: .travis/prepare.sh masterless
@@ -62,7 +61,6 @@ jobs:
       env:
         - DOCKER_IMAGE=debian-stretch
         - BASE_IMAGE_TAG=stretch
-        - SALT_VER="2019.2.0"
         - SALTENV=base
         - CONTEXT=gui
     - before_install: .travis/prepare.sh masterless
@@ -70,7 +68,6 @@ jobs:
       env:
         - DOCKER_IMAGE=debian-stretch
         - BASE_IMAGE_TAG=stretch
-        - SALT_VER="2019.2.0"
         - SALTENV=dev
         - CONTEXT=dev
     - before_install: .travis/prepare.sh masterless

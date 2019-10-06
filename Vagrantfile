@@ -65,6 +65,7 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.provision "install salt", type: "shell" do |s|
+    # todo use salt-bootstrap script
     s.path = "setup_salt.sh"
     s.args = ["salt-master", "salt-api", "salt-ssh"]
   end
