@@ -3,6 +3,8 @@ FROM ubuntu:$tag AS salt-base
 # "" == latest
 ARG salt_ver=""
 
+ENV DEBIAN_FRONTEND noninteractive
+
 COPY salt /srv/salt
 
 RUN apt-get update && apt-get install -y curl procps dirmngr iproute2 dumb-init && \
@@ -20,9 +22,8 @@ CMD [ "/usr/bin/salt-minion" ]
 
 FROM salt-base AS salt-master
 
-RUN apt-get install -y python3-pip && \
-    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 20 && \
-    curl -L https://gist.githubusercontent.com/kiemlicz/33e891dd78e985bd080b85afa24f5d0a/raw/1f5ce21454c10283d0c7d3f15a15ff46ad324fdb/init.sh && \
+RUN apt-get install -y python3-pip libffi-dev libgit2-dev git && \
+    pip3 install --upgrade pyOpenSSL pygit2 docker-py cherrypy jinja2 requests_oauthlib google-auth && \
     apt-get install -y salt-master
 
 # the salt-master should be installed but not running

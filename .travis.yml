@@ -54,6 +54,7 @@ jobs:
       script: .travis/test.sh masterless
       env:
         - DOCKER_IMAGE=debian-stretch
+        - SALT_VER="-d git 2019.2.1"
         - BASE_IMAGE_TAG=stretch
         - SALTENV=base
         - CONTEXT=base
@@ -61,6 +62,7 @@ jobs:
       script: .travis/test.sh masterless
       env:
         - DOCKER_IMAGE=debian-stretch
+        - SALT_VER="-d git 2019.2.1"
         - BASE_IMAGE_TAG=stretch
         - SALTENV=base
         - CONTEXT=gui
@@ -68,6 +70,7 @@ jobs:
       script: .travis/test.sh masterless
       env:
         - DOCKER_IMAGE=debian-stretch
+        - SALT_VER="-d git 2019.2.1"
         - BASE_IMAGE_TAG=stretch
         - SALTENV=dev
         - CONTEXT=dev
