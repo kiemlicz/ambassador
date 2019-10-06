@@ -26,6 +26,7 @@ jobs:
       name: "Test and publish"
       env:
         - DOCKER_IMAGE=debian-stretch
+        - SALT_VER="-d git 2019.2.1"
       before_install: .travis/prepare.sh dry
       script: .travis/test.sh dry
       after_success: .travis/publish.sh docker
