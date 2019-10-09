@@ -8,15 +8,24 @@
     'requisites': ["nfs-common", "nfs-kernel-server"],
     'sources': [{'vagrant': "https://releases.hashicorp.com/vagrant/" + version + "/vagrant_" + version + "_x86_64.deb"}],
     'owner': 'root',
+    'plugins': []
+  },
+}, merge=salt['grains.filter_by']({
+  'buster': {
+    'plugins': [{
+        'name': "vagrant-libvirt",
+        'pkgs': ["qemu", "libvirt-dev", "ebtables", "dnsmasq-base", "libxslt1-dev", "libxml2-dev", "zlib1g-dev", "ruby-dev"],
+        'env': "CONFIGURE_ARGS="with-libvirt-include=/usr/include/libvirt with-libvirt-lib=/usr/lib64""
+    }, {
+        'name': "vagrant-lxc",
+    }]
+  },
+  'stretch': {
     'plugins': [{
         'name': "vagrant-libvirt",
         'pkgs': ["qemu", "libvirt-dev", "ebtables", "dnsmasq-base", "libxslt1-dev", "libxml2-dev", "zlib1g-dev", "ruby-dev"],
     }, {
         'name': "vagrant-lxc",
     }]
-  },
-}, merge=salt['grains.filter_by']({
-  'sid': {
-
   }
 }, grain='oscodename', merge=salt['pillar.get']('vagrant'))) %}
