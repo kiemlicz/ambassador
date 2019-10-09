@@ -3,7 +3,7 @@
          'os_packages': ["aptitude", "apt-transport-https", "apt-listbugs", "apt-listchanges", "unattended-upgrades",
                    "nano", "tmux", "tmuxinator", "vim", "sudo", "man-db", "rsync", "mc",
                    "openssh-server", "openssh-client", "openvpn", "insserv",
-                   "build-essential", "git", "zsh", "curl", "ethtool", "ntp", "python3-pip",
+                   "build-essential", "git", "zsh", "curl", "ethtool", "ntp", "python3-pip", "cron",
                    "silversearcher-ag", "exuberant-ctags", "tig", "software-properties-common",
 		           "ca-certificates", "gnupg2"],
          'post_install': ['echo "command3"', 'echo "command4"', 'echo "command5"'],
