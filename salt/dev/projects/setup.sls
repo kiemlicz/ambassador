@@ -19,7 +19,11 @@
 {{ username }}_project_{{ project.url }}_config_{{ config.name }}:
   file_ext.managed:
     - name: {{ project.target }}/{{ config.name }}
+{% if config.contents is defined %}
+    - contents: {{ config.contents | yaml_encode }}
+{% else %}
     - source: {{ config.source }}
+{% endif %}
     - user: {{ username }}
     - makedirs: True
     - skip_verify: True
