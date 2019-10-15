@@ -38,6 +38,18 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD [ "/usr/bin/salt-master" ]
 
 
+FROM salt-master AS salt-master-foreman-proxy
+
+COPY .travis/debian-stretch/entrypoint.sh /opt/
+
+RUN echo "deb http://deb.theforeman.org/ stretch 1.23" >> /etc/apt/sources.list.d/foreman.list && \
+    wget -q https://deb.theforeman.org/pubkey.gpg -O- | apt-key add - && \
+    apt-get update && \
+    apt-get install -y foreman-proxy
+
+CMD [ "/opt/entrypoint.sh" ]
+
+
 FROM salt-base AS dry-test
 
 COPY .travis/reactor /srv/reactor
