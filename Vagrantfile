@@ -39,6 +39,12 @@ Vagrant.configure("2") do |config|
   ambassador_fqdn = ENV['CONTAINER_FQDN']
   ambassador_tftp_root = ENV['TFTP_ROOT']
   ambassador_domain = `dnsdomainname`
+  ambassador_psql_db = "foreman"
+  ambassador_psql_host =
+  # FIXME passing data that won't be modified is a fucking terrible idea and waste of time
+  # 1. figure out how to pass all of the certs
+  # 2. figure out how to pass all params or don't pass them at all
+  # is there something like local config server with all secrets in place? - you could hook it to salt and install processes as well
 
   if ENV.has_key?('DEPLOY_PUB_FILE') and ENV.has_key?('DEPLOY_PRIV_FILE')
     # todo what is the visibility scope, is it like in bash?
@@ -70,33 +76,9 @@ Vagrant.configure("2") do |config|
     s.args = ["salt-master", "salt-api", "salt-ssh"]
   end
 
-  config.vm.provision "foreman requisites", type: "shell", env: {
+  config.vm.provision "install foreman", type: "shell", env: {
     "CONTAINER_USERNAME" => ENV['CONTAINER_USERNAME'],
     "CONTAINER_NAME" => ENV['CONTAINER_NAME'],
-    "CONTAINER_FQDN" => ENV['CONTAINER_FQDN']
-    } do |s|
-    s.inline = <<-SHELL
-        sudo mkdir -p /etc/sudoers.d/
-        echo 'Cmnd_Alias SALT = /usr/bin/salt, /usr/bin/salt-key\nforeman-proxy ALL = NOPASSWD: SALT\nDefaults:foreman-proxy !requiretty' > /etc/sudoers.d/salt; chmod 440 /etc/sudoers.d/salt
-
-        if [ "$CONTAINER_USERNAME" != "root" ]; then
-            echo 'ubuntu ALL=NOPASSWD:ALL' > /etc/sudoers.d/ubuntu; chmod 440 /etc/sudoers.d/ubuntu
-        fi
-
-        #todo how to achieve passwordless sudo -u postgres, below doesn't work
-        #echo 'postgres ALL=NOPASSWD:ALL' > /etc/sudoers.d/postgres; chmod 440 /etc/sudoers.d/postgres
-
-        # remove accepting locale on server so that no locale generation is needed
-        sed -i -e 's/\(^AcceptEnv LANG.*\)/#\1/g' /etc/ssh/sshd_config
-        CIP=$(ip r s | grep "scope link src" | cut -d' ' -f9)
-        sed -i "s/127.0.1.1/#127.0.1.1/" /etc/hosts
-        echo "$CIP  $CONTAINER_FQDN $CONTAINER_NAME" >> /etc/hosts
-        #configure resolvconf utility so that proper nameserver exists, otherwise only 127.0.0.1 may appear
-        echo 'TRUNCATE_NAMESERVER_LIST_AFTER_LOOPBACK_ADDRESS=no' > /etc/default/resolvconf
-    SHELL
-  end
-
-  config.vm.provision "foreman install", type: "shell", env: {
     "CID" => ENV['CONTAINER_FQDN'],
     "CERT_BASEDIR" => ENV['CONTAINER_CERT_BASE'],
     "CA" => ambassador_ca,
@@ -106,7 +88,11 @@ Vagrant.configure("2") do |config|
     "CERT" => ambassador_cert,
     "PROXY_CERT" => ambassador_cert,
     "SALT_USER" => ambassador_salt_user,
-    "SALT_PASSWORD" => ambassador_salt_password
+    "SALT_PASSWORD" => ambassador_salt_password,
+    "PSQL_USERNAME" => ambassador_psql_username,
+    "PSQL_PASSWORD" => ambassador_psql_password,
+    "PSQL_HOST" => ambassador_psql_host,
+    "PSQL_DB" => ambassador_psql_db
     } do |s|
     s.path = "setup_foreman.sh"
   end

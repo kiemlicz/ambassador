@@ -8,6 +8,9 @@
     - fullname: {{ user.fullname|default(username) }}
     - shell: {{ user.shell|default("/bin/bash") }}
     - home: {{ user.home_dir|default("/home/" ~ username) }}
+{% if user.password is defined %}
+    - password: {{ user.password }}
+{% endif %}
     - require:
       - sls: os # deliberately full sls (in case of urgent pkgs.post_install commands)
 {% if user.groups is defined %}

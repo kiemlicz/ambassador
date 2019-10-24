@@ -21,7 +21,10 @@ assert_env() {
     fi
 }
 
+# todo instead of envs, just fetch data from kdbx
 assert_env "fqdn is not set" $CID
+assert_env "CONTAINER_NAME is not set" $CONTAINER_NAME
+assert_env "CONTAINER_USERNAME is not set" $CONTAINER_USERNAME
 assert_env "CA is not set" $CA
 assert_env "CRL is not set" $CRL
 assert_env "CERT is not set" $CERT
@@ -31,6 +34,10 @@ assert_env "PROXY_KEY is not set" $PROXY_KEY
 assert_env "CERT_BASEDIR is not set" $CERT_BASEDIR
 assert_env "SALT_USER is not set" $SALT_USER
 assert_env "SALT_PASSWORD is not set" $SALT_PASSWORD
+assert_env "PSQL_USERNAME is not set" $PSQL_USERNAME
+assert_env "PSQL_PASSWORD is not set" $PSQL_PASSWORD
+assert_env "PSQL_HOST is not set" $PSQL_HOST
+assert_env "PSQL_DB is not set" $PSQL_DB
 
 #edit versions
 readonly FOREMAN_STRETCH_REPO_URL="deb http://deb.theforeman.org/ stretch 1.23"
@@ -46,6 +53,24 @@ readonly FOREMAN_PUPPET_SERVER=$FOREMAN_PUPPET_SERVER_URL/$PUPPET_SERVER_PKG
 readonly FOREMAN_REPO_ENTRY=$FOREMAN_STRETCH_REPO_URL
 readonly FOREMAN_PLUGINS_REPO_ENTRY=$FOREMAN_STRETCH_PLUGINS_REPO_URL
 readonly FOREMAN_REPO_KEY=$FOREMAN_STRETCH_REPO_KEY
+
+mkdir -p /etc/sudoers.d/
+echo 'Cmnd_Alias SALT = /usr/bin/salt, /usr/bin/salt-key\nforeman-proxy ALL = NOPASSWD: SALT\nDefaults:foreman-proxy !requiretty' > /etc/sudoers.d/salt; chmod 440 /etc/sudoers.d/salt
+
+if [ "$CONTAINER_USERNAME" != "root" ]; then
+    echo 'ubuntu ALL=NOPASSWD:ALL' > /etc/sudoers.d/ubuntu; chmod 440 /etc/sudoers.d/ubuntu
+fi
+
+#todo how to achieve passwordless sudo -u postgres, below doesn't work
+#echo 'postgres ALL=NOPASSWD:ALL' > /etc/sudoers.d/postgres; chmod 440 /etc/sudoers.d/postgres
+
+# remove accepting locale on server so that no locale generation is needed
+sed -i -e 's/\(^AcceptEnv LANG.*\)/#\1/g' /etc/ssh/sshd_config
+CIP=$(ip r s | grep "scope link src" | cut -d' ' -f9)
+sed -i "s/127.0.1.1/#127.0.1.1/" /etc/hosts
+echo "$CIP  $CID $CONTAINER_NAME" >> /etc/hosts
+#configure resolvconf utility so that proper nameserver exists, otherwise only 127.0.0.1 may appear
+echo 'TRUNCATE_NAMESERVER_LIST_AFTER_LOOPBACK_ADDRESS=no' > /etc/default/resolvconf
 
 apt-get update
 apt-get upgrade -y -o DPkg::Options::=--force-confold
@@ -76,6 +101,8 @@ apt-get install -y foreman-installer dnsmasq tcpdump nano vim
 #api user for foreman
 useradd -r saltuser
 echo "$SALT_USER:$SALT_PASSWORD" | chpasswd
+
+#####<>#####
 
 CIF=$(cat /etc/resolv.conf | egrep -v '(127.0.0.1)|(127.0.1.1)' | egrep -m 1 '^nameserver.+' | cut -d' ' -f2)
 

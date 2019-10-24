@@ -1,0 +1,11 @@
+---
+:proto: https
+:host: {{ salt['pillar.get']("foreman:fqdn") }}
+:url: https://{{ salt['pillar.get']("foreman:fqdn") }}
+:port: 443
+:ssl_ca: {{ salt['pillar.get']("foreman:ca_cert_location") }}
+:ssl_cert: {{ salt['pillar.get']("foreman:server_cert_location") }}
+:ssl_key: {{ salt['pillar.get']("foreman:server_key_location") }}
+:timeout: 10
+:salt: /usr/bin/salt
+:upload_grains: true

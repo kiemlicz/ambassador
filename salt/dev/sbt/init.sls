@@ -8,7 +8,7 @@ include:
   - users
 
 
-{{ repo_pkg("sbt_repository", sbt) }}
+{{ repo_pkg("sbt", sbt) }}
 
 {{ add_environmental_variable(sbt.environ_variable, sbt.generic_link, sbt.exports_file) }}
 {{ add_to_path(sbt.environ_variable, sbt.path_inside, sbt.exports_file) }}
