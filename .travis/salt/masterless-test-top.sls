@@ -36,8 +36,6 @@ def run():
       "scala",
       "maven",
       "sbt",
-      "erlang",
-      "rebar",
       "grafana",
       "virtualbox",
       "projects",
@@ -50,12 +48,7 @@ def run():
       "docker",
       "docker.compose",
     ],
-    'I@mongodb:setup_type:cluster': [
-      "mongodb.server.cluster"
-    ],
-    'I@mongodb:setup_type:single': [
-      "mongodb.server.single"
-    ]
+    # erlang, rebar and mongodb states should be refactored and fixed
   }
 
   server = {
