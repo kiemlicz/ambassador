@@ -4,14 +4,10 @@ FROM debian:$tag AS salt-base
 ARG salt_ver=""
 
 # fixme remove once https://github.com/saltstack/salt-bootstrap/issues/1353 is done
-ADD https://raw.githubusercontent.com/kiemlicz/salt-bootstrap/develop/bootstrap-salt.sh /tmp
+ADD https://raw.githubusercontent.com/saltstack/salt-bootstrap/develop/bootstrap-salt.sh /tmp
 COPY salt /srv/salt
 
-# somehow using _utils/jinja.py doesn't override the installed one https://github.com/saltstack/salt/pull/54780
-# todo once sorted out, install stable version, for now git 2019.2.1 must be used
-# https://github.com/saltstack/salt/issues/54755 and https://github.com/saltstack/salt/issues/53570
-# todo once sorted out, remove manual python3-pip install
-RUN apt-get update && apt-get install -y procps curl dumb-init python3-pip && \
+RUN apt-get update && apt-get install -y procps curl dumb-init && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver
 
 WORKDIR /srv

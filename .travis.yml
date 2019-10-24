@@ -9,7 +9,7 @@ services:
 
 env:
   global:
-    - SALT_VER="git 2019.2.1" # use "" for latest stable
+    - SALT_VER="" # use "" for latest stable, other options: "git 2019.2.1"
     - COMPOSE_VER="1.22.0"
     - KUBECTL_VER="v1.14.2"
     - GH_URL="https://kiemlicz.github.io/ambassador/"
@@ -26,7 +26,6 @@ jobs:
       name: "Test and publish"
       env:
         - DOCKER_IMAGE=debian-stretch
-        - SALT_VER="-d git 2019.2.1"
       before_install: .travis/prepare.sh dry
       script: .travis/test.sh dry
       after_success: .travis/publish.sh docker
@@ -54,7 +53,6 @@ jobs:
       script: .travis/test.sh masterless
       env:
         - DOCKER_IMAGE=debian-stretch
-        - SALT_VER="-d git 2019.2.1"
         - BASE_IMAGE_TAG=stretch
         - SALTENV=base
         - CONTEXT=base
@@ -62,7 +60,6 @@ jobs:
       script: .travis/test.sh masterless
       env:
         - DOCKER_IMAGE=debian-stretch
-        - SALT_VER="-d git 2019.2.1"
         - BASE_IMAGE_TAG=stretch
         - SALTENV=base
         - CONTEXT=gui
@@ -70,7 +67,6 @@ jobs:
       script: .travis/test.sh masterless
       env:
         - DOCKER_IMAGE=debian-stretch
-        - SALT_VER="-d git 2019.2.1"
         - BASE_IMAGE_TAG=stretch
         - SALTENV=dev
         - CONTEXT=dev

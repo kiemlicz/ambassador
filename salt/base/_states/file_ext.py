@@ -23,7 +23,7 @@ salt_version = salt.version.__saltstack_version__.string
 
 
 def __virtual__():
-    supported = ["2019.2.0", "2019.2.1"]
+    supported = ["2019.2.0", "2019.2.1", "2019.2.2"]
     if not list(filter(lambda e: salt_version.startswith(e), supported)):
         return False, "Cannot load file.ext, install: salt version {} (detected: {})".format(supported, salt_version)
     return True if HAS_GOOGLE_AUTH else (False, "Cannot load file.ext, install: google-auth, pyasn1-modules and google-auth-oauthlib libraries")
