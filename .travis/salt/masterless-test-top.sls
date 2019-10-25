@@ -40,7 +40,6 @@ def run():
       "virtualbox",
       "projects",
       "redis.client",
-      "mongodb.client",
       "redis.server",
     ],
     # Artful image has hard time whereas Debian does not: https://github.com/docker/for-linux/issues/230
