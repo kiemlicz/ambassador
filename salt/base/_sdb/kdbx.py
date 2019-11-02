@@ -28,6 +28,10 @@ def get(key, profile=None):
     query_dict = _query_string_to_dict(query_parsed.query)
     filename = query_dict['attachment'] if 'attachment' in query_dict else None
     e = _get_first_entry_by_path(query_parsed.path, profile)
+    if not e:
+        log.error("KDBX entries by path: {}, didn't return entries".format(query_parsed.path))
+        return None
+
     if filename:
         attachments = [a.data for a in e.attachments if a.filename == filename]
         if len(attachments) > 1:
