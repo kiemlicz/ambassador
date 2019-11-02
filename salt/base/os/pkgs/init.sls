@@ -9,6 +9,7 @@ dist-upgrade:
     - force_yes: True
     - require:
       - sls: os.locale
+      - sls: os.groups
     - require_in:
       - pkg: os_packages
 {% endif %}
@@ -22,6 +23,7 @@ pkgs:
     - reload_modules: True
     - require:
       - sls: os.locale
+      - sls: os.groups
 
 {% if pkgs.versions is defined and pkgs.versions %}
 pkgs_versions:

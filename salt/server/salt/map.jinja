@@ -1,0 +1,43 @@
+{% set salt_installer = salt['grains.filter_by']({
+    'default': {
+        'repository': {
+            'file': "/etc/apt/sources.list.d/saltstack.list",
+        },
+        'master': {
+            'config': [],
+            'pkg_name': "salt-master",
+            'interface': "0.0.0.0",
+            'autosign': {
+                'file': '/etc/salt/autosign.conf'
+            }
+        },
+        'api': {
+            'config': [],
+            'port': 9191,
+            'pkg_name': "salt-api",
+            'file': "/etc/apt/sources.list.d/saltstack.list",
+        },
+        'ssh': {
+            'config': [],
+            'pkg_name': "salt-ssh",
+            'file': "/etc/apt/sources.list.d/saltstack.list",
+        }
+    },
+}, merge=salt['grains.filter_by']({
+       'buster': {
+         'repository': {
+           'names': [
+                "deb http://repo.saltstack.com/py3/debian/10/amd64/latest buster main"
+           ],
+           'key_url': "https://repo.saltstack.com/py3/debian/10/amd64/latest/SALTSTACK-GPG-KEY.pub"
+         }
+       },
+       'stretch': {
+         'repository': {
+            'names': [
+                "deb http://repo.saltstack.com/py3/debian/9/amd64/latest stretch main"
+            ],
+            'key_url': "https://repo.saltstack.com/py3/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub"
+         }
+       }
+   }, grain='oscodename', merge=salt['pillar.get']('salt_installer'))) %}

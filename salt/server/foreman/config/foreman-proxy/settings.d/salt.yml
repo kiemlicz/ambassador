@@ -1,9 +1,11 @@
+{% from "foreman/map.jinja" import foreman with context -%}
+{% from "salt/map.jinja" import salt_installer with context -%}
 ---
 :enabled: https
-:autosign_file: /etc/salt/autosign.conf
+:autosign_file: {{ salt_installer.master.autosign.file }}
 :salt_command_user: root
 :use_api: true
-:api_url: https://{{ salt['pillar.get']("foreman:fqdn") }}:{{ salt['pillar.get']("salt:api:port") }}
+:api_url: https://{{ foreman.fqdn }}:{{ salt_installer.api.port }}
 :api_auth: pam
-:api_username: {{ salt['pillar.get']("salt:api:username") }}
-:api_password: {{ salt['pillar.get']("salt:api:password") }}
+:api_username: {{ salt_installer.api.username }}
+:api_password: {{ salt_installer.api.password }}

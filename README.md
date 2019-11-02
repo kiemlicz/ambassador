@@ -23,7 +23,15 @@ The "installation" process end up with LXC container containing foreman&salt ful
 Simply follow two steps:  
 1. Clone this repo with submodules: `git submodule update --init` ([read more about submodules](https://github.com/kiemlicz/util/wiki/git))
 2. Ensure you have LXC configured: `requisites.sh`
-3. `./setup.sh -c -n ambassador -u your_username,other_username_allowed_to_ssh_into_ambassador`
+3. Optionally: provide `ambassador-installer.override.conf` to override any Salt masterless Vagrant provisioner settings, e.g.:
+```
+ext_pillar:
+  - git:
+    - branch git@bitbucket.org:someone/pillar_repo.git:
+      - root: pillar
+      - env: base
+```
+4. `./setup.sh -n ambassador -u your_username,other_username_allowed_to_ssh_into_ambassador [--deploy_priv priv.key] [--deploy_pub key.pub]`
 
 # Workflow
 Foreman&Salt workflow is best depicted using this (Foreman's) diagram:

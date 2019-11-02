@@ -23,10 +23,6 @@ trap tear_down_container EXIT TERM INT
 while [[ $# -gt 0 ]]; do
     arg="$1"
     case $arg in
-        --ssl-base)
-        SSL_BASE="$2"
-        shift # past argument
-        ;;
         -n|--name)
         CN="$2"
         shift # past argument
@@ -53,9 +49,12 @@ while [[ $# -gt 0 ]]; do
         shift
         ;;
         -s|--stop)
-        #comma separated alowed users list
-        CONTAINER_STOP="$2"
-        shift
+        #stop container after finish
+        CONTAINER_STOP="true"
+        ;;
+        -a|--auto_start)
+        #add auto-start flag for container
+        CONTAINER_AUTO_START="1"
         ;;
         *)
         # unknown option
@@ -64,30 +63,12 @@ while [[ $# -gt 0 ]]; do
     shift # past argument or value
 done
 
-export readonly CONTAINER_NAME=${CN-ambassador}
-export readonly CONTAINER_CERT_BASE=/etc/foreman/ssl
-export readonly CONTAINER_CERT_DIR=$CONTAINER_CERT_BASE/certs
-export readonly CONTAINER_PRIVATE_DIR=$CONTAINER_CERT_BASE/private
-export readonly CONTAINER_USERNAME=root
-export readonly CONTAINER_USER_HOME=/root # /home/$CONTAINER_USERNAME
-readonly CONTAINER_OS=debian
-readonly CONTAINER_OS_MAJOR=stretch
-readonly CONTAINER_BACKING_STORE=best
-readonly CONTAINER_STOP_AFTER=${CONTAINER_STOP-false}
-export readonly USERS=${ALLOWED_USERS-"$USER"}
-export readonly TFTP_ROOT="/srv/tftp"
-
 readonly setup_start_ts=$(date +%s.%N)
 
 ##### validate
 
 if [[ $EUID -eq 0 ]]; then
    echo "Warning: script is running as root"
-fi
-
-if [ -z "$SSL_BASE" ]; then
-    echo "Provide --ssl-base directory with all keys and certificates"
-    exit 1
 fi
 
 if ([ -z $DEPLOY_PUB_FILE ] || [ -z $DEPLOY_PRIV_FILE ]); then
@@ -104,6 +85,16 @@ if [ -z "$(dnsdomainname)" ]; then
     exit 1
 fi
 
+export readonly CONTAINER_NAME=${CN-ambassador}
+export readonly CONTAINER_USERNAME=root
+export readonly CONTAINER_USER_HOME=/root # /home/$CONTAINER_USERNAME
+export readonly USERS=${ALLOWED_USERS-"$USER"}
+export readonly AMBASSADOR_AUTO_START=${CONTAINER_AUTO_START-"0"}
+export DEPLOY_PUB_FILE
+export DEPLOY_PRIV_FILE
+readonly CONTAINER_STOP_AFTER=${CONTAINER_STOP-false}
+
+
 if [ ! -f ~/.ssh/id_rsa.pub ]; then
     echo "User: $CONTAINER_USERNAME, keypair doesn't exist, please generate it"
     exit 1
@@ -111,20 +102,7 @@ fi
 
 ##### initial
 export readonly CONTAINER_FQDN="$CONTAINER_NAME.$(dnsdomainname)"
-readonly CONTAINER_ROOTFS=/var/lib/lxc/$CONTAINER_NAME/rootfs
-# certificates and keys are expected to be found in following locations
-SSL_CERT_DIR=$SSL_BASE/certs
-SSL_PRIVATE_DIR=$SSL_BASE/private
-#export readonly CA_PK_FILE=$SSL_PRIVATE_DIR/ca.key.pem
-export readonly CA_CERT_FILE=$SSL_CERT_DIR/ca.cert.pem
-export readonly SERVER_KEY_FILE=$SSL_PRIVATE_DIR/$CONTAINER_FQDN.key
-export readonly SERVER_PROXY_KEY_FILE=$SSL_PRIVATE_DIR/$CONTAINER_FQDN-proxy.key
-export readonly SERVER_CERT_FILE=$SSL_CERT_DIR/$CONTAINER_FQDN.pem
-export readonly SERVER_PROXY_CERT_FILE=$SSL_CERT_DIR/$CONTAINER_FQDN-proxy.pem
-export readonly CRL_FILE=$SSL_BASE/crl.pem
 
-mkdir -p .target/etc/foreman/
-cp -r $SSL_BASE .target/etc/foreman/
 
 ##### build container
 
@@ -154,7 +132,6 @@ readonly run_time=$(echo "$run_stop_ts - $run_start_ts" | bc)
 readonly total_time=$(echo "$run_stop_ts - $setup_start_ts" | bc)
 
 #cleanup
-rm -rf ./.target
 
 echo "Container preparation time: ${container_prep_time}[s]"
 echo "Installation time: ${run_time}[s]"

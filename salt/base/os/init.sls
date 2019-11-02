@@ -3,6 +3,7 @@ include:
   - os.mounts
   - os.hosts
   - os.locale
+  - os.groups
   - os.pkgs
   - os.services
 
