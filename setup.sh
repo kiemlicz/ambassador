@@ -4,7 +4,6 @@
 # Arguments:
 # -c generate certificates, without this option create 'ssl' dir (in container directory) with ca, key+cert (signed by ca)
 # -n container name
-# --client_id and --client_secret are google developer's console generated credentials
 
 tear_down_container() {
     local rv=$?
@@ -35,12 +34,12 @@ while [[ $# -gt 0 ]]; do
         DEPLOY_PUB_FILE="$2"
         shift
         ;;
-        --client_id)
-        CLIENT_ID="$2"
+        --pillar_priv)
+        PILLAR_GPG_PRIV_FILE="$2"
         shift
         ;;
-        --client_secret)
-        CLIENT_SECRET="$2"
+        --pillar_pub)
+        PILLAR_GPG_PUB_FILE="$2"
         shift
         ;;
         -u|--users)
@@ -85,24 +84,22 @@ if [ -z "$(dnsdomainname)" ]; then
     exit 1
 fi
 
-export readonly CONTAINER_NAME=${CN-ambassador}
-export readonly CONTAINER_USERNAME=root
-export readonly CONTAINER_USER_HOME=/root # /home/$CONTAINER_USERNAME
-export readonly USERS=${ALLOWED_USERS-"$USER"}
-export readonly AMBASSADOR_AUTO_START=${CONTAINER_AUTO_START-"0"}
-export DEPLOY_PUB_FILE
-export DEPLOY_PRIV_FILE
-readonly CONTAINER_STOP_AFTER=${CONTAINER_STOP-false}
-
-
 if [ ! -f ~/.ssh/id_rsa.pub ]; then
     echo "User: $CONTAINER_USERNAME, keypair doesn't exist, please generate it"
     exit 1
 fi
 
-##### initial
+export readonly CONTAINER_NAME=${CN-ambassador}
+export readonly CONTAINER_USERNAME=root
+export readonly CONTAINER_USER_HOME=/root # /home/$CONTAINER_USERNAME
+export readonly USERS=${ALLOWED_USERS-"$USER"}
+export readonly AMBASSADOR_AUTO_START=${CONTAINER_AUTO_START-"0"}
 export readonly CONTAINER_FQDN="$CONTAINER_NAME.$(dnsdomainname)"
-
+export DEPLOY_PUB_FILE
+export DEPLOY_PRIV_FILE
+export PILLAR_GPG_PUB_FILE
+export PILLAR_GPG_PRIV_FILE
+readonly CONTAINER_STOP_AFTER=${CONTAINER_STOP-false}
 
 ##### build container
 

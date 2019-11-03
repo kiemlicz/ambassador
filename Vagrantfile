@@ -22,14 +22,22 @@ Vagrant.configure("2") do |config|
     config.vm.provision "file", source: ENV['DEPLOY_PRIV_FILE'], destination: "deploykeys/cfg_ro.key"
   end
 
+  if ENV.has_key?('PILLAR_GPG_PUB_FILE') and ENV.has_key?('PILLAR_GPG_PRIV_FILE')
+    config.vm.provision "file", source: ENV['PILLAR_GPG_PUB_FILE'], destination: "pillargpg/pillar.gpg.pub"
+    config.vm.provision "file", source: ENV['PILLAR_GPG_PRIV_FILE'], destination: "pillargpg/pillar.gpg"
+  end
+
   config.vm.synced_folder "extensions/file_ext_authorize", "/opt/file_ext_authorize"
   config.vm.synced_folder "salt", "/srv/salt"
 
   config.vm.provision "install salt requisites", type: "shell" do |s|
-    s.path = "https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/9bc130ba6800b1df66a3e34901d0c18dca560fd4/setup_salt_requisites.sh"
+    s.path = "https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/e0bcac51c3fea27d9c353f10ac5948a053c18690/setup_salt_requisites.sh"
   end
 
-  config.vm.provision "add top file", type: "shell" do |s|
+  config.vm.provision "salt configuration", type: "shell", env: {
+    "PILLAR_GPG_PUB_FILE" => ENV['PILLAR_GPG_PUB_FILE'],
+    "PILLAR_GPG_PRIV_FILE" => ENV['PILLAR_GPG_PRIV_FILE']
+  } do |s|
     s.inline = <<-SHELL
         sudo cat << EOF > /srv/salt/base/top.sls
 server:
@@ -41,6 +49,7 @@ server:
     - salt.ssh
     - foreman
 EOF
+      gpg --homedir /etc/salt/gpgkeys --import /home/vagrant/pillargpg/pillar.gpg
     SHELL
   end
 
