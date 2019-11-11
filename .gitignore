@@ -11,3 +11,5 @@ Gemfile.lock
 # local overrides for kitchen tests
 kitchen.local.yml
 requirements.lock
+docker-compose.override.yml
+ambassador-installer.override.conf

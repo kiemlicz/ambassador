@@ -7,6 +7,13 @@ locale:
     - en_US.UTF-8
     - pl_PL.UTF-8
 
+groups:
+  present:
+    - name: wireshark
+    - name: docker
+    - name: vboxusers
+    - name: fancygroup
+
 mail:
   configs:
     update-exim4.conf.conf:

@@ -7,6 +7,7 @@
                    "silversearcher-ag", "kde-standard", "xterm", "yakuake", "wireshark", "network-manager-openvpn",
                    "google-chrome-stable", "firefox", "exuberant-ctags", "tig", "software-properties-common",
 		           "ca-certificates", "gnupg2"],
+         'pip3_packages': ["google-auth-oauthlib", "google-api-python-client", "google-auth-httplib2"],
          'post_install': [
                     "echo 'wireshark-common wireshark-common/install-setuid boolean true' | debconf-set-selections",
                     "dpkg-reconfigure -f noninteractive wireshark-common",

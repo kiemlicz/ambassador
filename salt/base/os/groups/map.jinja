@@ -1,0 +1,5 @@
+{% set groups = salt['grains.filter_by']({
+    'default': {
+        'present': []
+    },
+}, merge=salt['pillar.get']('groups')) %}

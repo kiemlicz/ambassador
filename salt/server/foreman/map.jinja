@@ -1,0 +1,33 @@
+{% set foreman = salt['grains.filter_by']({
+    'default': {
+        'installer_options': [],
+        'tftp_root': "/srv/tftp",
+        'config': [{
+          'name': "/etc/dnsmasq.d/",
+          'source': 'salt://foreman/config/dnsmasq.d/'
+        }, {
+          'name': "/etc/foreman-proxy/",
+          'source': 'salt://foreman/config/foreman-proxy/'
+        },{
+          'name': "/etc/salt/",
+          'source': 'salt://foreman/config/salt/'
+        },{
+          'name': "/srv/tftp/",
+          'source': 'salt://foreman/config/tftp/'
+        }],
+        'user': "foreman",
+        'group': "foreman",
+        'ssl': {},
+        'services': ["foreman", "foreman-proxy", "dynflowd", "dnsmasq"]
+    },
+}, merge=salt['grains.filter_by']({
+       'stretch': {
+            'pkg_name': "foreman-installer",
+            'names': [
+                "deb http://deb.theforeman.org/ stretch 1.23",
+                "deb http://deb.theforeman.org/ plugins 1.23"
+            ],
+            'file': "/etc/apt/sources.list.d/foreman.list",
+            'key_url': "https://deb.theforeman.org/pubkey.gpg"
+       }
+   }, grain='oscodename', merge=salt['pillar.get']('foreman'))) %}

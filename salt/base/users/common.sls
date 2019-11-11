@@ -8,14 +8,14 @@
     - fullname: {{ user.fullname|default(username) }}
     - shell: {{ user.shell|default("/bin/bash") }}
     - home: {{ user.home_dir|default("/home/" ~ username) }}
+{%- if user.password is defined %}
+    - password: {{ user.password }}
+{% endif %}
+{%- if user.groups is defined %}
+    - groups: {{ user.groups|tojson }}
+{%- endif %}
     - require:
       - sls: os # deliberately full sls (in case of urgent pkgs.post_install commands)
-{% if user.groups is defined %}
-  group.present:
-    - names: {{ user.groups|tojson }}
-    - addusers:
-      - {{ username }}
-{% endif %}
 
 {% if user.user_dirs is defined and user.user_dirs %}
 {{ username }}_setup_directories:

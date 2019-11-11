@@ -1,0 +1,12 @@
+{% from "foreman/map.jinja" import foreman with context -%}
+---
+:proto: https
+:host: {{ foreman.fqdn }}
+:url: https://{{ foreman.fqdn }}
+:port: 443
+:ssl_ca: {{ foreman.ssl.ca.name }}
+:ssl_cert: {{ foreman.ssl.server.name }}
+:ssl_key: {{ foreman.ssl.key.name }}
+:timeout: 10
+:salt: /usr/bin/salt
+:upload_grains: true

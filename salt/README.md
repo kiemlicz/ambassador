@@ -201,6 +201,10 @@ This state does pretty much that.
 Environment variables operations.
 
 ## Custom Execution Modules
+
+## Custom SDB Modules
+### KDBX
+### GDrive
  
 # Tests
 Tests are performed on different OSes (in docker) in _Salt_ masterless mode.  

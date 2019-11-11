@@ -1,23 +1,8 @@
 version: '3'
 
 services:
-  foreman:
-    build:
-      context: .
-    ports:
-      - "80:80"
-      - "443:443"
-      - "8443:8443"
-      - "3000:3000"
-      - "67:67/udp"
-      - "68:68/udp"
-    links:
-      - db
-      - redis
-    volumes: []
-    depends_on:
-      - postgress
-
+  # db only since plugin management is not yet sorted out
+  # https://community.theforeman.org/t/dockerfile-is-now-included-in-foreman-core/13987/18
   db:
     environment:
       - POSTGRES_USER=foreman
@@ -36,9 +21,6 @@ services:
       retries: 3
     volumes:
       - db:/var/lib/postgresql/data
-
-  redis:
-    image: redis
 
 volumes:
   db:
