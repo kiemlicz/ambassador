@@ -1,6 +1,6 @@
 {%- set fqdn = salt['network.get_fqdn']() %}
-{%- set ip = salt['network.ip_addrs'](cidr="127.0.0.0/24", include_loopback=True)|first %}
-{%- set interface = salt['network.ifacestartswith'](cidr="127.0.0")|first %}
+{%- set ip = "127.0.0.1" %}
+{%- set interface = "lo" %}
 {%- set reverse = salt['network.reverse_ip'](ip) %}
 {%- set dnsserver = salt['grains.get']("dns:ip4_nameservers")|first %}
 {%- set dnsdomain = salt['grains.get']("dns:domain") %}
