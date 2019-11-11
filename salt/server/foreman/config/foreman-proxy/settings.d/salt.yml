@@ -2,7 +2,7 @@
 {% from "salt/map.jinja" import salt_installer with context -%}
 ---
 :enabled: https
-:autosign_file: {{ salt_installer.master.autosign.file }}
+:autosign_file: {{ salt_installer.master.config|selectattr("name", "match", ".*autosign.conf.*")|first }}
 :salt_command_user: root
 :use_api: true
 :api_url: https://{{ foreman.fqdn }}:{{ salt_installer.api.port }}

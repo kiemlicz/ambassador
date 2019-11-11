@@ -6,10 +6,10 @@
         'master': {
             'config': [],
             'pkg_name': "salt-master",
+            'service': "salt-master",
+            'service_init_delay': 5,
             'interface': "0.0.0.0",
-            'autosign': {
-                'file': '/etc/salt/autosign.conf'
-            }
+            'sync_cmd': "salt-run saltutil.sync_all"
         },
         'api': {
             'config': [],

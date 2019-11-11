@@ -11,19 +11,18 @@ Unfortunately as some setup work had already been done such solution may not be 
 Maintaining multi-node environments is cumbersome (configuration synchronization, duplicated installation process).
 Sometimes it would also be useful to keep your favourite os hacks/tips/tricks in structured manner (like in some configuration management solution)
 
-Setup (dev, prod, work, home) node using saltstack and PXE booting.
+Setup any environment: dev, prod, work, home using Salt (SaltStack's) and PXE booting (the Foreman's).
 
 Will aim to be both Linux&Windows friendly.
 
 # Setup
-
 As the best way of documenting things is writing automation scripts, this automation server's installation process
 is also automated.  
 The "installation" process end up with LXC container containing foreman&salt fully setup and configured.  
-Simply follow two steps:  
-1. Clone this repo with submodules: `git submodule update --init` ([read more about submodules](https://github.com/kiemlicz/util/wiki/git))
+Simply follow:  
+1. Clone this repo with [submodules](https://github.com/kiemlicz/util/wiki/git): `git submodule update --init`
 2. Ensure you have LXC configured: `requisites.sh`
-3. Optionally: provide `ambassador-installer.override.conf` to override any Salt masterless Vagrant provisioner settings, e.g.:
+3. Optionally: provide `ambassador-installer.override.conf` to override any Salt masterless Vagrant provisioner settings, e.g. add your own pillar:
 ```
 ext_pillar:
   - git:
@@ -31,11 +30,13 @@ ext_pillar:
       - root: pillar
       - env: base
 ```
-4. `./setup.sh -n ambassador -u your_username,other_username_allowed_to_ssh_into_ambassador [--deploy_priv priv.key] [--deploy_pub key.pub]`
+4. `./setup.sh -n ambassador -u your_username,other_username_allowed_to_ssh_into_ambassador [--deploy_priv priv.key] [--deploy_pub key.pub] [--pillar_pub key.gpg.pub] [--pillar_priv key.gpg] [--ambassador_kdbx ambassador.kdbx] [--ambassador_key ambassador.key]`
 
-# Workflow
+# Documentation
 Foreman&Salt workflow is best depicted using this (Foreman's) diagram:
 ![](https://theforeman.org/static/images/diagrams/foreman_workflow_final.jpg)
+
+For State Tree and custom extensions documentation, find the [State's Tree README.md](salt/README.md)
 
 # Known problems
 Provisioning of OSes involves many technologies and tools, it is very likely that something may not always works "as expected"

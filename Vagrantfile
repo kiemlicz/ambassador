@@ -27,11 +27,19 @@ Vagrant.configure("2") do |config|
     config.vm.provision "file", source: ENV['PILLAR_GPG_PRIV_FILE'], destination: "pillargpg/pillar.gpg"
   end
 
+  if ENV.has_key?('AMBASSADOR_KDBX')
+    config.vm.provision "file", source: ENV['AMBASSADOR_KDBX'], destination: "ambassador.kdbx"
+  end
+
+  if ENV.has_key?('AMBASSADOR_KDBX_KEY')
+    config.vm.provision "file", source: ENV['AMBASSADOR_KDBX_KEY'], destination: "ambassador.key"
+  end
+
   config.vm.synced_folder "extensions/file_ext_authorize", "/opt/file_ext_authorize"
   config.vm.synced_folder "salt", "/srv/salt"
 
   config.vm.provision "install salt requisites", type: "shell" do |s|
-    s.path = "https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/e0bcac51c3fea27d9c353f10ac5948a053c18690/setup_salt_requisites.sh"
+    s.path = "https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/c3a41412272e15f8687f312af63088a8d3938182/setup_salt_requisites.sh"
   end
 
   config.vm.provision "salt configuration", type: "shell", env: {

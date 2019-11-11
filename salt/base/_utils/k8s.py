@@ -18,8 +18,17 @@ except ImportError:
 log = logging.getLogger(__name__)
 
 
+def __virtual__():
+    return HAS_K8S
+
+
+def has_libs():
+    return __virtual__()
+
+
 class K8sClient(object):
     def __init__(self, **kwargs):
+        # todo don't assert this in constructor, expose this information via dedicated function
         if not HAS_K8S:
             raise CommandExecutionError('(unable to import kubernetes, module most likely not installed)')
 

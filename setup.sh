@@ -42,6 +42,14 @@ while [[ $# -gt 0 ]]; do
         PILLAR_GPG_PUB_FILE="$2"
         shift
         ;;
+        --ambassador_kdbx)
+        AMBASSADOR_KDBX="$2"
+        shift
+        ;;
+        --ambassador_key)
+        AMBASSADOR_KDBX_KEY="$2"
+        shift
+        ;;
         -u|--users)
         #comma separated alowed users list
         ALLOWED_USERS="$2"
@@ -99,6 +107,8 @@ export DEPLOY_PUB_FILE
 export DEPLOY_PRIV_FILE
 export PILLAR_GPG_PUB_FILE
 export PILLAR_GPG_PRIV_FILE
+export AMBASSADOR_KDBX
+export AMBASSADOR_KDBX_KEY
 readonly CONTAINER_STOP_AFTER=${CONTAINER_STOP-false}
 
 ##### build container
