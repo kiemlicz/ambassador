@@ -32,6 +32,27 @@ ext_pillar:
 ```
 4. `./setup.sh -n ambassador -u your_username,other_username_allowed_to_ssh_into_ambassador [--deploy_priv priv.key] [--deploy_pub key.pub] [--pillar_pub key.gpg.pub] [--pillar_priv key.gpg] [--ambassador_kdbx ambassador.kdbx] [--ambassador_key ambassador.key]`
 
+Since foreman still doesn't support 'dockerized' deployment (cannot specify plugins for Foreman Docker images, no official foreman-proxy image).  
+The provided `docker-compose.yml` can be used only to setup external DB or any other services. Use `docker-compose.override.yml` for any overrides:
+```
+version: '3'
+
+services:
+  db:
+    environment:
+      - POSTGRES_PASSWORD=realforemanpassword
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes:
+  db:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /tmp/foreman
+```
+
 # Documentation
 Foreman&Salt workflow is best depicted using this (Foreman's) diagram:
 ![](https://theforeman.org/static/images/diagrams/foreman_workflow_final.jpg)
