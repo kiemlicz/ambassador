@@ -9,6 +9,7 @@ services:
       - POSTGRES_PASSWORD=foreman
       - POSTGRES_DATABASE=foreman
       - PGDATA=/var/lib/postgresql/data/pgdata
+    network_mode: host
     hostname: db.ambassador
     image: postgres:10
     ports:
