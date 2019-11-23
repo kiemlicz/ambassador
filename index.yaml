@@ -2,11 +2,11 @@ apiVersion: v1
 entries:
   salt:
   - apiVersion: v1
-    created: "2019-11-22T05:04:27.786258859Z"
+    created: "2019-11-23T05:03:50.491192587Z"
     description: Salt deployment for in-k8s automations and orchestration
-    digest: 7126766903298b3adf2667852e0e3d39f61fca3b0ea257c8398d84674a61214e
+    digest: 29e109217f15d8d09766c2a980ca45d0dde8b88e4f3dd8266a0e738a1c35c352
     name: salt
     urls:
     - https://kiemlicz.github.io/ambassador/salt-1.3.4.tgz
     version: 1.3.4
-generated: "2019-11-22T05:04:27.784847492Z"
+generated: "2019-11-23T05:03:50.488868616Z"
