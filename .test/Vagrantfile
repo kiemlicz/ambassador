@@ -17,29 +17,28 @@ Vagrant.configure("2") do |config|
     end
   end
 
+  config.vm.provision "file", source: "~/local/keepass/ambassador.kdbx", destination: "~/local/keepass/ambassador.kdbx"
+  config.vm.provision "file", source: "~/local/keys/ambassador.key", destination: "~/local/keys/ambassador.key"
   config.vm.provision "file", source: "~/local/keys/cfg_ro.key", destination: "~/local/keys/cfg_ro"
   config.vm.provision "file", source: "~/local/keys/cfg_ro.key.pub", destination: "~/local/keys/cfg_ro.pub"
   config.vm.provision "file", source: "~/local/keys/pillargpg.gpg", destination: "~/local/keys/pillargpg.gpg"
   config.vm.provision "file", source: "~/local/keys/pillargpg.gpg.pub", destination: "~/local/keys/pillargpg.gpg.pub"
+
   config.vm.provision "salt deps", type: "shell", env: {"SHELL": "/bin/bash"} do |s|
+    s.path = "https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/c3a41412272e15f8687f312af63088a8d3938182/setup_salt_requisites.sh"
+  end
+  config.vm.provision "salt keys", type: "shell", env: {"SHELL": "/bin/bash"} do |s|
     s.inline = <<-SHELL
-         mkdir -p /srv/pillar
-         echo "deb http://ftp.debian.org/debian stretch-backports main" | sudo tee /etc/apt/sources.list.d/backports.list
-         sudo apt-get update
-         sudo apt-get upgrade -y -o DPkg::Options::=--force-confold
-         sudo apt-get install -y ca-certificates wget host curl gnupg2 sudo apt-transport-https libffi-dev git python3-pip zlib1g-dev
-         sudo apt-get install -t stretch-backports -y libgit2-dev
-         sudo pip3 install --upgrade pyOpenSSL pygit2==0.27.3 docker-py cherrypy jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib google-auth
-         sudo mkdir -p /etc/salt/gpgkeys
-         sudo chmod 0700 /etc/salt/gpgkeys
-         sudo gpg --homedir /etc/salt/gpgkeys --import /home/vagrant/local/keys/pillargpg.gpg
-         sudo gpg --homedir /etc/salt/gpgkeys --import /home/vagrant/local/keys/pillargpg.gpg.pub
+        # must be installed here since masterless run may require it...
+        pip3 install --upgrade pykeepass
+        gpg --homedir /etc/salt/gpgkeys --import /home/vagrant/local/keys/pillargpg.gpg
     SHELL
   end
+# todo saltutil.sync_all must be performed first...
   config.vm.provision :salt do |salt|
     salt.masterless = true
     salt.run_highstate = true
-    salt.minion_config = "minion.conf"
+    salt.minion_config = "minion-zeus.conf"
     salt.bootstrap_options = "-x python3"
     salt.python_version = 3
   end

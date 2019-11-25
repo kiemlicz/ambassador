@@ -1,6 +1,8 @@
 # Gemfile
 source 'https://rubygems.org'
 
+# for debian 9
+gem 'rubyzip', "< 2.0.0"
 gem 'kitchen-salt'
 gem 'kitchen-docker'
 gem 'kitchen-sync'

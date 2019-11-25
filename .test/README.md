@@ -19,7 +19,7 @@ platforms:
         - remote: 'sudo apt-get install -t stretch-backports -y libgit2-dev'
         - remote: 'sudo pip3 install --upgrade pyOpenSSL pygit2==0.27.3 docker-py cherrypy jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib google-auth'
     driver:
-      box: "debian/stretch64"      
+      box: "debian/stretch64"
       customize:
         host: maybe_remote
         username: coolguy
