@@ -13,3 +13,4 @@ kitchen.local.yml
 requirements.lock
 docker-compose.override.yml
 ambassador-installer.override.conf
+minion-zeus.override.conf

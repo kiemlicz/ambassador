@@ -3,21 +3,16 @@ Due to numerous docker limitations tests should be performed in LXC container or
 
 The most common way is to use [kitchen-salt](https://github.com/saltstack/kitchen-salt), the Kitchen plugin that provides Salt provisioner
 
-Following directory contains setup of kitchen test **runner** (`Vagrantfile` for the test executor).  
-Basically it spawns LXC container (using Vagrant) and provisions it using ambassador (create your own pillar configuration)
+Following directory contains setup of kitchen test **runner** (the machine that will be running tests).  
+Basically it spawns LXC container (using Vagrant) and provisions it using Ambassador (create your own pillar configuration)
 
-Prepare `kitchen.local.yml`
+Prepare `kitchen.local.yml` (it's possible to automate the creation using Ambassador)
 ```
 platforms:
-  - name: debian
+  - name: debian9
     lifecycle:
       pre_converge:
-        - remote: 'echo "deb http://ftp.debian.org/debian stretch-backports main" | sudo tee /etc/apt/sources.list.d/backports.list'
-        - remote: 'sudo apt-get update'
-        - remote: 'sudo apt-get upgrade -y -o DPkg::Options::=--force-confold'
-        - remote: 'sudo apt-get install -y ca-certificates wget host curl gnupg2 sudo apt-transport-https libffi-dev git python3-pip zlib1g-dev'
-        - remote: 'sudo apt-get install -t stretch-backports -y libgit2-dev'
-        - remote: 'sudo pip3 install --upgrade pyOpenSSL pygit2==0.27.3 docker-py cherrypy jinja2 Flask eventlet PyYAML flask-socketio requests_oauthlib google-auth'
+        - remote: 'sudo su -c "bash <(wget --no-check-certificate -qO- https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/9bc130ba6800b1df66a3e34901d0c18dca560fd4/setup_salt_requisites.sh)"'
     driver:
       box: "debian/stretch64"
       customize:
@@ -33,6 +28,13 @@ platforms:
 suites:
   - name: default
     provisioner:
+      salt_minion_extra_config:
+        # the tested VM minion config options like:
+        custom_sdb:
+           driver: custom_sdb
+        ext_pillar: []
+        gitfs_remotes: {}
+        # in general: minion config that will be merged with minion.erb
       pillars:
         top.sls:
           base:
@@ -43,6 +45,15 @@ suites:
             extra:
               pillar: "to add"
 ```
-Prepare `.local/pillar.conf` for VM under-test (salt minion configuration)
 
-To run tests add `.test/runner.sh` to `cron` (ideally using Ambassador)
+Prepare `minion-zeus.override.conf` for any runner minion config overrides, like:
+```
+kdbx:
+  driver: kdbx
+  db_file: /the/keepass/file/keepass.kdbx
+  password: pass
+  key_file: /the/key/file/keepass.key
+
+```
+
+To run tests add `.test/runner.sh` to `cron`
