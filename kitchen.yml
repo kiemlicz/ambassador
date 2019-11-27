@@ -7,6 +7,9 @@ provisioner:
   salt_install: bootstrap
   salt_bootstrap_url: https://bootstrap.saltstack.com
   salt_bootstrap_options: -x python3 -n stable
+  # https://github.com/saltstack/kitchen-salt/issues/295
+  # impossible to sync_all before highstate to use custom modules in very first run
+  # init_environment: "sudo salt-call --local saltutil.sync_all"
   salt_version: latest
   require_chef: false
   is_file_root: true

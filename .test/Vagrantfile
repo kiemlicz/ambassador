@@ -26,6 +26,13 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "../salt", "/srv/salt"
   if File.file?("minion-zeus.override.conf")
     config.vm.provision "file", source: "minion-zeus.override.conf", destination: "minion-zeus.override.conf"
+  else
+    config.vm.provision "fail", type: "shell" do |s|
+      s.inline = <<-SHELL
+          >&2 echo "minion-zeus.override.conf was not found in .test/minion-zeus.override.conf, create this file"
+          exit 3
+      SHELL
+    end
   end
 
   config.vm.provision "salt deps", type: "shell", env: {"SHELL": "/bin/bash"} do |s|

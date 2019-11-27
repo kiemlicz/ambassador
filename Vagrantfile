@@ -63,6 +63,13 @@ EOF
 
   if File.file?("ambassador-installer.override.conf")
     config.vm.provision "file", source: "ambassador-installer.override.conf", destination: "ambassador-installer.override.conf"
+  else
+    config.vm.provision "fail", type: "shell" do |s|
+      s.inline = <<-SHELL
+          >&2 echo "ambassador-installer.override.conf was not found in project root dir, create this file"
+          exit 3
+      SHELL
+    end
   end
 
   config.vm.provision :salt do |salt|
