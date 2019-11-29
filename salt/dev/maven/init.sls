@@ -13,7 +13,7 @@ maven:
     - user: {{ maven.owner }}
     - group: {{ maven.owner }}
     - saltenv: {{ saltenv }}
-{{ retry(attempts=8, interval=90)| indent(4) }}
+{{ retry(attempts=5, interval=60)| indent(4) }}
     - require:
       - sls: users
 {{ add_environmental_variable(maven.environ_variable, maven.generic_link, maven.exports_file) }}

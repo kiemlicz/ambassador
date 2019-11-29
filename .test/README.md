@@ -3,10 +3,21 @@ Due to numerous docker limitations tests should be performed in LXC container or
 
 The most common way is to use [kitchen-salt](https://github.com/saltstack/kitchen-salt), the Kitchen plugin that provides Salt provisioner
 
-Following directory contains setup of kitchen test **runner** (the machine that will be running tests).  
+Following directory contains setup of kitchen test **runner** (the machine that will be running tests, **not the tests themselves**).  
 Basically it spawns LXC container (using Vagrant) and provisions it using Ambassador (create your own pillar configuration)
 
-Prepare `kitchen.local.yml` (it's possible to automate the creation using Ambassador)
+The example `top.sls`
+```
+server:
+  'zeus':
+    - os
+    - mail
+    - vagrant
+    - projects
+```
+
+Clone this project, add at least following files:  
+1. `kitchen.local.yml`
 ```
 platforms:
   - name: debian9
@@ -46,7 +57,7 @@ suites:
               pillar: "to add"
 ```
 
-Prepare `minion-zeus.override.conf` for any runner minion config overrides, like:
+2. `.test/minion-zeus.override.conf` for any runner minion config overrides, like:
 ```
 kdbx:
   driver: kdbx
@@ -56,4 +67,4 @@ kdbx:
 
 ```
 
-To run tests add `.test/runner.sh` to `cron`
+Run with: `.test/runner.sh`

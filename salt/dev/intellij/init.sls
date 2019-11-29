@@ -15,7 +15,7 @@ intellij:
     - user: {{ intellij.owner }}
     - group: {{ intellij.owner }}
     - saltenv: {{ saltenv }}
-{{ retry()| indent(4) }}
+{{ retry(attempts=4, interval=30)| indent(4) }}
     - require:
       - sls: users
 {{ link_to_bin(intellij.owner_link_location, intellij.generic_link + '/bin/idea.sh', intellij.owner) }}

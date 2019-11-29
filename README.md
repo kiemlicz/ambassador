@@ -18,11 +18,11 @@ Will aim to be both Linux&Windows friendly.
 # Setup
 As the best way of documenting things is writing automation scripts, this automation server's installation process
 is also automated.  
-The "installation" process end up with LXC container containing foreman&salt fully setup and configured.  
+The "installation" process ends up with LXC container containing foreman&salt fully setup and configured.  
 Simply follow:  
 1. Clone this repo with [submodules](https://github.com/kiemlicz/util/wiki/git): `git submodule update --init`
 2. Ensure you have LXC configured: `requisites.sh`
-3. Optionally: provide `ambassador-installer.override.conf` to override any Salt masterless Vagrant provisioner settings, e.g. add your own pillar:
+3. Provide `ambassador-installer.override.conf` to override any Salt masterless Vagrant provisioner settings, e.g. add your own pillar:
 ```
 ext_pillar:
   - git:
@@ -30,6 +30,7 @@ ext_pillar:
       - root: pillar
       - env: base
 ```
+This file is required, create empty if no overrides.  
 4. `./setup.sh -n ambassador -u your_username,other_username_allowed_to_ssh_into_ambassador [--deploy_priv priv.key] [--deploy_pub key.pub] [--pillar_pub key.gpg.pub] [--pillar_priv key.gpg] [--ambassador_kdbx ambassador.kdbx] [--ambassador_key ambassador.key]`
 
 Since foreman still doesn't support 'dockerized' deployment (cannot specify plugins for Foreman Docker images, no official foreman-proxy image).  

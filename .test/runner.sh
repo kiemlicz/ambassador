@@ -14,6 +14,8 @@ result=$?
 readonly test_stop_ts=$(date +%s.%N)
 readonly test_time=$(echo "$test_stop_ts - $test_start_ts" | bc)
 
+ln -sf $LOGFILE /var/log/ambassador/lastlog
+
 if [[ $result -ne 0 ]]; then
     echo "Test fail, find the logs attached (test time: $test_time)" | mail -A $LOGFILE -s "Ambassador test failed" $(git config user.email)
 fi
