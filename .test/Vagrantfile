@@ -52,6 +52,8 @@ Vagrant.configure("2") do |config|
         # must be installed here since masterless run may require it...
         pip3 install --upgrade pykeepass
         gpg --homedir /etc/salt/gpgkeys --import /home/vagrant/local/keys/pillargpg.gpg
+        # so that kichen-salt could export this
+        chown vagrant -R /etc/salt/gpgkeys
         salt-call --local saltutil.sync_all
         salt-call --local state.highstate
     SHELL
