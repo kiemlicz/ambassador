@@ -8,6 +8,9 @@
     - names: {{ project.cmds|tojson }}
     - runas: {{ username }}
     - cwd: {{ project.target }}
+{% if project.shell is defined %}
+    - shell: {{ project.shell }}
+{% endif %}
     - onchanges:
       - git: {{ project.url }}
 
