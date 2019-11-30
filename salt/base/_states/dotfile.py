@@ -28,7 +28,12 @@ def managed(name, home_dir, username,
     override
         override existing dotfiles
     '''
-    ret = {'name': name, 'changes': {}, 'result': False, 'comment': ''}
+    ret = {
+        'name': name,
+        'changes': {},
+        'result': False,
+        'comment': ''
+    }
     log = logging.getLogger(__name__)
 
     # fixme add validation!
@@ -44,6 +49,7 @@ def managed(name, home_dir, username,
     # check if users.dotfiles should be applied
     cret = __states__['git.mod_run_check'](run_check_cmd_kwargs, onlyif, unless)
     if isinstance(cret, dict):
+        log.info("DOTFILE: not running due to onlyif/unless condition")
         ret.update(cret)
         return ret
 
@@ -69,7 +75,9 @@ def managed(name, home_dir, username,
         }
         return __utils__['common.test'](ret, 'DOTFILE: (url: {0}, branch: {1}) will be applied'.format(name, branch))
 
-    if not render and "refs/heads/{0}".format(branch) in __salt__['git.remote_refs'](name, heads=True, tags=False, user=username, identity=identity, saltenv=saltenv):
+    desired_branch = "refs/heads/{0}".format(branch)
+    branches_dict = __salt__['git.remote_refs'](name, heads=True, tags=False, user=username, identity=identity, saltenv=saltenv)
+    if not render and desired_branch in branches_dict:
         if __opts__['test']:
             log.debug("Checking out files (test mode) from: {0}, branch: {1}".format(name, branch))
             tempdir = clone_repo()
@@ -105,8 +113,10 @@ def managed(name, home_dir, username,
                 'old': 'saved in: {0}/.cfg.bak'.format(target),
                 'new': 'populated using repo: {0}, branch: {1}'.format(name, branch)
             }})
-            ret['result'] = True
-            return ret
+            return __utils__['common.success'](ret, "DOTFILE: success without rendering")
+    elif not render:
+        log.error("DOTFILE: cannot find {} in {}".format(desired_branch, branches_dict.keys()))
+        return __utils__['common.fail'](ret, "DOTFILE: dotfiles not found for: {} ({})".format(desired_branch, branches_dict.keys()), ["No changes"])
 
     if render:
         log.debug("Checking out templates from: {0}, branch: {1}".format(name, branch))
@@ -128,4 +138,4 @@ def managed(name, home_dir, username,
 
         return __utils__['common.success'](ret, "DOTFILE: success with render")
 
-    return __utils__['common.success'](ret, "DOTFILE: success", ["No changes"])
+    return __utils__['common.fail'](ret, "DOTFILE: cannot setup dotfiles", ["No changes"])
