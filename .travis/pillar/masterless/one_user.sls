@@ -143,9 +143,6 @@ maven:
 rebar:
   owner: {{ owner }}
   owner_home_dir: {{ home_dir }}
-robomongo:
-  owner: {{ owner }}
-  owner_link_location: {{ home_dir }}/bin/robomongo
 scala:
   owner: {{ owner }}
 mongodb:

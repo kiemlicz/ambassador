@@ -42,7 +42,6 @@ def run():
       "erlang",
       "rebar",
       "intellij",
-      "robomongo",
       "gatling",
       "grafana",
       "virtualbox",
