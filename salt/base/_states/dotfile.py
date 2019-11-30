@@ -5,7 +5,7 @@ import os
 def managed(name, home_dir, username,
            branch, target, identity=None,
            render=False, override=False,
-           onlyif=False, unless=False, saltenv='base'):
+           onlyif=None, unless=None, saltenv='base'):
     '''
     This state manages dotfiles: the 'name' repo is parsed and placed under 'home_dir'
 
