@@ -11,6 +11,7 @@ saltMaster:
 
   service:
     name: salt-master
+    annotations: {}
 
   config:
     custom.conf: |-

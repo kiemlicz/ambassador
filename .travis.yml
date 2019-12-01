@@ -14,6 +14,7 @@ env:
     - KUBECTL_VER="v1.14.2"
     - GH_URL="https://kiemlicz.github.io/ambassador/"
     - BUILD_DIR=".local"
+    - CHART_BRANCH="gh-pages"
 
 jobs:
   allow_failures:
@@ -119,7 +120,7 @@ jobs:
         github_token: $GITHUB_TOKEN
         keep_history: true
         local_dir: $BUILD_DIR
-        target-branch: gh-pages
+        target-branch: $CHART_BRANCH
         verbose: true
         on:
           branch: master

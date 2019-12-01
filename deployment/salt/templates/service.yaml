@@ -7,6 +7,10 @@ metadata:
     helm.sh/chart: {{ include "salt.chart" . }}
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Values.saltMaster.service.name }}
+  annotations:
+{{- with .Values.saltMaster.service.annotations }}
+    {{- toYaml . | nindent 4 }}
+{{- end }}
 spec:
   selector:
     app: {{ .Values.saltMaster.service.name }}

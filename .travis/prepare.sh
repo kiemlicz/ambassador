@@ -45,6 +45,8 @@ salt-master-run-k8s)
 
     # Temporary dir for storing new packaged charts and index files
     mkdir $BUILD_DIR
+    # clone existing charts
+    git clone --single-branch --branch $CHART_BRANCH https://github.com/$TRAVIS_REPO_SLUG.git $BUILD_DIR
     helm dependency update deployment/salt
     helm package -d $BUILD_DIR deployment/salt
     cd $BUILD_DIR
