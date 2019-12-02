@@ -1,7 +1,9 @@
 {% set helm = salt['grains.filter_by']({
   'default': {
-     'installer_url': "https://raw.githubusercontent.com/helm/helm/master/scripts/get",
+     'installer_url': "https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3",
      'options': [],
-     'owner': "root"
+     'owner': "root",
+     'perform_init': False,
+     'plugins': []
   },
 }, merge=salt['pillar.get']('helm')) %}

@@ -62,7 +62,8 @@ salt-master-run-k8s)
     trap k8s_log_error EXIT TERM INT
 
     helm dependency update deployment/salt
-    helm install deployment/salt -f .travis/travis_values.yaml -n salt --namespace salt-provisioning --wait --timeout 300
+    kubectl create namespace salt-provisioning
+    helm install salt deployment/salt -f .travis/travis_values.yaml --namespace salt-provisioning --wait --timeout=300s
 
     # wait for logger first, not sure if --wait waits for dependencies
     #kubectl wait -n salt-provisioning pod -l app=logstash --for condition=ready --timeout=5m
