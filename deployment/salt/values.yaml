@@ -1,6 +1,9 @@
 nameOverride: "salt"
 fullnameOverride: ""
 
+serviceAccount:
+  create: true
+
 saltMaster:
   replicaCount: 1
 

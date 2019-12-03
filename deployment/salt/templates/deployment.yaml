@@ -4,20 +4,20 @@ kind: Deployment
 metadata:
   name: {{ .Values.saltMaster.service.name }}
   labels:
-    app.kubernetes.io/name: {{ include "salt.name" . }}
-    helm.sh/chart: {{ include "salt.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app: {{ .Values.saltMaster.service.name }}
+    {{- include "salt.labels" . | nindent 4 }}
+    app: salt
+    role: salt-master
 spec:
   replicas: {{ .Values.saltMaster.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Values.saltMaster.service.name }}
+      app: salt
+      role: salt-master
   template:
     metadata:
       labels:
-        app: {{ .Values.saltMaster.service.name }}
+        app: salt
+        role: salt-master
         name: {{ .Values.saltMaster.service.name }}
     spec:
       serviceAccount: {{ include "salt.fullname" . }}
