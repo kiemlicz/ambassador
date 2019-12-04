@@ -23,87 +23,87 @@ jobs:
       before_install: .travis/prepare.sh dry
       script: .travis/test.sh dry
   include:
-    - stage: test
-      name: "Test and publish"
-      env:
-        - DOCKER_IMAGE=debian-stretch
-      before_install: .travis/prepare.sh dry
-      script: .travis/test.sh dry
-      after_success: .travis/publish.sh docker
-    - env:
-        - DOCKER_IMAGE=debian-buster
-      before_install: .travis/prepare.sh dry
-      script: .travis/test.sh dry
-      after_success: .travis/publish.sh docker
-    - env:
-        - DOCKER_IMAGE=ubuntu-xenial
-      before_install: .travis/prepare.sh dry
-      script: .travis/test.sh dry
-    - env:
-        - DOCKER_IMAGE=ubuntu-bionic
-      before_install: .travis/prepare.sh dry
-      script: .travis/test.sh dry
-      after_success: .travis/publish.sh docker
-    - env:
-        - DOCKER_IMAGE=fedora-30
-      before_install: .travis/prepare.sh dry
-      script: .travis/test.sh dry
-    - stage: masterless
-      name: "Masterless tests"
-      before_install: .travis/prepare.sh masterless
-      script: .travis/test.sh masterless
-      env:
-        - DOCKER_IMAGE=debian-stretch
-        - BASE_IMAGE_TAG=stretch
-        - SALTENV=base
-        - CONTEXT=base
-    - before_install: .travis/prepare.sh masterless
-      script: .travis/test.sh masterless
-      env:
-        - DOCKER_IMAGE=debian-stretch
-        - BASE_IMAGE_TAG=stretch
-        - SALTENV=base
-        - CONTEXT=gui
-    - before_install: .travis/prepare.sh masterless
-      script: .travis/test.sh masterless
-      env:
-        - DOCKER_IMAGE=debian-stretch
-        - BASE_IMAGE_TAG=stretch
-        - SALTENV=dev
-        - CONTEXT=dev
-    - before_install: .travis/prepare.sh masterless
-      script: .travis/test.sh masterless
-      env:
-        - DOCKER_IMAGE=debian-buster
-        - BASE_IMAGE_TAG=buster
-        - SALTENV=base
-        - CONTEXT=base
-    - before_install: .travis/prepare.sh masterless
-      script: .travis/test.sh masterless
-      env:
-        - DOCKER_IMAGE=debian-buster
-        - BASE_IMAGE_TAG=buster
-        - SALTENV=base
-        - CONTEXT=gui
-    - before_install: .travis/prepare.sh masterless
-      script: .travis/test.sh masterless
-      env:
-        - DOCKER_IMAGE=debian-buster
-        - BASE_IMAGE_TAG=buster
-        - SALTENV=dev
-        - CONTEXT=dev
-    - before_install: .travis/prepare.sh masterless
-      script: .travis/test.sh masterless
-      env:
-        - DOCKER_IMAGE=ubuntu-bionic
-        - SALTENV=base
-        - CONTEXT=base
-    - before_install: .travis/prepare.sh masterless
-      script: .travis/test.sh masterless
-      env:
-        - DOCKER_IMAGE=ubuntu-bionic
-        - SALTENV=dev
-        - CONTEXT=dev
+#    - stage: test
+#      name: "Test and publish"
+#      env:
+#        - DOCKER_IMAGE=debian-stretch
+#      before_install: .travis/prepare.sh dry
+#      script: .travis/test.sh dry
+#      after_success: .travis/publish.sh docker
+#    - env:
+#        - DOCKER_IMAGE=debian-buster
+#      before_install: .travis/prepare.sh dry
+#      script: .travis/test.sh dry
+#      after_success: .travis/publish.sh docker
+#    - env:
+#        - DOCKER_IMAGE=ubuntu-xenial
+#      before_install: .travis/prepare.sh dry
+#      script: .travis/test.sh dry
+#    - env:
+#        - DOCKER_IMAGE=ubuntu-bionic
+#      before_install: .travis/prepare.sh dry
+#      script: .travis/test.sh dry
+#      after_success: .travis/publish.sh docker
+#    - env:
+#        - DOCKER_IMAGE=fedora-30
+#      before_install: .travis/prepare.sh dry
+#      script: .travis/test.sh dry
+#    - stage: masterless
+#      name: "Masterless tests"
+#      before_install: .travis/prepare.sh masterless
+#      script: .travis/test.sh masterless
+#      env:
+#        - DOCKER_IMAGE=debian-stretch
+#        - BASE_IMAGE_TAG=stretch
+#        - SALTENV=base
+#        - CONTEXT=base
+#    - before_install: .travis/prepare.sh masterless
+#      script: .travis/test.sh masterless
+#      env:
+#        - DOCKER_IMAGE=debian-stretch
+#        - BASE_IMAGE_TAG=stretch
+#        - SALTENV=base
+#        - CONTEXT=gui
+#    - before_install: .travis/prepare.sh masterless
+#      script: .travis/test.sh masterless
+#      env:
+#        - DOCKER_IMAGE=debian-stretch
+#        - BASE_IMAGE_TAG=stretch
+#        - SALTENV=dev
+#        - CONTEXT=dev
+#    - before_install: .travis/prepare.sh masterless
+#      script: .travis/test.sh masterless
+#      env:
+#        - DOCKER_IMAGE=debian-buster
+#        - BASE_IMAGE_TAG=buster
+#        - SALTENV=base
+#        - CONTEXT=base
+#    - before_install: .travis/prepare.sh masterless
+#      script: .travis/test.sh masterless
+#      env:
+#        - DOCKER_IMAGE=debian-buster
+#        - BASE_IMAGE_TAG=buster
+#        - SALTENV=base
+#        - CONTEXT=gui
+#    - before_install: .travis/prepare.sh masterless
+#      script: .travis/test.sh masterless
+#      env:
+#        - DOCKER_IMAGE=debian-buster
+#        - BASE_IMAGE_TAG=buster
+#        - SALTENV=dev
+#        - CONTEXT=dev
+#    - before_install: .travis/prepare.sh masterless
+#      script: .travis/test.sh masterless
+#      env:
+#        - DOCKER_IMAGE=ubuntu-bionic
+#        - SALTENV=base
+#        - CONTEXT=base
+#    - before_install: .travis/prepare.sh masterless
+#      script: .travis/test.sh masterless
+#      env:
+#        - DOCKER_IMAGE=ubuntu-bionic
+#        - SALTENV=dev
+#        - CONTEXT=dev
     - stage: k8s
       name: "Kubernetes tests"
       env:

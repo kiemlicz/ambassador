@@ -75,13 +75,13 @@ spec:
 {{- range $key, $val := .Values.saltMaster.pillar }}
         - name: pillar-{{ $key | replace "." "-" }}
           configMap:
-            name: {{ .Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-pillar
+            name: {{ $root.Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-pillar
             defaultMode: 0644
 {{- end }}
 {{- range $key, $val := .Values.saltMaster.reactor }}
         - name: reactor-{{ $key | replace "." "-" }}
           configMap:
-            name: {{ .Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-reactor
+            name: {{ $root.Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-reactor
             defaultMode: 0644
 {{- end }}
         - name: cloud-providers
