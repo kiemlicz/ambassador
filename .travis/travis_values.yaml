@@ -62,7 +62,7 @@ saltMaster:
 
       reactor:
         - 'salt/minion/*/start':
-          - /srv/reactor/minion_ready.sls
+          - /srv/reactor/minion-ready.sls
         #- 'salt/engines/docker_events/*':
         #  - /srv/reactor/docker_events_reactor.sls
 
@@ -93,7 +93,7 @@ saltMaster:
         kubernetes: {{ "{{" }} salt['sdb.get']("sdb://k8s/daemon_set?name={{ .Values.saltMinion.service.name }}") {{ "}}" }}
 
   reactor:
-    minion_ready.sls: |-
+    minion-ready.sls: |-
       {% if data['id'] is match('salt-minion-\S+') %}
       k8s_ready:
           local.state.sls:
