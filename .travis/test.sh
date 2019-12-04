@@ -64,6 +64,8 @@ salt-master-run-k8s)
     helm dependency update deployment/salt
     kubectl create namespace salt-provisioning
     helm install salt deployment/salt -f .travis/travis_values.yaml --namespace salt-provisioning --wait --timeout=300s
+    # fixme there must be some logic to hook into salt, use Python Salt API
+    # wait for minion to connect and sync
 
     # wait for logger first, not sure if --wait waits for dependencies
     #kubectl wait -n salt-provisioning pod -l app=logstash --for condition=ready --timeout=5m

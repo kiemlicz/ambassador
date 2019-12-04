@@ -23,7 +23,7 @@ saltMaster:
           - /srv/salt/base
           - /srv/reactor
 
-      autosign_file: /etc/salt/master.d/autosign.conf
+      autosign_file: /etc/salt/master.d/autosign
 
       #dumps events to file for easier assertion of success/failure
       event_return: rawfile_json
@@ -75,7 +75,7 @@ saltMaster:
         version: 1
         msg_type: logstash
 
-    autosign.conf: |-
+    autosign: |-
       minion1.local
       minion2.local
       minion3.local
