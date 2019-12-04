@@ -5,8 +5,40 @@ saltMaster:
     pullPolicy: Never
   # travis uses dedicated image
   config:
+    master.conf: |-
+      fileserver_backend:
+        - roots
+
+      file_roots:
+        base:
+          - /srv/salt/base
+          - /srv/reactor
+        dev:
+          - /srv/salt/dev
+          - /srv/salt/base
+          - /srv/reactor
+        server:
+          - /srv/salt/server
+          - /srv/salt/dev
+          - /srv/salt/base
+          - /srv/reactor
+
+      autosign_file: /etc/salt/master.d/autosign.conf
+
+      #dumps events to file for easier assertion of success/failure
+      event_return: rawfile_json
+      rawfile_json.filename: /var/log/salt/events
+
+      log_level: info
+
+      ext_pillar_first: True
+      pillar_merge_lists: True
+      pillar_opts: True
+
+      use_superseded:
+        - module.run
+
     custom.conf: |-
-      #autosign_file: /etc/salt/master.d/autosign
       #event_return: rawfile_json
       #rawfile_json.filename: /var/log/salt/events
       #log_level: debug
@@ -31,6 +63,8 @@ saltMaster:
       reactor:
         - 'salt/minion/*/start':
           - /srv/reactor/minion_ready.sls
+        #- 'salt/engines/docker_events/*':
+        #  - /srv/reactor/docker_events_reactor.sls
 
       color: False
       log_fmt_console: '[%(levelname)-8s] %(message)s'
@@ -41,9 +75,36 @@ saltMaster:
         version: 1
         msg_type: logstash
 
-  pillar: |-
-    salt:
-      kubernetes: {{ "{{" }} salt['sdb.get']("sdb://k8s/daemon_set?name={{ .Values.saltMinion.service.name }}") {{ "}}" }}
+    autosign.conf: |-
+      minion1.local
+      minion2.local
+      minion3.local
+      minion4.local
+      minion5.local
+      salt-*
+
+  pillar:
+    top.sls: |-
+      base:
+        '*':
+          - kubernetes
+    kubernetes.sls: |-
+      salt:
+        kubernetes: {{ "{{" }} salt['sdb.get']("sdb://k8s/daemon_set?name={{ .Values.saltMinion.service.name }}") {{ "}}" }}
+
+  reactor:
+    minion_ready.sls: |-
+      {% if data['id'] is match('salt-minion-\S+') %}
+      k8s_ready:
+          local.state.sls:
+              - tgt: {{ "{{" }} data['id'] {{ "}}" }}
+              - args:
+                - mods:
+                  - minion
+                - saltenv: {{ "{{" }} salt['environ.get']("SALTENV") {{ "}}" }}
+                - pillar:
+                      docker_event: {{ "{{" }} data|tojson {{ "}}" }}
+      {% endif %}
 
 saltMinion:
   image:

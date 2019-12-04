@@ -9,6 +9,10 @@ RUN apt-get update && apt-get install -y procps curl dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver
 
+# sync via _log_handlers does nothing... forcing override of installed packages
+# temporary workaound until PR with this fix is merged&released
+COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/
+
 WORKDIR /srv
 
 
@@ -52,7 +56,8 @@ CMD [ "/opt/entrypoint.sh" ]
 
 FROM salt-base AS dry-test
 
-COPY .travis/reactor /srv/reactor
+#todo this reactor doesn't seem to be necessary
+#COPY .travis/reactor /srv/reactor
 COPY .travis/salt/dry-test-top.sls /srv/salt/base/top.sls
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
 COPY .travis/envoy_test.py /opt/
@@ -103,7 +108,6 @@ COPY .travis/config/reactor/orch /srv/reactor
 COPY .travis/pillar/ /srv/pillar/
 COPY .travis/salt/ /srv/salt/
 COPY .travis/salt/dev/top.sls /srv/salt/base/
-COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/
 
 RUN chmod 600 /etc/salt/autosign.conf && \
     salt-run saltutil.sync_all
@@ -120,23 +124,20 @@ ARG kubectl_ver
 ENV SALTENV=$saltenv
 ENV LOG_LEVEL=$log_level
 
+# todo scan differently and remove scan_events with its weird entrypoint
 COPY .travis/entrypoint_master_run.sh /opt/
 COPY .travis/scan_events.py /opt/
-COPY .travis/config/master.conf /etc/salt/master.d/master.conf
-COPY .travis/config/autosign.conf /etc/salt/autosign.conf
-COPY .travis/config/reactor_k8s.conf /etc/salt/master.d/reactor.conf
-COPY .travis/config/reactor/k8s /srv/reactor
+# todo move thorium to ConfigMap as well
 COPY .travis/thorium/ /srv/thorium/
-COPY .travis/pillar/ /srv/pillar/
-COPY .travis/salt/ /srv/salt/
-# sync via _log_handlers does nothing... forcing override of installed packages
-# todo move to the base master / minion images
-COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/
+# is it even used?
+#COPY .travis/pillar/ /srv/pillar/
+# is it even used?
+#COPY .travis/salt/ /srv/salt/
 
+#todo make this conditional part of salt-master image
 RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_ver/bin/linux/amd64/kubectl && \
     chmod +x kubectl && \
     mv kubectl /usr/bin/ && \
-    chmod 600 /etc/salt/autosign.conf && \
     pip install --upgrade kubernetes && \
     salt-run saltutil.sync_all
 
@@ -151,7 +152,6 @@ COPY .travis/config/minion.conf /etc/salt/minion.d/minion.conf
 FROM salt-minion as minion-k8s-test
 
 COPY .travis/config/minion.conf /etc/salt/minion.d/minion.conf
-COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/
 
 RUN apt-get install -y python3-pip && \
     update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 20 && \

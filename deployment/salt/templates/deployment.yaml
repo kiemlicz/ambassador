@@ -47,9 +47,18 @@ spec:
             - mountPath: /etc/salt/cloud.providers.d
               name: cloud-providers
               readOnly: false
-            - mountPath: /srv/pillar/overrides
-              name: pillar-overrides
+{{- range $key, $val := .Values.saltMaster.pillar }}
+            - name: pillar-{{ $key | replace "." "-" }}
+              mountPath: /srv/pillar/{{ $key }}
+              subPath: {{ $key }}
               readOnly: true
+{{- end }}
+{{- range $key, $val := .Values.saltMaster.reactor }}
+            - name: reactor-{{ $key | replace "." "-" }}
+              mountPath: /srv/reactor/{{ $key }}
+              subPath: {{ $key }}
+              readOnly: true
+{{- end }}
 {{- range $key, $val := .Values.saltMaster.config }}
             - name: master-config-{{ $key | replace "." "-" }}
               mountPath: /etc/salt/master.d/{{ $key }}
@@ -63,10 +72,18 @@ spec:
             name: {{ $root.Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-config-cm
             defaultMode: 0644
 {{- end }}
-        - name: pillar-overrides
+{{- range $key, $val := .Values.saltMaster.pillar }}
+        - name: pillar-{{ $key | replace "." "-" }}
           configMap:
-            name: {{ .Values.saltMaster.service.name }}-pillar-overrides
+            name: {{ .Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-pillar
             defaultMode: 0644
+{{- end }}
+{{- range $key, $val := .Values.saltMaster.reactor }}
+        - name: reactor-{{ $key | replace "." "-" }}
+          configMap:
+            name: {{ .Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-reactor
+            defaultMode: 0644
+{{- end }}
         - name: cloud-providers
           configMap:
             name: {{ .Values.saltMaster.service.name }}-cloud-providers-cm

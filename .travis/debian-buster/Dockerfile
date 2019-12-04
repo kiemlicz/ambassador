@@ -95,7 +95,7 @@ RUN chmod 600 /etc/salt/autosign.conf && \
 
 CMD [ "/opt/entrypoint_master_run.sh" ]
 
-
+# fixme remove in the same way as in stretch
 FROM salt-master AS master-k8s-test
 
 ARG saltenv

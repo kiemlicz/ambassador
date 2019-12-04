@@ -16,11 +16,15 @@ saltMaster:
     name: salt-master
     annotations: {}
 
+  # /etc/salt/master.d/ config files, must end with .conf suffix
   config: {}
 
   cloudProviders: {}
 
-  pillar:
+  pillar: {}
+
+  # the reactor sls files
+  reactor: {}
 
   readinessProbe:
     tcpSocket:
