@@ -3,11 +3,10 @@ FROM debian:$tag AS salt-base
 # "" == latest
 ARG salt_ver=""
 
-# fixme remove once https://github.com/saltstack/salt-bootstrap/issues/1353 is done
-ADD https://raw.githubusercontent.com/saltstack/salt-bootstrap/develop/bootstrap-salt.sh /tmp
 COPY salt /srv/salt
 
 RUN apt-get update && apt-get install -y procps curl dumb-init && \
+    curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver
 
 WORKDIR /srv
