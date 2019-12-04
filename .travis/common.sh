@@ -35,6 +35,8 @@ docker_build() {
         "--build-arg=log_level=${LOG_LEVEL-info}"
         "--build-arg=saltenv=$SALTENV"
         "--build-arg=kubectl_ver=$KUBECTL_VER"
+        "--build-arg=api_enabled=${API_ENABLED-false}"
+        "--build-arg=k8s_api_enabled=${K8S_API_ENABLED-false}"
     )
     if [ ! -z $BASE_IMAGE_TAG ]; then
         build_args+=("--build-arg=tag=$BASE_IMAGE_TAG")

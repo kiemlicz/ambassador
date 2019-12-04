@@ -25,13 +25,29 @@ CMD [ "/usr/bin/salt-minion" ]
 
 FROM salt-base AS salt-master
 
+ARG api_enabled=false
+ARG k8s_api_enabled=false
+ENV API_ENABLED=$api_enabled
+ENV K8S_API_ENABLED=$k8s_api_enabled
+
 RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list.d/backports.list && \
     apt-get update && \
     apt-get install -t stretch-backports -y libgit2-dev && \
     apt-get install -y python3-pip libffi-dev git && \
-    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 20 && \
-    pip install --upgrade pyOpenSSL pygit2 docker-py cherrypy jinja2 requests_oauthlib google-auth && \
+    pip3 install --upgrade pyOpenSSL pygit2 docker-py cherrypy jinja2 requests_oauthlib google-auth && \
     apt-get install -y salt-master
+
+RUN if [ "$API_ENABLED" = true ]; then \
+        apt-get install -y salt-api; \
+    fi
+
+RUN if [ "$K8S_API_ENABLED" = true ]; then \
+        curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_ver/bin/linux/amd64/kubectl && \
+        chmod +x kubectl && \
+        mv kubectl /usr/bin/ && \
+        pip3 install --upgrade kubernetes && \
+        salt-run saltutil.sync_all; \
+    fi
 
 # PyYAML
 #pip install --upgrade --default-timeout=300 pip && hash -r pip && \
@@ -118,11 +134,9 @@ CMD [ "/opt/entrypoint_master_run.sh" ]
 FROM salt-master AS master-k8s-test
 
 ARG saltenv
-ARG log_level
 ARG kubectl_ver
 
 ENV SALTENV=$saltenv
-ENV LOG_LEVEL=$log_level
 
 # todo scan differently and remove scan_events with its weird entrypoint
 COPY .travis/entrypoint_master_run.sh /opt/
@@ -133,13 +147,6 @@ COPY .travis/thorium/ /srv/thorium/
 #COPY .travis/pillar/ /srv/pillar/
 # is it even used?
 #COPY .travis/salt/ /srv/salt/
-
-#todo make this conditional part of salt-master image
-RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_ver/bin/linux/amd64/kubectl && \
-    chmod +x kubectl && \
-    mv kubectl /usr/bin/ && \
-    pip install --upgrade kubernetes && \
-    salt-run saltutil.sync_all
 
 CMD [ "/opt/entrypoint_master_run.sh" ]
 
