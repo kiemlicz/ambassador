@@ -4,22 +4,27 @@ kind: DaemonSet
 metadata:
   name: {{ .Values.saltMinion.service.name }}
   labels:
-    app: {{ .Values.saltMinion.service.name }}
+    {{- include "salt.labels" . | nindent 4 }}
+    app: salt
+    role: minion
 spec:
   selector:
     matchLabels:
-      name: {{ .Values.saltMinion.service.name }}
+      app: salt
+      role: minion
   template:
     metadata:
       labels:
+        app: salt
+        role: minion
         name: {{ .Values.saltMinion.service.name }}
     spec:
-      serviceAccount: {{ include "salt.fullname" . }}
-      serviceAccountName: {{ include "salt.fullname" . }}
-      {{- if .Values.registry.enabled }}
+      serviceAccount: {{ include "salt.serviceAccountName" . }}
+      serviceAccountName: {{ include "salt.serviceAccountName" . }}
+{{- if .Values.registry.enabled }}
       imagePullSecrets:
         - name: {{ include "salt.fullname" . }}-registry-credentials
-      {{- end }}
+{{- end }}
       terminationGracePeriodSeconds: 30
       containers:
         - name: {{ .Values.saltMinion.service.name }}

@@ -16,48 +16,11 @@ saltMaster:
     name: salt-master
     annotations: {}
 
-  config:
-    custom.conf: |-
-      #autosign_file: /etc/salt/master.d/autosign
-      #event_return: rawfile_json
-      #rawfile_json.filename: /var/log/salt/events
-      #log_level: debug
-      #log_level_logfile: debug
-
-      engines:
-        - thorium: {}
-        - k8s_events: {}
-
-      # queue config
-      runner_queue:
-        queue: runner_queue
-        backend: sqlite
-
-      schedule:
-        runner_queue:
-          function: queue.process_runner
-          minutes: 1
-          kwargs:
-            quantity: 1
-
-      reactor:
-        - 'salt/minion/*/start':
-          - /srv/reactor/minion_ready.sls
-
-      {{- if .Values.logstash.enabled }}
-      color: False
-      logstash_udp_handler:
-        host: logstash.logging
-        port: 1514
-        version: 1
-        msg_type: logstash
-      {{- end }}
+  config: {}
 
   cloudProviders: {}
 
-  pillar: |-
-    salt:
-      kubernetes: {{ "{{" }} salt['sdb.get']("sdb://k8s/daemon_set?name={{ .Values.saltMinion.service.name }}") {{ "}}" }}
+  pillar:
 
   readinessProbe:
     tcpSocket:
@@ -80,40 +43,23 @@ saltMinion:
   service:
     name: salt-minion
 
-  config:
-    custom.conf: |-
-      master: "salt-master"
-
-      mine_functions:
-        network.interfaces: []
-        network.ip_addrs: []
-
-      beacons:
-        status:
-          - interval: 45
-
-      {{- if .Values.logstash.enabled }}
-      color: False
-      logstash_udp_handler:
-        host: logstash.logging
-        port: 1514
-        version: 1
-        msg_type: logstash
-      {{- end }}
+  config: {}
 
   readinessProbe:
     exec:
       command:
-        - cat
-        - /tmp/salt/healthz
+        - salt-call
+        - --local
+        - test.ping
     initialDelaySeconds: 60
     periodSeconds: 30
 
   livenessProbe:
     exec:
       command:
-        - cat
-        - /tmp/salt/healthz
+        - salt-call
+        - --local
+        - test.ping
     initialDelaySeconds: 120
     periodSeconds: 60
 
@@ -152,7 +98,6 @@ volume:
 
 logstash:
   enabled: false
-  fullnameOverride: "logstash"
   livenessProbe:
     httpGet:
       path: /
@@ -171,8 +116,6 @@ logstash:
     timeoutSeconds: 60
     failureThreshold: 6
     successThreshold: 1
-  persistence:
-    enabled: false
   service:
     ports:
       syslog-udp:
@@ -190,17 +133,3 @@ logstash:
     - name: beats
       containerPort: 5044
       protocol: TCP
-  inputs:
-    main: |-
-      input {
-        udp {
-          port => 1514
-          codec => json
-        }
-      }
-
-  outputs:
-    main: |-
-      output {
-        stdout { }
-      }

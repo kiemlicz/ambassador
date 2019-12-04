@@ -6,53 +6,25 @@ metadata:
   labels:
     {{- include "salt.labels" . | nindent 4 }}
     app: salt
-    role: salt-master
+    role: master
 spec:
   replicas: {{ .Values.saltMaster.replicaCount }}
   selector:
     matchLabels:
       app: salt
-      role: salt-master
+      role: master
   template:
     metadata:
       labels:
         app: salt
-        role: salt-master
+        role: master
         name: {{ .Values.saltMaster.service.name }}
     spec:
-      serviceAccount: {{ include "salt.fullname" . }}
-      serviceAccountName: {{ include "salt.fullname" . }}
+      serviceAccount: {{ include "salt.serviceAccountName" . }}
+      serviceAccountName: {{ include "salt.serviceAccountName" . }}
 {{- if .Values.registry.enabled }}
       imagePullSecrets:
         - name: {{ include "salt.fullname" . }}-registry-credentials
-{{- end }}
-      volumes:
-{{- range $key, $val := .Values.saltMaster.config }}
-        - name: master-config-{{ $key | replace "." "-" }}
-          configMap:
-            name: {{ $root.Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-config-cm
-            defaultMode: 0644
-{{- end }}
-        - name: pillar-overrides
-          configMap:
-            name: {{ .Values.saltMaster.service.name }}-pillar-overrides
-            defaultMode: 0644
-        - name: cloud-providers
-          configMap:
-            name: {{ .Values.saltMaster.service.name }}-cloud-providers-cm
-            defaultMode: 0644
-{{ if .Values.persistence.enabled }}
-        - name: saltqueue
-          persistentVolumeClaim:
-            claimName: {{ include "salt.fullname" . }}-saltqueue
-        - name: saltpki
-          persistentVolumeClaim:
-            claimName: {{ include "salt.fullname" . }}-saltpki
-{{- else }}
-        - name: saltqueue
-          emptyDir: {}
-        - name: saltpki
-          emptyDir: {}
 {{- end }}
       containers:
         - name: {{ .Values.saltMaster.service.name }}
@@ -83,4 +55,32 @@ spec:
               mountPath: /etc/salt/master.d/{{ $key }}
               subPath: {{ $key }}
               readOnly: false
+{{- end }}
+      volumes:
+{{- range $key, $val := .Values.saltMaster.config }}
+        - name: master-config-{{ $key | replace "." "-" }}
+          configMap:
+            name: {{ $root.Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-config-cm
+            defaultMode: 0644
+{{- end }}
+        - name: pillar-overrides
+          configMap:
+            name: {{ .Values.saltMaster.service.name }}-pillar-overrides
+            defaultMode: 0644
+        - name: cloud-providers
+          configMap:
+            name: {{ .Values.saltMaster.service.name }}-cloud-providers-cm
+            defaultMode: 0644
+{{ if .Values.persistence.enabled }}
+        - name: saltqueue
+          persistentVolumeClaim:
+            claimName: {{ include "salt.fullname" . }}-saltqueue
+        - name: saltpki
+          persistentVolumeClaim:
+            claimName: {{ include "salt.fullname" . }}-saltpki
+{{- else }}
+        - name: saltqueue
+          emptyDir: {}
+        - name: saltpki
+          emptyDir: {}
 {{- end }}
