@@ -26,6 +26,9 @@ saltMaster:
   # the reactor sls files
   reactor: {}
 
+  # the thorium state tree
+  thorium: {}
+
   readinessProbe:
     tcpSocket:
       port: publisher

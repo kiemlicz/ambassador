@@ -44,9 +44,12 @@ spec:
             - mountPath: /var/cache/salt/master/queues
               name: saltqueue
               readOnly: false
-            - mountPath: /etc/salt/cloud.providers.d
-              name: cloud-providers
+            - name: cloud-providers
+              mountPath: /etc/salt/cloud.providers.d
               readOnly: false
+            - name: thorium
+              mountPath: /srv/thorium
+              readOnly: true
 {{- range $key, $val := .Values.saltMaster.pillar }}
             - name: pillar-{{ $key | replace "." "-" }}
               mountPath: /srv/pillar/{{ $key }}
@@ -84,6 +87,10 @@ spec:
             name: {{ $root.Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-reactor
             defaultMode: 0644
 {{- end }}
+        - name: thorium
+          configMap:
+            name: {{ $root.Values.saltMaster.service.name }}-thorium
+            defaultMode: 0644
         - name: cloud-providers
           configMap:
             name: {{ .Values.saltMaster.service.name }}-cloud-providers-cm

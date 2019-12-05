@@ -66,9 +66,6 @@ saltMaster:
         #- 'salt/engines/docker_events/*':
         #  - /srv/reactor/docker_events_reactor.sls
 
-      color: False
-      log_fmt_console: '[%(levelname)-8s] %(message)s'
-      log_fmt_logfile: '%(asctime)s,%(msecs)03d [%(name)-17s][%(levelname)-8s] %(message)s'
       logstash_udp_handler:
         host: logstash.salt-provisioning
         port: 1514
@@ -106,6 +103,21 @@ saltMaster:
                       docker_event: {{ "{{" }} data|tojson {{ "}}" }}
       {% endif %}
 
+  thorium:
+    top.sls: |-
+      base:
+        '*':
+          - minion
+    minion.sls: |-
+      statreg:
+        status.reg
+
+      keydel:
+        key.timeout:
+          - delete: 30
+          - require:
+            - status: statreg
+
 saltMinion:
   image:
     tag: latest
@@ -124,9 +136,6 @@ saltMinion:
         status:
           - interval: 45
 
-      color: False
-      log_fmt_console: '[%(levelname)-8s] %(message)s'
-      log_fmt_logfile: '%(asctime)s,%(msecs)03d [%(name)-17s][%(levelname)-8s] %(message)s'
       logstash_udp_handler:
         host: logstash.salt-provisioning
         port: 1514

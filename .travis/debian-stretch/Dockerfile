@@ -141,12 +141,6 @@ ENV SALTENV=$saltenv
 # todo scan differently and remove scan_events with its weird entrypoint
 COPY .travis/entrypoint_master_run.sh /opt/
 COPY .travis/scan_events.py /opt/
-# todo move thorium to ConfigMap as well
-COPY .travis/thorium/ /srv/thorium/
-# is it even used?
-#COPY .travis/pillar/ /srv/pillar/
-# is it even used?
-#COPY .travis/salt/ /srv/salt/
 
 CMD [ "/opt/entrypoint_master_run.sh" ]
 

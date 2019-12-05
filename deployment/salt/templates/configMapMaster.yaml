@@ -43,14 +43,14 @@ metadata:
 data:
   {{ $key }}: {{ tpl $val $root | toYaml | nindent 4 }}
 {{- end }}
-{{- range $key, $val := .Values.saltMinion.config }}
 ---
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ $root.Values.saltMinion.service.name }}-{{ $key | replace "." "-" }}-config-cm
+  name: {{ $root.Values.saltMaster.service.name }}-thorium
   labels:
     addonmanager.kubernetes.io/mode: Reconcile
 data:
+{{- range $key, $val := .Values.saltMaster.thorium }}
   {{ $key }}: {{ tpl $val $root | toYaml | nindent 4 }}
 {{- end }}
