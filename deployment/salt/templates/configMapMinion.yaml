@@ -1,3 +1,4 @@
+{{- $root := . -}}
 {{- range $key, $val := .Values.saltMinion.config }}
 ---
 kind: ConfigMap
