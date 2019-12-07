@@ -3,6 +3,7 @@ FROM debian:$tag AS salt-base
 # "" == latest
 ARG salt_ver=""
 
+# for master and masterless purposes
 COPY salt /srv/salt
 
 RUN apt-get update && apt-get install -y procps curl dumb-init && \
@@ -19,6 +20,9 @@ WORKDIR /srv
 FROM salt-base AS salt-minion
 # hostname from `docker run -h` must be used as minion ID
 
+RUN apt-get install -y python3-pip && \
+    pip3 install --upgrade docker
+
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD [ "/usr/bin/salt-minion" ]
 
@@ -29,6 +33,14 @@ ARG api_enabled=false
 ARG k8s_api_enabled=false
 ENV API_ENABLED=$api_enabled
 ENV K8S_API_ENABLED=$k8s_api_enabled
+ARG kubectl_ver
+ARG saltenv
+
+ENV SALTENV=$saltenv
+
+# minimalistic config
+COPY .travis/config/master.conf /etc/salt/master.d/
+COPY .travis/debian-stretch/entrypoint.sh /opt/
 
 RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list.d/backports.list && \
     apt-get update && \
@@ -45,29 +57,26 @@ RUN if [ "$K8S_API_ENABLED" = true ]; then \
         curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_ver/bin/linux/amd64/kubectl && \
         chmod +x kubectl && \
         mv kubectl /usr/bin/ && \
-        pip3 install --upgrade kubernetes && \
+        pip3 install kubernetes==10.0.1 && \
         salt-run saltutil.sync_all; \
     fi
 
-# PyYAML
-#pip install --upgrade --default-timeout=300 pip && hash -r pip && \
-# the salt-master should be installed but not running
 EXPOSE 4505:4505 4506:4506
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD [ "/usr/bin/salt-master" ]
+CMD [ "/opt/entrypoint.sh" ]
 
 
 FROM salt-master AS salt-master-foreman-proxy
 
-COPY .travis/debian-stretch/entrypoint.sh /opt/
+COPY .travis/debian-stretch/entrypoint-smart-proxy.sh /opt/
 
 RUN echo "deb http://deb.theforeman.org/ stretch 1.23" >> /etc/apt/sources.list.d/foreman.list && \
     wget -q https://deb.theforeman.org/pubkey.gpg -O- | apt-key add - && \
     apt-get update && \
     apt-get install -y foreman-proxy
 
-CMD [ "/opt/entrypoint.sh" ]
+CMD [ "/opt/entrypoint-smart-proxy.sh" ]
 
 
 FROM salt-base AS dry-test
@@ -130,13 +139,8 @@ RUN chmod 600 /etc/salt/autosign.conf && \
 
 CMD [ "/opt/entrypoint_master_run.sh" ]
 
-
+# todo remove this image
 FROM salt-master AS master-k8s-test
-
-ARG saltenv
-ARG kubectl_ver
-
-ENV SALTENV=$saltenv
 
 # todo scan differently and remove scan_events with its weird entrypoint
 COPY .travis/entrypoint_master_run.sh /opt/
@@ -150,10 +154,10 @@ FROM salt-minion as minion-compose-test
 COPY .travis/config/minion.conf /etc/salt/minion.d/minion.conf
 
 
+# todo remove this image
 FROM salt-minion as minion-k8s-test
 
 COPY .travis/config/minion.conf /etc/salt/minion.d/minion.conf
 
 RUN apt-get install -y python3-pip && \
-    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 20 && \
-    pip install docker redis
+    pip3 install docker

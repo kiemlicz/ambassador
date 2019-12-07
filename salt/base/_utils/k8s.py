@@ -35,13 +35,14 @@ class K8sClient(object):
         self.active_namespace = "default"
 
         if "KUBERNETES_SERVICE_HOST" in os.environ:
+            log.debug("K8s loading incluster config")
             config.load_incluster_config()
             with open("/var/run/secrets/kubernetes.io/serviceaccount/namespace", "r") as f:
                 self.active_namespace = f.read()
         else:
+            log.debug("K8s loading config")
             try:
-                # todo handle opts from profile
-                config.load_kube_config()
+                config.load_kube_config(**kwargs)
             except FileNotFoundError as e:
                 raise CommandExecutionError("unable to create kubernetes config: {}".format(e))
 
@@ -65,9 +66,10 @@ class K8sClient(object):
     def _list(self, kind, namespaced=True):
         return "list_namespaced_{}".format(kind) if namespaced else "list_{}".format(kind)
 
-    def watch_start(self, kind, namespaced=True, timeout=60, **kwargs):
+    # use _request_timeout to stop the watch after given time
+    def watch_start(self, kind, namespaced=True, **kwargs):
         func = self._get_func(kind, self._list(kind, namespaced))
-        return self.watch.stream(func, _request_timeout=timeout, **kwargs)
+        return self.watch.stream(func, **kwargs)
 
     def watch_stop(self):
         self.watch.stop()

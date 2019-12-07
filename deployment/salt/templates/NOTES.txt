@@ -1,1 +1,1 @@
-1. Get the application URL by running these commands:
+Salt is deployed, application doesn't have web UI

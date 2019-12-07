@@ -29,6 +29,8 @@ saltMaster:
   # the thorium state tree
   thorium: {}
 
+  apicerts: {}
+
   readinessProbe:
     tcpSocket:
       port: publisher
@@ -58,8 +60,8 @@ saltMinion:
         - salt-call
         - --local
         - test.ping
-    initialDelaySeconds: 60
-    periodSeconds: 30
+    initialDelaySeconds: 15
+    periodSeconds: 20
 
   livenessProbe:
     exec:
@@ -67,8 +69,8 @@ saltMinion:
         - salt-call
         - --local
         - test.ping
-    initialDelaySeconds: 120
-    periodSeconds: 60
+    initialDelaySeconds: 60
+    periodSeconds: 40
 
 storage:
   enabled: false

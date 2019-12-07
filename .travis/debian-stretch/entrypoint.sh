@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
 
-/usr/share/foreman-proxy/bin/smart-proxy &
-/usr/bin/salt-master
+if [ $API_ENABLED = true ]; then
+  /usr/bin/salt-api &
+  /usr/bin/salt-master &
+  wait -n
+else
+  # replace the bash process with salt-master
+  exec /usr/bin/salt-master
+fi

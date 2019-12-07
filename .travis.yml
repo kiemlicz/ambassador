@@ -9,9 +9,9 @@ services:
 
 env:
   global:
-    - SALT_VER="" # use "" for latest stable, other options: "git 2019.2.1"
+    - SALT_VER="" # use "" for latest stable, other options: "git 2019.2.2"
     - COMPOSE_VER="1.22.0"
-    - KUBECTL_VER="v1.14.2"
+    - KUBECTL_VER="v1.16.3"
     - GH_URL="https://kiemlicz.github.io/ambassador/"
     - BUILD_DIR=".local"
     - CHART_BRANCH="gh-pages"

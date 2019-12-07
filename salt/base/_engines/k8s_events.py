@@ -63,8 +63,10 @@ def start(timeout=CLIENT_TIMEOUT,
                 if e is StopIteration: return
                 yield e
         elif len(generators) == 1:
+            log.debug("single generator")
             return generators[0]
         else:
+            log.info("Empty generators list, nothing to do")
             return []
 
     def fire(tag, msg):
@@ -77,8 +79,9 @@ def start(timeout=CLIENT_TIMEOUT,
             __salt__['event.send'](tag, msg)
 
     try:
-        all_watch = [(c.sanitize_for_serialization(e) for e in c.watch_start(watch_def.pop('kind'), **watch_def)) for watch_def in watch_defs]
-        for event in multiplex(all_watch):
+        all_watch_generators = [(c.sanitize_for_serialization(e) for e in c.watch_start(watch_def.pop('kind'), **watch_def)) for watch_def in watch_defs]
+        for event in multiplex(all_watch_generators):
+            log.debug("handling event (type: {})".format(event['type']))
             fire('{0}/{1}'.format(tag, event['type']), event)
     except Exception as e:
         log.error("Unable to watch() k8s resources")
