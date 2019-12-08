@@ -2,6 +2,7 @@ pkgs:
   dist_upgrade: False
   os_packages:
     - socat
+    - python3-setuptools
   pip3_user: travis
   pip3_packages:
     - testinfra
