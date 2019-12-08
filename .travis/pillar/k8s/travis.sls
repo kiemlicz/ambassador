@@ -2,6 +2,8 @@ pkgs:
   dist_upgrade: False
   os_packages:
     - socat
+  pip3_packages:
+    - testinfra
 
 docker:
     version: "18.06.1~ce~3-0~ubuntu"

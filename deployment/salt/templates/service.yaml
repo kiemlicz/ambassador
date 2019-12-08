@@ -13,7 +13,8 @@ metadata:
 {{- end }}
 spec:
   selector:
-    app: {{ .Values.saltMaster.service.name }}
+    app: salt
+    role: master
   ports:
     - protocol: TCP
       name: pubsub

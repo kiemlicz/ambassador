@@ -3,7 +3,6 @@ FROM debian:$tag AS salt-base
 # "" == latest
 ARG salt_ver=""
 
-# for master and masterless purposes
 COPY salt /srv/salt
 
 RUN apt-get update && apt-get install -y procps curl dumb-init && \
@@ -31,11 +30,10 @@ FROM salt-base AS salt-master
 
 ARG api_enabled=false
 ARG k8s_api_enabled=false
-ENV API_ENABLED=$api_enabled
-ENV K8S_API_ENABLED=$k8s_api_enabled
 ARG kubectl_ver
 ARG saltenv
-
+ENV API_ENABLED=$api_enabled
+ENV K8S_API_ENABLED=$k8s_api_enabled
 ENV SALTENV=$saltenv
 
 # minimalistic config

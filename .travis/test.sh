@@ -64,8 +64,6 @@ salt-master-run-k8s)
     helm dependency update deployment/salt
     kubectl create namespace salt-provisioning
     helm install salt deployment/salt -f .travis/travis_values.yaml --namespace salt-provisioning --wait --timeout=300s
-    # fixme there must be some logic to hook into salt, use Python Salt API
-    # wait for minion to connect and sync
 
     # wait for logger first, not sure if --wait waits for dependencies
     #kubectl wait -n salt-provisioning pod -l app=logstash --for condition=ready --timeout=5m
@@ -73,23 +71,25 @@ salt-master-run-k8s)
     echo -e "starting logs from: $logger"
     kubectl -n salt-provisioning logs -f $logger &
 
+    python3 .travis/k8s-test.py salt-provisioning
+
     #while sleep 5m; do echo -e "\nEvents:$(kubectl get events --all-namespaces)\nStatus:$(kubectl get all --all-namespaces)"; done &
 
-    echo -e "\nTest 1: should accept new minion\n"
-    kubectl -n salt-provisioning delete pod -l name=salt-minion
-    kubectl -n salt-provisioning wait pod -l name=salt-minion --for condition=ready --timeout=5m
+    ##echo -e "\nTest 1: should accept new minion\n"
+    ##kubectl -n salt-provisioning delete pod -l name=salt-minion
+    ##kubectl -n salt-provisioning wait pod -l name=salt-minion --for condition=ready --timeout=5m
 # this will still contain old minion that will fail the ping
 #    echo "Pinging minions"
 #    kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt '*' test.ping
 
-    echo -e "\nTest 2: should work after master crash\n"
-    kubectl -n salt-provisioning delete pod -l name=salt-master
-    kubectl -n salt-provisioning wait pod -l name=salt-master --for condition=ready --timeout=5m
+    ##echo -e "\nTest 2: should work after master crash\n"
+    ##kubectl -n salt-provisioning delete pod -l name=salt-master
+    ##kubectl -n salt-provisioning wait pod -l name=salt-master --for condition=ready --timeout=5m
 
     # the minion must first re-auth to master that got down, will do that after auth_timeout (?) + thorium re-scan
     # it will finally clean the old keys but honestly, why does it take so long?
-    sleep 180
-    echo -e "\nAfter 3 min sleep: listing who's up"
+    ##sleep 180
+    ##echo -e "\nAfter 3 min sleep: listing who's up"
     master=$(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}')
     kubectl -n salt-provisioning exec -it $master -- salt-key -L
     kubectl -n salt-provisioning exec -it $master -- salt-run manage.up

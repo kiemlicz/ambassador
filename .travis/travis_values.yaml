@@ -72,11 +72,6 @@ saltMaster:
         msg_type: logstash
 
     autosign: |-
-      minion1.local
-      minion2.local
-      minion3.local
-      minion4.local
-      minion5.local
       salt-*
 
     02-netapi.conf: |-
@@ -119,7 +114,7 @@ saltMaster:
 
       keydel:
         key.timeout:
-          - delete: 30
+          - delete: 90
           - require:
             - status: statreg
 
@@ -141,9 +136,9 @@ saltMinion:
         network.interfaces: []
         network.ip_addrs: []
 
-      beacons:
-        status:
-          - interval: 45
+      #beacons:
+      #  status:
+      #    - interval: 45
 
       logstash_udp_handler:
         host: logstash.salt-provisioning
@@ -164,8 +159,9 @@ saltMinion:
 
       # todo research
       #auth_safemode: False
-      #ping_interval: 1
-      #rejected_retry: True
+      ping_interval: 1
+      # when master rejects this minion, it will try to re-auth, fixme research if helps in master crash case
+      # rejected_retry: True
 
       engines:
        - docker_events:
