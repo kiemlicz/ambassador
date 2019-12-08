@@ -43,9 +43,6 @@ salt-master-run-k8s)
     docker_build master-k8s-test salt-master
     docker_build minion-k8s-test salt-minion
 
-    # fixme remove since salt must install this properly
-    pip3 install --upgrade testinfra
-
     # Temporary dir for storing new packaged charts and index files
     mkdir $BUILD_DIR
     # clone existing charts

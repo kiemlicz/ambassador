@@ -56,6 +56,9 @@ pkgs_pip:
     - name: pip_packages
     - pkgs: {{ pkgs.pip_packages|tojson }}
     - reload_modules: True
+{%- if pkgs.pip_user is defined %}
+    - user: {{ pkgs.pip_user }}
+{%- endif %}
     - require:
       - pkg: pip_provider
 {% endif %}
@@ -74,6 +77,9 @@ pkgs_pip3:
     - pkgs: {{ pkgs.pip3_packages|tojson }}
     - bin_env: '/usr/bin/pip3'
     - reload_modules: True
+{%- if pkgs.pip3_user is defined %}
+    - user: {{ pkgs.pip3_user }}
+{%- endif %}
     - require:
       - pkg: pip3_provider
 {% endif %}

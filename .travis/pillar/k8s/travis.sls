@@ -4,6 +4,8 @@ pkgs:
     - socat
   pip3_packages:
     - testinfra
+    - kubernetes
+#add pip3_user if still fails
 
 docker:
     version: "18.06.1~ce~3-0~ubuntu"
