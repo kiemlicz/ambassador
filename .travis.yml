@@ -1,6 +1,5 @@
-language: python
-python:
-  - "3.6"
+language: generic
+# in order not to use virtualenv
 
 sudo: required
 
