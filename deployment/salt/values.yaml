@@ -55,11 +55,12 @@ saltMinion:
   config: {}
 
   # not using --local in minion probes, this way the probe succeeds only when established master communication
-  # still not sure if this is good idea
+  # still not sure if this is good idea (master crash will cause minion restart as well)
   readinessProbe:
     exec:
       command:
         - salt-call
+        - --local
         - test.ping
     initialDelaySeconds: 15
     periodSeconds: 20
@@ -68,6 +69,7 @@ saltMinion:
     exec:
       command:
         - salt-call
+        - --local
         - test.ping
     initialDelaySeconds: 60
     periodSeconds: 40
