@@ -72,7 +72,11 @@ class KubectlSaltBackend(object):
         return self._loads(output.stdout)
 
     def local(self, local_fun):
-        output = self._invoke_salt("salt-call --local --out json -l error {}".format(local_fun))
+        output = self._invoke_salt("salt --out json -l error {}".format(local_fun))
+        return self._loads(output.stdout)
+
+    def caller(self, caller_fun):
+        output = self._invoke_salt("salt-call --local --out json -l error {}".format(caller_fun))
         return self._loads(output.stdout)
 
 
@@ -95,6 +99,8 @@ class SaltMasterTest(unittest.TestCase):
         minions_json = self.saltMaster.runner("manage.up")
         # then
         self.assertEqual(len(minions_json), SaltMasterTest.minion_count)
+        pong = self.saltMaster.local("'*' test.ping")
+        self.assertEqual(len(pong), SaltMasterTest.minion_count, "Wrong PONG response: {}".format(pong))
 
     def test_01_minion_delete(self):
         # given
