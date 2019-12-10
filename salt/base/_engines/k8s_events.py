@@ -78,15 +78,18 @@ def start(timeout=CLIENT_TIMEOUT,
         else:
             __salt__['event.send'](tag, msg)
 
-    try:
-        all_watch_generators = [(c.sanitize_for_serialization(e) for e in c.watch_start(watch_def.pop('kind'), **watch_def)) for watch_def in watch_defs]
-        for event in multiplex(all_watch_generators):
-            log.debug("handling event (type: {})".format(event['type']))
-            fire('{0}/{1}'.format(tag, event['type']), event)
-    except Exception as e:
-        log.error("Unable to watch() k8s resources")
-        log.exception(e)
-        c.watch_stop()
+    if watch_defs:
+        try:
+            all_watch_generators = [(c.sanitize_for_serialization(e) for e in c.watch_start(watch_def.pop('kind'), **watch_def)) for watch_def in watch_defs]
+            for event in multiplex(all_watch_generators):
+                log.debug("handling event (type: {})".format(event['type']))
+                fire('{0}/{1}'.format(tag, event['type']), event)
+        except Exception as e:
+            log.error("Unable to watch() k8s resources")
+            log.exception(e)
+            c.watch_stop()
+    else:
+        log.warning("No watch_defs configured, exiting")
 
 
 def _get_client(profile=None):

@@ -44,7 +44,10 @@ saltMaster:
     99-custom.conf: |-
       engines:
         - thorium: {}
-        - k8s_events: {}
+        - k8s_events:
+            watch_defs:
+              - kind: pod
+                namespace: salt-provisioning
 
       # queue config
       runner_queue:
