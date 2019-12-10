@@ -79,7 +79,7 @@ class KubectlSaltBackend(object):
 # todo add POD failure tests
 # todo add k8s_events engine tests
 class SaltMasterTest(unittest.TestCase):
-    minion_count = 4
+    minion_count = 1
 
     def setUp(self) -> None:
         self.masters = [e.metadata.name for e in v1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
