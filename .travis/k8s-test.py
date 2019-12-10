@@ -3,6 +3,7 @@ import testinfra
 import logging
 import sys
 import json
+import yaml
 import time
 from kubernetes import client, config
 from functools import wraps
@@ -137,7 +138,8 @@ class SaltMasterTest(unittest.TestCase):
     def test_03_k8s_events(self):
         # given
         with open(".travis/k8s-test-deployment.yaml", 'r') as f:
-            appsV1.create_namespaced_deployment(namespace=namespace, body=f)
+            body = yaml.safe_load(f)
+            appsV1.create_namespaced_deployment(namespace=namespace, body=body)
 
         # when
         time.sleep(10)
