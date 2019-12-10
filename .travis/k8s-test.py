@@ -147,14 +147,13 @@ class SaltMasterTest(unittest.TestCase):
 
         # then
         try:
+            k8s_events = []
             o = self.saltMaster.run("cat /var/log/salt/events")
-            log.error(" stdout -> {}".format(o.stdout))
             j = [json.loads(e) for e in o.stdout.splitlines()]
-            log.error(" -> {}".format(j))
             k8s_events = [e for e in j if k8s_events_tag.match(e['tag'])]
-            log.error(" k8sevents only -> {}".format(k8s_events))
+            log.error("k8s events: {}".format(k8s_events))
         except Exception as e:
-            log.error("Cannot assert k8s_events")
+            log.error("Cannot assert k8s_events, all events: \n{}".format(k8s_events))
             log.exception(e)
             raise e
 

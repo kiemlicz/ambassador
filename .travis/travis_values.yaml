@@ -166,16 +166,17 @@ saltMinion:
       # when master rejects this minion, it will try to re-auth, fixme research if helps in master crash case
       # rejected_retry: True
 
-      engines:
-       - docker_events:
-           docker_url: unix://var/run/docker.sock
-           filters:
-             event:
-                - create
-                - start
-                - stop
-                - die
-                - oom
+      # switching to k8s_events
+      #engines:
+      # - docker_events:
+      #     docker_url: unix://var/run/docker.sock
+      #     filters:
+      #       event:
+      #          - create
+      #          - start
+      #          - stop
+      #          - die
+      #          - oom
 
 persistence:
   saltPkiSelector:
