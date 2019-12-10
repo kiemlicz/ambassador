@@ -50,7 +50,7 @@ class KubectlSaltBackend(object):
         self.kubectl = kubectlBackend
 
     def _invoke_salt(self, cmd):
-        output = self.kubectl.run(cmd)
+        output = self.run(cmd)
         if output.stderr:
             log.error("The command: {}, stderr: {}".format(cmd, output.stderr))
         return output
@@ -66,6 +66,9 @@ class KubectlSaltBackend(object):
             log.error("Unable to parse output: {}".format(stdout))
             log.exception(e)
             return {}
+
+    def run(self, cmd):
+        return self.kubectl.run(cmd)
 
     def runner(self, runner_fun):
         output = self._invoke_salt("salt-run --out=json -l error {}".format(runner_fun))
@@ -86,8 +89,8 @@ class SaltMasterTest(unittest.TestCase):
     minion_count = 1
 
     def setUp(self) -> None:
-        self.masters = [e.metadata.name for e in v1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
-        self.minions = [e.metadata.name for e in v1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=minion").items]
+        self.masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
+        self.minions = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=minion").items]
         if not self.masters:
             self.fail("No Salt Master instances found in namespace: {}".format(namespace))
         self.saltMaster = KubectlSaltBackend(testinfra.get_host("kubectl://{}?namespace={}".format(next(iter(self.masters)), namespace)))
@@ -106,7 +109,7 @@ class SaltMasterTest(unittest.TestCase):
         # given
         old_minions = self.minions
         for m in old_minions:
-            v1.delete_namespaced_pod(name=m, namespace=namespace)
+            coreV1.delete_namespaced_pod(name=m, namespace=namespace)
 
         # when
         time.sleep(10)
@@ -121,7 +124,7 @@ class SaltMasterTest(unittest.TestCase):
         # given
         old_masters = self.masters
         for m in old_masters:
-            v1.delete_namespaced_pod(name=m, namespace=namespace)
+            coreV1.delete_namespaced_pod(name=m, namespace=namespace)
 
         # when
         time.sleep(10)
@@ -131,13 +134,33 @@ class SaltMasterTest(unittest.TestCase):
         new_masters = self.masters
         self.assertEqual(len(set(old_masters) & set(new_masters)), 0)  # all new masters
 
+    def test_03_k8s_events(self):
+        # given
+        with open(".travis/k8s-test-deployment.yaml", 'r') as f:
+            appsV1.create_namespaced_deployment(namespace=namespace, body=f)
 
-log = logging.getLogger("TestLogger")
+        # when
+        time.sleep(10)
+
+        # then
+        try:
+            o = self.saltMaster.run("cat /var/log/salt/events")
+            j = json.loads(o)
+            # todo finish
+            log.error(" -> {}".format(j))
+        except Exception as e:
+            log.error("Cannot assert k8s_events")
+            log.exception(e)
+            raise e
+
+
+log = logging.getLogger("k8s-test")
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 
 # minikube sets KUBECONFIG properly
 config.load_kube_config()
-v1 = client.CoreV1Api()
+coreV1 = client.CoreV1Api()
+appsV1 = client.AppsV1Api()
 namespace = "salt-provisioning"
 
 if __name__ == "__main__":
