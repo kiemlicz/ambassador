@@ -5,6 +5,7 @@ import sys
 import json
 import yaml
 import time
+import re
 from kubernetes import client, config
 from functools import wraps
 
@@ -147,9 +148,10 @@ class SaltMasterTest(unittest.TestCase):
         # then
         try:
             o = self.saltMaster.run("cat /var/log/salt/events")
-            j = json.loads(o)
-            # todo finish
+            j = json.loads(o.stdout)
             log.error(" -> {}".format(j))
+            k8s_events = [e for e in j if k8s_events_tag.match(e['tag'])]
+            log.error(" k8sevents only -> {}".format(k8s_events))
         except Exception as e:
             log.error("Cannot assert k8s_events")
             log.exception(e)
@@ -164,6 +166,8 @@ config.load_kube_config()
 coreV1 = client.CoreV1Api()
 appsV1 = client.AppsV1Api()
 namespace = "salt-provisioning"
+
+k8s_events_tag = re.compile("salt/engines/k8s_events/\S+")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
