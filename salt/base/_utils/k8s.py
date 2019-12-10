@@ -69,6 +69,10 @@ class K8sClient(object):
     # use _request_timeout to stop the watch after given time
     def watch_start(self, kind, namespaced=True, **kwargs):
         func = self._get_func(kind, self._list(kind, namespaced))
+        # todo this may not be necessary
+        #r = func(**kwargs)  # todo kwargs may contain far too many kwargs...
+        # resource_version is mandatory, otherwise it will immediately terminate
+        #kwargs['resource_version'] = r['metadata']['resource_version']
         return self.watch.stream(func, **kwargs)
 
     def watch_stop(self):

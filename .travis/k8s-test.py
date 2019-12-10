@@ -86,7 +86,6 @@ class KubectlSaltBackend(object):
 
 
 # todo add POD failure tests
-# todo add k8s_events engine tests
 class SaltMasterTest(unittest.TestCase):
     minion_count = 1
 
@@ -96,15 +95,28 @@ class SaltMasterTest(unittest.TestCase):
         if not self.masters:
             self.fail("No Salt Master instances found in namespace: {}".format(namespace))
         self.saltMaster = KubectlSaltBackend(testinfra.get_host("kubectl://{}?namespace={}".format(next(iter(self.masters)), namespace)))
+        self.startTime = time.time()
 
-    @retry(Exception, tries=5)
+    def tearDown(self) -> None:
+        coreV1.delete_namespace(name="salt-provisioning-test")
+        t = time.time() - self.startTime
+        print("%s: %.3f" % (self.id(), t))
+
+    @retry(Exception, delay=20)
     def assert_connected_minions(self):
         # given
-        self.setUp()
-        minions_json = self.saltMaster.runner("manage.up")
+        masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
+
+        if not masters:
+            self.fail("No Salt Master instances found in namespace: {} (in repeatable assertion)".format(namespace))
+        master = KubectlSaltBackend(testinfra.get_host("kubectl://{}?namespace={}".format(next(iter(masters)), namespace)))
+
+        # when
+        minions_json = master.runner("manage.up")
+
         # then
         self.assertEqual(len(minions_json), SaltMasterTest.minion_count)
-        pong = self.saltMaster.local("'*' test.ping")
+        pong = master.local("'*' test.version")
         self.assertEqual(len(pong), SaltMasterTest.minion_count, "Wrong PONG response: {}".format(pong))
 
     def test_01_minion_delete(self):
@@ -118,7 +130,7 @@ class SaltMasterTest(unittest.TestCase):
 
         # then
         self.assert_connected_minions()
-        new_minions = self.minions
+        new_minions = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=minion").items]
         self.assertEqual(len(set(old_minions) & set(new_minions)), 0)  # all new minions
 
     # fixme the master restart causes existing minions not to connect
@@ -133,25 +145,39 @@ class SaltMasterTest(unittest.TestCase):
 
         # then
         self.assert_connected_minions()
-        new_masters = self.masters
+        new_masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
         self.assertEqual(len(set(old_masters) & set(new_masters)), 0)  # all new masters
 
-    def test_03_k8s_events(self):
+    # todo some weird minion loss when salt-run saltutil.sync_all...
+
+
+class SaltK8sEngineTest(unittest.TestCase):
+    def setUp(self) -> None:
+        self.masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
+        self.minions = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=minion").items]
+        if not self.masters:
+            self.fail("No Salt Master instances found in namespace: {}".format(namespace))
+        self.saltMaster = KubectlSaltBackend(testinfra.get_host("kubectl://{}?namespace={}".format(next(iter(self.masters)), namespace)))
+
+    def test_01_k8s_events(self):
         # given
         with open(".travis/k8s-test-deployment.yaml", 'r') as f:
             body = yaml.safe_load(f)
-            appsV1.create_namespaced_deployment(namespace=namespace, body=body)
+            ns = client.V1Namespace(metadata=client.V1ObjectMeta(name="salt-provisioning-test"))
+            coreV1.create_namespace(body=ns)
+            appsV1.create_namespaced_deployment(namespace="salt-provisioning-test", body=body)
 
         # when
-        time.sleep(10)
+        time.sleep(30)
 
         # then
         try:
             k8s_events = []
+            # fixme this file will contain all k8s events
             o = self.saltMaster.run("cat /var/log/salt/events")
             j = [json.loads(e) for e in o.stdout.splitlines()]
             k8s_events = [e for e in j if k8s_events_tag.match(e['tag'])]
-            log.error("k8s events: {}".format(k8s_events))
+            self.assertEqual(len(k8s_events), 3)
         except Exception as e:
             log.error("Cannot assert k8s_events, all events: \n{}".format(k8s_events))
             log.exception(e)

@@ -37,7 +37,7 @@ ENV K8S_API_ENABLED=$k8s_api_enabled
 ENV SALTENV=$saltenv
 
 # minimalistic config
-COPY .travis/config/master.conf /etc/salt/master.d/
+COPY .travis/config/master.conf /etc/salt/master.d/01-master.conf
 COPY .travis/debian-stretch/entrypoint.sh /opt/
 
 RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list.d/backports.list && \

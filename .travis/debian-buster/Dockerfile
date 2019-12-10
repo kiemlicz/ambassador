@@ -37,7 +37,7 @@ ENV K8S_API_ENABLED=$k8s_api_enabled
 ENV SALTENV=$saltenv
 
 # minimalistic config
-COPY .travis/config/master.conf /etc/salt/master.d/
+COPY .travis/config/master.conf /etc/salt/master.d/01-master.conf
 COPY .travis/debian-buster/entrypoint.sh /opt/
 
 RUN apt-get update && \

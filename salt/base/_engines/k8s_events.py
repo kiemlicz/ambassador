@@ -63,7 +63,8 @@ def start(timeout=CLIENT_TIMEOUT,
                 if e is StopIteration: return
                 yield e
         elif len(generators) == 1:
-            log.debug("single generator")
+            log.debug("Single generator")
+            # fixme this breaks the generator....
             return generators[0]
         else:
             log.info("Empty generators list, nothing to do")
@@ -88,6 +89,7 @@ def start(timeout=CLIENT_TIMEOUT,
             log.error("Unable to watch() k8s resources")
             log.exception(e)
             c.watch_stop()
+        log.info("Kubernetes watch has stopped")
     else:
         log.warning("No watch_defs configured, exiting")
 

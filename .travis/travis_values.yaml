@@ -47,7 +47,7 @@ saltMaster:
         - k8s_events:
             watch_defs:
               - kind: pod
-                namespace: salt-provisioning
+                namespace: salt-provisioning-test
 
       # queue config
       runner_queue:
