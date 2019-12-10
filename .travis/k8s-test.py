@@ -148,6 +148,7 @@ class SaltMasterTest(unittest.TestCase):
         # then
         try:
             o = self.saltMaster.run("cat /var/log/salt/events")
+            log.error(" stdout -> {}".format(o.stdout))
             j = json.loads(o.stdout)
             log.error(" -> {}".format(j))
             k8s_events = [e for e in j if k8s_events_tag.match(e['tag'])]
