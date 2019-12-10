@@ -40,8 +40,8 @@ salt-master-run-k8s)
     sudo mkdir -p /mnt/data/saltpki /mnt/data/saltqueue
     # build images that are used for provisioning (salt master's and minion's)
     # only one of each is required per one node cluster
-    docker_build master-k8s-test salt-master
-    docker_build minion-k8s-test salt-minion
+    docker_build salt-master salt-master
+    docker_build salt-minion salt-minion
 
     # Temporary dir for storing new packaged charts and index files
     mkdir $BUILD_DIR

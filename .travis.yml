@@ -108,8 +108,8 @@ jobs:
     - stage: k8s
       name: "Kubernetes tests"
       env:
-        - DOCKER_IMAGE=debian-stretch
-        - SALTENV=dev
+        - DOCKER_IMAGE=debian-buster
+        - SALTENV=server
         - CONTEXT=k8s
         - K8S_API_ENABLED=true
         #- API_ENABLED=true

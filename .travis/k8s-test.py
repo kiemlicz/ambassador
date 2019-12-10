@@ -96,7 +96,7 @@ class SaltMasterTest(unittest.TestCase):
         # then
         self.assertEqual(len(minions_json), SaltMasterTest.minion_count)
 
-    def test_minion_delete(self):
+    def test_01_minion_delete(self):
         # given
         old_minions = self.minions
         for m in old_minions:
@@ -111,7 +111,7 @@ class SaltMasterTest(unittest.TestCase):
         self.assertEqual(len(set(old_minions) & set(new_minions)), 0)  # all new minions
 
     # fixme the master restart causes existing minions not to connect
-    def test_master_delete(self):
+    def test_02_master_delete(self):
         # given
         old_masters = self.masters
         for m in old_masters:
@@ -138,7 +138,4 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         namespace = sys.argv.pop()
         log.info("Changed namespace to: {}".format(namespace))
-    loader = unittest.TestLoader()
-    loader.sortTestMethodsUsing = None
-    suites = loader.loadTestsFromTestCase(SaltMasterTest)
-    unittest.TextTestRunner(verbosity=2).run(suites)
+    unittest.main(verbosity=2)

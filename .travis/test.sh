@@ -25,9 +25,10 @@ k8s_log_error() {
     esac
 }
 
+while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+
 case "$1" in
 dry)
-    while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
     docker run --privileged "envoy-dry-test-$DOCKER_IMAGE:$TAG"
     result=$?
     kill %1
@@ -37,7 +38,6 @@ dry)
 masterless)
     # privileged mode is necessary for e.g. setting: net.ipv4.ip_forward or running docker in docker
     name="ambassador-salt-masterless-run-$TRAVIS_JOB_NUMBER"
-    while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
     docker run --name $name --hostname "$CONTEXT-host" --privileged "masterless-test-$DOCKER_IMAGE:$TAG" 2>&1 | tee output
     exit_code=${PIPESTATUS[0]}  # gets the exit code of first (piped) process
     kill %1
@@ -65,13 +65,13 @@ salt-master-run-k8s)
     kubectl create namespace salt-provisioning
     helm install salt deployment/salt -f .travis/travis_values.yaml --namespace salt-provisioning --wait --timeout=300s
 
+    python3 .travis/k8s-test.py salt-provisioning
+
     # wait for logger first, not sure if --wait waits for dependencies
     #kubectl wait -n salt-provisioning pod -l app=logstash --for condition=ready --timeout=5m
     logger=$(kubectl get pod -l app=logstash -n salt-provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
     echo -e "starting logs from: $logger"
     kubectl -n salt-provisioning logs -f $logger &
-
-    python3 .travis/k8s-test.py salt-provisioning
 
     #while sleep 5m; do echo -e "\nEvents:$(kubectl get events --all-namespaces)\nStatus:$(kubectl get all --all-namespaces)"; done &
 
@@ -91,8 +91,8 @@ salt-master-run-k8s)
     ##sleep 180
     ##echo -e "\nAfter 3 min sleep: listing who's up"
     master=$(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}')
-    kubectl -n salt-provisioning exec -it $master -- salt-key -L
-    kubectl -n salt-provisioning exec -it $master -- salt-run manage.up
+#    kubectl -n salt-provisioning exec -it $master -- salt-key -L
+#    kubectl -n salt-provisioning exec -it $master -- salt-run manage.up
     echo -e "\nSalt-master POD logs:\n"
     kubectl -n salt-provisioning logs $master
 # fixme
@@ -100,6 +100,6 @@ salt-master-run-k8s)
 #    echo "Pinging minions"
 #    kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt '*' test.ping
 
-    echo "Deployment finished"
+    echo "Deployment testing finished"
     ;;
 esac
