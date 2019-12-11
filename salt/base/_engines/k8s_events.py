@@ -18,8 +18,6 @@ import salt.utils.event
 
 log = logging.getLogger(__name__)
 
-CLIENT_TIMEOUT = 60
-
 __virtualname__ = 'k8s_events'
 
 
@@ -27,7 +25,7 @@ def __virtual__():
     return True
 
 
-def start(timeout=CLIENT_TIMEOUT,
+def start(timeout=None,
           tag='salt/engines/k8s_events',
           watch_defs=None):
     c = _get_client()
@@ -64,8 +62,7 @@ def start(timeout=CLIENT_TIMEOUT,
                 yield e
         elif len(generators) == 1:
             log.debug("Single generator")
-            # fixme this breaks the generator....
-            return generators[0]
+            yield from generators[0]
         else:
             log.info("Empty generators list, nothing to do")
             return []
@@ -81,7 +78,7 @@ def start(timeout=CLIENT_TIMEOUT,
 
     if watch_defs:
         try:
-            all_watch_generators = [(c.sanitize_for_serialization(e) for e in c.watch_start(watch_def.pop('kind'), **watch_def)) for watch_def in watch_defs]
+            all_watch_generators = [(c.sanitize_for_serialization(e) for e in c.watch_start(watch_def.pop('kind'), timeout=timeout, **watch_def)) for watch_def in watch_defs]
             for event in multiplex(all_watch_generators):
                 log.debug("handling event (type: {})".format(event['type']))
                 fire('{0}/{1}'.format(tag, event['type']), event)

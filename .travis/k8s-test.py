@@ -98,7 +98,6 @@ class SaltDeploymentTest(unittest.TestCase):
         self.startTime = time.time()
 
     def tearDown(self) -> None:
-        coreV1.delete_namespace(name="salt-provisioning-test")
         t = time.time() - self.startTime
         print("%s: %.3f" % (self.id(), t))
 
@@ -152,20 +151,26 @@ class SaltDeploymentTest(unittest.TestCase):
 
 
 class SaltK8sEngineTest(unittest.TestCase):
+    test_namespace = "salt-provisioning-test"
+
     def setUp(self) -> None:
         self.masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
         self.minions = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=minion").items]
         if not self.masters:
             self.fail("No Salt Master instances found in namespace: {}".format(namespace))
         self.saltMaster = KubectlSaltBackend(testinfra.get_host("kubectl://{}?namespace={}".format(next(iter(self.masters)), namespace)))
+        ns = client.V1Namespace(metadata=client.V1ObjectMeta(name=SaltK8sEngineTest.test_namespace))
+        coreV1.create_namespace(body=ns)
+
+    def tearDown(self) -> None:
+        coreV1.delete_namespace(name=SaltK8sEngineTest.test_namespace)
 
     def test_01_k8s_events(self):
         # given
         with open(".travis/k8s-test-deployment.yaml", 'r') as f:
             body = yaml.safe_load(f)
-            ns = client.V1Namespace(metadata=client.V1ObjectMeta(name="salt-provisioning-test"))
-            coreV1.create_namespace(body=ns)
-            appsV1.create_namespaced_deployment(namespace="salt-provisioning-test", body=body)
+
+            appsV1.create_namespaced_deployment(namespace=SaltK8sEngineTest.test_namespace, body=body)
 
         # when
         time.sleep(30)
@@ -173,11 +178,13 @@ class SaltK8sEngineTest(unittest.TestCase):
         # then
         try:
             k8s_events = []
-            # fixme this file will contain all k8s events
+            # fixme this file will contain all k8s events from given namespace
             o = self.saltMaster.run("cat /var/log/salt/events")
             j = [json.loads(e) for e in o.stdout.splitlines()]
             k8s_events = [e for e in j if k8s_events_tag.match(e['tag'])]
-            self.assertEqual(len(k8s_events), 3)
+
+            self.assertEqual(len([e for e in k8s_events if e == 'salt/engines/k8s_events/ADDED']), 2)
+            # try killing pods
         except Exception as e:
             log.error("Cannot assert k8s_events, all events: \n{}".format(k8s_events))
             log.exception(e)
