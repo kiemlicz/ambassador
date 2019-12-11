@@ -85,8 +85,8 @@ class KubectlSaltBackend(object):
         return self._loads(output.stdout)
 
 
-# todo add POD failure tests
-class SaltMasterTest(unittest.TestCase):
+# todo add random POD failure tests
+class SaltDeploymentTest(unittest.TestCase):
     minion_count = 1
 
     def setUp(self) -> None:
@@ -115,9 +115,9 @@ class SaltMasterTest(unittest.TestCase):
         minions_json = master.runner("manage.up")
 
         # then
-        self.assertEqual(len(minions_json), SaltMasterTest.minion_count)
+        self.assertEqual(len(minions_json), SaltDeploymentTest.minion_count)
         pong = master.local("'*' test.version")
-        self.assertEqual(len(pong), SaltMasterTest.minion_count, "Wrong PONG response: {}".format(pong))
+        self.assertEqual(len(pong), SaltDeploymentTest.minion_count, "Wrong PONG response: {}".format(pong))
 
     def test_01_minion_delete(self):
         # given
