@@ -7,7 +7,6 @@ pkgs:
   pip3_packages:
     - testinfra
     - kubernetes
-    - deepdiff
 
 docker:
     version: "18.06.1~ce~3-0~ubuntu"

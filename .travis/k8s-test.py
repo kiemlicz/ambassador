@@ -9,7 +9,6 @@ import re
 import pprint
 from kubernetes import client, config
 from functools import wraps
-from deepdiff import DeepDiff
 
 
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
@@ -148,6 +147,8 @@ class SaltDeploymentTest(unittest.TestCase):
         self.assertEqual(len(minions_json), SaltDeploymentTest.minion_count)
         pong = master.local("'*' test.version")
         self.assertEqual(len(pong), SaltDeploymentTest.minion_count, "Wrong PONG response: {}".format(pong))
+        # fixme remove
+        log.info("PONG: {}".format(pong))
 
 
 class SaltK8sEngineTest(unittest.TestCase):
@@ -175,39 +176,41 @@ class SaltK8sEngineTest(unittest.TestCase):
         time.sleep(30)
 
         # then
-        # fixme this file will contain all k8s events from given namespace
-        o = self.saltMaster.run("cat /var/log/salt/events")
-        j = [json.loads(e) for e in o.stdout.splitlines()]
-        k8s_events = [e for e in j if k8s_events_tag.match(e['tag'])]
-        add_events = [e for e in k8s_events if e['tag'] == 'salt/engines/k8s_events/ADDED']
-        mod_events = [e for e in k8s_events if e['tag'] == 'salt/engines/k8s_events/MODIFIED']
+        @retry(Exception, delay=10)
+        def validate():
+            # fixme this file will contain all k8s events from given namespace
+            o = self.saltMaster.run("cat /var/log/salt/events")
+            j = [json.loads(e) for e in o.stdout.splitlines()]
+            k8s_events = [e for e in j if k8s_events_tag.match(e['tag'])]
+            add_events = [e for e in k8s_events if e['tag'] == 'salt/engines/k8s_events/ADDED']
+            mod_events = [e for e in k8s_events if e['tag'] == 'salt/engines/k8s_events/MODIFIED']
 
-        self.assertEqual(len(add_events), 2)
-        self.assertEqual(len(mod_events), 6)
+            self.assertEqual(len(add_events), 2)
+            self.assertEqual(len(mod_events), 6)
 
-        pods = {}
-        for e in mod_events:
-            pods.setdefault(e['data']['object']['metadata']['name'], []).append(e['data'])
+            pods = {}
+            for e in mod_events:
+                pods.setdefault(e['data']['object']['metadata']['name'], []).append(e['data'])
 
-        self.assertEqual(len(pods), 2, "There must be two Nginx PODs only")
+            self.assertEqual(len(pods), 2, "There must be two Nginx PODs only")
 
-        for k, v in pods.items():
-            if len(v) > 1:
-                last = v[-1:]
-                self.assertEqual(last['object']['status']['phase'], "Running")
-                self.assertRegexpMatches(last['object']['status']['hostIP'], "\d+\.\d+\.\d+\.\d+")
-                self.assertRegexpMatches(last['object']['status']['podIP'], "\d+\.\d+\.\d+\.\d+")
-                log.debug("Last modified event status:\n{}".format(pp.pformat(last)))
-            else:
-                self.fail("no MODIFIED event received")
+            for k, v in pods.items():
+                if len(v) > 1:
+                    last = v[-1:]
+                    log.info("LAST => {}".format(last['object']))
+                    self.assertEqual(last['object']['status']['phase'], "Running")
+                    self.assertRegexpMatches(last['object']['status']['hostIP'], "\d+\.\d+\.\d+\.\d+")
+                    self.assertRegexpMatches(last['object']['status']['podIP'], "\d+\.\d+\.\d+\.\d+")
+                    log.debug("Last modified event status:\n{}".format(pp.pformat(last)))
+                else:
+                    self.fail("no MODIFIED event received")
+        validate()
 
 
 log = logging.getLogger("k8s-test")
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
-
 pp = pprint.PrettyPrinter(indent=4)
 
-# minikube sets KUBECONFIG properly
 config.load_kube_config()
 coreV1 = client.CoreV1Api()
 appsV1 = client.AppsV1Api()
