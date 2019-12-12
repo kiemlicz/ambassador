@@ -195,7 +195,7 @@ class SaltK8sEngineTest(unittest.TestCase):
             if len(v) > 1:
                 last = v[-1:]
                 #self.assertTrue(last['object']['status']['conditions'][''])
-                log.info("Last modified event status:\n{}".format(pp.pformat(last['object']['status'])))
+                log.info("Last modified event status:\n{}".format(pp.pformat(last)))
             else:
                 self.fail("no MODIFIED event received")
 
