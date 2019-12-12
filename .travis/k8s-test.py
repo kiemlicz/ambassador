@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import unittest
 import testinfra
 import logging
@@ -8,6 +10,7 @@ import time
 import re
 from kubernetes import client, config
 from functools import wraps
+from deepdiff import DeepDiff
 
 
 def retry(ExceptionToCheck, tries=4, delay=3, backoff=2, logger=None):
@@ -101,23 +104,6 @@ class SaltDeploymentTest(unittest.TestCase):
         t = time.time() - self.startTime
         print("%s: %.3f" % (self.id(), t))
 
-    @retry(Exception, delay=20)
-    def assert_connected_minions(self):
-        # given
-        masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
-
-        if not masters:
-            self.fail("No Salt Master instances found in namespace: {} (in repeatable assertion)".format(namespace))
-        master = KubectlSaltBackend(testinfra.get_host("kubectl://{}?namespace={}".format(next(iter(masters)), namespace)))
-
-        # when
-        minions_json = master.runner("manage.up")
-
-        # then
-        self.assertEqual(len(minions_json), SaltDeploymentTest.minion_count)
-        pong = master.local("'*' test.version")
-        self.assertEqual(len(pong), SaltDeploymentTest.minion_count, "Wrong PONG response: {}".format(pong))
-
     def test_01_minion_delete(self):
         # given
         old_minions = self.minions
@@ -147,7 +133,22 @@ class SaltDeploymentTest(unittest.TestCase):
         new_masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
         self.assertEqual(len(set(old_masters) & set(new_masters)), 0)  # all new masters
 
-    # todo some weird minion loss when salt-run saltutil.sync_all...
+    @retry(Exception, delay=20)
+    def assert_connected_minions(self):
+        # given
+        masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
+
+        if not masters:
+            self.fail("No Salt Master instances found in namespace: {} (in repeatable assertion)".format(namespace))
+        master = KubectlSaltBackend(testinfra.get_host("kubectl://{}?namespace={}".format(next(iter(masters)), namespace)))
+
+        # when
+        minions_json = master.runner("manage.up")
+
+        # then
+        self.assertEqual(len(minions_json), SaltDeploymentTest.minion_count)
+        pong = master.local("'*' test.version")
+        self.assertEqual(len(pong), SaltDeploymentTest.minion_count, "Wrong PONG response: {}".format(pong))
 
 
 class SaltK8sEngineTest(unittest.TestCase):
@@ -161,16 +162,15 @@ class SaltK8sEngineTest(unittest.TestCase):
         self.saltMaster = KubectlSaltBackend(testinfra.get_host("kubectl://{}?namespace={}".format(next(iter(self.masters)), namespace)))
         ns = client.V1Namespace(metadata=client.V1ObjectMeta(name=SaltK8sEngineTest.test_namespace))
         coreV1.create_namespace(body=ns)
+        with open(".travis/k8s-test-deployment.yaml", 'r') as f:
+            self.deployment_yaml = yaml.safe_load(f)
 
     def tearDown(self) -> None:
         coreV1.delete_namespace(name=SaltK8sEngineTest.test_namespace)
 
     def test_01_k8s_events(self):
         # given
-        with open(".travis/k8s-test-deployment.yaml", 'r') as f:
-            body = yaml.safe_load(f)
-
-            appsV1.create_namespaced_deployment(namespace=SaltK8sEngineTest.test_namespace, body=body)
+        appsV1.create_namespaced_deployment(namespace=SaltK8sEngineTest.test_namespace, body=self.deployment_yaml)
 
         # when
         time.sleep(30)
@@ -182,9 +182,21 @@ class SaltK8sEngineTest(unittest.TestCase):
             o = self.saltMaster.run("cat /var/log/salt/events")
             j = [json.loads(e) for e in o.stdout.splitlines()]
             k8s_events = [e for e in j if k8s_events_tag.match(e['tag'])]
+            add_events = [e for e in k8s_events if e['tag'] == 'salt/engines/k8s_events/ADDED']
+            mod_events = [e for e in k8s_events if e['tag'] == 'salt/engines/k8s_events/MODIFIED']
+            self.assertEqual(len(add_events), 2)
+            self.assertEqual(len(mod_events), 6)
+            pods = {}
+            for e in mod_events:
+                pods.setdefault(e['data']['object']['metadata']['name'], []).append(e['data'])
 
-            self.assertEqual(len([e for e in k8s_events if e == 'salt/engines/k8s_events/ADDED']), 2)
-            # try killing pods
+            for k, v in pods.items():
+                if len(v) > 1:
+                    for e in v[1:]:
+                        diff = DeepDiff(v[0], v[1])
+                        log.info("DIFF: {}".format(pp.pformat(diff)))
+                else:
+                    log.info("no diff")
         except Exception as e:
             log.error("Cannot assert k8s_events, all events: \n{}".format(k8s_events))
             log.exception(e)
@@ -193,6 +205,8 @@ class SaltK8sEngineTest(unittest.TestCase):
 
 log = logging.getLogger("k8s-test")
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+
+pp = pprint.PrettyPrinter(indent=4)
 
 # minikube sets KUBECONFIG properly
 config.load_kube_config()
