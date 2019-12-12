@@ -194,8 +194,10 @@ class SaltK8sEngineTest(unittest.TestCase):
         for k, v in pods.items():
             if len(v) > 1:
                 last = v[-1:]
-                #self.assertTrue(last['object']['status']['conditions'][''])
-                log.info("Last modified event status:\n{}".format(pp.pformat(last)))
+                self.assertEqual(last['object']['status']['phase'], "Running")
+                self.assertRegexpMatches(last['object']['status']['hostIP'], "\d+\.\d+\.\d+\.\d+")
+                self.assertRegexpMatches(last['object']['status']['podIP'], "\d+\.\d+\.\d+\.\d+")
+                log.debug("Last modified event status:\n{}".format(pp.pformat(last)))
             else:
                 self.fail("no MODIFIED event received")
 
@@ -217,4 +219,4 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         namespace = sys.argv.pop()
         log.info("Changed namespace to: {}".format(namespace))
-    unittest.main(verbosity=2)
+    unittest.main(verbosity=1)

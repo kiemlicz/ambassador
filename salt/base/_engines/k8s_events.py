@@ -6,8 +6,6 @@ Send events from Kubernetes
 # Import Python Libs
 from __future__ import absolute_import, print_function, unicode_literals
 
-from itertools import chain
-
 import logging
 import queue
 import threading

@@ -139,9 +139,9 @@ saltMinion:
         network.interfaces: []
         network.ip_addrs: []
 
-      #beacons:
-      #  status:
-      #    - interval: 45
+      beacons:
+        status:
+          - interval: 60
 
       logstash_udp_handler:
         host: logstash.salt-provisioning
@@ -162,6 +162,8 @@ saltMinion:
 
       # todo research
       #auth_safemode: False
+      # this is not accounted as communication thus keydel could still remove such minion, this is why beacon is configured
+      # todo confirm !!!!!!!!!!!!
       ping_interval: 1
       # when master rejects this minion, it will try to re-auth, fixme research if helps in master crash case
       # rejected_retry: True
