@@ -175,31 +175,29 @@ class SaltK8sEngineTest(unittest.TestCase):
         time.sleep(30)
 
         # then
-        try:
-            k8s_events = []
-            # fixme this file will contain all k8s events from given namespace
-            o = self.saltMaster.run("cat /var/log/salt/events")
-            j = [json.loads(e) for e in o.stdout.splitlines()]
-            k8s_events = [e for e in j if k8s_events_tag.match(e['tag'])]
-            add_events = [e for e in k8s_events if e['tag'] == 'salt/engines/k8s_events/ADDED']
-            mod_events = [e for e in k8s_events if e['tag'] == 'salt/engines/k8s_events/MODIFIED']
-            self.assertEqual(len(add_events), 2)
-            self.assertEqual(len(mod_events), 6)
-            pods = {}
-            for e in mod_events:
-                pods.setdefault(e['data']['object']['metadata']['name'], []).append(e['data'])
+        # fixme this file will contain all k8s events from given namespace
+        o = self.saltMaster.run("cat /var/log/salt/events")
+        j = [json.loads(e) for e in o.stdout.splitlines()]
+        k8s_events = [e for e in j if k8s_events_tag.match(e['tag'])]
+        add_events = [e for e in k8s_events if e['tag'] == 'salt/engines/k8s_events/ADDED']
+        mod_events = [e for e in k8s_events if e['tag'] == 'salt/engines/k8s_events/MODIFIED']
 
-            for k, v in pods.items():
-                if len(v) > 1:
-                    for e in v[1:]:
-                        diff = DeepDiff(v[0], v[1])
-                        log.info("DIFF: {}".format(pp.pformat(diff)))
-                else:
-                    log.info("no diff")
-        except Exception as e:
-            log.error("Cannot assert k8s_events, all events: \n{}".format(k8s_events))
-            log.exception(e)
-            raise e
+        self.assertEqual(len(add_events), 2)
+        self.assertEqual(len(mod_events), 6)
+
+        pods = {}
+        for e in mod_events:
+            pods.setdefault(e['data']['object']['metadata']['name'], []).append(e['data'])
+
+        self.assertEqual(len(pods), 2, "There must be two Nginx PODs only")
+
+        for k, v in pods.items():
+            if len(v) > 1:
+                last = v[-1:]
+                #self.assertTrue(last['object']['status']['conditions'][''])
+                log.info("Last modified event status:\n{}".format(pp.pformat(last['object']['status'])))
+            else:
+                self.fail("no MODIFIED event received")
 
 
 log = logging.getLogger("k8s-test")
