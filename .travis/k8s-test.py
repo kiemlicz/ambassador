@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import unittest
 import testinfra
 import logging
@@ -8,6 +6,7 @@ import json
 import yaml
 import time
 import re
+import pprint
 from kubernetes import client, config
 from functools import wraps
 from deepdiff import DeepDiff
