@@ -180,6 +180,15 @@ saltMinion:
       #          - die
       #          - oom
 
+clusterRole:
+  verbs:
+    - get
+    - list
+    - watch
+# the create/delete are needed for test purposes
+    - create
+    - delete
+
 persistence:
   saltPkiSelector:
       matchLabels:

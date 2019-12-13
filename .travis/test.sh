@@ -65,15 +65,19 @@ salt-master-run-k8s)
     kubectl create namespace salt-provisioning
     helm install salt deployment/salt -f .travis/travis_values.yaml --namespace salt-provisioning --wait --timeout=300s
 
+    # deployment tests
     python3 .travis/k8s-test.py salt-provisioning
+
+    # upload and run salt tests
+    master=$(kubectl -n salt-provisioning get pod -l app=salt,role=master -o jsonpath='{.items[0].metadata.name}')
+    kubectl -n salt-provisioning cp .travis/k8s-salt-test.py salt-provisioning/$master:/opt/
+    kubectl -n salt-provisioning exec $master -- python3 /opt/k8s-salt-test.py
 
     # wait for logger first, not sure if --wait waits for dependencies
     #kubectl wait -n salt-provisioning pod -l app=logstash --for condition=ready --timeout=5m
     logger=$(kubectl get pod -l app=logstash -n salt-provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
     echo -e "starting logs from: $logger"
     kubectl -n salt-provisioning logs -f $logger &
-
-    #while sleep 5m; do echo -e "\nEvents:$(kubectl get events --all-namespaces)\nStatus:$(kubectl get all --all-namespaces)"; done &
 
     ##echo -e "\nTest 1: should accept new minion\n"
     ##kubectl -n salt-provisioning delete pod -l name=salt-minion

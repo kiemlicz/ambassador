@@ -6,12 +6,5 @@ rules:
   - apiGroups:
       - ""
       - "apps"
-    resources:
-      - pods
-      - namespaces
-      - statefulsets
-      - daemonsets
-    verbs:
-      - get
-      - list
-      - watch
+    resources: {{ .Values.clusterRole.resources | toYaml | nindent 6 }}
+    verbs: {{ .Values.clusterRole.verbs | toYaml | nindent 6 }}

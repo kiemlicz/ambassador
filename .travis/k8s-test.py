@@ -3,9 +3,7 @@ import testinfra
 import logging
 import sys
 import json
-import yaml
 import time
-import re
 import pprint
 from kubernetes import client, config
 from functools import wraps
@@ -131,7 +129,7 @@ class SaltDeploymentTest(unittest.TestCase):
         new_masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
         self.assertEqual(len(set(old_masters) & set(new_masters)), 0)  # all new masters
 
-    @retry(Exception, delay=20)
+    @retry(Exception, delay=10)
     def assert_connected_minions(self):
         # given
         masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
@@ -147,64 +145,6 @@ class SaltDeploymentTest(unittest.TestCase):
         self.assertEqual(len(minions_json), SaltDeploymentTest.minion_count)
         pong = master.local("'*' test.version")
         self.assertEqual(len(pong), SaltDeploymentTest.minion_count, "Wrong PONG response: {}".format(pong))
-        # fixme remove
-        log.info("PONG: {}".format(pong))
-
-
-class SaltK8sEngineTest(unittest.TestCase):
-    test_namespace = "salt-provisioning-test"
-
-    def setUp(self) -> None:
-        self.masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
-        self.minions = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=minion").items]
-        if not self.masters:
-            self.fail("No Salt Master instances found in namespace: {}".format(namespace))
-        self.saltMaster = KubectlSaltBackend(testinfra.get_host("kubectl://{}?namespace={}".format(next(iter(self.masters)), namespace)))
-        ns = client.V1Namespace(metadata=client.V1ObjectMeta(name=SaltK8sEngineTest.test_namespace))
-        coreV1.create_namespace(body=ns)
-        with open(".travis/k8s-test-deployment.yaml", 'r') as f:
-            self.deployment_yaml = yaml.safe_load(f)
-
-    def tearDown(self) -> None:
-        coreV1.delete_namespace(name=SaltK8sEngineTest.test_namespace)
-
-    def test_01_k8s_events(self):
-        # given
-        appsV1.create_namespaced_deployment(namespace=SaltK8sEngineTest.test_namespace, body=self.deployment_yaml)
-
-        # when
-        time.sleep(30)
-
-        # then
-        @retry(Exception, delay=10)
-        def validate():
-            # fixme this file will contain all k8s events from given namespace
-            o = self.saltMaster.run("cat /var/log/salt/events")
-            j = [json.loads(e) for e in o.stdout.splitlines()]
-            k8s_events = [e for e in j if k8s_events_tag.match(e['tag'])]
-            add_events = [e for e in k8s_events if e['tag'] == 'salt/engines/k8s_events/ADDED']
-            mod_events = [e for e in k8s_events if e['tag'] == 'salt/engines/k8s_events/MODIFIED']
-
-            self.assertEqual(len(add_events), 2)
-            self.assertEqual(len(mod_events), 6)
-
-            pods = {}
-            for e in mod_events:
-                pods.setdefault(e['data']['object']['metadata']['name'], []).append(e['data'])
-
-            self.assertEqual(len(pods), 2, "There must be two Nginx PODs only")
-
-            for k, v in pods.items():
-                if len(v) > 1:
-                    last = v[-1:]
-                    log.info("LAST => {}".format(last['object']))
-                    self.assertEqual(last['object']['status']['phase'], "Running")
-                    self.assertRegexpMatches(last['object']['status']['hostIP'], "\d+\.\d+\.\d+\.\d+")
-                    self.assertRegexpMatches(last['object']['status']['podIP'], "\d+\.\d+\.\d+\.\d+")
-                    log.debug("Last modified event status:\n{}".format(pp.pformat(last)))
-                else:
-                    self.fail("no MODIFIED event received")
-        validate()
 
 
 log = logging.getLogger("k8s-test")
@@ -215,8 +155,6 @@ config.load_kube_config()
 coreV1 = client.CoreV1Api()
 appsV1 = client.AppsV1Api()
 namespace = "salt-provisioning"
-
-k8s_events_tag = re.compile("salt/engines/k8s_events/\S+")
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:

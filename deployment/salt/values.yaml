@@ -74,6 +74,19 @@ saltMinion:
     initialDelaySeconds: 60
     periodSeconds: 40
 
+# alter the Salt capabilities, set roles that best suit the needs
+clusterRole:
+  resources:
+    - pods
+    - namespaces
+    - statefulsets
+    - daemonsets
+    - deployments
+  verbs:
+    - get
+    - list
+    - watch
+
 storage:
   enabled: false
   createClass: false
