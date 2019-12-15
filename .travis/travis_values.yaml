@@ -5,16 +5,49 @@ saltMaster:
     pullPolicy: Never
   # travis uses dedicated image
   config:
-    custom.conf: |-
-      #autosign_file: /etc/salt/master.d/autosign
-      #event_return: rawfile_json
-      #rawfile_json.filename: /var/log/salt/events
-      #log_level: debug
-      #log_level_logfile: debug
+    01-master.conf: |-
+      fileserver_backend:
+        - roots
 
+      file_roots:
+        base:
+          - /srv/salt/base
+          - /srv/reactor
+        dev:
+          - /srv/salt/dev
+          - /srv/salt/base
+          - /srv/reactor
+        server:
+          - /srv/salt/server
+          - /srv/salt/dev
+          - /srv/salt/base
+          - /srv/reactor
+
+      autosign_file: /etc/salt/master.d/autosign
+
+      #dumps events to file for easier assertion of success/failure
+      event_return: rawfile_json
+      rawfile_json.filename: /var/log/salt/events
+
+      log_level: info
+
+      ext_pillar_first: True
+      pillar_merge_lists: True
+      pillar_opts: True
+
+      use_superseded:
+        - module.run
+
+      k8s:
+        driver: kubectl
+
+    99-custom.conf: |-
       engines:
         - thorium: {}
-        - k8s_events: {}
+        - k8s_events:
+            watch_defs:
+              - kind: pod
+                namespace: salt-provisioning-test
 
       # queue config
       runner_queue:
@@ -30,16 +63,67 @@ saltMaster:
 
       reactor:
         - 'salt/minion/*/start':
-          - /srv/reactor/minion_ready.sls
+          - /srv/reactor/minion-ready.sls
+        #- 'salt/engines/docker_events/*':
+        #  - /srv/reactor/docker_events_reactor.sls
 
-      color: False
-      log_fmt_console: '[%(levelname)-8s] %(message)s'
-      log_fmt_logfile: '%(asctime)s,%(msecs)03d [%(name)-17s][%(levelname)-8s] %(message)s'
+      log_fmt_console: '%(asctime)s,%(msecs)03d [%(levelname)-8s] %(message)s'
       logstash_udp_handler:
         host: logstash.salt-provisioning
         port: 1514
         version: 1
         msg_type: logstash
+
+    autosign: |-
+      salt-*
+
+    02-netapi.conf: |-
+      rest_cherrypy:
+        port: 8000
+        ssl_crt: /etc/pki/tls/certs/localhost.crt
+        ssl_key: /etc/pki/tls/certs/localhost.key
+
+  pillar:
+    top.sls: |-
+      base:
+        '*':
+          - kubernetes
+    kubernetes.sls: |-
+      salt:
+        kubernetes: {{ "{{" }} salt['sdb.get']("sdb://k8s/daemon_set?name={{ .Values.saltMinion.service.name }}") {{ "}}" }}
+
+  reactor:
+    minion-ready.sls: |-
+      {% if data['id'] is match('salt-minion-\S+') %}
+      k8s_ready:
+          local.state.sls:
+              - tgt: {{ "{{" }} data['id'] {{ "}}" }}
+              - args:
+                - mods:
+                  - minion
+                - saltenv: {{ "{{" }} salt['environ.get']("SALTENV") {{ "}}" }}
+                - pillar:
+                      docker_event: {{ "{{" }} data|tojson {{ "}}" }}
+      {% endif %}
+
+  thorium:
+    top.sls: |-
+      base:
+        '*':
+          - minion
+    minion.sls: |-
+      statreg:
+        status.reg
+
+      keydel:
+        key.timeout:
+          - delete: 90
+          - require:
+            - status: statreg
+
+  apicerts:
+    localhost.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSURTakNDQWpLZ0F3SUJBZ0lZTUM0Mk1EazFNVGt4TlRjMU56TTBOalUyWDU5NGltWDZNQTBHQ1NxR1NJYjMKRFFFQkN3VUFNRjB4Q3pBSkJnTlZCQVlUQWxWVE1RMHdDd1lEVlFRSURBUlZkR0ZvTVJjd0ZRWURWUVFIREE1VApZV3gwSUV4aGEyVWdRMmwwZVRFU01CQUdBMVVFQ2d3SlUyRnNkRk4wWVdOck1SSXdFQVlEVlFRRERBbHNiMk5oCmJHaHZjM1F3SGhjTk1Ua3hNakEzTVRZd05ERTJXaGNOTWpBeE1qQTJNVFl3TkRFMldqQmRNUXN3Q1FZRFZRUUcKRXdKVlV6RU5NQXNHQTFVRUNBd0VWWFJoYURFWE1CVUdBMVVFQnd3T1UyRnNkQ0JNWVd0bElFTnBkSGt4RWpBUQpCZ05WQkFvTUNWTmhiSFJUZEdGamF6RVNNQkFHQTFVRUF3d0piRzlqWVd4b2IzTjBNSUlCSWpBTkJna3Foa2lHCjl3MEJBUUVGQUFPQ0FROEFNSUlCQ2dLQ0FRRUFzWTF0VE9vNGQyYlNEVFhlZDBaOHNSd1RHdlVrK0ZHTUMvbjcKdnF2Y0dIcHFON1hHcVAzSEtKbGc4b3BmTFc1eVZkVzRMVXB2NGFvbmZhelFuSXRSL3hJVWxPeWtyU096bjIxUgphc3lNelRVdnRLaHJHbm91Vnd4N0cyODJZZ0NJSDJKeHF4L1FyUGhDS1FPR045L3lSeFhFVCtLRUhMaG1qOE13Cm14VUU0anVvcklWYmFlT2pPOHpvRDRXSjhIZHdqNjJrVDM3NVFZNGdqTjVXS3FSQlk1bWJSV091b3lWSC9aaGsKTHZlaGNoRXB2WDgxWDJxSGpqYWRKcnhzVkdNSWJoK3NuaWxndnNlYU9SZWEwK0d6Qkd6blZYdGZ0TzU1ZGJQawpPTm8zTU1jQXBJWEp4OUwxeEpudEZ5M2hzLzlybU04RW9haElmbnRDczBXc3hkemN4UUlEQVFBQk1BMEdDU3FHClNJYjNEUUVCQ3dVQUE0SUJBUUNxU2hXclVWT1FUL04wcGVXNnB4VEpSMWEwZjcxbzM5UWZaeUxnQk9pYkVBYkQKanE3SjdXTkM5V21UWU81T2t1aTN1L0JTR2FTL21XNUMzWmRQdzAvWFhtN1ZEbmhwREZ1emhqWnZhNlIyUmRsRwpzdUVFalhya1BLcEVqRC80UHNvVHlOSXpReG82UHZvb2pwaEFwazhNMitqWWpoUU1yNlBHNXZWcFhmODd2YkxqCmwxRS96Q2VnVEJRbjZGM3ZUeFZCWk93K1RjaHZ5K0xaZU16QnNBbmtGYjBtK0hqaGQrc1JlWGkybEg4NzNMYnEKUzFpY0dHSVZZbEJzOExYWjdsZWlxUkdiK1JZNk9TWHJSMng5R1lSejZ5UWMvaDFqM0VGVlJPbWJQVEIyNXVMSApMTWFmZk1jOVZQSzE3SURpWTI2b1g2dHlMYVRYTVpDR3A3VVY1WCtnCi0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0=
+    localhost.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV3QUlCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktvd2dnU21BZ0VBQW9JQkFRQ3hqVzFNNmpoM1p0SU4KTmQ1M1JueXhIQk1hOVNUNFVZd0wrZnUrcTl3WWVtbzN0Y2FvL2Njb21XRHlpbDh0Ym5KVjFiZ3RTbS9ocWlkOQpyTkNjaTFIL0VoU1U3S1N0STdPZmJWRnF6SXpOTlMrMHFHc2FlaTVYREhzYmJ6WmlBSWdmWW5Hckg5Q3MrRUlwCkE0WTMzL0pIRmNSUDRvUWN1R2FQd3pDYkZRVGlPNmlzaFZ0cDQ2TTd6T2dQaFlud2QzQ1ByYVJQZnZsQmppQ00KM2xZcXBFRmptWnRGWTY2akpVZjltR1F1OTZGeUVTbTlmelZmYW9lT05wMG12R3hVWXdodUg2eWVLV0MreDVvNQpGNXJUNGJNRWJPZFZlMSswN25sMXMrUTQyamN3eHdDa2hjbkgwdlhFbWUwWExlR3ovMnVZendTaHFFaCtlMEt6ClJhekYzTnpGQWdNQkFBRUNnZ0VCQUt0ZzBYRitXc2FWam9hRnlwZmloNVVFZmtSMC94eFl5Zzc5V2tzdTQ2RVUKOTlXU05aRUVjK255TWl1cCtEaUg5UUI0Nis5N2ZBYWNFTVl6dXFCL3NjTzhsZlV4ZmJwSlRhWERCT1ZMVDFUNwowM0pUWmg0R2RSZzh5Yzh2UjVUTTRwYzRsSE1Tb0g5MG1aZXcrU3FSbE8rY1NRSzZwNzU1RnpZSXQ2L1pWLzlzCjdtbjdFWVlZOC9RdFN1RW5heG93blVYNXF4aXVyR29CczNXZzM0dVI2RU9FaXdsMU5DSk5DMkRNK3hmdHB2RGUKejVPMTdiVlhxMjBWQndXRFoyeTZ4dklsYmZ1YWR6MS8zakFZM09qVlRYSEVnUGNWZTNhZHZnNkYrb0NYVEo4bwpxTlJHNFcxYXR4MlZnMDJGZHNtbmpiN1lTV0haTW51VHlnZUQ3U1diWEVFQ2dZRUEzcXJsYmZNOXRidGZidmNrCjNOSTZUaUVYdlJLeHZZNHpGSFVsSWUxQmJsc3lvNHVzemNxRHFkT2YyaVJnVzlZSENydjRvamhvWkY1b0p2N2UKK011VU1CZWg4UVZiOHRmNUVIUnl1RHRkMjFFZmdZRjlUbjJVL3VUN05oa1poTTBRUG85NnBCdmdMK1BhODY4Nwp1Ujk1OXdTZWlwaXVkZm1xT0tORzZiQm83L2tDZ1lFQXpDR2ZLelRtWlJ1YkVjYU1PRlZ1aks5OGVlZU83alViCmhWZFF2WUJiVGt2VUpyd0ZKOHgrYjJvaEZ2dlpXTE5tUERzUEJlam1GTUt1Ky9Qb3NxeUVaallFWTdPanlvczIKWWlRTzNyQUsvZ3R2dEY5VGVLRjZxU2tVWlRoMHR3N0wxN2FXOGZON0tRcmJEbWZGMmdJOWNGZ2IwZitUbXBwNwpqOWNhajh1SG5pMENnWUVBemFIUFRYSGtIRytVMjVwYnJaNXIvL2twdmcrRW00UzJBWCtKc2tJME9lRDQ2L1l5CnVMMzhSNXJMTmg1LzZtL0dneEJDdGpVWG14RmdhQnJaK2JPdi81WGpsUDBaQkRTVnE2K092anI5RzJ4WWh6WDUKYmNJbUZodUxMMU9Rc0liY0tKcENiVW5kQ1AwSkdDQk5MRkk0UlhvN204MFMySnFmcTd5RjRZeHI3S2tDZ1lFQQpvTENlNFo1RTk3YWhmWDYwaHV3Sm1FblVUUXBSWTRiKzRScDQvcFA2VEVvNCtUenRPZ1VxU241YkNnSzdkNjNSCmZ2eG11Um83ZElCRXl5V1lPbjYvd3M0bTZtMVJOSEllSDJlUEpSR2p0WlEvSE5nbGwwSldrcTg1MU94NlJGZ3IKY3VYVE1TZWYvaEVEbS9Wb3RGTXJGakxsdzR2VEg5TVlEWVVnN2Ewa1Z3a0NnWUVBckI5VmJ4dEFMSDBVc0ZUSwpob1lscGZDdXN0WDRoZ2JhQ3J5VTFVLzFEUEZZWFpEcmc2aXQ4N0RQNEcya3RUWnAxbzZTcHAxeXVCWnJVYlV6ClVuclFVQU1lbzZVWnVjSndCbEZMdmc3clZ0aXhhZGRXY2RBVW1oWFZQRnk3VzBrQ2w4bzFlczhVWDNwODFIYU4KUmZNeU04bnNoS3NVWFFYbmpvSDl0dXZ2UnBJPQotLS0tLUVORCBQUklWQVRFIEtFWS0tLS0t
 
 saltMinion:
   image:
@@ -48,7 +132,7 @@ saltMinion:
     pullPolicy: Never
 
   config:
-    custom.conf: |-
+    99-custom.conf: |-
       master: "salt-master"
 
       mine_functions:
@@ -57,16 +141,54 @@ saltMinion:
 
       beacons:
         status:
-          - interval: 45
+          - interval: 60
 
-      color: False
-      log_fmt_console: '[%(levelname)-8s] %(message)s'
-      log_fmt_logfile: '%(asctime)s,%(msecs)03d [%(name)-17s][%(levelname)-8s] %(message)s'
       logstash_udp_handler:
         host: logstash.salt-provisioning
         port: 1514
         version: 1
         msg_type: logstash
+
+      use_superseded:
+       - module.run
+
+      #tests are run in docker
+      #override provider because in docker container the default one could be impossible to use (e.g. systemd)
+      providers:
+       service: service
+
+      log_level: info
+      log_fmt_console: '%(asctime)s,%(msecs)03d [%(levelname)-8s] %(message)s'
+
+      # todo research
+      #auth_safemode: False
+      # this is not accounted as communication thus keydel could still remove such minion, this is why beacon is configured
+      # todo confirm !!!!!!!!!!!!
+      ping_interval: 1
+      # when master rejects this minion, it will try to re-auth, fixme research if helps in master crash case
+      # rejected_retry: True
+
+      # switching to k8s_events
+      #engines:
+      # - docker_events:
+      #     docker_url: unix://var/run/docker.sock
+      #     filters:
+      #       event:
+      #          - create
+      #          - start
+      #          - stop
+      #          - die
+      #          - oom
+
+clusterRole:
+  verbs:
+    - get
+    - list
+    - watch
+# the create/delete/patch are needed for test purposes
+    - create
+    - delete
+    - patch
 
 persistence:
   saltPkiSelector:
@@ -92,3 +214,26 @@ volume:
 
 logstash:
   enabled: true
+  fullnameOverride: "logstash"
+  persistence:
+    enabled: false
+  inputs:
+    main: |-
+      input {
+        udp {
+          port => 1514
+          codec => json
+        }
+      }
+  filters:
+    main: |-
+      filter {
+        mutate {
+          remove_field => [ "bracketprocess", "type", "colorname", "@version", "exc_info_on_loglevel", "stack_info", "jid", "tags", "colorprocess", "colormsg", "bracketlevel", "bracketname", "colorlevel" ]
+        }
+      }
+  outputs:
+    main: |-
+      output {
+        stdout { }
+      }

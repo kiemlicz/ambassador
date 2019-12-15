@@ -4,27 +4,93 @@ kind: Deployment
 metadata:
   name: {{ .Values.saltMaster.service.name }}
   labels:
-    app.kubernetes.io/name: {{ include "salt.name" . }}
-    helm.sh/chart: {{ include "salt.chart" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
-    app.kubernetes.io/managed-by: {{ .Release.Service }}
-    app: {{ .Values.saltMaster.service.name }}
+    {{- include "salt.labels" . | nindent 4 }}
+    app: salt
+    role: master
 spec:
   replicas: {{ .Values.saltMaster.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Values.saltMaster.service.name }}
+      app: salt
+      role: master
   template:
     metadata:
       labels:
-        app: {{ .Values.saltMaster.service.name }}
+        app: salt
+        role: master
         name: {{ .Values.saltMaster.service.name }}
     spec:
-      serviceAccount: {{ include "salt.fullname" . }}
-      serviceAccountName: {{ include "salt.fullname" . }}
+      serviceAccount: {{ include "salt.serviceAccountName" . }}
+      serviceAccountName: {{ include "salt.serviceAccountName" . }}
 {{- if .Values.registry.enabled }}
       imagePullSecrets:
         - name: {{ include "salt.fullname" . }}-registry-credentials
+{{- end }}
+      containers:
+        - name: {{ .Values.saltMaster.service.name }}
+          image: {{ .Values.saltMaster.image.repository }}:{{ tpl .Values.saltMaster.image.tag . }}
+          imagePullPolicy: {{ .Values.saltMaster.image.pullPolicy }}
+          readinessProbe: {{ .Values.saltMaster.readinessProbe | toYaml | nindent 12 }}
+          livenessProbe: {{ .Values.saltMaster.livenessProbe | toYaml | nindent 12 }}
+{{- if semverCompare "1.16.0" .Capabilities.KubeVersion.Version }}
+          startupProbe: {{ .Values.saltMaster.startupProbe | toYaml | nindent 12 }}
+{{- end }}
+          ports:
+            - name: publisher
+              containerPort: 4505
+            - name: reqserver
+              containerPort: 4506
+          volumeMounts:
+            - mountPath: /etc/salt/pki/master
+              name: saltpki
+              readOnly: false
+            - mountPath: /var/cache/salt/master/queues
+              name: saltqueue
+              readOnly: false
+            - name: api-certs
+              mountPath: /etc/pki/tls/certs
+              readOnly: true
+            - name: cloud-providers
+              mountPath: /etc/salt/cloud.providers.d
+              readOnly: false
+            - name: thorium
+              mountPath: /srv/thorium
+              readOnly: true
+{{- range $key, $val := .Values.saltMaster.pillar }}
+            - name: pillar-{{ $key | replace "." "-" }}
+              mountPath: /srv/pillar/{{ $key }}
+              subPath: {{ $key }}
+              readOnly: true
+{{- end }}
+{{- range $key, $val := .Values.saltMaster.reactor }}
+            - name: reactor-{{ $key | replace "." "-" }}
+              mountPath: /srv/reactor/{{ $key }}
+              subPath: {{ $key }}
+              readOnly: true
+{{- end }}
+{{- range $key, $val := .Values.saltMaster.config }}
+            - name: master-config-{{ $key | replace "." "-" }}
+              mountPath: /etc/salt/master.d/{{ $key }}
+              subPath: {{ $key }}
+              readOnly: false
+{{- end }}
+{{- if .Values.saltMaster.minion.enabled }}
+        - name: {{ .Values.saltMinion.service.name }}
+          image: {{ .Values.saltMinion.image.repository }}:{{ tpl .Values.saltMinion.image.tag . }}
+          imagePullPolicy: {{ .Values.saltMinion.image.pullPolicy }}
+          readinessProbe: {{ .Values.saltMinion.readinessProbe | toYaml | nindent 12 }}
+          livenessProbe: {{ .Values.saltMinion.livenessProbe | toYaml | nindent 12 }}
+{{- if semverCompare "1.16.0" .Capabilities.KubeVersion.Version }}
+          startupProbe: {{ .Values.saltMinion.startupProbe | toYaml | nindent 12 }}
+{{- end }}
+          volumeMounts:
+            - name: dockersock
+              mountPath: /var/run/docker.sock
+{{- range $key, $val := .Values.saltMinion.config }}
+            - name: minion-config-{{ $key | replace "." "-" }}
+              mountPath: /etc/salt/minion.d/{{ $key }}
+              subPath: {{ $key }}
+{{- end }}
 {{- end }}
       volumes:
 {{- range $key, $val := .Values.saltMaster.config }}
@@ -33,10 +99,25 @@ spec:
             name: {{ $root.Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-config-cm
             defaultMode: 0644
 {{- end }}
-        - name: pillar-overrides
+{{- range $key, $val := .Values.saltMaster.pillar }}
+        - name: pillar-{{ $key | replace "." "-" }}
           configMap:
-            name: {{ .Values.saltMaster.service.name }}-pillar-overrides
+            name: {{ $root.Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-pillar
             defaultMode: 0644
+{{- end }}
+{{- range $key, $val := .Values.saltMaster.reactor }}
+        - name: reactor-{{ $key | replace "." "-" }}
+          configMap:
+            name: {{ $root.Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-reactor
+            defaultMode: 0644
+{{- end }}
+        - name: thorium
+          configMap:
+            name: {{ $root.Values.saltMaster.service.name }}-thorium
+            defaultMode: 0644
+        - name: api-certs
+          secret:
+            secretName: {{ .Values.saltMaster.service.name }}-apicerts
         - name: cloud-providers
           configMap:
             name: {{ .Values.saltMaster.service.name }}-cloud-providers-cm
@@ -54,33 +135,15 @@ spec:
         - name: saltpki
           emptyDir: {}
 {{- end }}
-      containers:
-        - name: {{ .Values.saltMaster.service.name }}
-          image: {{ .Values.saltMaster.image.repository }}:{{ tpl .Values.saltMaster.image.tag . }}
-          imagePullPolicy: {{ .Values.saltMaster.image.pullPolicy }}
-          readinessProbe: {{ .Values.saltMaster.readinessProbe | toYaml | nindent 12 }}
-          livenessProbe: {{ .Values.saltMaster.livenessProbe | toYaml | nindent 12 }}
-          ports:
-            - name: publisher
-              containerPort: 4505
-            - name: reqserver
-              containerPort: 4506
-          volumeMounts:
-            - mountPath: /etc/salt/pki/master
-              name: saltpki
-              readOnly: false
-            - mountPath: /var/cache/salt/master/queues
-              name: saltqueue
-              readOnly: false
-            - mountPath: /etc/salt/cloud.providers.d
-              name: cloud-providers
-              readOnly: false
-            - mountPath: /srv/pillar/overrides
-              name: pillar-overrides
-              readOnly: true
-{{- range $key, $val := .Values.saltMaster.config }}
-            - name: master-config-{{ $key | replace "." "-" }}
-              mountPath: /etc/salt/master.d/{{ $key }}
-              subPath: {{ $key }}
-              readOnly: false
+{{- if .Values.saltMaster.minion.enabled }}
+        - name: dockersock
+          hostPath:
+            path: /var/run/docker.sock
+            type: Socket
+{{- range $key, $val := .Values.saltMinion.config }}
+        - name: minion-config-{{ $key | replace "." "-" }}
+          configMap:
+            name: {{ $root.Values.saltMinion.service.name }}-{{ $key | replace "." "-" }}-config-cm
+            defaultMode: 0644
+{{- end }}
 {{- end }}

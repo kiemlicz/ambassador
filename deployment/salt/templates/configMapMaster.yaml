@@ -21,23 +21,36 @@ data:
 {{- range $key, $val := .Values.saltMaster.cloudProviders }}
   {{ $key }}: {{ tpl $val $root | toYaml | nindent 4 }}
 {{- end }}
+{{- range $key, $val := .Values.saltMaster.pillar }}
 ---
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ .Values.saltMaster.service.name }}-pillar-overrides
+  name: {{ $root.Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-pillar
   labels:
     addonmanager.kubernetes.io/mode: Reconcile
 data:
-  init.sls: {{ tpl .Values.saltMaster.pillar . | toYaml | nindent 4 }}
-{{- range $key, $val := .Values.saltMinion.config }}
+  {{ $key }}: {{ tpl $val $root | toYaml | nindent 4 }}
+{{- end }}
+{{- range $key, $val := .Values.saltMaster.reactor }}
 ---
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ $root.Values.saltMinion.service.name }}-{{ $key | replace "." "-" }}-config-cm
+  name: {{ $root.Values.saltMaster.service.name }}-{{ $key | replace "." "-" }}-reactor
   labels:
     addonmanager.kubernetes.io/mode: Reconcile
 data:
+  {{ $key }}: {{ tpl $val $root | toYaml | nindent 4 }}
+{{- end }}
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ $root.Values.saltMaster.service.name }}-thorium
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+data:
+{{- range $key, $val := .Values.saltMaster.thorium }}
   {{ $key }}: {{ tpl $val $root | toYaml | nindent 4 }}
 {{- end }}

@@ -6,8 +6,6 @@ Send events from Kubernetes
 # Import Python Libs
 from __future__ import absolute_import, print_function, unicode_literals
 
-from itertools import chain
-
 import logging
 import queue
 import threading
@@ -18,8 +16,6 @@ import salt.utils.event
 
 log = logging.getLogger(__name__)
 
-CLIENT_TIMEOUT = 60
-
 __virtualname__ = 'k8s_events'
 
 
@@ -27,7 +23,7 @@ def __virtual__():
     return True
 
 
-def start(timeout=CLIENT_TIMEOUT,
+def start(timeout=None,
           tag='salt/engines/k8s_events',
           watch_defs=None):
     c = _get_client()
@@ -63,8 +59,10 @@ def start(timeout=CLIENT_TIMEOUT,
                 if e is StopIteration: return
                 yield e
         elif len(generators) == 1:
-            return generators[0]
+            log.debug("Single generator")
+            yield from generators[0]
         else:
+            log.info("Empty generators list, nothing to do")
             return []
 
     def fire(tag, msg):
@@ -76,14 +74,19 @@ def start(timeout=CLIENT_TIMEOUT,
         else:
             __salt__['event.send'](tag, msg)
 
-    try:
-        all_watch = [(c.sanitize_for_serialization(e) for e in c.watch_start(watch_def.pop('kind'), **watch_def)) for watch_def in watch_defs]
-        for event in multiplex(all_watch):
-            fire('{0}/{1}'.format(tag, event['type']), event)
-    except Exception as e:
-        log.error("Unable to watch() k8s resources")
-        log.exception(e)
-        c.watch_stop()
+    if watch_defs:
+        try:
+            all_watch_generators = [(c.sanitize_for_serialization(e) for e in c.watch_start(watch_def.pop('kind'), timeout=timeout, **watch_def)) for watch_def in watch_defs]
+            for event in multiplex(all_watch_generators):
+                log.debug("handling event (type: {})".format(event['type']))
+                fire('{0}/{1}'.format(tag, event['type']), event)
+        except Exception as e:
+            log.error("Unable to watch() k8s resources")
+            log.exception(e)
+            c.watch_stop()
+        log.info("Kubernetes watch has stopped")
+    else:
+        log.warning("No watch_defs configured, exiting")
 
 
 def _get_client(profile=None):

@@ -13,9 +13,9 @@ dry)
     if [ "$TRAVIS" = "true" ]; then
         docker_update
     fi
-    docker_build salt-minion "envoy-minion-$DOCKER_IMAGE:$TAG"
-    docker_build salt-master "envoy-master-$DOCKER_IMAGE:$TAG"
-    docker_build dry-test "envoy-dry-test-$DOCKER_IMAGE:$TAG"
+    docker_build salt-minion "$BASE_PUB_NAME-minion-$DOCKER_IMAGE:$TAG"
+    docker_build salt-master "$BASE_PUB_NAME-master-$DOCKER_IMAGE:$TAG"
+    docker_build dry-test "$BASE_PUB_NAME-dry-test-$DOCKER_IMAGE:$TAG"
     ;;
 masterless)
     if [ "$TRAVIS" = "true" ]; then
@@ -40,8 +40,8 @@ salt-master-run-k8s)
     sudo mkdir -p /mnt/data/saltpki /mnt/data/saltqueue
     # build images that are used for provisioning (salt master's and minion's)
     # only one of each is required per one node cluster
-    docker_build master-k8s-test salt-master
-    docker_build minion-k8s-test salt-minion
+    docker_build salt-master salt-master
+    docker_build salt-minion salt-minion
 
     # Temporary dir for storing new packaged charts and index files
     mkdir $BUILD_DIR

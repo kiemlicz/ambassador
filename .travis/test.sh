@@ -25,10 +25,11 @@ k8s_log_error() {
     esac
 }
 
+while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+
 case "$1" in
 dry)
-    while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
-    docker run --privileged "envoy-dry-test-$DOCKER_IMAGE:$TAG"
+    docker run --privileged "$BASE_PUB_NAME-dry-test-$DOCKER_IMAGE:$TAG"
     result=$?
     kill %1
     # in order to return proper exit code instead of always 0 (of kill command)
@@ -37,7 +38,6 @@ dry)
 masterless)
     # privileged mode is necessary for e.g. setting: net.ipv4.ip_forward or running docker in docker
     name="ambassador-salt-masterless-run-$TRAVIS_JOB_NUMBER"
-    while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
     docker run --name $name --hostname "$CONTEXT-host" --privileged "masterless-test-$DOCKER_IMAGE:$TAG" 2>&1 | tee output
     exit_code=${PIPESTATUS[0]}  # gets the exit code of first (piped) process
     kill %1
@@ -61,43 +61,51 @@ salt-master-run-k8s)
     echo -e "Starting kubernetes deployment\n$(date)\n"
     trap k8s_log_error EXIT TERM INT
 
+    ns="salt-provisioning"
     helm dependency update deployment/salt
-    kubectl create namespace salt-provisioning
-    helm install salt deployment/salt -f .travis/travis_values.yaml --namespace salt-provisioning --wait --timeout=300s
+    kubectl create namespace $ns
+    helm install salt deployment/salt -f .travis/travis_values.yaml --namespace $ns --wait --timeout=300s
+
+    # deployment tests
+    python3 .travis/k8s-test.py $ns
+
+    # upload and run salt tests
+    master=$(kubectl -n $ns get pod -l app=salt,role=master -o jsonpath='{.items[0].metadata.name}')
+    kubectl -n $ns cp .travis/k8s-salt-test.py $ns/$master:/opt/
+    kubectl -n $ns exec $master -- pip3 install timeout_decorator
+    kubectl -n $ns exec $master -- python3 /opt/k8s-salt-test.py
 
     # wait for logger first, not sure if --wait waits for dependencies
     #kubectl wait -n salt-provisioning pod -l app=logstash --for condition=ready --timeout=5m
-    logger=$(kubectl get pod -l app=logstash -n salt-provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+    logger=$(kubectl get pod -l app=logstash -n $ns -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
     echo -e "starting logs from: $logger"
-    kubectl -n salt-provisioning logs -f $logger &
+    kubectl -n $ns logs -f $logger &
 
-    #while sleep 5m; do echo -e "\nEvents:$(kubectl get events --all-namespaces)\nStatus:$(kubectl get all --all-namespaces)"; done &
-
-    echo -e "\nTest 1: should accept new minion\n"
-    kubectl -n salt-provisioning delete pod -l name=salt-minion
-    kubectl -n salt-provisioning wait pod -l name=salt-minion --for condition=ready --timeout=5m
+    ##echo -e "\nTest 1: should accept new minion\n"
+    ##kubectl -n salt-provisioning delete pod -l name=salt-minion
+    ##kubectl -n salt-provisioning wait pod -l name=salt-minion --for condition=ready --timeout=5m
 # this will still contain old minion that will fail the ping
 #    echo "Pinging minions"
 #    kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt '*' test.ping
 
-    echo -e "\nTest 2: should work after master crash\n"
-    kubectl -n salt-provisioning delete pod -l name=salt-master
-    kubectl -n salt-provisioning wait pod -l name=salt-master --for condition=ready --timeout=5m
+    ##echo -e "\nTest 2: should work after master crash\n"
+    ##kubectl -n salt-provisioning delete pod -l name=salt-master
+    ##kubectl -n salt-provisioning wait pod -l name=salt-master --for condition=ready --timeout=5m
 
     # the minion must first re-auth to master that got down, will do that after auth_timeout (?) + thorium re-scan
     # it will finally clean the old keys but honestly, why does it take so long?
-    sleep 180
-    echo -e "\nAfter 3 min sleep: listing who's up"
-    master=$(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}')
-    kubectl -n salt-provisioning exec -it $master -- salt-key -L
-    kubectl -n salt-provisioning exec -it $master -- salt-run manage.up
+    ##sleep 180
+    ##echo -e "\nAfter 3 min sleep: listing who's up"
+    master=$(kubectl -n $ns get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}')
+#    kubectl -n salt-provisioning exec -it $master -- salt-key -L
+#    kubectl -n salt-provisioning exec -it $master -- salt-run manage.up
     echo -e "\nSalt-master POD logs:\n"
-    kubectl -n salt-provisioning logs $master
+    kubectl -n $ns logs $master
 # fixme
 # this will still contain old minion that will fail the ping
 #    echo "Pinging minions"
 #    kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt '*' test.ping
 
-    echo "Deployment finished"
+    echo "Deployment testing finished"
     ;;
 esac

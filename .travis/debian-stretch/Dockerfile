@@ -9,11 +9,18 @@ RUN apt-get update && apt-get install -y procps curl dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver
 
+# sync via _log_handlers does nothing... forcing override of installed packages
+# temporary workaound until PR with this fix is merged&released
+COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/
+
 WORKDIR /srv
 
 
 FROM salt-base AS salt-minion
 # hostname from `docker run -h` must be used as minion ID
+
+RUN apt-get install -y python3-pip && \
+    pip3 install --upgrade docker
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD [ "/usr/bin/salt-minion" ]
@@ -21,38 +28,59 @@ CMD [ "/usr/bin/salt-minion" ]
 
 FROM salt-base AS salt-master
 
+ARG api_enabled=false
+ARG k8s_api_enabled=false
+ARG kubectl_ver
+ARG saltenv
+ENV API_ENABLED=$api_enabled
+ENV K8S_API_ENABLED=$k8s_api_enabled
+ENV SALTENV=$saltenv
+
+# minimalistic config
+COPY .travis/config/master.conf /etc/salt/master.d/01-master.conf
+COPY .travis/debian-stretch/entrypoint.sh /opt/
+
 RUN echo "deb http://ftp.debian.org/debian stretch-backports main" >> /etc/apt/sources.list.d/backports.list && \
     apt-get update && \
     apt-get install -t stretch-backports -y libgit2-dev && \
     apt-get install -y python3-pip libffi-dev git && \
-    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 20 && \
-    pip install --upgrade pyOpenSSL pygit2 docker-py cherrypy jinja2 requests_oauthlib google-auth && \
+    pip3 install --upgrade pyOpenSSL pygit2 docker-py cherrypy jinja2 requests_oauthlib google-auth && \
     apt-get install -y salt-master
 
-# PyYAML
-#pip install --upgrade --default-timeout=300 pip && hash -r pip && \
-# the salt-master should be installed but not running
+RUN if [ "$API_ENABLED" = true ]; then \
+        apt-get install -y salt-api; \
+    fi
+
+RUN if [ "$K8S_API_ENABLED" = true ]; then \
+        curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_ver/bin/linux/amd64/kubectl && \
+        chmod +x kubectl && \
+        mv kubectl /usr/bin/ && \
+        pip3 install kubernetes==10.0.1 && \
+        salt-run saltutil.sync_all; \
+    fi
+
 EXPOSE 4505:4505 4506:4506
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD [ "/usr/bin/salt-master" ]
+CMD [ "/opt/entrypoint.sh" ]
 
 
 FROM salt-master AS salt-master-foreman-proxy
 
-COPY .travis/debian-stretch/entrypoint.sh /opt/
+COPY .travis/debian-stretch/entrypoint-smart-proxy.sh /opt/
 
 RUN echo "deb http://deb.theforeman.org/ stretch 1.23" >> /etc/apt/sources.list.d/foreman.list && \
     wget -q https://deb.theforeman.org/pubkey.gpg -O- | apt-key add - && \
     apt-get update && \
     apt-get install -y foreman-proxy
 
-CMD [ "/opt/entrypoint.sh" ]
+CMD [ "/opt/entrypoint-smart-proxy.sh" ]
 
 
 FROM salt-base AS dry-test
 
-COPY .travis/reactor /srv/reactor
+#todo this reactor doesn't seem to be necessary
+#COPY .travis/reactor /srv/reactor
 COPY .travis/salt/dry-test-top.sls /srv/salt/base/top.sls
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
 COPY .travis/envoy_test.py /opt/
@@ -103,42 +131,18 @@ COPY .travis/config/reactor/orch /srv/reactor
 COPY .travis/pillar/ /srv/pillar/
 COPY .travis/salt/ /srv/salt/
 COPY .travis/salt/dev/top.sls /srv/salt/base/
-COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/
 
 RUN chmod 600 /etc/salt/autosign.conf && \
     salt-run saltutil.sync_all
 
 CMD [ "/opt/entrypoint_master_run.sh" ]
 
-
+# todo remove this image
 FROM salt-master AS master-k8s-test
 
-ARG saltenv
-ARG log_level
-ARG kubectl_ver
-
-ENV SALTENV=$saltenv
-ENV LOG_LEVEL=$log_level
-
+# todo scan differently and remove scan_events with its weird entrypoint
 COPY .travis/entrypoint_master_run.sh /opt/
 COPY .travis/scan_events.py /opt/
-COPY .travis/config/master.conf /etc/salt/master.d/master.conf
-COPY .travis/config/autosign.conf /etc/salt/autosign.conf
-COPY .travis/config/reactor_k8s.conf /etc/salt/master.d/reactor.conf
-COPY .travis/config/reactor/k8s /srv/reactor
-COPY .travis/thorium/ /srv/thorium/
-COPY .travis/pillar/ /srv/pillar/
-COPY .travis/salt/ /srv/salt/
-# sync via _log_handlers does nothing... forcing override of installed packages
-# todo move to the base master / minion images
-COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/
-
-RUN curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_ver/bin/linux/amd64/kubectl && \
-    chmod +x kubectl && \
-    mv kubectl /usr/bin/ && \
-    chmod 600 /etc/salt/autosign.conf && \
-    pip install --upgrade kubernetes && \
-    salt-run saltutil.sync_all
 
 CMD [ "/opt/entrypoint_master_run.sh" ]
 
@@ -148,11 +152,10 @@ FROM salt-minion as minion-compose-test
 COPY .travis/config/minion.conf /etc/salt/minion.d/minion.conf
 
 
+# todo remove this image
 FROM salt-minion as minion-k8s-test
 
 COPY .travis/config/minion.conf /etc/salt/minion.d/minion.conf
-COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/
 
 RUN apt-get install -y python3-pip && \
-    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 20 && \
-    pip install docker redis
+    pip3 install docker

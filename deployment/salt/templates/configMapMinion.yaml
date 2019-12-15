@@ -1,0 +1,12 @@
+{{- $root := . -}}
+{{- range $key, $val := .Values.saltMinion.config }}
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ $root.Values.saltMinion.service.name }}-{{ $key | replace "." "-" }}-config-cm
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
+data:
+  {{ $key }}: {{ tpl $val $root | toYaml | nindent 4 }}
+{{- end }}

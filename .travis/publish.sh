@@ -4,11 +4,11 @@ source .travis/common.sh
 
 case "$1" in
 docker)
-  docker tag "envoy-minion-$DOCKER_IMAGE:$TAG" "$DOCKER_USERNAME/envoy-minion-$DOCKER_IMAGE:$TAG"
-  docker tag "envoy-master-$DOCKER_IMAGE:$TAG" "$DOCKER_USERNAME/envoy-master-$DOCKER_IMAGE:$TAG"
+  docker tag "$BASE_PUB_NAME-minion-$DOCKER_IMAGE:$TAG" "$DOCKER_USERNAME/$BASE_PUB_NAME-minion-$DOCKER_IMAGE:$TAG"
+  docker tag "$BASE_PUB_NAME-master-$DOCKER_IMAGE:$TAG" "$DOCKER_USERNAME/$BASE_PUB_NAME-master-$DOCKER_IMAGE:$TAG"
 
-  docker_push "$DOCKER_USERNAME/envoy-minion-$DOCKER_IMAGE:$TAG"
-  docker_push "$DOCKER_USERNAME/envoy-master-$DOCKER_IMAGE:$TAG"
+  docker_push "$DOCKER_USERNAME/$BASE_PUB_NAME-minion-$DOCKER_IMAGE:$TAG"
+  docker_push "$DOCKER_USERNAME/$BASE_PUB_NAME-master-$DOCKER_IMAGE:$TAG"
   ;;
 chart)
   echo "Uploading contents of: $BUILD_DIR"

@@ -1,6 +1,9 @@
 nameOverride: "salt"
 fullnameOverride: ""
 
+serviceAccount:
+  create: true
+
 saltMaster:
   replicaCount: 1
 
@@ -13,48 +16,20 @@ saltMaster:
     name: salt-master
     annotations: {}
 
-  config:
-    custom.conf: |-
-      #autosign_file: /etc/salt/master.d/autosign
-      #event_return: rawfile_json
-      #rawfile_json.filename: /var/log/salt/events
-      #log_level: debug
-      #log_level_logfile: debug
-
-      engines:
-        - thorium: {}
-        - k8s_events: {}
-
-      # queue config
-      runner_queue:
-        queue: runner_queue
-        backend: sqlite
-
-      schedule:
-        runner_queue:
-          function: queue.process_runner
-          minutes: 1
-          kwargs:
-            quantity: 1
-
-      reactor:
-        - 'salt/minion/*/start':
-          - /srv/reactor/minion_ready.sls
-
-      {{- if .Values.logstash.enabled }}
-      color: False
-      logstash_udp_handler:
-        host: logstash.logging
-        port: 1514
-        version: 1
-        msg_type: logstash
-      {{- end }}
+  # /etc/salt/master.d/ config files, must end with .conf suffix
+  config: {}
 
   cloudProviders: {}
 
-  pillar: |-
-    salt:
-      kubernetes: {{ "{{" }} salt['sdb.get']("sdb://k8s/daemon_set?name={{ .Values.saltMinion.service.name }}") {{ "}}" }}
+  pillar: {}
+
+  # the reactor sls files
+  reactor: {}
+
+  # the thorium state tree
+  thorium: {}
+
+  apicerts: {}
 
   readinessProbe:
     tcpSocket:
@@ -65,8 +40,14 @@ saltMaster:
   livenessProbe:
     tcpSocket:
       port: publisher
-    initialDelaySeconds: 60
+    initialDelaySeconds: 45
     periodSeconds: 40
+
+  startupProbe: {}
+
+  # Deploy Salt Minion container to the Salt Master POD
+  minion:
+    enabled: false
 
 saltMinion:
   image:
@@ -77,42 +58,46 @@ saltMinion:
   service:
     name: salt-minion
 
-  config:
-    custom.conf: |-
-      master: "salt-master"
+  config: {}
 
-      mine_functions:
-        network.interfaces: []
-        network.ip_addrs: []
-
-      beacons:
-        status:
-          - interval: 45
-
-      {{- if .Values.logstash.enabled }}
-      color: False
-      logstash_udp_handler:
-        host: logstash.logging
-        port: 1514
-        version: 1
-        msg_type: logstash
-      {{- end }}
-
+  # not using --local in minion probes, this way the probe succeeds only when established master communication
+  # still not sure if this is good idea (master crash will cause minion restart as well)
   readinessProbe:
     exec:
       command:
-        - cat
-        - /tmp/salt/healthz
-    initialDelaySeconds: 60
-    periodSeconds: 30
+        - salt-call
+        - --local
+        - test.ping
+    initialDelaySeconds: 15
+    periodSeconds: 20
 
   livenessProbe:
     exec:
       command:
-        - cat
-        - /tmp/salt/healthz
-    initialDelaySeconds: 120
-    periodSeconds: 60
+        - salt-call
+        - --local
+        - test.ping
+    initialDelaySeconds: 45
+    periodSeconds: 40
+
+  # typically when --local is used for readiness/liveness probe the startup probe shouldn't be defined
+  startupProbe: {}
+
+  # pick nodes where Salt Minion should be deployed
+  nodeSelector: {}
+
+# alter the Salt capabilities, set roles that best suit the needs
+clusterRole:
+  resources:
+    - pods
+    - namespaces
+    - statefulsets
+    - daemonsets
+    - deployments
+  verbs:
+    - get
+    - list
+    - watch
 
 storage:
   enabled: false
@@ -149,7 +134,6 @@ volume:
 
 logstash:
   enabled: false
-  fullnameOverride: "logstash"
   livenessProbe:
     httpGet:
       path: /
@@ -168,8 +152,6 @@ logstash:
     timeoutSeconds: 60
     failureThreshold: 6
     successThreshold: 1
-  persistence:
-    enabled: false
   service:
     ports:
       syslog-udp:
@@ -187,17 +169,3 @@ logstash:
     - name: beats
       containerPort: 5044
       protocol: TCP
-  inputs:
-    main: |-
-      input {
-        udp {
-          port => 1514
-          codec => json
-        }
-      }
-
-  outputs:
-    main: |-
-      output {
-        stdout { }
-      }

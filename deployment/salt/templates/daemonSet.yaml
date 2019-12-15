@@ -4,22 +4,28 @@ kind: DaemonSet
 metadata:
   name: {{ .Values.saltMinion.service.name }}
   labels:
-    app: {{ .Values.saltMinion.service.name }}
+    {{- include "salt.labels" . | nindent 4 }}
+    app: salt
+    role: minion
 spec:
   selector:
     matchLabels:
-      name: {{ .Values.saltMinion.service.name }}
+      app: salt
+      role: minion
   template:
     metadata:
       labels:
+        app: salt
+        role: minion
         name: {{ .Values.saltMinion.service.name }}
     spec:
-      serviceAccount: {{ include "salt.fullname" . }}
-      serviceAccountName: {{ include "salt.fullname" . }}
-      {{- if .Values.registry.enabled }}
+      serviceAccount: {{ include "salt.serviceAccountName" . }}
+      serviceAccountName: {{ include "salt.serviceAccountName" . }}
+{{- if .Values.registry.enabled }}
       imagePullSecrets:
         - name: {{ include "salt.fullname" . }}-registry-credentials
-      {{- end }}
+{{- end }}
+      nodeSelector: {{ .Values.saltMinion.nodeSelector | toYaml | nindent 8 }}
       terminationGracePeriodSeconds: 30
       containers:
         - name: {{ .Values.saltMinion.service.name }}
@@ -27,6 +33,9 @@ spec:
           imagePullPolicy: {{ .Values.saltMinion.image.pullPolicy }}
           readinessProbe: {{ .Values.saltMinion.readinessProbe | toYaml | nindent 12 }}
           livenessProbe: {{ .Values.saltMinion.livenessProbe | toYaml | nindent 12 }}
+{{- if semverCompare "1.16.0" .Capabilities.KubeVersion.Version }}
+          startupProbe: {{ .Values.saltMinion.startupProbe | toYaml | nindent 12 }}
+{{- end }}
           volumeMounts:
             - name: dockersock
               mountPath: /var/run/docker.sock

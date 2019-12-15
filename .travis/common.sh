@@ -35,6 +35,8 @@ docker_build() {
         "--build-arg=log_level=${LOG_LEVEL-info}"
         "--build-arg=saltenv=$SALTENV"
         "--build-arg=kubectl_ver=$KUBECTL_VER"
+        "--build-arg=api_enabled=${API_ENABLED-false}"
+        "--build-arg=k8s_api_enabled=${K8S_API_ENABLED-false}"
     )
     if [ ! -z $BASE_IMAGE_TAG ]; then
         build_args+=("--build-arg=tag=$BASE_IMAGE_TAG")
@@ -57,6 +59,7 @@ salt_install() {
     sudo mkdir -p /etc/salt/minion.d/
     sudo cp ${1-".travis/config/masterless.conf"} /etc/salt/minion.d/
     sudo ln -s $TRAVIS_BUILD_DIR/salt /srv/salt
+    #fixme rename k8s to something more meaningful (this is the minikube setup)
     sudo ln -s $TRAVIS_BUILD_DIR/.travis/pillar/k8s /srv/pillar
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com
     sudo sh /tmp/bootstrap-salt.sh -x python3 -n stable
