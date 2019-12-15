@@ -40,8 +40,10 @@ saltMaster:
   livenessProbe:
     tcpSocket:
       port: publisher
-    initialDelaySeconds: 60
+    initialDelaySeconds: 45
     periodSeconds: 40
+
+  startupProbe: {}
 
   # Deploy Salt Minion container to the Salt Master POD
   minion:
@@ -75,8 +77,11 @@ saltMinion:
         - salt-call
         - --local
         - test.ping
-    initialDelaySeconds: 60
+    initialDelaySeconds: 45
     periodSeconds: 40
+
+  # typically when --local is used for readiness/liveness probe the startup probe shouldn't be defined
+  startupProbe: {}
 
   # pick nodes where Salt Minion should be deployed
   nodeSelector: {}

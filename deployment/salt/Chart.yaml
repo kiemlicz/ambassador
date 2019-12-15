@@ -4,6 +4,11 @@ description: Salt deployment for in-k8s automations and orchestration
 name: salt
 version: 2.0.1
 type: application
+
+maintainers:
+  - name: kiemlicz
+    email: stanislaw.dev@gmail.com
+
 dependencies:
   - name: logstash
     version: 2.3.0
