@@ -61,23 +61,25 @@ salt-master-run-k8s)
     echo -e "Starting kubernetes deployment\n$(date)\n"
     trap k8s_log_error EXIT TERM INT
 
+    ns="salt-provisioning"
     helm dependency update deployment/salt
-    kubectl create namespace salt-provisioning
-    helm install salt deployment/salt -f .travis/travis_values.yaml --namespace salt-provisioning --wait --timeout=300s
+    kubectl create namespace $ns
+    helm install salt deployment/salt -f .travis/travis_values.yaml --namespace $ns --wait --timeout=300s
 
     # deployment tests
-    python3 .travis/k8s-test.py salt-provisioning
+    python3 .travis/k8s-test.py $ns
 
     # upload and run salt tests
-    master=$(kubectl -n salt-provisioning get pod -l app=salt,role=master -o jsonpath='{.items[0].metadata.name}')
-    kubectl -n salt-provisioning cp .travis/k8s-salt-test.py salt-provisioning/$master:/opt/
-    kubectl -n salt-provisioning exec $master -- python3 /opt/k8s-salt-test.py
+    master=$(kubectl -n $ns get pod -l app=salt,role=master -o jsonpath='{.items[0].metadata.name}')
+    kubectl -n $ns cp .travis/k8s-salt-test.py $ns/$master:/opt/
+    kubectl -n $ns exec $master -- pip3 install timeout_decorator
+    kubectl -n $ns exec $master -- python3 /opt/k8s-salt-test.py
 
     # wait for logger first, not sure if --wait waits for dependencies
     #kubectl wait -n salt-provisioning pod -l app=logstash --for condition=ready --timeout=5m
-    logger=$(kubectl get pod -l app=logstash -n salt-provisioning -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+    logger=$(kubectl get pod -l app=logstash -n $ns -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
     echo -e "starting logs from: $logger"
-    kubectl -n salt-provisioning logs -f $logger &
+    kubectl -n $ns logs -f $logger &
 
     ##echo -e "\nTest 1: should accept new minion\n"
     ##kubectl -n salt-provisioning delete pod -l name=salt-minion
@@ -94,11 +96,11 @@ salt-master-run-k8s)
     # it will finally clean the old keys but honestly, why does it take so long?
     ##sleep 180
     ##echo -e "\nAfter 3 min sleep: listing who's up"
-    master=$(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}')
+    master=$(kubectl -n $ns get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}')
 #    kubectl -n salt-provisioning exec -it $master -- salt-key -L
 #    kubectl -n salt-provisioning exec -it $master -- salt-run manage.up
     echo -e "\nSalt-master POD logs:\n"
-    kubectl -n salt-provisioning logs $master
+    kubectl -n $ns logs $master
 # fixme
 # this will still contain old minion that will fail the ping
 #    echo "Pinging minions"

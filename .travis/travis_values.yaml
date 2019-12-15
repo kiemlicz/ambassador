@@ -188,6 +188,7 @@ clusterRole:
 # the create/delete are needed for test purposes
     - create
     - delete
+    - patch
 
 persistence:
   saltPkiSelector:
