@@ -16,6 +16,7 @@ env:
     - GH_URL="https://kiemlicz.github.io/ambassador/"
     - BUILD_DIR=".local"
     - CHART_BRANCH="gh-pages"
+    - BASE_PUB_NAME="envoy"
 
 jobs:
   allow_failures:
@@ -113,7 +114,6 @@ jobs:
         - CONTEXT=k8s
         - K8S_API_ENABLED=true
         - CHANGE_MINIKUBE_NONE_USER=true # adjusts minikube permissions when driver=none
-        - BASE_PUB_NAME="envoy"
       before_install: .travis/prepare.sh salt-master-run-k8s
       script: .travis/test.sh salt-master-run-k8s
       after_success: .travis/publish.sh chart
