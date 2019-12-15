@@ -13,9 +13,9 @@ dry)
     if [ "$TRAVIS" = "true" ]; then
         docker_update
     fi
-    docker_build salt-minion "envoy-minion-$DOCKER_IMAGE:$TAG"
-    docker_build salt-master "envoy-master-$DOCKER_IMAGE:$TAG"
-    docker_build dry-test "envoy-dry-test-$DOCKER_IMAGE:$TAG"
+    docker_build salt-minion "$BASE_PUB_NAME-minion-$DOCKER_IMAGE:$TAG"
+    docker_build salt-master "$BASE_PUB_NAME-master-$DOCKER_IMAGE:$TAG"
+    docker_build dry-test "$BASE_PUB_NAME-dry-test-$DOCKER_IMAGE:$TAG"
     ;;
 masterless)
     if [ "$TRAVIS" = "true" ]; then

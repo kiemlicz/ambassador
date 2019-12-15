@@ -29,7 +29,7 @@ while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
 
 case "$1" in
 dry)
-    docker run --privileged "envoy-dry-test-$DOCKER_IMAGE:$TAG"
+    docker run --privileged "$BASE_PUB_NAME-dry-test-$DOCKER_IMAGE:$TAG"
     result=$?
     kill %1
     # in order to return proper exit code instead of always 0 (of kill command)

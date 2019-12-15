@@ -122,12 +122,11 @@ class SaltK8sEngineTest(unittest.TestCase):
         appsV1.delete_namespaced_deployment(name="k8s-test-nginx-deployment", namespace=SaltK8sEngineTest.test_namespace)
 
         # then
-        k8s_events = list(islice(self.event_stream.iter_events(tag='salt/engines/k8s_events/*', match_type="fnmatch"), 12))
-        mod_events = [e for e in k8s_events if e['type'] == 'MODIFIED']
+        k8s_events = list(islice(self.event_stream.iter_events(tag='salt/engines/k8s_events/DELETED', match_type="fnmatch"), 3))
         del_events = [e for e in k8s_events if e['type'] == 'DELETED']
-        self.assertEqual(len(k8s_events), 12, "improper total number of events")
-        self.assertEqual(len(mod_events), 9, "improper total number of 'modified' events\n{}".format(pp.pformat(mod_events)))
-        self.assertEqual(len(del_events), 3, "improper total number of 'deleted' events\n{}".format(pp.pformat(del_events)))
+        # the number of MODIFIED events depends on many factors, thus we don't gather it
+        self.assertEqual(len(k8s_events), 3, "improper total number of events")
+        self.assertEqual(len(del_events), 3, "improper total number of 'deleted' events\n{}".format(pp.pformat([{'name': e['object']['metadata']['name'], 'type': e['type']} for e in del_events])))
 
 
 log = logging.getLogger("k8s-test")
