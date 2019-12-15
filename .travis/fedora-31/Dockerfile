@@ -1,4 +1,4 @@
-ARG tag="30"
+ARG tag="31"
 FROM fedora:$tag AS salt-base
 # "" == latest
 ARG salt_ver=""
