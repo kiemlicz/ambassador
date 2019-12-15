@@ -25,6 +25,7 @@ spec:
       imagePullSecrets:
         - name: {{ include "salt.fullname" . }}-registry-credentials
 {{- end }}
+      nodeSelector: {{ .Values.saltMinion.nodeSelector | toYaml | nindent 8 }}
       terminationGracePeriodSeconds: 30
       containers:
         - name: {{ .Values.saltMinion.service.name }}

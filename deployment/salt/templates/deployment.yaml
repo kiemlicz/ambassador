@@ -71,6 +71,21 @@ spec:
               subPath: {{ $key }}
               readOnly: false
 {{- end }}
+{{- if .Values.saltMaster.minion.enabled }}
+        - name: {{ .Values.saltMinion.service.name }}
+          image: {{ .Values.saltMinion.image.repository }}:{{ tpl .Values.saltMinion.image.tag . }}
+          imagePullPolicy: {{ .Values.saltMinion.image.pullPolicy }}
+          readinessProbe: {{ .Values.saltMinion.readinessProbe | toYaml | nindent 12 }}
+          livenessProbe: {{ .Values.saltMinion.livenessProbe | toYaml | nindent 12 }}
+          volumeMounts:
+            - name: dockersock
+              mountPath: /var/run/docker.sock
+{{- range $key, $val := .Values.saltMinion.config }}
+            - name: minion-config-{{ $key | replace "." "-" }}
+              mountPath: /etc/salt/minion.d/{{ $key }}
+              subPath: {{ $key }}
+{{- end }}
+{{- end }}
       volumes:
 {{- range $key, $val := .Values.saltMaster.config }}
         - name: master-config-{{ $key | replace "." "-" }}
@@ -113,4 +128,16 @@ spec:
           emptyDir: {}
         - name: saltpki
           emptyDir: {}
+{{- end }}
+{{- if .Values.saltMaster.minion.enabled }}
+        - name: dockersock
+          hostPath:
+            path: /var/run/docker.sock
+            type: Socket
+{{- range $key, $val := .Values.saltMinion.config }}
+        - name: minion-config-{{ $key | replace "." "-" }}
+          configMap:
+            name: {{ $root.Values.saltMinion.service.name }}-{{ $key | replace "." "-" }}-config-cm
+            defaultMode: 0644
+{{- end }}
 {{- end }}

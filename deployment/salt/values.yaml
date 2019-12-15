@@ -43,6 +43,10 @@ saltMaster:
     initialDelaySeconds: 60
     periodSeconds: 40
 
+  # Deploy Salt Minion container to the Salt Master POD
+  minion:
+    enabled: false
+
 saltMinion:
   image:
     repository: "envoy-minion-debian-stretch"
@@ -73,6 +77,9 @@ saltMinion:
         - test.ping
     initialDelaySeconds: 60
     periodSeconds: 40
+
+  # pick nodes where Salt Minion should be deployed
+  nodeSelector: {}
 
 # alter the Salt capabilities, set roles that best suit the needs
 clusterRole:

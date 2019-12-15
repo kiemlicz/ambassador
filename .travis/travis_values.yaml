@@ -185,7 +185,7 @@ clusterRole:
     - get
     - list
     - watch
-# the create/delete are needed for test purposes
+# the create/delete/patch are needed for test purposes
     - create
     - delete
     - patch
