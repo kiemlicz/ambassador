@@ -24,8 +24,17 @@
        'stretch': {
             'pkg_name': "foreman-installer",
             'names': [
-                "deb http://deb.theforeman.org/ stretch 1.23",
-                "deb http://deb.theforeman.org/ plugins 1.23"
+                "deb http://deb.theforeman.org/ stretch 1.24",
+                "deb http://deb.theforeman.org/ plugins 1.24"
+            ],
+            'file': "/etc/apt/sources.list.d/foreman.list",
+            'key_url': "https://deb.theforeman.org/pubkey.gpg"
+       },
+       'buster': {
+            'pkg_name': "foreman-installer",
+            'names': [
+                "deb http://deb.theforeman.org/ buster 1.24",
+                "deb http://deb.theforeman.org/ plugins 1.24"
             ],
             'file': "/etc/apt/sources.list.d/foreman.list",
             'key_url': "https://deb.theforeman.org/pubkey.gpg"
