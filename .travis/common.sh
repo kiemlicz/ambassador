@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# if the git tag is present then it will be used as docker tag
 if [ -z "$TRAVIS_TAG" ]; then
     TAG="latest"
 else
