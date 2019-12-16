@@ -22,6 +22,8 @@ FROM salt-base AS salt-minion
 RUN apt-get install -y python3-pip && \
     pip3 install --upgrade docker
 
+VOLUME /etc/salt/minion.d
+
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD [ "/usr/bin/salt-minion" ]
 
@@ -58,6 +60,14 @@ RUN if [ "$K8S_API_ENABLED" = true ]; then \
     fi
 
 EXPOSE 4505:4505 4506:4506
+
+VOLUME /etc/salt/pki/master
+VOLUME /var/cache/salt/master/queues
+VOLUME /etc/pki/tls/certs
+VOLUME /etc/salt/cloud.providers.d
+VOLUME /srv/thorium
+VOLUME /srv/pillar
+VOLUME /etc/salt/master.d
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD [ "/opt/entrypoint.sh" ]
