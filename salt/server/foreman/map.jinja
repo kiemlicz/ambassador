@@ -18,7 +18,8 @@
         'user': "foreman",
         'group': "foreman",
         'ssl': {},
-        'services': ["foreman", "foreman-proxy", "dynflowd", "dnsmasq"]
+        'services': ["foreman", "foreman-proxy", "dynflowd", "dnsmasq"],
+        'setup': [],
     },
 }, merge=salt['grains.filter_by']({
        'stretch': {

@@ -24,3 +24,16 @@ foreman:
     - "--foreman-proxy-dns-reverse={{ reverse }}"
     - "--foreman-proxy-dns-forwarders={{ dnsserver }}"
     - "--foreman-proxy-foreman-base-url=https://{{ fqdn }}"
+  setup:
+    - name: arch
+      method: POST
+      url: https://{{ fqdn }}/api/architectures
+      header_dict:
+        Accept: application/json
+        Content-Type: application/json
+      data: |
+        {
+          "architecture": {
+            "name": "amd64"
+          }
+        }

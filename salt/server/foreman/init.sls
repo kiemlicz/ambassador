@@ -63,3 +63,25 @@ install_foreman:
     - watch:
       - cmd: install_foreman
 {%- endfor %}
+
+{%- for query in foreman.setup %}
+setup_foreman_{{ query.name }}:
+  module.run:
+    - http.query:
+      - {{ query.url }}
+      - method: {{ query.method }}
+{%- if query.data is defined %}
+      # this tojson assumes Content-Type json but this is what foreman accepts either way... so maybe move this dict here
+      - data: {{ query.data|tojson }}
+{%- endif %}
+{%- if foreman.foreman_username is defined and foreman.foreman_password is defined %}
+      - username: {{ foreman.foreman_username }}
+      - password: {{ foreman.foreman_password }}
+{%- endif %}
+{%- if query.header_dict is defined %}
+      - header_dict: {{ query.header_dict|tojson }}
+{%- endif %}
+      - verify_ssl: {{ query.verify_ssl|default(True) }}
+    - require:
+      - cmd: install_foreman
+{%- endfor %}
