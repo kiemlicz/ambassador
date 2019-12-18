@@ -82,6 +82,12 @@ setup_foreman_{{ query.name }}:
       - header_dict: {{ query.header_dict|tojson }}
 {%- endif %}
       - verify_ssl: {{ query.verify_ssl|default(True) }}
+{%- if query.ca_bundle is defined %}
+      - ca_bundle: {{ query.ca_bundle }}
+{%- endif %}
+{%- if query.cert is defined %}
+      - cert: {{ query.cert }}
+{%- endif %}
     - require:
       - cmd: install_foreman
 {%- endfor %}
