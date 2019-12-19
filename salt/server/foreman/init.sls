@@ -66,20 +66,20 @@ install_foreman:
 
 {%- for query in foreman.setup %}
 setup_foreman_{{ query.name }}:
+    #fixme make it fail on non 2XX status
   module.run:
     - http.query:
       - {{ query.url }}
+      - header_dict:
+            Accept: application/json
+            Content-Type: application/json
       - method: {{ query.method }}
 {%- if query.data is defined %}
-      # this tojson assumes Content-Type json but this is what foreman accepts either way... so maybe move this dict here
       - data: {{ query.data|tojson }}
 {%- endif %}
 {%- if foreman.foreman_username is defined and foreman.foreman_password is defined %}
       - username: {{ foreman.foreman_username }}
       - password: {{ foreman.foreman_password }}
-{%- endif %}
-{%- if query.header_dict is defined %}
-      - header_dict: {{ query.header_dict|tojson }}
 {%- endif %}
       - verify_ssl: {{ query.verify_ssl|default(True) }}
 {%- if query.ca_bundle is defined %}
