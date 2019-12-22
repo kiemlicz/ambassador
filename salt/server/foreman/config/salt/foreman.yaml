@@ -7,6 +7,6 @@
 :ssl_ca: {{ foreman.ssl.ca.name }}
 :ssl_cert: {{ foreman.ssl.server.name }}
 :ssl_key: {{ foreman.ssl.key.name }}
-:timeout: 10
+:timeout: 120
 :salt: /usr/bin/salt
 :upload_grains: true
