@@ -75,7 +75,7 @@ setup_foreman_{{ query.name }}:
             Content-Type: application/json
       - method: {{ query.method }}
 {%- if query.data is defined %}
-      - data: {{ query.data|tojson }}
+      - data: {{ query.data|tojson|yaml_squote }}
 {%- endif %}
 {%- if foreman.foreman_username is defined and foreman.foreman_password is defined %}
       - username: {{ foreman.foreman_username }}
