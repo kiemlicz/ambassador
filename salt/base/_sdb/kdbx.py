@@ -17,11 +17,12 @@ log = logging.getLogger(__name__)
 
 
 def __virtual__():
-    if not HAS_LIBS:
+    if not HAS_LIBS or not __utils__['urlutils.has_libs']():
         # somehow sdb modules doesn't print missing lib message nicely, instead you will just see KeyError 'kdbx.get'
         # that's why this additional log message
         log.error("pykeepass not found")
-    return True if HAS_LIBS and __utils__['urlutils.has_libs']() else (False, "pykeepass/urlparse not found")
+        return False, "pykeepass/urlparse not found"
+    return True
 
 
 def get(key, profile=None):
@@ -58,6 +59,8 @@ def _get_first_entry_by_path(path, profile=None):
     return kp.find_entries_by_path(path=path, first=True)
 
 
+# memoize will help to not re-load DB during just this call only, but I'm not so sure it is security-wise
+# use argon2 DB encryption since it's way faster
 def _load(kdbx_settings):
     db_file = kdbx_settings['db_file']
     password = kdbx_settings['password'] if 'password' in kdbx_settings else None

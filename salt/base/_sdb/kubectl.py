@@ -26,7 +26,7 @@ def __virtual__():
 def get(key, profile=None):
     query_parsed = urlparse(key)
     query_dict = _query_string_to_dict(query_parsed.query)
-    client = _get_client()
+    client = _get_client(profile)
     kind = query_parsed.path
     if 'label_selector' in query_dict:
         return client.list(kind, **query_dict)
@@ -49,5 +49,5 @@ def _query_string_to_dict(qs):
     return query_dict
 
 
-def _get_client():
-    return __utils__['k8s.k8s_client']()
+def _get_client(profile):
+    return __utils__['k8s.k8s_client'](**profile)

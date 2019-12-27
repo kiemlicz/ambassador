@@ -28,14 +28,10 @@ def has_libs():
 
 
 class GDriveClient(object):
-    def __init__(self, profile):
+    def __init__(self, token_url, client_id, client_secret, access_token, refresh_token):
         # it's impossible to use __salt__ dict here (no 'config.get' available)
-        token_url = profile['token_url']
-        client_id = profile['client_id']
-        client_secret = profile['client_secret']
-
-        credentials = Credentials(profile[u'access_token'],
-                                  refresh_token=profile[u'refresh_token'],
+        credentials = Credentials(token=access_token,
+                                  refresh_token=refresh_token,
                                   token_uri=token_url,
                                   client_id=client_id,
                                   client_secret=client_secret)
@@ -166,4 +162,4 @@ class GDriveClient(object):
 
 
 def client(profile):
-    return GDriveClient(profile)
+    return GDriveClient(**profile)
