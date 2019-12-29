@@ -1,8 +1,20 @@
 import logging
+import salt.utils.dictupdate
 from typing import Tuple, List, Any, Dict
 
 
 log = logging.getLogger(__name__)
+
+
+def merge(input_list, output_dict):
+    for dict_elem in input_list:
+        output_dict = salt.utils.dictupdate.merge(
+            output_dict,
+            dict_elem,
+            strategy='smart',
+            merge_lists=True
+        )
+    return output_dict
 
 
 def fail(ret: Dict[str, Any], msg: str, comments: List[str] = None) -> Dict[str, Any]:

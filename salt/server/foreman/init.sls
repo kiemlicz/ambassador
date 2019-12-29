@@ -91,3 +91,30 @@ setup_foreman_{{ query.name }}:
     - require:
       - cmd: install_foreman
 {%- endfor %}
+
+{% for override in foreman.overrides %}
+foreman_override_{{ override.name }}:
+  file_ext.managed:
+    - name: {{ override.name }}
+{%- if override.contents is defined %}
+    - contents: {{ override.contents | yaml_encode }}
+{%- elif override.source is defined %}
+    - source: {{ override.source }}
+{%- endif %}
+{%- if override.template is defined %}
+    - template: {{ override.template }}
+{%- endif %}
+{%- if override.mode is defined %}
+    - mode: {{ override.mode }}
+{%- endif %}
+{%- if override.user is defined %}
+    - user: {{ override.user }}
+{%- endif %}
+{%- if override.group is defined %}
+    - group: {{ override.group }}
+{%- endif %}
+    - makedirs: True
+    - skip_verify: True
+    - require:
+      - cmd: install_foreman
+{% endfor %}

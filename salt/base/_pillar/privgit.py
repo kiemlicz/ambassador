@@ -16,17 +16,32 @@ __virtualname__ = 'privgit'
 
 
 def __virtual__():
-    privgit_ext_pillars = [x for x in __opts__['ext_pillar'] if 'privgit' in x]
+    privgit_ext_pillars = [x for x in __opts__['ext_pillar'] if __virtualname__ in x]
     if not privgit_ext_pillars:
-        # No privgit configured, don't load then
-        return False
+        log.info("privgit ext pillar disabled")
+        return False, "privgit ext pillar disabled"
     return __virtualname__
 
 
 def ext_pillar(minion_id, pillar, *args, **kwargs):
     '''
     Custom git pillar that can be set up in the runtime via other pillar data
-    Read more at envoy README.md file
+    This ext_pillar may fetch data from previous pillar or configuration. Thus 'previous' pillars must be properly configured
+    first.
+
+    The pillar data:
+    ```
+     - main:
+         url: git@bitbucket.org:user/repo.git
+         branch: master
+         pubkey: ssh-rsa AAAAB3dhfksdfhjsdfsdf
+         privkey: |
+           -----BEGIN RSA PRIVATE KEY-----
+           thekey
+           -----END RSA PRIVATE KEY-----
+         env: base
+         root; pillar
+    ```
     Use:
     privkey_location
     pubkey_location
@@ -35,6 +50,19 @@ def ext_pillar(minion_id, pillar, *args, **kwargs):
     privkey
     pubkey
     with raw content (instead of *_location)
+
+    Entries must be formed as list
+
+    It is possible to use following 'flat' syntax:
+    ```
+    privgit_main_url: git@bitbucket.org:user/repo.git
+    privgit_main_branch: master
+    privgit_main_pubkey: ssh-rsa AAAAB3dhfksdfhjsdfsdf
+    ...
+    ```
+    That corresponds to the previous yaml example
+    This 'flat' syntax exists for the purposes of fetching data from very limited sources (like the Foreman's host params
+    in pre 1.22 version)
     '''
 
     def fail(ex): raise ex
@@ -53,21 +81,11 @@ def ext_pillar(minion_id, pillar, *args, **kwargs):
             }})
         return d
 
-    def merge(input_dict, output_dict):
-        for e in input_dict:
-            output_dict = salt.utils.dictupdate.merge(
-                output_dict,
-                e,
-                strategy='smart',
-                merge_lists=True
-            )
-        return output_dict
-
     def write_file(path, content, perms):
         __salt__['file.write'](path, content)
         __salt__['file.set_mode'](path, perms)
 
-    ext_name = 'privgit'
+    ext_name = __virtualname__
     opt_url = 'url'
     opt_branch = 'branch'
     opt_env = 'env'
@@ -78,11 +96,11 @@ def ext_pillar(minion_id, pillar, *args, **kwargs):
     opt_pubkey_loc = 'pubkey_location'
 
     cachedir = __salt__['config.get']('cachedir')
-    repositories = collections.OrderedDict()
 
-    repositories = merge(args, repositories)
-    repositories = merge(pillar[ext_name] if ext_name in pillar else [], repositories)
-    repositories = merge(deflatten_pillar(), repositories)
+    repositories = collections.OrderedDict()
+    repositories = __utils__['common.merge'](args, repositories)
+    repositories = __utils__['common.merge'](pillar[ext_name] if ext_name in pillar else [], repositories)
+    repositories = __utils__['common.merge'](deflatten_pillar(), repositories)
 
     log.info("Using following repositories: {}".format(repositories))
     ret = {}
