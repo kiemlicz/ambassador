@@ -21,6 +21,8 @@ users:
       - {{ home_dir }}/projects
       - {{ home_dir }}/share
       - {{ home_dir }}/.vpn
+    user_excluded_dirs:
+      - {{ home_dir }}/Desktop
     known_hosts:
       - bitbucket.org
     sec:

@@ -16,6 +16,15 @@
       - user: {{ username }}
 {% for req in project.requisites|default([]) %}
       - sls: {{ req }}
+  file.directory:
+    - name: {{ project.target }}
+    - user: {{ username }}
+    - group: {{ username }}
+    - recurse:
+      - user
+      - group
+    - require:
+      - git: {{ project.url }}
 {% endfor %}
 
 

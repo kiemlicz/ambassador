@@ -17,7 +17,7 @@
     - require:
       - sls: os # deliberately full sls (in case of urgent pkgs.post_install commands)
 
-{% if user.user_dirs is defined and user.user_dirs %}
+{%- if user.user_dirs is defined and user.user_dirs %}
 {{ username }}_setup_directories:
   file.directory:
     - user: {{ username }}
@@ -27,9 +27,17 @@
     - names: {{ user.user_dirs|tojson }}
     - require:
       - user: {{ username }}
-{% endif %}
+{%- endif %}
 
-{% if user.git is defined %}
+{%- if user.user_excluded_dirs is defined and user.user_excluded_dirs %}
+{{ username }}_remove_directories:
+  file.absent:
+    - names: {{ user.user_excluded_dirs }}
+    - require:
+      - user: {{ username }}
+{%- endif %}
+
+{%- if user.git is defined %}
 {% for k,v in user.git.items() %}
 git_global_config_{{ username }}_{{ k }}:
   git.config_set:
@@ -40,7 +48,7 @@ git_global_config_{{ username }}_{{ k }}:
     - require:
       - user: {{ username }}
 {% endfor %}
-{% endif %}
+{%- endif %}
 
 {% if user.known_hosts is defined %}
 {{ username }}_setup_ssh_known_hosts:
