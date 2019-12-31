@@ -28,7 +28,7 @@ def has_libs():
 
 
 class GDriveClient(object):
-    def __init__(self, token_url, client_id, client_secret, access_token, refresh_token):
+    def __init__(self, token_url, client_id, client_secret, access_token, refresh_token, **kwargs):
         # it's impossible to use __salt__ dict here (no 'config.get' available)
         credentials = Credentials(token=access_token,
                                   refresh_token=refresh_token,
