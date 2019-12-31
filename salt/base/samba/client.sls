@@ -8,12 +8,15 @@ samba_automount:
       - pkg: os_packages
     - require_in:
       - service: {{ samba.service_name }}
-  service.running:
-    - name: {{ samba.service_name }}
-    - enable: True
   file.managed:
     - name: {{ samba.pam_mount_conf }}
     - source: {{ samba.pam_mount_conf_managed }}
     - require:
-      - service: {{ samba.service_name }}
+      - pkg: samba_automount
+  service.running:
+    - name: {{ samba.service_name }}
+    - enable: True
+    - watch:
+      - file: {{ samba.pam_mount_conf }}
+
 #verify if changing the /etc/pam.d/common-session and common-auth is needed
