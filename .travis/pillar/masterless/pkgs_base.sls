@@ -1,7 +1,7 @@
 {% set default_pkgs = salt['grains.filter_by']({
       'default': {
-         'os_packages': ["cron", "vim", "sudo", "man-db", "insserv", "git", "zsh", "curl", "ca-certificates", "gnupg2", "python3-pip"],
-         'pip3_packages': ["google-auth-oauthlib", "google-api-python-client", "google-auth-httplib2"],
+         'os_packages': ["cron", "vim", "sudo", "man-db", "insserv", "git", "zsh", "curl", "ca-certificates", "gnupg2", "python3-pip", "vim-gtk3"],
+         'pip3_packages': ["google-auth-oauthlib", "google-api-python-client", "google-auth-httplib2", "powerline-status"],
          'post_install': ['echo "command3"', 'echo "command4"', 'echo "command5"'],
       },
       'Windows': {

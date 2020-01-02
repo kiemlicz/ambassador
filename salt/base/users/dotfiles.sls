@@ -4,7 +4,6 @@
   dotfile.managed:
     - require:
       - sls: users.common
-      - sls: users.tools
       - sls: users.keys
       - user: {{ username }}
     - name: {{ user.dotfile.repo }}

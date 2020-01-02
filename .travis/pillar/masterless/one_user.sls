@@ -83,22 +83,6 @@ users:
           vpn
           long
           data
-    tools:
-      oh_my_zsh:
-        url: https://github.com/robbyrussell/oh-my-zsh.git
-        target: {{ home_dir }}/projects/open-source/oh-my-zsh
-      oh_my_zsh_syntax_highlighting:
-        url: https://github.com/zsh-users/zsh-syntax-highlighting.git
-        target: {{ home_dir }}/projects/open-source/oh-my-zsh/custom/plugins/zsh-syntax-highlighting
-      fzf:
-        url: https://github.com/junegunn/fzf.git
-        target: {{ home_dir }}/projects/open-source/fzf
-      powerline:
-        pip:
-          - powerline-status
-        required_pkgs:
-          - vim-gtk3
-          - python3-pip
     dotfile:
       repo: https://github.com/kiemlicz/ambassador.git
       branch: test-dotfiles
@@ -109,6 +93,14 @@ users:
       user.name: coolnick
       user.email: coolnick@gmail.com
     projects:
+      - url: https://github.com/robbyrussell/oh-my-zsh.git
+        target: {{ home_dir }}/projects/open-source/oh-my-zsh
+      - url: https://github.com/zsh-users/zsh-syntax-highlighting.git
+        target: {{ home_dir }}/projects/open-source/oh-my-zsh/custom/plugins/zsh-syntax-highlighting
+      - url: https://github.com/junegunn/fzf.git
+        target: {{ home_dir }}/projects/open-source/fzf
+        cmds:
+          - 'yes | {{ home_dir }}/projects/open-source/fzf/install'
       - url: https://github.com/kiemlicz/util.git
         target: {{ home_dir }}/projects/util
         cmds:

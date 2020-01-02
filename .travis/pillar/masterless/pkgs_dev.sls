@@ -5,8 +5,8 @@
                    "openssh-server", "openssh-client", "openvpn", "insserv",
                    "build-essential", "git", "zsh", "curl", "ethtool", "ntp", "python3-pip", "cron",
                    "silversearcher-ag", "exuberant-ctags", "tig", "software-properties-common",
-		           "ca-certificates", "gnupg2"],
-         'pip3_packages': ["google-auth-oauthlib", "google-api-python-client", "google-auth-httplib2"],
+		           "ca-certificates", "gnupg2", "vim-gtk3"],
+         'pip3_packages': ["google-auth-oauthlib", "google-api-python-client", "google-auth-httplib2", "powerline-status"],
          'post_install': ['echo "command3"', 'echo "command4"', 'echo "command5"'],
       },
       'Windows': {
