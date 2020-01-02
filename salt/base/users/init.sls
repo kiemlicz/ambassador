@@ -7,7 +7,7 @@ include:
   - users.backup
   - users.cron
 
-users-notification:
+base-users-notification:
   test.show_notification:
     - name: Base user setup completed
     - text: "Base user setup completed"

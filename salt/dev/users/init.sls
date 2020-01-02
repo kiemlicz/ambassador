@@ -2,7 +2,7 @@ include:
   - base: users
   - users.projects
 
-users-notification:
+dev-users-notification:
   test.show_notification:
     - name: Dev user setup completed
     - text: "Dev user setup completed"
