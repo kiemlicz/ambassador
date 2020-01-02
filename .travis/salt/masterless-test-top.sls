@@ -38,7 +38,6 @@ def run():
       "sbt",
       "grafana",
       "virtualbox",
-      "projects",
       "redis.client",
       "redis.server",
     ],

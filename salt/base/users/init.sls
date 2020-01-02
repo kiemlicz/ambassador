@@ -10,5 +10,5 @@ include:
 
 users-notification:
   test.show_notification:
-    - name: User setup completed
-    - text: "User setup completed"
+    - name: Base user setup completed
+    - text: "Base user setup completed"

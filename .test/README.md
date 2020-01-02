@@ -13,7 +13,7 @@ server:
     - os
     - mail
     - vagrant
-    - projects
+    - users
 ```
 
 Clone this project, add at least following files:  

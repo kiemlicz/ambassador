@@ -40,7 +40,6 @@ def run():
       "rebar",
       "grafana",
       "virtualbox",
-      "projects",
       "redis.client",
       "mongodb.client",
       "redis.server",

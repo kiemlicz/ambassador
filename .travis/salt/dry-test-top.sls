@@ -45,7 +45,6 @@ def run():
       "gatling",
       "grafana",
       "virtualbox",
-      "projects",
       "influxdb",
       "redis.client",
       "mongodb.client",

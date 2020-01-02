@@ -1,7 +1,7 @@
 dev:
   '*':
     - os
-    - projects
+    - users
     - redis.client
     - mongodb.client
     - redis.server
