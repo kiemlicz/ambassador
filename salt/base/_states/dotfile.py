@@ -96,10 +96,19 @@ def managed(name, home_dir, username,
                 return __utils__['common.fail'](ret, "DOTFILE: Cloning dotfiles repo failed", [return_data['comment']])
             # backup previous files
             return_data = __states__['cmd.run']("mkdir -p {0}/.cfg.bak && "
-                                                "git --git-dir={1} --work-tree={0} checkout {2} 2>&1 | sed -n 's/\(^[[:alnum:]]\)\?\s\+\(\.[[:alnum:]]\+\)/\\2/p' | "
-                                                "xargs -I{{}} mv {{}} {0}/.cfg.bak/{{}}".format(target, git_dir, branch), runas=username)
+                                                "git --git-dir={1} --work-tree={0} checkout {2} 2>&1 | sed -n 's/\(^[[:alnum:]]\)\?\s\+\(\.[[:alnum:]]\+\)/\\2/p'".format(target, git_dir, branch), runas=username)
+
             if return_data['changes']['retcode'] != 0:
-                return __utils__['common.fail'](ret, "DOTFILE: Backup of previous dotfiles failed", [return_data['changes']['stderr']])
+                return __utils__['common.fail'](ret, "DOTFILE: Backup of previous dotfiles failed (git checkout)", [return_data['changes']['stderr']])
+
+            for f in return_data['changes']['stdout'].splitlines():
+                ret = __states__['file.copy']("{}/.cfg.bak/".format(target), source=os.path.join(target, f), makedirs=True)
+                if not ret['result']:
+                    return __utils__['common.fail'](ret, "DOTFILE: Backup of previous dotfiles failed")
+            for f in return_data['changes']['stdout'].splitlines():
+                ret = __states__['file.absent'](os.path.join(target, f))
+                if not ret['result']:
+                    return __utils__['common.fail'](ret, "DOTFILE: Cannot remove backed files")
 
             # as this is bare repo -f must be used
             return_data = __states__['cmd.run']("git --git-dir={0} --work-tree={1} checkout -f {2}".format(git_dir, target, branch), runas=username)
