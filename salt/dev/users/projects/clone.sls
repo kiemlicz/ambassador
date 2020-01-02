@@ -1,4 +1,4 @@
-{% for username in pillar['users'].keys() %}
+{% for username in salt['pillar.get']("users", {}).keys() %}
 {% set user = pillar['users'][username] %}
 
 {% for project in user.projects|default([]) %}

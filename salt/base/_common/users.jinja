@@ -1,0 +1,17 @@
+{% macro users_state(saltenv) %}
+include:
+  - os
+  - users.common
+  - users.keys
+  - users.vpn
+  - users.dotfiles
+  - users.backup
+  - users.cron
+{%- if saltenv == 'dev' %}
+  - users.projects
+{%- endif %}
+users-notification:
+  test.show_notification:
+    - name: User setup completed
+    - text: "user setup completed"
+{% endmacro %}

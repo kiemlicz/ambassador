@@ -1,3 +1,3 @@
 include:
-  - projects.clone
-  - projects.setup
+  - users.projects.clone
+  - users.projects.setup
