@@ -9,6 +9,8 @@ include:
   - users.cron
 {%- if saltenv == 'dev' %}
   - users.projects
+{%- elif saltenv == 'server' %}
+  - users.projects
 {%- endif %}
 users-notification:
   test.show_notification:
