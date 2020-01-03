@@ -15,6 +15,12 @@ foreman_{{ config.name }}:
     - source: {{ config.source }}
     - template: jinja
     - clean: False
+{%- if config.user is defined %}
+    - user: {{ config.user }}
+{%- endif %}
+{%- if config.group is defined %}
+    - group: {{ config.group }}
+{%- endif %}
     - require:
       - pkg: foreman
     - require_in:
