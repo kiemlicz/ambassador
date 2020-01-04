@@ -8,25 +8,6 @@ include:
 
 {{ repo_pkg("foreman", foreman) }}
 
-{% for config in foreman.config %}
-foreman_{{ config.name }}:
-  file.recurse:
-    - name: {{ config.name }}
-    - source: {{ config.source }}
-    - template: jinja
-    - clean: False
-{%- if config.user is defined %}
-    - user: {{ config.user }}
-{%- endif %}
-{%- if config.group is defined %}
-    - group: {{ config.group }}
-{%- endif %}
-    - require:
-      - pkg: foreman
-    - require_in:
-      - cmd: install_foreman
-{% endfor %}
-
 {%- for secret_name, secret in foreman.ssl.items() %}
 foreman_{{ secret.name }}:
   x509.pem_managed:
@@ -60,6 +41,24 @@ install_foreman:
     - require:
       - sls: os
       - host: ensure_fqdn_hosts
+
+{% for config in foreman.config %}
+foreman_{{ config.name }}:
+  file.recurse:
+    - name: {{ config.name }}
+    - source: {{ config.source }}
+    - template: jinja
+    - clean: False
+{%- if config.user is defined %}
+    - user: {{ config.user }}
+{%- endif %}
+{%- if config.group is defined %}
+    - group: {{ config.group }}
+{%- endif %}
+    - require:
+      - pkg: foreman
+      - cmd: install_foreman
+{% endfor %}
 
 {%- for service in foreman.services %}
 {{ service }}_service:
