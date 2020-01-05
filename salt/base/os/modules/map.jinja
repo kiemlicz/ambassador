@@ -1,0 +1,9 @@
+{% set kernel_modules = salt['grains.filter_by']({
+    'default': {
+        'present': [],
+        'absent': []
+    },
+    'Windows': {
+
+    }
+}, merge=salt['pillar.get']('kernel_modules')) %}

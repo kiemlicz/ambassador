@@ -5,6 +5,8 @@ include:
   - os.locale
   - os.groups
   - os.pkgs
+  - os.modules
+  - os.pkgs.scripts
   - os.services
 
 os-notification:
