@@ -3,7 +3,7 @@
 
 {% for repo in repositories.list %}
 # refresh on last configured repo
-{{ repository(repo.file ~ "_" ~ repo.names|first ~ "_repository", repo, refresh=(repositories.list|last == repo)) }}
+{{ repository(repo.file ~ "_" ~ repo.names|first ~ "_repository", repo, refresh=(repositories.list|last == repo), consolidate=(repositories.list|last == repo)) }}
 {% endfor %}
 
 {% for pref in repositories.preferences %}
