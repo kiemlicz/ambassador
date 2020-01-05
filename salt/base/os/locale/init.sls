@@ -5,7 +5,7 @@
 {% if locale.required_pkgs %}
 required_pkgs:
   pkg.latest:
-    - name:
+    - name: locale_required_pkgs
     - pkgs: {{ locale.required_pkgs|tojson }}
     - require:
       - sls: os.repositories
