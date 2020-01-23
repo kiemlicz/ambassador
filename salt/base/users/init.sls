@@ -9,6 +9,6 @@
 # etc for all included states
 # Whole file could be overriden in other envs but that would lead to duplication
 # that is the reason why there is macro that inspects saltenv and generates proper users state
-{% from "_common/users.jinja" import users_state with context %}
+{% from "users/users.jinja" import users_state with context %}
 
 {{ users_state(saltenv) }}
