@@ -22,6 +22,8 @@
   cmd.run:
     - names: {{ user.dotfile.post_cmds|tojson }}
     - runas: {{ username }}
+    # causes setting use_sudo and running commands via `sudo`, not `su -`
+    - group: {{ username }}
     - cwd: {{ user.dotfile.root }}
     - onchange:
       - dotfile: {{ user.dotfile.repo }}
