@@ -55,14 +55,5 @@ def get(key, profile=None):
 
 
 def _get_first_entry_by_path(path, profile=None):
-    kp = _load(profile)
+    kp = __utils__['kdbx.load'](profile)
     return kp.find_entries_by_path(path=path, first=True)
-
-
-# memoize will help to not re-load DB during just this call only, but I'm not so sure it is security-wise
-# use argon2 DB encryption since it's way faster
-def _load(kdbx_settings):
-    db_file = kdbx_settings['db_file']
-    password = kdbx_settings['password'] if 'password' in kdbx_settings else None
-    key_file = kdbx_settings['key_file'] if 'key_file' in kdbx_settings else None
-    return PyKeePass(db_file, password, key_file)
