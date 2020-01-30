@@ -1,10 +1,9 @@
-[![Build status](https://travis-ci.org/kiemlicz/envoy.svg?branch=master)](https://travis-ci.org/kiemlicz/envoy)
 # Basics 
 [Salt](https://saltstack.com/) _states_ for provisioning machines in generic yet sensible way.  
 The goal is to create _salt environments_ usable by developers as well as admins during the setup of either server or 'client' machines.
 
 ## Setup  
-There are multiple options to deploy **envoy**.  
+There are multiple options to deploy **Salt**.  
 They depend on how you want to provision machines:  
  1. Separate `salt-master` process provisioning `salt-minions`:  
 Refer to SaltStack documentation of [gitfs](https://docs.saltstack.com/en/latest/topics/tutorials/gitfs.html) 
@@ -52,14 +51,14 @@ Vagrant supports [_Salt_ provisioner](https://www.vagrantup.com/docs/provisionin
 ### Using Kubernetes
 Depending on use case, different deployment strategies exist.
 
-#### Using envoy to deploy Kubernetes
+#### Using Salt to deploy Kubernetes
 _Salt Master_ installed on separate machine, _Salt Minion_ installed on each [Kubernetes node](https://kubernetes.io/docs/concepts/architecture/nodes/).
 
 This way it is possible to automatically create Kubernetes master and worker nodes
 
-For documentation refer to [Kubernetes states](https://github.com/kiemlicz/envoy/tree/master/salt/server/kubernetes#kubernetes)
+For documentation refer to [Kubernetes states](https://github.com/kiemlicz/ambassador/tree/master/salt/server/kubernetes#kubernetes)
 
-#### Using envoy to provision in-Kubernetes pods
+#### Using Salt to provision in-Kubernetes pods
 In this strategy the _Salt Master_ is deployed within dedicated pod and _Salt Minions_ are deployed as [DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/).  
 In this approach, the _Salt Minion_ is **not** the provisioned entity. 
 Instead the _Salt Minion_ registers [`docker_events` engine](https://docs.saltstack.com/en/latest/ref/engines/all/salt.engines.docker_events.html). The engine captures 
@@ -70,7 +69,7 @@ Example: creating and maintaining Redis Cluster.
 Mind that _Salt Minion_ is **not** installed on every container and **not** used to fully configure that container. That would be possible but
 this should be the responsibility of the tool that is used to create that container (of course it is possible to use _Salt_ as such tool)
 
-More detailed description can be found in [POD provisioning section](https://github.com/kiemlicz/envoy/tree/master/salt/server/kubernetes#provisioning-pods) 
+More detailed description can be found in [POD provisioning section](https://github.com/kiemlicz/ambassador/tree/master/salt/server/kubernetes#provisioning-pods) 
     
 ## Components
 In order to run _states_ against _minions_, _pillar_ must be configured.  
@@ -208,7 +207,7 @@ Environment variables operations.
  
 # Tests
 Tests are performed on different OSes (in docker) in _Salt_ masterless mode.  
-Different [pillar data](https://github.com/kiemlicz/envoy/tree/master/.travis/pillar) is mixed with different [saltenvs](https://github.com/kiemlicz/envoy/tree/master/salt).  
+Different [pillar data](https://github.com/kiemlicz/ambassador/tree/master/.travis/pillar) is mixed with different [saltenvs](https://github.com/kiemlicz/ambassador/tree/master/.travis/pillar).  
 Then the `salt-call --local state.show_sls <state name>` is invoked and checked if renders properly
 
 More complex tests that perform actual state application in different environments are performed in associated [ambassador project](https://github.com/kiemlicz/ambassador)
