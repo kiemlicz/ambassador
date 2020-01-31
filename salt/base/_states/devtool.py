@@ -28,7 +28,7 @@ def managed(name, download_url, destination_dir, user, group, enforce_toplevel=T
 
     extract_dir = os.path.commonprefix(archive_contents)  # relative path
     if not extract_dir and not enforce_toplevel:
-        return __utils__['common.fail'](ret, "DEVTOOL: Cannot find root directory in extracted archive, try setting enforce_toplevel: True", archive_contents)
+        return __utils__['common.fail'](ret, "DEVTOOL: Cannot find root directory in extracted archive, try setting enforce_toplevel: True", comments=archive_contents)
 
     extract_location = os.path.join(destination_dir, extract_dir)
     log.debug("Will extract to: {0}".format(extract_location))
@@ -39,7 +39,7 @@ def managed(name, download_url, destination_dir, user, group, enforce_toplevel=T
     extract_result = __states__['archive.extracted'](name=destination_dir, source=download_url, user=user, group=group,
                                                      enforce_ownership_on=extract_location, skip_verify=True, trim_output=50)
     if not extract_result['result']:
-        return __utils__['common.fail'](ret, "DEVTOOL: Cannot extract archive from: {0}".format(download_url), [extract_result['comment']])
+        return __utils__['common.fail'](ret, "DEVTOOL: Cannot extract archive from: {0}".format(download_url), comments=[extract_result['comment']])
 
     old_state = ["{0} previously didn't exist".format(download_url)]
     if not extract_result['changes']:

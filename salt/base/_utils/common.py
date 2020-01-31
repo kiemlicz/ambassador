@@ -17,11 +17,14 @@ def merge(input_list, output_dict):
     return output_dict
 
 
-def fail(ret: Dict[str, Any], msg: str, comments: List[str] = None) -> Dict[str, Any]:
+def fail(ret: Dict[str, Any], msg: str, e: Exception = None, comments: List[str] = None) -> Dict[str, Any]:
     if comments:
         msg += '\nFailure reason: '
         msg += _format_comments(comments)
-    log.error(msg)
+    if e is None:
+        log.error(msg)
+    else:
+        log.exception(msg, e)
     ret['comment'] = msg
     ret['result'] = False
     return ret

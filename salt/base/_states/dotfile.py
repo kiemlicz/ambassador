@@ -65,7 +65,7 @@ def managed(name, home_dir, username,
         if test_mode:
             __opts__['test']=True
         if not rdata['result']:
-            return __utils__['common.fail'](ret, "DOTFILE: Cloning dotfiles (templates) repo failed", [rdata['comment']])
+            return __utils__['common.fail'](ret, "DOTFILE: Cloning dotfiles (templates) repo failed", comments=[rdata['comment']])
         return tdir
 
     def test_return(files_to_populate):
@@ -93,13 +93,13 @@ def managed(name, home_dir, username,
             return_data = __states__['git.latest'](name=name, target=git_dir, user=username, bare=True, identity=identity)
             # no branch at this point as this is bare repository
             if not return_data['result']:
-                return __utils__['common.fail'](ret, "DOTFILE: Cloning dotfiles repo failed", [return_data['comment']])
+                return __utils__['common.fail'](ret, "DOTFILE: Cloning dotfiles repo failed", comments=[return_data['comment']])
             # backup previous files
             return_data = __states__['cmd.run']("mkdir -p {0}/.cfg.bak && "
                                                 "git --git-dir={1} --work-tree={0} checkout {2} 2>&1 | sed -n 's/\(^[[:alnum:]]\)\?\s\+\(\.[[:alnum:]]\+\)/\\2/p'".format(target, git_dir, branch), runas=username)
 
             if return_data['changes']['retcode'] != 0:
-                return __utils__['common.fail'](ret, "DOTFILE: Backup of previous dotfiles failed (git checkout)", [return_data['changes']['stderr']])
+                return __utils__['common.fail'](ret, "DOTFILE: Backup of previous dotfiles failed (git checkout)", comments=[return_data['changes']['stderr']])
 
             for f in return_data['changes']['stdout'].splitlines():
                 ret = __states__['file.copy']("{}/.cfg.bak/".format(target), source=os.path.join(target, f), makedirs=True)
@@ -113,7 +113,7 @@ def managed(name, home_dir, username,
             # as this is bare repo -f must be used
             return_data = __states__['cmd.run']("git --git-dir={0} --work-tree={1} checkout -f {2}".format(git_dir, target, branch), runas=username)
             if return_data['changes']['retcode'] != 0:
-                return __utils__['common.fail'](ret, "DOTFILE: Dotfiles checkout failed", [return_data['changes']['stderr']])
+                return __utils__['common.fail'](ret, "DOTFILE: Dotfiles checkout failed", comments=[return_data['changes']['stderr']])
 
             __states__['cmd.run']("git --git-dir={0} --work-tree={1} config --local status.showUntrackedFiles no".format(git_dir, target), runas=username)
 
@@ -125,7 +125,7 @@ def managed(name, home_dir, username,
             return __utils__['common.success'](ret, "DOTFILE: success without rendering")
     elif not render:
         log.error("DOTFILE: cannot find {} in {}".format(desired_branch, branches_dict.keys()))
-        return __utils__['common.fail'](ret, "DOTFILE: dotfiles not found for: {} ({})".format(desired_branch, branches_dict.keys()), ["No changes"])
+        return __utils__['common.fail'](ret, "DOTFILE: dotfiles not found for: {} ({})".format(desired_branch, branches_dict.keys()), comments=["No changes"])
 
     if render:
         log.debug("Checking out templates from: {0}, branch: {1}".format(name, branch))
@@ -147,4 +147,4 @@ def managed(name, home_dir, username,
 
         return __utils__['common.success'](ret, "DOTFILE: success with render")
 
-    return __utils__['common.fail'](ret, "DOTFILE: cannot setup dotfiles", ["No changes"])
+    return __utils__['common.fail'](ret, "DOTFILE: cannot setup dotfiles", comments=["No changes"])
