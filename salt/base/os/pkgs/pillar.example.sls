@@ -13,6 +13,10 @@ pkgs:
   scripts:
     - source: http://example.com/somescript.sh
       args: "-a -b -c"
+  fromrepo:
+      - from: buster-backports
+        pkgs:
+          - nvidia-driver
 ---
 {% set default_pkgs = salt['grains.filter_by']({
       'default': {

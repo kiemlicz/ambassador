@@ -25,6 +25,16 @@ pkgs:
       - sls: os.locale
       - sls: os.groups
 
+{% for fromrepo_config in pkgs.fromrepo if pkgs.fromrepo is defined and pkgs.fromrepo %}
+pkgs_fromrepo_{{ fromrepo_config.from }}:
+  pkg.latest:
+    - pkgs: {{ fromrepo_config.pkgs | tojson }}
+{{ pkg_latest_opts() | indent(4) }}
+    - reload_modules: True
+    - require:
+      - pkg: os_packages
+{%- endfor %}
+
 {% if pkgs.versions is defined and pkgs.versions %}
 pkgs_versions:
   pkg.installed:
