@@ -17,6 +17,8 @@ pkgs:
       - from: buster-backports
         pkgs:
           - nvidia-driver
+  purged:
+    - xserver-xorg-video-intel
 ---
 {% set default_pkgs = salt['grains.filter_by']({
       'default': {

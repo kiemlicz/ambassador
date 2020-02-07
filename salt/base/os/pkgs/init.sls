@@ -55,6 +55,14 @@ pkgs_sources:
 {{ retry(attempts=2)| indent(4) }}
 {% endif %}
 
+{%- if pkgs.purged is defined and pkgs.purged %}
+pkgs_purged:
+  pkg.purged:
+    - pkgs: {{ pkgs.purged|tojson }}
+    - require:
+      - pkg: os_packages
+{%- endif %}
+
 {% if pkgs.pip_packages is defined and pkgs.pip_packages %}
 pip_provider:
   pkg.latest:
