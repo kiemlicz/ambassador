@@ -25,7 +25,8 @@ pkgs:
       - sls: os.locale
       - sls: os.groups
 
-{% for fromrepo_config in pkgs.fromrepo if pkgs.fromrepo is defined and pkgs.fromrepo %}
+{%- if pkgs.fromrepo is defined and pkgs.fromrepo %}
+{%- for fromrepo_config in pkgs.fromrepo %}
 pkgs_fromrepo_{{ fromrepo_config.from }}:
   pkg.latest:
     - pkgs: {{ fromrepo_config.pkgs | tojson }}
@@ -34,6 +35,7 @@ pkgs_fromrepo_{{ fromrepo_config.from }}:
     - require:
       - pkg: os_packages
 {%- endfor %}
+{%- endif %}
 
 {% if pkgs.versions is defined and pkgs.versions %}
 pkgs_versions:
