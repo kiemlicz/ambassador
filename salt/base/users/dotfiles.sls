@@ -2,10 +2,6 @@
 
 {{ username }}_dotfiles:
   dotfile.managed:
-    - require:
-      - sls: users.common
-      - sls: users.keys
-      - user: {{ username }}
     - name: {{ user.dotfile.repo }}
     - home_dir: {{ user.home_dir }}
     - username: {{ username }}
@@ -17,6 +13,7 @@
     - saltenv: {{ saltenv }}
     - require:
       - sls: users.keys
+      - sls: users.common
 #todo fallback location = home
 {% if user.dotfile.post_cmds is defined %}
   cmd.run:
