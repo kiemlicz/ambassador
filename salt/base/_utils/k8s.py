@@ -44,7 +44,8 @@ class K8sClient(object):
             try:
                 config.load_kube_config(**kwargs)
             except FileNotFoundError as e:
-                raise CommandExecutionError("unable to create kubernetes config: {}".format(e))
+                log.exception("KUBECONFIG file not found")
+                raise CommandExecutionError("unable to create kubernetes config: {}".format(e)) from e
 
         self.client_apps_v1_api = client.AppsV1Api()
         self.client_core_v1_api = client.CoreV1Api()
@@ -83,8 +84,7 @@ class K8sClient(object):
             result = self._get_func(kind, method)(**kwargs)
             return self.sanitize_for_serialization(result)
         except ApiException as e:
-            log.error("unable to fetch: {}".format(kind))
-            log.exception(e)
+            log.exception("unable to fetch: %s", kind)
             return None
 
     def sanitize_for_serialization(self, e):
@@ -96,7 +96,7 @@ class K8sClient(object):
             return getattr(c, method)
         except AttributeError as e:
             log.exception(e)
-            raise CommandExecutionError("Method {} not found".format(method))
+            raise CommandExecutionError("Method {} not found".format(method)) from e
 
     def _client(self, kind):
         if kind == "pod" or kind == "persistent_volume" or kind == "persistent_volume_claim" or kind == "namespace":

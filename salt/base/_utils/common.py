@@ -1,7 +1,6 @@
 import logging
 import salt.utils.dictupdate
-from typing import Tuple, List, Any, Dict
-
+from typing import List, Any, Dict
 
 log = logging.getLogger(__name__)
 
@@ -17,14 +16,11 @@ def merge(input_list, output_dict):
     return output_dict
 
 
-def fail(ret: Dict[str, Any], msg: str, e: Exception = None, comments: List[str] = None) -> Dict[str, Any]:
+def fail(ret: Dict[str, Any], msg: str, comments: List[str] = None) -> Dict[str, Any]:
     if comments:
         msg += '\nFailure reason: '
         msg += _format_comments(comments)
-    if e is None:
-        log.error(msg)
-    else:
-        log.exception(msg, e)
+    log.error(msg)
     ret['comment'] = msg
     ret['result'] = False
     return ret
