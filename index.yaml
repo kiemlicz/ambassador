@@ -2,14 +2,14 @@ apiVersion: v1
 entries:
   salt:
   - apiVersion: v2
-    created: "2020-02-22T05:29:21.813573892Z"
+    created: "2020-02-24T05:29:17.700196369Z"
     dependencies:
     - condition: logstash.enabled
       name: logstash
       repository: https://kubernetes-charts.storage.googleapis.com/
       version: 2.3.0
     description: Salt deployment for in-k8s automations and orchestration
-    digest: b5ddd816417d92302fcd89bdf8476e4172a17b49bb0a9c75318832c8addd90d3
+    digest: 4fd7caa33f5d5ef4eade4cb7059d4905d4b18eb6f7708acc9407f1ef909f2b27
     maintainers:
     - email: stanislaw.dev@gmail.com
       name: kiemlicz
@@ -19,7 +19,7 @@ entries:
     - https://kiemlicz.github.io/ambassador/salt-2.0.1.tgz
     version: 2.0.1
   - apiVersion: v2
-    created: "2020-02-22T05:29:21.811157169Z"
+    created: "2020-02-24T05:29:17.69783897Z"
     dependencies:
     - condition: logstash.enabled
       name: logstash
@@ -33,7 +33,7 @@ entries:
     - https://kiemlicz.github.io/ambassador/salt-2.0.0.tgz
     version: 2.0.0
   - apiVersion: v1
-    created: "2020-02-22T05:29:21.805796577Z"
+    created: "2020-02-24T05:29:17.692355971Z"
     dependencies:
     - condition: logstash.enabled
       name: logstash
@@ -46,7 +46,7 @@ entries:
     - https://kiemlicz.github.io/ambassador/salt-1.3.6.tgz
     version: 1.3.6
   - apiVersion: v1
-    created: "2020-02-22T05:29:21.802280031Z"
+    created: "2020-02-24T05:29:17.689930199Z"
     dependencies:
     - condition: logstash.enabled
       name: logstash
@@ -59,7 +59,7 @@ entries:
     - https://kiemlicz.github.io/ambassador/salt-1.3.5.tgz
     version: 1.3.5
   - apiVersion: v1
-    created: "2020-02-22T05:29:21.799247813Z"
+    created: "2020-02-24T05:29:17.687771853Z"
     dependencies:
     - condition: logstash.enabled
       name: logstash
@@ -71,4 +71,4 @@ entries:
     urls:
     - https://kiemlicz.github.io/ambassador/salt-1.3.4.tgz
     version: 1.3.4
-generated: "2020-02-22T05:29:21.795799428Z"
+generated: "2020-02-24T05:29:17.685391345Z"
