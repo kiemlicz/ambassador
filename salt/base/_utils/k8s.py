@@ -2,7 +2,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
 import os
-
+from distutils.util import strtobool
 from salt.exceptions import CommandExecutionError
 
 try:
@@ -55,16 +55,24 @@ class K8sClient(object):
     def read(self, kind, namespaced=True, name=None, namespace=None):
         if not namespace:
             namespace = self.active_namespace
+        if not isinstance(namespaced, bool):
+            namespaced = strtobool(namespaced)
         method = "read_namespaced_{}".format(kind) if namespaced else "read_{}".format(kind)
         return self._invoke(kind, method, namespaced, name=name, namespace=namespace)
 
-    def list(self, kind, namespaced=True, label_selector=None, namespace=None):
+    def list(self, kind, namespaced=True, label_selector=None, namespace=None, all_namespaces=False):
         if not namespace:
             namespace = self.active_namespace
-        method = self._list(kind, namespaced)
-        return self._invoke(kind, method, namespaced, label_selector=label_selector, namespace=namespace)
+        if not isinstance(namespaced, bool):
+            namespaced = strtobool(namespaced)
+        if not isinstance(all_namespaces, bool):
+            all_namespaces = strtobool(all_namespaces)
+        method = self._list(kind, namespaced, all_namespaces)
+        return self._invoke(kind, method, namespaced, all_namespaces, label_selector=label_selector, namespace=namespace)
 
-    def _list(self, kind, namespaced=True):
+    def _list(self, kind, namespaced=True, all_namespaces=False):
+        if all_namespaces:
+            return "list_{}_for_all_namespaces".format(kind)
         return "list_namespaced_{}".format(kind) if namespaced else "list_{}".format(kind)
 
     # use _request_timeout to stop the watch after given time
@@ -77,9 +85,9 @@ class K8sClient(object):
     def watch_stop(self):
         self.watch.stop()
 
-    def _invoke(self, kind, method, namespaced, **kwargs):
+    def _invoke(self, kind, method, namespaced, all_namespaces=False, **kwargs):
         try:
-            if not namespaced:
+            if not namespaced or all_namespaces:
                 kwargs.pop('namespace')
             result = self._get_func(kind, method)(**kwargs)
             return self.sanitize_for_serialization(result)
