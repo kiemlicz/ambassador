@@ -22,7 +22,6 @@ class SaltK8sEngineTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        pass
         coreV1.delete_namespace(name=SaltK8sEngineTest.test_namespace)
 
     def setUp(self) -> None:
