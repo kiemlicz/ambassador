@@ -9,10 +9,6 @@ RUN apt-get update && apt-get install -y procps curl dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver
 
-# sync via _log_handlers does nothing... forcing override of installed packages
-# temporary workaound until PR with this fix is merged&released
-COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/
-
 WORKDIR /srv
 
 
@@ -126,7 +122,6 @@ COPY .travis/config/reactor/orch /srv/reactor
 COPY .travis/pillar/ /srv/pillar/
 COPY .travis/salt/ /srv/salt/
 COPY .travis/salt/dev/top.sls /srv/salt/base/
-COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/
 
 RUN chmod 600 /etc/salt/autosign.conf && \
     salt-run saltutil.sync_all

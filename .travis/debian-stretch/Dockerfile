@@ -9,10 +9,6 @@ RUN apt-get update && apt-get install -y procps curl dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver
 
-# sync via _log_handlers does nothing... forcing override of installed packages
-# temporary workaound until PR with this fix is merged&released
-COPY salt/base/_log_handlers/logstash_mod.py /usr/lib/python3/dist-packages/salt/log/handlers/
-
 WORKDIR /srv
 
 
