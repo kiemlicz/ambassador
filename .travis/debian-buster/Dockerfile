@@ -127,25 +127,3 @@ RUN chmod 600 /etc/salt/autosign.conf && \
     salt-run saltutil.sync_all
 
 CMD [ "/opt/entrypoint_master_run.sh" ]
-
-# fixme remove in the same way as in stretch
-FROM salt-master AS master-k8s-test
-
-COPY .travis/entrypoint_master_run.sh /opt/
-COPY .travis/scan_events.py /opt/
-
-CMD [ "/opt/entrypoint_master_run.sh" ]
-
-
-FROM salt-minion as minion-compose-test
-
-COPY .travis/config/minion.conf /etc/salt/minion.d/minion.conf
-
-
-# todo remove this image
-FROM salt-minion as minion-k8s-test
-
-COPY .travis/config/minion.conf /etc/salt/minion.d/minion.conf
-
-RUN apt-get install -y python3-pip && \
-    pip3 install docker
