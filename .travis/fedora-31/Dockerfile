@@ -70,6 +70,5 @@ WORKDIR /opt
 
 RUN salt-call --local saltutil.sync_all
 
-#don't understand why not python3
-ENTRYPOINT [ "python", "/opt/envoy_test.py" ]
+ENTRYPOINT [ "python3", "/opt/envoy_test.py" ]
 CMD []
