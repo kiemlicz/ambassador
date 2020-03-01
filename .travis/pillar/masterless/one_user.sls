@@ -110,18 +110,6 @@ users:
         target: {{ home_dir }}/.vim/bundle/Vundle.vim
         cmds:
           - 'echo "\n" | vim +PluginInstall +qall'
-    backup:
-      script_location: {{ home_dir }}/bin/backup
-      source_locations:
-        - /etc
-        - /boot
-        - /var
-        - /home
-      destination_location: /some/backup/path/OS/{{ grains['host'] }}
-      remote: coolguy@backuphost
-      hour: 21
-      minute: 0
-      archive_location: /some/archive/path/OS/{{ grains['host'] }}
 
 {% set owner = username %}
 

@@ -107,16 +107,6 @@ users:
         target: {{ home_dir }}/.vim/bundle/Vundle.vim
         cmds:
           - 'echo "\n" | vim +PluginInstall +qall'
-    backup:
-      script_location: {{ home_dir }}/bin/backup
-      source_locations:
-        - /etc
-        - {{ home_dir }}/local
-      destination_location: /mnt/Backup/OS/{{ grains['host'] }}
-      remote: user@backup
-      hour: 21
-      minute: 0
-      archive_location: /mnt/Archive/OS/{{ grains['host'] }}
   {{ other_username }}:
     name: {{ other_username }}
     fullname: Coolest One
