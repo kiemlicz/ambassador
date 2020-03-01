@@ -5,7 +5,7 @@ ARG salt_ver=""
 
 COPY salt /srv/salt
 
-RUN apt-get update && apt-get install -y procps curl dumb-init && \
+RUN apt-get update && apt-get install -y curl dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver
 
@@ -29,6 +29,7 @@ FROM salt-base AS salt-master
 ARG api_enabled=false
 ARG k8s_api_enabled=false
 ARG kubectl_ver
+ARG pygit2_ver
 ARG saltenv
 ENV API_ENABLED=$api_enabled
 ENV K8S_API_ENABLED=$k8s_api_enabled
@@ -40,7 +41,7 @@ COPY .travis/debian-buster/entrypoint.sh /opt/
 
 RUN apt-get update && \
     apt-get install -y python3-pip libffi-dev libgit2-dev git && \
-    pip3 install --upgrade pyOpenSSL pygit2 docker-py cherrypy jinja2 requests_oauthlib google-auth requests && \
+    pip3 install --upgrade pyOpenSSL pygit2==$pygit2_ver docker-py cherrypy jinja2 requests_oauthlib google-auth requests && \
     apt-get install -y salt-master
 
 RUN if [ "$API_ENABLED" = true ]; then \

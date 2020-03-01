@@ -13,6 +13,7 @@ env:
     - SALT_VER="" # use "" for latest stable, other options: "git 2019.2.2"
     - COMPOSE_VER="1.22.0"
     - KUBECTL_VER="v1.16.3"
+    - PYGIT2_VER="1.0.3"
     - GH_URL="https://kiemlicz.github.io/ambassador/"
     - BUILD_DIR=".local"
     - CHART_BRANCH="gh-pages"
@@ -29,11 +30,6 @@ jobs:
     - stage: test
       name: "Test and publish"
       env:
-        - DOCKER_IMAGE=debian-stretch
-      before_install: .travis/prepare.sh dry
-      script: .travis/test.sh dry
-      after_success: .travis/publish.sh docker
-    - env:
         - DOCKER_IMAGE=debian-buster
       before_install: .travis/prepare.sh dry
       script: .travis/test.sh dry
@@ -50,13 +46,6 @@ jobs:
     - stage: masterless
       name: "Masterless tests"
       before_install: .travis/prepare.sh masterless
-      script: .travis/test.sh masterless
-      env:
-        - DOCKER_IMAGE=debian-stretch
-        - BASE_IMAGE_TAG=stretch
-        - SALTENV=dev
-        - CONTEXT=dev
-    - before_install: .travis/prepare.sh masterless
       script: .travis/test.sh masterless
       env:
         - DOCKER_IMAGE=debian-buster

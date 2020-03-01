@@ -8,7 +8,7 @@ saltMaster:
   replicaCount: 1
 
   image:
-    repository: "envoy-master-debian-stretch"
+    repository: "envoy-master-debian-buster"
     tag: "latest"
     pullPolicy: IfNotPresent
 
@@ -51,7 +51,7 @@ saltMaster:
 
 saltMinion:
   image:
-    repository: "envoy-minion-debian-stretch"
+    repository: "envoy-minion-debian-buster"
     tag: "latest"
     pullPolicy: IfNotPresent
 
