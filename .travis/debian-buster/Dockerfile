@@ -29,7 +29,8 @@ FROM salt-base AS salt-master
 ARG api_enabled=false
 ARG k8s_api_enabled=false
 ARG kubectl_ver
-ARG pygit2_ver
+ARG pip3_kubernetes_ver
+ARG pip3_pygit2_ver
 ARG saltenv
 ENV API_ENABLED=$api_enabled
 ENV K8S_API_ENABLED=$k8s_api_enabled
@@ -37,11 +38,11 @@ ENV SALTENV=$saltenv
 
 # minimalistic config
 COPY .travis/config/master.conf /etc/salt/master.d/01-master.conf
-COPY .travis/debian-buster/entrypoint.sh /opt/
+COPY .travis/entrypoint.sh /opt/
 
 RUN apt-get update && \
     apt-get install -y python3-pip libffi-dev libgit2-dev git && \
-    pip3 install --upgrade pyOpenSSL pygit2==$pygit2_ver docker-py cherrypy jinja2 requests_oauthlib google-auth requests && \
+    pip3 install --upgrade pyOpenSSL pygit2==$pip3_pygit2_ver docker-py cherrypy jinja2 requests_oauthlib google-auth requests && \
     apt-get install -y salt-master
 
 RUN if [ "$API_ENABLED" = true ]; then \
@@ -52,7 +53,7 @@ RUN if [ "$K8S_API_ENABLED" = true ]; then \
         curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_ver/bin/linux/amd64/kubectl && \
         chmod +x kubectl && \
         mv kubectl /usr/bin/ && \
-        pip3 install kubernetes==10.0.1 && \
+        pip3 install kubernetes==$pip3_kubernetes_ver && \
         salt-run saltutil.sync_all; \
     fi
 
