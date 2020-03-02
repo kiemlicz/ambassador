@@ -21,6 +21,7 @@ helm_init:
 helm_plugin_{{ plugin }}:
   cmd.run:
     - name: "helm plugin install {{ plugin }}"
+    - runas: {{ helm.owner }}
     - env:
         - KUBECONFIG: {{ kubernetes.config.locations|join(':') }}
     - require:
@@ -31,6 +32,7 @@ helm_plugin_{{ plugin }}:
 helm_repo_{{ repo.name }}:
   cmd.run:
     - name: "helm repo add {{ repo.name }} {{ repo.url }}"
+    - runas: {{ helm.owner }}
     - env:
         - KUBECONFIG: {{ kubernetes.config.locations|join(':') }}
     - require:
@@ -42,6 +44,7 @@ helm_repo_{{ repo.name }}:
 helm_repo_update:
   cmd.run:
     - name: "helm repo update"
+    - runas: {{ helm.owner }}
     - env:
         - KUBECONFIG: {{ kubernetes.config.locations|join(':') }}
     - require:
