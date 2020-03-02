@@ -199,23 +199,21 @@ logstash:
   fullnameOverride: "logstash"
   persistence:
     enabled: false
-  inputs:
-    main: |-
+  logstashPipeline:
+    salt.conf: |-
       input {
         udp {
           port => 1514
           codec => json
         }
       }
-  filters:
-    main: |-
+
       filter {
         mutate {
           remove_field => [ "bracketprocess", "type", "colorname", "@version", "exc_info_on_loglevel", "stack_info", "jid", "tags", "colorprocess", "colormsg", "bracketlevel", "bracketname", "colorlevel" ]
         }
       }
-  outputs:
-    main: |-
+
       output {
         stdout { }
       }
