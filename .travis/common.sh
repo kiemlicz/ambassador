@@ -70,8 +70,9 @@ salt_install() {
 
 minikube_ready() {
     echo "Waiting for nodes..."
-    kubectl get nodes
-    kubectl wait nodes/minikube --for condition=ready
+    kubectl get nodes --show-labels
+    # since minikube 1.7.X the node name is equal to hostname
+    kubectl wait nodes/$(hostname) --for condition=ready
     echo "minikube setup complete"
 }
 
