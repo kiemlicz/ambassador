@@ -135,18 +135,12 @@ volume:
 logstash:
   enabled: false
   livenessProbe:
-    httpGet:
-      path: /
-      port: monitor
     initialDelaySeconds: 30
     periodSeconds: 30
     timeoutSeconds: 60
     failureThreshold: 6
     successThreshold: 1
   readinessProbe:
-    httpGet:
-      path: /
-      port: monitor
     initialDelaySeconds: 30
     periodSeconds: 30
     timeoutSeconds: 60
