@@ -17,7 +17,7 @@ helm_init:
       - cmd: helm
 {% endif %}
 
-{% for plugin in helm.plugins %}
+{%- for plugin in helm.plugins %}
 helm_plugin_{{ plugin }}:
   cmd.run:
     - name: "helm plugin install {{ plugin }}"
@@ -25,4 +25,24 @@ helm_plugin_{{ plugin }}:
         - KUBECONFIG: {{ kubernetes.config.locations|join(':') }}
     - require:
       - cmd: helm
-{% endfor %}
+{%- endfor %}
+
+{%- for repo in helm.repositories %}
+helm_repo_{{ repo.name }}:
+  cmd.run:
+    - name: "helm repo add {{ repo.name }} {{ repo.url }}"
+    - env:
+        - KUBECONFIG: {{ kubernetes.config.locations|join(':') }}
+    - require:
+      - cmd: helm
+    - require_in:
+      - cmd: helm_repo_update
+{%- endfor %}
+
+helm_repo_update:
+  cmd.run:
+    - name: "helm repo update"
+    - env:
+        - KUBECONFIG: {{ kubernetes.config.locations|join(':') }}
+    - require:
+      - cmd: helm

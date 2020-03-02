@@ -19,3 +19,6 @@ kubernetes:
 
 helm:
   owner: travis
+  repositories:
+    - name: elastic
+      url: https://helm.elastic.co

@@ -9,7 +9,7 @@ saltMaster:
 
   image:
     repository: "envoy-master-debian-buster"
-    tag: "latest"
+    tag: '{{ default "latest" .Chart.AppVersion }}'
     pullPolicy: IfNotPresent
 
   service:
@@ -52,7 +52,7 @@ saltMaster:
 saltMinion:
   image:
     repository: "envoy-minion-debian-buster"
-    tag: "latest"
+    tag: '{{ default "latest" .Chart.AppVersion }}'
     pullPolicy: IfNotPresent
 
   service:

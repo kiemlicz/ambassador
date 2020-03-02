@@ -1,6 +1,5 @@
 saltMaster:
   image:
-    tag: latest
     repository: "salt-master"
     pullPolicy: Never
   # travis uses dedicated image
@@ -33,7 +32,6 @@ saltMaster:
 
       ext_pillar_first: True
       pillar_merge_lists: True
-      pillar_opts: True
 
       use_superseded:
         - module.run
@@ -41,7 +39,6 @@ saltMaster:
       k8s:
         driver: kubectl
 
-    99-custom.conf: |-
       engines:
         - thorium: {}
         - k8s_events:
@@ -64,10 +61,10 @@ saltMaster:
       reactor:
         - 'salt/minion/*/start':
           - /srv/reactor/minion-ready.sls
-        #- 'salt/engines/docker_events/*':
-        #  - /srv/reactor/docker_events_reactor.sls
 
       log_fmt_console: '%(asctime)s,%(msecs)03d [%(levelname)-8s] %(message)s'
+
+    01-logstash.conf: |-
       logstash_udp_handler:
         host: logstash.salt-provisioning
         port: 1514
@@ -77,7 +74,7 @@ saltMaster:
     autosign: |-
       salt-*
 
-    02-netapi.conf: |-
+    01-netapi.conf: |-
       rest_cherrypy:
         port: 8000
         ssl_crt: /etc/pki/tls/certs/localhost.crt
@@ -127,18 +124,18 @@ saltMaster:
 
 saltMinion:
   image:
-    tag: latest
     repository: "salt-minion"
     pullPolicy: Never
 
   config:
-    99-custom.conf: |-
+    01-minion.conf: |-
       master: "salt-master"
 
       mine_functions:
         network.interfaces: []
         network.ip_addrs: []
 
+      # status beacon is required for thorium reactor, otherwise keydel removes minion without beacon-type communication
       beacons:
         status:
           - interval: 60
@@ -162,23 +159,8 @@ saltMinion:
 
       # todo research
       #auth_safemode: False
-      # this is not accounted as communication thus keydel could still remove such minion, this is why beacon is configured
-      # todo confirm !!!!!!!!!!!!
-      ping_interval: 1
       # when master rejects this minion, it will try to re-auth, fixme research if helps in master crash case
       # rejected_retry: True
-
-      # switching to k8s_events
-      #engines:
-      # - docker_events:
-      #     docker_url: unix://var/run/docker.sock
-      #     filters:
-      #       event:
-      #          - create
-      #          - start
-      #          - stop
-      #          - die
-      #          - oom
 
 clusterRole:
   verbs:

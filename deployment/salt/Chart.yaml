@@ -2,7 +2,7 @@ apiVersion: v2
 #appVersion: 2.2.0
 description: Salt deployment for in-k8s automations and orchestration
 name: salt
-version: 2.0.1
+version: 2.0.2
 type: application
 
 maintainers:
@@ -11,6 +11,6 @@ maintainers:
 
 dependencies:
   - name: logstash
-    version: 2.3.0
-    repository: "https://kubernetes-charts.storage.googleapis.com/"
+    version: 7.6.0
+    repository: "https://helm.elastic.co"
     condition: logstash.enabled
