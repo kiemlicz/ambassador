@@ -154,18 +154,9 @@ logstash:
     successThreshold: 1
   service:
     ports:
-      syslog-udp:
+      - name: syslog-udp
         port: 1514
-        targetPort: syslog-udp
         protocol: UDP
-      beats:
+      - name: beats
         port: 5044
-        targetPort: beats
         protocol: TCP
-  ports:
-    - name: syslog-udp
-      containerPort: 1514
-      protocol: UDP
-    - name: beats
-      containerPort: 5044
-      protocol: TCP
