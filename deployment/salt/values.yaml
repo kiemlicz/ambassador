@@ -31,6 +31,11 @@ saltMaster:
 
   apicerts: {}
 
+  # memory and cpu limits for salt-master, typically 4Gi is max
+  resources: {}
+
+  env: []
+
   readinessProbe:
     tcpSocket:
       port: publisher
@@ -59,6 +64,11 @@ saltMinion:
     name: salt-minion
 
   config: {}
+
+  # memory and cpu limits for salt-master, typically 1Gi is max
+  resources: {}
+
+  env: []
 
   # not using --local in minion probes, this way the probe succeeds only when established master communication
   # still not sure if this is good idea (master crash will cause minion restart as well)

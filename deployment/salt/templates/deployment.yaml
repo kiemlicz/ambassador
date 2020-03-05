@@ -30,6 +30,8 @@ spec:
         - name: {{ .Values.saltMaster.service.name }}
           image: {{ .Values.saltMaster.image.repository }}:{{ tpl .Values.saltMaster.image.tag . }}
           imagePullPolicy: {{ .Values.saltMaster.image.pullPolicy }}
+          env: {{ .Values.saltMaster.env | toYaml | nindent 12 }}
+          resources: {{ .Values.saltMaster.resources | toYaml | nindent 12 }}
           readinessProbe: {{ .Values.saltMaster.readinessProbe | toYaml | nindent 12 }}
           livenessProbe: {{ .Values.saltMaster.livenessProbe | toYaml | nindent 12 }}
 {{- if semverCompare "1.16.0" .Capabilities.KubeVersion.Version }}
@@ -78,6 +80,8 @@ spec:
         - name: {{ .Values.saltMinion.service.name }}
           image: {{ .Values.saltMinion.image.repository }}:{{ tpl .Values.saltMinion.image.tag . }}
           imagePullPolicy: {{ .Values.saltMinion.image.pullPolicy }}
+          env: {{ .Values.saltMinion.env | toYaml | nindent 12 }}
+          resources: {{ .Values.saltMinion.resources | toYaml | nindent 12 }}
           readinessProbe: {{ .Values.saltMinion.readinessProbe | toYaml | nindent 12 }}
           livenessProbe: {{ .Values.saltMinion.livenessProbe | toYaml | nindent 12 }}
 {{- if semverCompare "1.16.0" .Capabilities.KubeVersion.Version }}
