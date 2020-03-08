@@ -78,13 +78,13 @@ FROM salt-base AS dry-test
 #COPY .travis/reactor /srv/reactor
 COPY .travis/salt/dry-test-top.sls /srv/salt/base/top.sls
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/envoy_test.py /opt/
+COPY .travis/test-runner.py /opt/
 
 WORKDIR /opt
 
 RUN salt-call --local saltutil.sync_all
 
-ENTRYPOINT [ "python3", "/opt/envoy_test.py" ]
+ENTRYPOINT [ "python3", "/opt/test-runner.py" ]
 CMD []
 
 
@@ -107,27 +107,3 @@ RUN printf '#!/bin/bash\necho "N 5"' > /sbin/runlevel && \
     chmod 775 /sbin/runlevel
 
 CMD salt-call --local state.highstate saltenv=$SALTENV -l $LOG_LEVEL
-
-
-FROM salt-master AS master-compose-test
-
-ARG saltenv
-ARG log_level
-
-ENV SALTENV=$saltenv
-ENV LOG_LEVEL=$log_level
-
-COPY .travis/entrypoint_master_run.sh /opt/
-COPY .travis/scan_events.py /opt/
-COPY .travis/config/master.conf /etc/salt/master.d/master.conf
-COPY .travis/config/autosign.conf /etc/salt/autosign.conf
-COPY .travis/config/reactor_orch.conf /etc/salt/master.d/reactor.conf
-COPY .travis/config/reactor/orch /srv/reactor
-COPY .travis/pillar/ /srv/pillar/
-COPY .travis/salt/ /srv/salt/
-COPY .travis/salt/dev/top.sls /srv/salt/base/
-
-RUN chmod 600 /etc/salt/autosign.conf && \
-    salt-run saltutil.sync_all
-
-CMD [ "/opt/entrypoint_master_run.sh" ]

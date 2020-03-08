@@ -31,7 +31,6 @@ users:
           - "YfqjhSJK47ksdjhf7sdfa09sdV"
           - "YfqajhSsdsaJK47ksdjhf7sdfa09sdV"
           enc: "ssh-rsa"
-        - source: salt://keys/user_key.pub
       ssh:
         home:
           privkey_location: {{ home_dir }}/.ssh/id_rsa
@@ -71,11 +70,13 @@ users:
           pubkey_location: {{ home_dir }}/.ssh/cfg_ro.key.pub
           override: False
     vpn:
-    {% if grains['domain'] == 'somewhere' %}
-      - name: nameofvpn
+      - name: somename
         location: {{ home_dir }}/.vpn/
-        source: "salt://some/VPN/"
-    {% endif %}
+        config: |
+          important
+          vpn
+          long
+          data
     dotfile:
       repo: https://github.com/kiemlicz/ambassador.git
       branch: test-dotfiles
@@ -118,7 +119,6 @@ users:
       - wireshark
       - docker
       - vboxusers
-      - fancygroup
     user_dirs:
       - {{ other_home_dir }}/bin
       - {{ other_home_dir }}/downloads
@@ -141,4 +141,3 @@ users:
         target: {{ home_dir }}/projects/open-source/fzf
         cmds:
           - 'yes | {{ home_dir }}/projects/open-source/fzf/install'
----

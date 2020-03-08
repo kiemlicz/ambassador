@@ -15,9 +15,9 @@ def render(template, saltenv='base', sls='', **kwargs):
         template = template.read()
 
     log.debug("Template = {}".format(template))
-
+    # fixme proper python3 support
     mod = imp.new_module(sls)
-    exec template in mod.__dict__
+    exec(template, mod.__dict__)
 
     if '__env__' not in kwargs:
         setattr(mod, '__env__', saltenv)
@@ -35,5 +35,6 @@ def render(template, saltenv='base', sls='', **kwargs):
     try:
         return mod.run()
     except Exception:
+        log.exception("Unable to run dynamic module")
         trb = traceback.format_exc()
         raise SaltRenderError(trb)

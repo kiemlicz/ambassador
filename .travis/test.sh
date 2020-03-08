@@ -28,15 +28,17 @@ k8s_log_error() {
 while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
 
 case "$1" in
-dry)
-    docker run --privileged "$BASE_PUB_NAME-dry-test-$DOCKER_IMAGE:$TAG"
+salt-test)
+    #docker run --privileged "$BASE_PUB_NAME-dry-test-$DOCKER_IMAGE:$TAG"
+    docker run --hostname "$CONTEXT-host" --privileged "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:$TAG"
     result=$?
-    kill %1
+    kill %1  # kill the while loop
     # in order to return proper exit code instead of always 0 (of kill command)
     exit $result
     ;;
 masterless)
     # privileged mode is necessary for e.g. setting: net.ipv4.ip_forward or running docker in docker
+    # all of below can be done in test-runner.py
     name="ambassador-salt-masterless-run-$TRAVIS_JOB_NUMBER"
     docker run --name $name --hostname "$CONTEXT-host" --privileged "masterless-test-$DOCKER_IMAGE:$TAG" 2>&1 | tee output
     exit_code=${PIPESTATUS[0]}  # gets the exit code of first (piped) process
@@ -108,4 +110,7 @@ salt-master-run-k8s)
 
     echo "Deployment testing finished"
     ;;
+*)
+    echo "No such test"
+  ;;
 esac

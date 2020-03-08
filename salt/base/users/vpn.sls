@@ -20,7 +20,7 @@
       - user: {{ username }}
 
 {% elif pillar[vpn_config] is defined or v.source_file is defined %}
-
+# fixme it is not possible to setup VPN using contents
 {{ username }}_vpn_{{ v.name }}_file:
   file_ext.managed:
     - name: {{ v.location }}/{{ v.name }}
