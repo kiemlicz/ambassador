@@ -1,6 +1,4 @@
 {% from "os/mounts/map.jinja" import mounts with context %}
-
-
 {% for mount in mounts.list %}
 {{ mount.dev }}_mount:
   mount.mounted:

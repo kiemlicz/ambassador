@@ -1,9 +1,6 @@
 {% set default_pkgs = salt['grains.filter_by']({
       'default': {
-         'os_packages': ["vim", "sudo", "man", "insserv", "git", "curl", "ca-certificates", "gnupg2"],
-         'sources': [{
-             'keepassxc': "https://github.com/magkopian/keepassxc-debian/releases/download/2.3.3/keepassxc_2.3.3-1_amd64_stable_stretch.deb"
-          }],
+         'os_packages': ["vim", "sudo", "insserv", "git", "curl", "ca-certificates", "gnupg2", "python3-pip"],
          'post_install': ['echo "command3"', 'echo "command4"', 'echo "command5"'],
       },
 
@@ -15,7 +12,7 @@
     }, grain='oscodename')) %}
 pkgs:
   dist_upgrade: True
-  os_packages: {{ default_pkgs | tojson }}
+  os_packages: {{ default_pkgs.os_packages | tojson }}
   versions:
     - "python-pip: 9.0.1-2.3"
   pip3_packages:
@@ -34,4 +31,3 @@ pkgs:
           - zsh
   purged:
     - xserver-xorg-video-intel
-

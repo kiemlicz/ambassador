@@ -91,6 +91,7 @@ ENTRYPOINT [ "python3", "/opt/test-runner.py" ]
 CMD []
 
 
+# to be removed
 FROM salt-base AS masterless-test
 
 ARG log_level="info"

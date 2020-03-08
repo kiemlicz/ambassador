@@ -1,12 +1,16 @@
 server:
-  'dry-host': []
-  'base-host':
+  'dry-host':
     - os
     - os.pkgs.unattended
     - samba
     - users
     - mail
+    - minion
+    - minion.upgrade
+    - lxc
     - java
+    - erlang
+    - rebar
     - scala
     - gradle
     - maven
@@ -14,10 +18,25 @@ server:
     - intellij
     - gatling
     - grafana
+    - influxdb
     - virtualbox
+    - redis.client
+    - mongodb.client
     - docker
     - docker.compose
+    - keepalived
+    - lvs.director
+    - lvs.realserver
     - kvm
     - kubernetes.client
+    - kubernetes.minikube
+    - kubernetes.master
+    - kubernetes.worker
     - kubernetes.helm
     - vagrant
+  'salt-test-host':
+    - os
+    - os.pkgs.unattended
+    - samba
+    - users
+    - mail
