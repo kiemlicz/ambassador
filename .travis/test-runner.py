@@ -7,6 +7,7 @@ import unittest
 import pprint
 import logging
 import sys
+import argparse
 from pathlib import Path
 from typing import List, Dict, Any
 
@@ -17,6 +18,7 @@ from salt.exceptions import CommandExecutionError
 
 pp = pprint.PrettyPrinter(indent=4)
 log = logging.getLogger()
+# this settings override salt's one causing log to be terrible, at least copy the default format
 # log.level = logging.getLevelName(os.environ.get('LOG_LEVEL', 'INFO'))
 log.level = logging.INFO
 stream_handler = logging.StreamHandler(sys.stdout)
@@ -95,6 +97,8 @@ class SaltStatesTest(ParametrizedSaltTestCase):
         caller = self._get_client()
         log.info("saltenv: %s", self.saltenv)
         try:
+            # not running sync_all in Dockerfile so that no Minion ID will be generated
+            caller.cmd("saltutil.sync_all", saltenv=self.saltenv)
             tops = caller.cmd("state.show_top")
             self.assertFalse(len(tops) == 0, "empty state.show_top output")
             for env, states in tops.items():
@@ -136,20 +140,29 @@ class SaltCheckTest(ParametrizedSaltTestCase):
 
     def _assertHighstateResult(self, result):
         if not isinstance(result, dict):
-            log.error("Unexpected highstate return: %s", result)
-            self.fail("Unexpected highstate return")
+            log.error("Unexpected (expected dict) highstate return: %s", result)
+            self.fail("Unexpected (expected dict) highstate return")
         if not all([e['result'] for e in result.values()]):
-            log.error("Highstate contains failures:\n%s", pp.pformat([e for e in result.values() if not e['result']]))
+            output = [{**e, 'comment': "".join(e['comment'])} for e in result.values() if not e['result']]
+            log.error("Highstate contains failures:\n%s", pp.pformat(output))
             self.fail("Highstate contains failures")
 
 
 if __name__ == "__main__":
     suite = unittest.TestSuite()
-    # todo split into separate runs if takes too long
-    # testing only for 'top-most' saltenv which includes all other saltenvs
-    pillars=ParametrizedSaltTestCase.generate_pillars()
-    #suite.addTest(ParametrizedSaltTestCase.parametrize(SaltStatesTest, pillar=pillars, saltenv="server"))
-    suite.addTest(ParametrizedSaltTestCase.parametrize(SaltCheckTest, pillar=pillars[:1], saltenv="server"))
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--tests', nargs="+", default='dry', type=str, required=True)
+    args = parser.parse_args()
+
+    pillars = ParametrizedSaltTestCase.generate_pillars()
+    if 'dry' in args.tests:
+        log.info("Adding dry run tests")
+        # testing only for 'top-most' saltenv which includes all other saltenvs
+        suite.addTest(ParametrizedSaltTestCase.parametrize(SaltStatesTest, pillar=pillars, saltenv="server"))
+    if 'saltcheck' in args.tests:
+        log.info("Adding Saltcheck tests")
+        suite.addTest(ParametrizedSaltTestCase.parametrize(SaltCheckTest, pillar=pillars[:1], saltenv="server"))
 
     log.info("Starting tests")
     result = unittest.TextTestRunner(verbosity=2).run(suite)

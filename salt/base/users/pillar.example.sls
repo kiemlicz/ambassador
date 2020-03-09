@@ -28,8 +28,7 @@ users:
     sec:
       ssh_authorized_keys:
         - names:
-          - "YfqjhSJK47ksdjhf7sdfa09sdV"
-          - "YfqajhSsdsaJK47ksdjhf7sdfa09sdV"
+          - "AAAAB3NzaC1yc2EAAAADAQABAAABAQD6h7LmHyVGAiBfHR30m/ldSlrP7jeHM0UZKZLc7aR8KMfwHl48TwbbD4egYA7xooYICcOhdhcIfG91YKxYfEJYTawWZtDPfRRsN3FIPJpGREcmYtItoQxLkkLcrMLy2IeK62dRmfx93xr40SFBbfs4hG2eVnhEWc9b1tLPywEa9zrv1HSTLX3vbL+19SK0nqa1L/BU0H2kzP+Lbjv4apJ8IPrwkpglWMvsu/4S4cRs91oyO8WcRZazB929AOMAlzfIEKemWHspXQWP91Ot/xgiSe0u7l8JGCxuX/wReC3ijku0WExCo5gEDJnbHw4PEL0YGHWoY8VIBz28YeOuCE5B"
           enc: "ssh-rsa"
       ssh:
         home:

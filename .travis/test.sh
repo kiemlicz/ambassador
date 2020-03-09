@@ -29,29 +29,14 @@ while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
 
 case "$1" in
 salt-test)
+    # privileged mode is necessary for e.g. setting: net.ipv4.ip_forward or running docker in docker
+    # check if https://stackoverflow.com/questions/33013539/docker-loading-kernel-modules is possible on travis
     #docker run --privileged "$BASE_PUB_NAME-dry-test-$DOCKER_IMAGE:$TAG"
-    docker run --hostname "$CONTEXT-host" --privileged "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:$TAG"
+    docker run --hostname "$CONTEXT-host" --privileged "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:$TAG" --tests $TEST
     result=$?
     kill %1  # kill the while loop
     # in order to return proper exit code instead of always 0 (of kill command)
     exit $result
-    ;;
-masterless)
-    # privileged mode is necessary for e.g. setting: net.ipv4.ip_forward or running docker in docker
-    # all of below can be done in test-runner.py
-    name="ambassador-salt-masterless-run-$TRAVIS_JOB_NUMBER"
-    docker run --name $name --hostname "$CONTEXT-host" --privileged "masterless-test-$DOCKER_IMAGE:$TAG" 2>&1 | tee output
-    exit_code=${PIPESTATUS[0]}  # gets the exit code of first (piped) process
-    kill %1
-    if [[ "$exit_code" != 0 ]]; then
-        echo "found failures"
-        exit $exit_code
-    fi
-    result=$(awk '/^Failed:/ {if($2 != "0") print "fail"}' output)
-    if [[ "$result" == "fail" ]]; then
-        echo "found failures"
-        exit 3
-    fi
     ;;
 salt-master-run-compose)
     # --exit-code-from master isn't the way to go as implies --abort-on-container-exit

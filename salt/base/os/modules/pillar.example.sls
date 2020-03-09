@@ -1,7 +1,6 @@
 kernel_modules:
-  absent:
-    - name: novueau
-      persist: True
+  absent: []
+  present: []
 ---
 kernel_modules:
   present:

@@ -34,7 +34,7 @@ server:
     - kubernetes.worker
     - kubernetes.helm
     - vagrant
-  'salt-test-host':
+  'base-host':
     - os
     - os.pkgs.unattended
     - samba

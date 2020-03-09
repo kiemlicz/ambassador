@@ -1,13 +1,13 @@
 {% set default_pkgs = salt['grains.filter_by']({
       'default': {
-         'os_packages': ["vim", "sudo", "insserv", "git", "curl", "ca-certificates", "gnupg2", "python3-pip"],
+         'os_packages': ["cron", "vim", "sudo", "insserv", "git", "curl", "ca-certificates", "gnupg2", "python3-pip", "fonts-powerline"],
          'post_install': ['echo "command3"', 'echo "command4"', 'echo "command5"'],
       },
 
     },
     merge=salt['grains.filter_by']({
       'bionic': {
-        'os_packages': ["vim", "sudo", "man-db", "rsync", "zsh", "git", "curl", "ntp",  "ca-certificates", "gnupg2", "python3-pip", "vim-gtk3", "fonts-powerline"],
+        'os_packages': ["cron", "vim", "sudo", "man-db", "rsync", "zsh", "git", "curl", "ntp",  "ca-certificates", "gnupg2", "python3-pip", "vim-gtk3", "fonts-powerline"],
       }
     }, grain='oscodename')) %}
 pkgs:
@@ -16,9 +16,9 @@ pkgs:
   versions:
     - "python-pip: 9.0.1-2.3"
   pip3_packages:
-    - google-auth
+    - google-api-python-client
+    - google-auth-httplib2
     - google-auth-oauthlib
-    - pyasn1-modules
     - powerline-status
   post_install:
     - "echo 'test'"

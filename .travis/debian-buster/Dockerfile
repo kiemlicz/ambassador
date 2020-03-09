@@ -85,8 +85,6 @@ COPY .travis/test-runner.py /opt/
 
 WORKDIR /opt
 
-RUN salt-call --local saltutil.sync_all
-
 ENTRYPOINT [ "python3", "/opt/test-runner.py" ]
 CMD []
 

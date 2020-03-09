@@ -17,13 +17,6 @@ salt-test)
     docker_build salt-master "$BASE_PUB_NAME-master-$DOCKER_IMAGE:$TAG"
     docker_build salt-test "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:$TAG"
     ;;
-masterless)
-    # to be removed
-    if [ "$TRAVIS" = "true" ]; then
-        docker_update
-    fi
-    docker_build masterless-test "masterless-test-$DOCKER_IMAGE:$TAG"
-    ;;
 salt-master-run-compose)
     if [ "$TRAVIS" = "true" ]; then
         docker_update

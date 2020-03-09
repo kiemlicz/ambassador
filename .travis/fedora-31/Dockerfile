@@ -59,16 +59,14 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD [ "/usr/bin/salt-master" ]
 
 
-FROM salt-base AS dry-test
+# to be merged with masterless
+FROM salt-base AS salt-test
 
-COPY .travis/reactor /srv/reactor
 COPY .travis/salt/dry-test-top.sls /srv/salt/base/top.sls
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
 COPY .travis/test-runner.py /opt/
 
 WORKDIR /opt
-
-RUN salt-call --local saltutil.sync_all
 
 ENTRYPOINT [ "python3", "/opt/test-runner.py" ]
 CMD []

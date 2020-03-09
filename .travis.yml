@@ -32,53 +32,65 @@ jobs:
       name: "Test and publish"
       env:
         - DOCKER_IMAGE=debian-buster
-      before_install: .travis/prepare.sh dry
-      script: .travis/test.sh dry
+        - CONTEXT=dry
+        - TEST=dry
+      before_install: .travis/prepare.sh salt-test
+      script: .travis/test.sh salt-test
       after_success: .travis/publish.sh docker
     - env:
         - DOCKER_IMAGE=ubuntu-bionic
-      before_install: .travis/prepare.sh dry
-      script: .travis/test.sh dry
+        - CONTEXT=dry
+        - TEST=dry
+      before_install: .travis/prepare.sh salt-test
+      script: .travis/test.sh salt-test
       after_success: .travis/publish.sh docker
     - env:
         - DOCKER_IMAGE=fedora-31
-      before_install: .travis/prepare.sh dry
-      script: .travis/test.sh dry
+        - CONTEXT=dry
+        - TEST=dry
+      before_install: .travis/prepare.sh salt-test
+      script: .travis/test.sh salt-test
+# fixme try to merge together masterless with dry
     - stage: masterless
       name: "Masterless tests"
-      before_install: .travis/prepare.sh masterless
-      script: .travis/test.sh masterless
+      before_install: .travis/prepare.sh salt-test
+      script: .travis/test.sh salt-test
       env:
         - DOCKER_IMAGE=debian-buster
         - BASE_IMAGE_TAG=buster
         - SALTENV=base
         - CONTEXT=base
-    - before_install: .travis/prepare.sh masterless
-      script: .travis/test.sh masterless
+        - TEST=saltcheck
+    - before_install: .travis/prepare.sh salt-test
+      script: .travis/test.sh salt-test
       env:
         - DOCKER_IMAGE=debian-buster
         - BASE_IMAGE_TAG=buster
         - SALTENV=base
         - CONTEXT=gui
-    - before_install: .travis/prepare.sh masterless
-      script: .travis/test.sh masterless
+        - TEST=saltcheck
+    - before_install: .travis/prepare.sh salt-test
+      script: .travis/test.sh salt-test
       env:
         - DOCKER_IMAGE=debian-buster
         - BASE_IMAGE_TAG=buster
         - SALTENV=dev
         - CONTEXT=dev
-    - before_install: .travis/prepare.sh masterless
-      script: .travis/test.sh masterless
+        - TEST=saltcheck
+    - before_install: .travis/prepare.sh salt-test
+      script: .travis/test.sh salt-test
       env:
         - DOCKER_IMAGE=ubuntu-bionic
         - SALTENV=base
         - CONTEXT=base
-    - before_install: .travis/prepare.sh masterless
-      script: .travis/test.sh masterless
+        - TEST=saltcheck
+    - before_install: .travis/prepare.sh salt-test
+      script: .travis/test.sh salt-test
       env:
         - DOCKER_IMAGE=ubuntu-bionic
         - SALTENV=dev
         - CONTEXT=dev
+        - TEST=saltcheck
     - stage: k8s
       name: "Kubernetes tests"
       env:
