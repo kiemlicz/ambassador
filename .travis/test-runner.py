@@ -91,6 +91,15 @@ class ParametrizedSaltTestCase(unittest.TestCase):
 
 
 class SaltStatesTest(ParametrizedSaltTestCase):
+    def setUp(self) -> None:
+        with open("/tmp/pillar.json", "w") as output:
+            json.dump({}, output)
+        log.info("Pillar setup for dry test completed")
+
+    def tearDown(self) -> None:
+        os.remove("/tmp/pillar.json")
+        log.info("Pillar for dry test removed")
+
     def test_states_syntax(self):
         self.assertTrue(os.path.isdir(os.path.join(self.saltenv_location, self.saltenv)),
                         msg="salt states not found: {}".format(os.path.join(self.saltenv_location, self.saltenv)))
