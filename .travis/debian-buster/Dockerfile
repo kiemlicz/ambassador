@@ -79,14 +79,16 @@ ARG saltenv
 ENV SALTENV=$saltenv
 ENV LOG_LEVEL=$log_level
 
+RUN apt-get install -y python3-pip vim && pip3 install --upgrade pytest pytest-xdist redis
+
 COPY .travis/salt/top.sls /srv/salt/base/top.sls
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/test-runner.py /opt/
+COPY .travis/conftest.py .travis/test-runner-pytest.py /opt/
 
 WORKDIR /opt
 
-ENTRYPOINT [ "python3", "/opt/test-runner.py" ]
-CMD []
+ENTRYPOINT [ "pytest", "test-runner-pytest.py" ]
+CMD ["--log-level", "INFO" ]
 
 
 # to be removed

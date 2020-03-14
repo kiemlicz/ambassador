@@ -7,6 +7,7 @@ dist: bionic
 
 services:
   - docker
+  - redis
 
 env:
   global:

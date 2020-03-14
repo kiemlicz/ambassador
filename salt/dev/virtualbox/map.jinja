@@ -10,9 +10,11 @@
     },
     'Debian': {
         'file': '/etc/apt/sources.list.d/virtualbox.list',
-        'names': ["deb http://download.virtualbox.org/virtualbox/debian " + dist_codename + " contrib"],
-        'key_url': "https://www.virtualbox.org/download/oracle_vbox_2016.asc",
-        'pkg_name': "virtualbox-6.0",
+        'names': [
+            "deb [arch=amd64] https://download.virtualbox.org/virtualbox/debian " + dist_codename + " contrib"
+        ],
+        'key_url': "https://www.virtualbox.org/download/oracle_vbox.asc",
+        'pkg_name': "virtualbox-6.1",
     }
 }, merge=salt['grains.filter_by']({
     'sid': {

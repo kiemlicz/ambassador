@@ -1,5 +1,5 @@
 server:
-  'dry-host':
+  'syntax-host':
     - os
     - os.pkgs.unattended
     - samba
@@ -16,12 +16,9 @@ server:
     - maven
     - sbt
     - intellij
-    - gatling
     - grafana
     - influxdb
     - virtualbox
-    - redis.client
-    - mongodb.client
     - docker
     - docker.compose
     - keepalived

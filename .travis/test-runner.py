@@ -8,8 +8,9 @@ import pprint
 import logging
 import sys
 import argparse
+from hashlib import sha256
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Set
 
 import salt.client
 import salt.minion
@@ -17,7 +18,7 @@ from salt.exceptions import CommandExecutionError
 
 
 pp = pprint.PrettyPrinter(indent=4)
-log = logging.getLogger()
+log = logging.getLogger("test-runner")
 # this settings override salt's one causing log to be terrible, at least copy the default format
 # log.level = logging.getLevelName(os.environ.get('LOG_LEVEL', 'INFO'))
 log.level = logging.INFO
@@ -31,11 +32,13 @@ class ParametrizedSaltTestCase(unittest.TestCase):
     """
 
     def __init__(self,
-                 methodName='runTest',
-                 saltenv=None,
-                 saltenv_location=None,
-                 pillar=None):
+                 methodName: str ='runTest',
+                 saltenv:str =None,
+                 saltenv_location: str=None,
+                 pillar: Dict[str, Any] = None,
+                 computed_sls_cache: Set[str] = None):
         super(ParametrizedSaltTestCase, self).__init__(methodName)
+        self.computed_sls_cache = computed_sls_cache
         self.saltenv = saltenv
         self.saltenv_location = saltenv_location
         self.pillar = pillar
@@ -80,13 +83,16 @@ class ParametrizedSaltTestCase(unittest.TestCase):
         testloader = unittest.TestLoader()
         testnames = testloader.getTestCaseNames(testcase_klass)
         suite = unittest.TestSuite()
+        computed_sls_cache = set()
         for test_case_name, pillar in itertools.product(testnames, pillar):
             suite.addTest(testcase_klass(test_case_name,
                                          saltenv=saltenv,
                                          saltenv_location=saltenv_location,
-                                         pillar=pillar
+                                         pillar=pillar,
+                                         computed_sls_cache=computed_sls_cache
                                          )
                           )
+        log.info("Returning: %s test cases", suite.countTestCases())
         return suite
 
 
@@ -94,18 +100,24 @@ class SaltStatesTest(ParametrizedSaltTestCase):
     def setUp(self) -> None:
         with open("/tmp/pillar.json", "w") as output:
             json.dump({}, output)
-        log.info("Pillar setup for dry test completed")
+        log.debug("Pillar setup for dry test completed")
 
     def tearDown(self) -> None:
         os.remove("/tmp/pillar.json")
-        log.info("Pillar for dry test removed")
+        log.debug("Pillar for dry test removed")
 
     def test_states_syntax(self):
         self.assertTrue(os.path.isdir(os.path.join(self.saltenv_location, self.saltenv)),
                         msg="salt states not found: {}".format(os.path.join(self.saltenv_location, self.saltenv)))
         caller = self._get_client()
         log.info("saltenv: %s", self.saltenv)
+
+        def discriminator(sub_pillar: Dict[str, Any], env: str):
+            return sha256("{}:{}".format(json.dumps(sub_pillar, sort_keys=True), env).encode("utf-8")).hexdigest()
+
         try:
+            states_evaluated = 0
+            states_already_cached = 0
             # not running sync_all in Dockerfile so that no Minion ID will be generated
             caller.cmd("saltutil.sync_all", saltenv=self.saltenv)
             tops = caller.cmd("state.show_top")
@@ -113,11 +125,23 @@ class SaltStatesTest(ParametrizedSaltTestCase):
             for env, states in tops.items():
                 self.assertFalse(len(states) == 0, "NOT expecting empty state list for env: {}".format(env))
                 for state in states:
-                    result_sls = caller.cmd("state.show_sls", state, saltenv=env, pillar=self.pillar)
-                    self.assertTrue(
-                        isinstance(result_sls, dict),
-                        msg="rendering of: {} (saltenv={}), failed with: {}\npillar: {}".format(state, env, "".join(result_sls) if isinstance(result_sls, list) else result_sls, pp.pformat(self.pillar))
-                    )
+                    # todo prove this works even for included states
+                    pillar_hash = discriminator(self.pillar[state], env) if state in self.pillar else None
+                    if pillar_hash is None or pillar_hash not in self.computed_sls_cache:
+                        if pillar_hash is None:
+                            log.warning("The state %s doesn't contain dedicated pillar, state is re-evaluated", state)
+                        result_sls = caller.cmd("state.show_sls", state, saltenv=env, pillar=self.pillar)
+                        # fixme how to print immediate feedback? other than log.error?
+                        self.assertTrue(
+                            isinstance(result_sls, dict),
+                            msg="rendering of: {} (saltenv={}), failed with: {}\npillar: {}".format(state, env, "".join(result_sls) if isinstance(result_sls, list) else result_sls, pp.pformat(self.pillar))
+                        )
+                        self.computed_sls_cache.add(pillar_hash)
+                        states_evaluated += 1
+                    else:
+                        states_already_cached += 1
+                        log.info("State: %s was already tested", state)
+            log.info("Total states evaluated: %s, not evaluated: %s", states_evaluated, states_already_cached)
         except CommandExecutionError:
             log.exception("Unexpected test failure")
             self.fail("Unexpected error, failing...")
