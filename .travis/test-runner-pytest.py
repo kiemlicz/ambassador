@@ -41,6 +41,17 @@ def ext_pillar_empty():
     return
 
 
+@pytest.fixture(scope="module")
+def ext_pillar_saltcheck(pillars_with_dependencies: Tuple[List[Dict[str, Any]], Dict[str, Set[str]]]):
+    generated, dependencies = pillars_with_dependencies
+    with open("/tmp/pillar.json", "w") as output:
+        json.dump(generated[0], output)
+    log.info("Saltcheck ext_pillar setup")
+    yield
+    os.remove("/tmp/pillar.json")
+    log.info("Saltcheck pillar removed")
+
+
 @pytest.fixture(scope="session")
 def salt_client(saltenv: str) -> salt.client.Caller:
     client = salt.client.Caller()
@@ -56,6 +67,13 @@ def redis_client() -> redis.Redis:
 
 @pytest.fixture(scope="session")
 def pillars_with_dependencies(salt_client: salt.client.Caller, pillar_location: str) -> Tuple[List[Dict[str, Any]], Dict[str, Set[str]]]:
+    '''
+    Generates the test pillar dict based on **every** pillar.example.sls found in Salt State Tree
+    All pillar.example.sls'es are found and merged together, if pillar.example.sls contains multiple YAML documents -
+    they are treated as separate files and both tested (cartesian product)
+
+    pillar.example.sls must be found right under state root directory (same level as init.sls)
+    '''
     all_pillars = {}  # state sls path -> list(pillar1, pillar2)
     state_pillar_dependencies = {}  # state sls name -> list(pillar_key1, pillar_key2)
     for pillar_file in Path(pillar_location).glob('**/pillar.example.sls'):
@@ -71,6 +89,7 @@ def pillars_with_dependencies(salt_client: salt.client.Caller, pillar_location: 
                     state_pillar_dependencies.setdefault(sls, set()).update(rendered.keys())
     generated = [salt_client.cmd("slsutil.merge_all", list(e)) for e in itertools.product(*all_pillars.values())]
     generated.append({})  # add empty pillar
+    # generated's first entry contains every first pillar.example.sls entry
 
     tops = salt_client.cmd("state.show_top")
     for env, states in tops.items():
@@ -144,5 +163,21 @@ def test_syntax(salt_client: salt.client.Caller, redis_client: redis.Redis, pill
                         log.info("State: %s was already tested", state)
             log.info("Total states evaluated: %s, not evaluated: %s", states_evaluated, states_already_cached)
         except CommandExecutionError:
-            log.exception("Unexpected test failure")
             pytest.fail("Unexpected error, failing...")
+
+
+@pytest.mark.saltcheck
+def test_saltcheck(salt_client: salt.client.Caller, saltenv: str, ext_pillar_saltcheck: Any):
+    try:
+        # output formatting
+        minion_id = salt_client.cmd("grains.get", "id")
+        log.info("Starting tests for minion id: %s", minion_id)
+        highstate_result = salt_client.cmd("state.highstate", saltenv=saltenv)
+        log.debug("Highstate result:\n%s", pp.pformat(highstate_result))
+        assert isinstance(highstate_result, dict), "Unexpected (expected dict) highstate return: {}".format(pp.pformat(highstate_result))
+        assert all([e['result'] for e in highstate_result.values()]), "Highstate contains failures:\n{}".format(pp.pformat([{**e, 'comment': "".join(e['comment'])} for e in highstate_result.values() if not e['result']]))
+        log.info("Running Saltcheck")
+        saltcheck_result = salt_client.cmd("saltcheck.run_highstate_tests", saltenv=saltenv)
+        log.info("Saltcheck result:\n%s", pp.pformat(saltcheck_result))
+    except CommandExecutionError:
+        pytest.fail("Unexpected saltcheck test failure")

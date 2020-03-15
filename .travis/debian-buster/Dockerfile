@@ -71,7 +71,6 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD [ "/opt/entrypoint.sh" ]
 
 
-# to be merged with masterless
 FROM salt-base AS salt-test
 
 ARG log_level="INFO"
@@ -79,32 +78,7 @@ ARG saltenv
 ENV SALTENV=$saltenv
 ENV LOG_LEVEL=$log_level
 
-RUN apt-get install -y python3-pip vim && pip3 install --upgrade pytest pytest-xdist redis
-
-COPY .travis/salt/top.sls /srv/salt/base/top.sls
-COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/conftest.py .travis/test-runner-pytest.py .travis/pytest.ini /opt/
-
-WORKDIR /opt
-
-ENTRYPOINT [ "pytest", "test-runner-pytest.py" ]
-CMD ["--log-level", "INFO" ]
-
-
-# to be removed
-FROM salt-base AS masterless-test
-
-ARG log_level="info"
-ARG saltenv
-
-ENV SALTENV=$saltenv
-ENV LOG_LEVEL=$log_level
-
-# merge with dry test, pass option to test-runner
-# masterless now completely gone?
-COPY .travis/pillar/masterless/ /srv/pillar/
-COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/salt/masterless-test-top.sls /srv/salt/base/top.sls
+RUN apt-get install -y python3-pip && pip3 install --upgrade pytest pytest-xdist redis
 
 # workaround for salt's service state
 # somehow in masterless config the service provider cannot be overriden
@@ -112,4 +86,11 @@ COPY .travis/salt/masterless-test-top.sls /srv/salt/base/top.sls
 RUN printf '#!/bin/bash\necho "N 5"' > /sbin/runlevel && \
     chmod 775 /sbin/runlevel
 
-CMD salt-call --local state.highstate saltenv=$SALTENV -l $LOG_LEVEL
+COPY .travis/top.sls /srv/salt/base/top.sls
+COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
+COPY .travis/conftest.py .travis/test-runner-pytest.py .travis/pytest.ini /opt/
+
+WORKDIR /opt
+
+ENTRYPOINT [ "pytest", "test-runner-pytest.py" ]
+CMD ["--log-level", "INFO" ]

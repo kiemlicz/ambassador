@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 COPY salt /srv/salt
 
-RUN apt-get update && apt-get install -y curl procps dirmngr iproute2 dumb-init && \
+RUN apt-get update && apt-get install -y curl dirmngr iproute2 dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver
 
@@ -73,7 +73,6 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD [ "/opt/entrypoint.sh" ]
 
 
-# to be merged with masterless
 FROM salt-base AS salt-test
 
 ARG log_level="INFO"
@@ -81,27 +80,7 @@ ARG saltenv
 ENV SALTENV=$saltenv
 ENV LOG_LEVEL=$log_level
 
-COPY .travis/salt/top.sls /srv/salt/base/top.sls
-COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/test-runner.py /opt/
-
-WORKDIR /opt
-
-ENTRYPOINT [ "python3", "/opt/test-runner.py" ]
-CMD []
-
-
-FROM salt-base AS masterless-test
-
-ARG log_level="info"
-ARG saltenv
-
-ENV SALTENV=$saltenv
-ENV LOG_LEVEL=$log_level
-
-COPY .travis/pillar/masterless/ /srv/pillar/
-COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/salt/masterless-test-top.sls /srv/salt/base/top.sls
+RUN apt-get install -y python3-pip && pip3 install --upgrade pytest pytest-xdist redis
 
 # workaround for salt's service state
 # somehow in masterless config the service provider cannot be overriden
@@ -109,4 +88,11 @@ COPY .travis/salt/masterless-test-top.sls /srv/salt/base/top.sls
 RUN printf '#!/bin/bash\necho "N 5"' > /sbin/runlevel && \
     chmod 775 /sbin/runlevel
 
-CMD salt-call --local state.highstate saltenv=$SALTENV -l $LOG_LEVEL
+COPY .travis/top.sls /srv/salt/base/top.sls
+COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
+COPY .travis/conftest.py .travis/test-runner-pytest.py .travis/pytest.ini /opt/
+
+WORKDIR /opt
+
+ENTRYPOINT [ "pytest", "test-runner-pytest.py" ]
+CMD ["--log-level", "INFO" ]
