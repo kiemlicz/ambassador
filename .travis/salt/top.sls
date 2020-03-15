@@ -1,5 +1,5 @@
 server:
-  'syntax-host':
+  'syntax-test-host':
     - os
     - os.pkgs.unattended
     - samba

@@ -83,7 +83,7 @@ RUN apt-get install -y python3-pip vim && pip3 install --upgrade pytest pytest-x
 
 COPY .travis/salt/top.sls /srv/salt/base/top.sls
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/conftest.py .travis/test-runner-pytest.py /opt/
+COPY .travis/conftest.py .travis/test-runner-pytest.py .travis/pytest.ini /opt/
 
 WORKDIR /opt
 
