@@ -1,3 +1,10 @@
+base:
+  'base-host':
+    - os
+    - os.pkgs.unattended
+    - samba
+    - users
+    - mail
 server:
   'syntax-test-host':
     - os

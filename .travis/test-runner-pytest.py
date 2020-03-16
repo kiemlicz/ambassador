@@ -29,7 +29,7 @@ def states_location(request) -> str:
 
 @pytest.fixture(scope="session")
 def saltenv() -> str:
-    return "server"
+    return os.environ.get("SALTENV", "server")
 
 
 @pytest.fixture(scope="session")
@@ -54,10 +54,11 @@ def ext_pillar_saltcheck(pillars_with_dependencies: Tuple[List[Dict[str, Any]], 
 
 @pytest.fixture(scope="session")
 def salt_client(saltenv: str) -> salt.client.Caller:
-    client = salt.client.Caller()
     # not running sync_all in Dockerfile so that no Minion ID is generated
-    client.cmd("saltutil.sync_all", saltenv=saltenv)
-    return client
+    sync_result = salt.client.Caller().cmd("saltutil.sync_all", saltenv=saltenv)
+    log.info("saltutil.sync_all: %s", pp.pformat(sync_result))
+    # return new Caller instance that will have 'synced' modules loaded
+    return salt.client.Caller()
 
 
 @pytest.fixture(scope="session")

@@ -69,14 +69,6 @@ jobs:
       env:
         - DOCKER_IMAGE=debian-buster
         - BASE_IMAGE_TAG=buster
-        - SALTENV=base
-        - CONTEXT=gui
-        - TEST=saltcheck
-    - before_install: .travis/prepare.sh salt-test
-      script: .travis/test.sh salt-test
-      env:
-        - DOCKER_IMAGE=debian-buster
-        - BASE_IMAGE_TAG=buster
         - SALTENV=dev
         - CONTEXT=dev
         - TEST=saltcheck
