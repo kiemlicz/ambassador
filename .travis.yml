@@ -26,6 +26,8 @@ jobs:
   allow_failures:
     - env:
         - DOCKER_IMAGE=fedora-31
+        - CONTEXT=syntax-test
+        - TEST=syntax
       before_install: .travis/prepare.sh salt-test
       script: .travis/test.sh salt-test
   include:
