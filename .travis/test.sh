@@ -31,7 +31,6 @@ case "$1" in
 salt-test)
     # privileged mode is necessary for e.g. setting: net.ipv4.ip_forward or running docker in docker
     # check if https://stackoverflow.com/questions/33013539/docker-loading-kernel-modules is possible on travis
-    #docker run --privileged "$BASE_PUB_NAME-dry-test-$DOCKER_IMAGE:$TAG"
     docker run --name salt-test --network=host --hostname "$CONTEXT-host" --privileged "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:$TAG" --tests $TEST -n $(nproc) --log-level INFO
     result=$?
     kill %1  # kill the while loop
@@ -56,6 +55,7 @@ salt-master-run-k8s)
     # deployment tests
     python3 .travis/k8s-test.py $ns
 
+    # fixme this is terrible, maybe come up with dedicated test image?
     # upload and run salt tests
     master=$(kubectl -n $ns get pod -l app=salt,role=master -o jsonpath='{.items[0].metadata.name}')
     kubectl -n $ns cp .travis/k8s-salt-test.py $ns/$master:/opt/
@@ -68,30 +68,9 @@ salt-master-run-k8s)
     echo -e "starting logs from: $logger"
     kubectl -n $ns logs -f $logger &
 
-    ##echo -e "\nTest 1: should accept new minion\n"
-    ##kubectl -n salt-provisioning delete pod -l name=salt-minion
-    ##kubectl -n salt-provisioning wait pod -l name=salt-minion --for condition=ready --timeout=5m
-# this will still contain old minion that will fail the ping
-#    echo "Pinging minions"
-#    kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt '*' test.ping
-
-    ##echo -e "\nTest 2: should work after master crash\n"
-    ##kubectl -n salt-provisioning delete pod -l name=salt-master
-    ##kubectl -n salt-provisioning wait pod -l name=salt-master --for condition=ready --timeout=5m
-
-    # the minion must first re-auth to master that got down, will do that after auth_timeout (?) + thorium re-scan
-    # it will finally clean the old keys but honestly, why does it take so long?
-    ##sleep 180
-    ##echo -e "\nAfter 3 min sleep: listing who's up"
     master=$(kubectl -n $ns get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}')
-#    kubectl -n salt-provisioning exec -it $master -- salt-key -L
-#    kubectl -n salt-provisioning exec -it $master -- salt-run manage.up
     echo -e "\nSalt-master POD logs:\n"
     kubectl -n $ns logs $master
-# fixme
-# this will still contain old minion that will fail the ping
-#    echo "Pinging minions"
-#    kubectl -n salt-provisioning exec -it $(kubectl -n salt-provisioning get pod -l name=salt-master -o jsonpath='{.items[0].metadata.name}') -- salt '*' test.ping
 
     echo "Deployment testing finished"
     ;;

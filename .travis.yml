@@ -84,7 +84,7 @@ jobs:
       env:
         - DOCKER_IMAGE=ubuntu-bionic
         - SALTENV=server
-        - CONTEXT=dev
+        - CONTEXT=server
         - TEST=saltcheck
     - stage: k8s
       name: "Kubernetes tests"

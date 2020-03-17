@@ -7,6 +7,7 @@ pkgs:
   pip3_packages:
     - testinfra
     - kubernetes
+    - retrying
 
 docker:
     version: "18.06.1~ce~3-0~ubuntu"
