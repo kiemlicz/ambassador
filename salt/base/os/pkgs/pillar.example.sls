@@ -13,11 +13,12 @@
 pkgs:
   dist_upgrade: True
   os_packages: {{ default_pkgs.os_packages | tojson }}
+{% if grains['os'] == 'Debian' %}
   versions:
     - "python-pip: 9.0.1-2.3"
+{% endif %}
   pip3_packages:
     - google-api-python-client
-    - google-auth-httplib2
     - google-auth-oauthlib
     - powerline-status
   post_install:
@@ -25,9 +26,11 @@ pkgs:
 #  scripts:
 #    - source: http://example.com/somescript.sh
 #      args: "-a -b -c"
+{% if grains['os'] == 'Debian' %}
   fromrepo:
       - from: buster-backports
         pkgs:
           - zsh
   purged:
     - xserver-xorg-video-intel
+{% endif %}

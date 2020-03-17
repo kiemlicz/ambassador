@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 
 def __virtual__():
-    return True if __utils__['gdrive.has_libs']() else (False, "Cannot load file.ext, install: google-auth, pyasn1-modules and google-auth-oauthlib libraries")
+    return True if __utils__['gdrive.has_libs']() else (False, "Cannot load file.ext, install: pyasn1-modules and google-auth-oauthlib libraries")
 
 
 def managed(name, source=None, contents=None, **kwargs):
@@ -25,8 +25,6 @@ def managed(name, source=None, contents=None, **kwargs):
     then the returned result is undefined (will fetch any of ambiguous folders/files)
     In order to use this state you must pre-authorize file_ext in your google drive using file_ext_authorize
 
-    This extensions requires (pip):
-     - google-auth
     Also set pillar_opts: True in master config file
     '''
 
