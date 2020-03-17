@@ -1,10 +1,3 @@
-base:
-  'base-host':
-    - os
-    - os.pkgs.unattended
-    - samba
-    - users
-    - mail
 server:
   'syntax-test-host':
     - os
@@ -44,3 +37,12 @@ server:
     - samba
     - users
     - mail
+  'server-host':
+    - os
+    - os.pkgs.unattended
+    - samba
+    - users
+    - java
+    - scala
+    - sbt
+    - intellij

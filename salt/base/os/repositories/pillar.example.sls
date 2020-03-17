@@ -13,6 +13,12 @@ repositories:
   }, merge=salt['grains.filter_by']({
     'buster': {
       'list': [{
+                 'file': '/etc/apt/sources.list.d/stable.list',
+                 'names': [
+                    "deb http://ftp.pl.debian.org/debian stable contrib main non-free",
+                    "deb-src http://ftp.pl.debian.org/debian stable contrib main non-free"
+                 ]
+               },{
                  'file': '/etc/apt/sources.list.d/testing.list',
                  'names': [
                     "deb http://ftp.pl.debian.org/debian testing contrib main non-free",
@@ -31,6 +37,10 @@ repositories:
                    'key_url': "https://dl.google.com/linux/linux_signing_key.pub",
                }],
       'preferences': [{
+                        'file': '/etc/apt/preferences.d/stable.pref',
+                        'pin': 'release a=stable',
+                        'priority': '900'
+                      },{
                         'file': '/etc/apt/preferences.d/testing.pref',
                         'pin': 'release a=testing',
                         'priority': '500'

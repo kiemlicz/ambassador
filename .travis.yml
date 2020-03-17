@@ -53,7 +53,7 @@ jobs:
         - TEST=syntax
       before_install: .travis/prepare.sh salt-test
       script: .travis/test.sh salt-test
-# fixme try to merge together masterless with dry
+# todo it is possible to merge the stages however: how to run syntax tests first (in parallel) and then saltcheck using one runner only
     - stage: saltcheck
       name: "Saltcheck tests"
       before_install: .travis/prepare.sh salt-test
@@ -61,7 +61,7 @@ jobs:
       env:
         - DOCKER_IMAGE=debian-buster
         - BASE_IMAGE_TAG=buster
-        - SALTENV=base
+        - SALTENV=server
         - CONTEXT=base
         - TEST=saltcheck
     - before_install: .travis/prepare.sh salt-test
@@ -69,21 +69,21 @@ jobs:
       env:
         - DOCKER_IMAGE=debian-buster
         - BASE_IMAGE_TAG=buster
-        - SALTENV=dev
-        - CONTEXT=dev
+        - SALTENV=server
+        - CONTEXT=server
         - TEST=saltcheck
     - before_install: .travis/prepare.sh salt-test
       script: .travis/test.sh salt-test
       env:
         - DOCKER_IMAGE=ubuntu-bionic
-        - SALTENV=base
+        - SALTENV=server
         - CONTEXT=base
         - TEST=saltcheck
     - before_install: .travis/prepare.sh salt-test
       script: .travis/test.sh salt-test
       env:
         - DOCKER_IMAGE=ubuntu-bionic
-        - SALTENV=dev
+        - SALTENV=server
         - CONTEXT=dev
         - TEST=saltcheck
     - stage: k8s
