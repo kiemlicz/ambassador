@@ -70,6 +70,14 @@ class K8sClient(object):
         method = self._list(kind, namespaced, all_namespaces)
         return self._invoke(kind, method, namespaced, all_namespaces, label_selector=label_selector, namespace=namespace)
 
+    def patch(self, kind, name, body, namespaced=True, namespace=None):
+        if not namespace:
+            namespace = self.active_namespace
+        if not isinstance(namespaced, bool):
+            namespaced = strtobool(namespaced)
+        method = "patch_namespaced_{}".format(kind) if namespaced else "patch_{}".format(kind)
+        return self._invoke(kind, method, namespaced, namespace=namespace, name=name, body=body)
+
     def _list(self, kind, namespaced=True, all_namespaces=False):
         if all_namespaces:
             return "list_{}_for_all_namespaces".format(kind)
