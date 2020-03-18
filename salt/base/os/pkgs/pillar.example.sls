@@ -18,6 +18,8 @@ pkgs:
     - "python-pip: 9.0.1-2.3"
 {% endif %}
   pip3_packages:
+#    - setuptools
+    - setuptools==46.0.0
     - google-api-python-client
     - google-auth-oauthlib
     - powerline-status
@@ -31,6 +33,7 @@ pkgs:
       - from: buster-backports
         pkgs:
           - zsh
-  purged:
-    - xserver-xorg-video-intel
 {% endif %}
+  purged:
+    - python3-setuptools
+    - xserver-xorg-video-intel
