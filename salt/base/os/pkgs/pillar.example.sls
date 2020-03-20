@@ -18,8 +18,8 @@ pkgs:
     - "python-pip: 9.0.1-2.3"
 {% endif %}
   pip3_packages:
-#    - setuptools
-    - setuptools==46.0.0
+    - setuptools
+#    - setuptools==46.0.0
     - google-api-python-client
     - google-auth-oauthlib
     - powerline-status

@@ -12,6 +12,7 @@ def pytest_addoption(parser):
 
 def pytest_configure(config):
     config.addinivalue_line("markers", "syntax: run syntax tests only")
+    config.addinivalue_line("markers", "saltcheck: run saltcheck tests only")
 
 
 def pytest_collection_modifyitems(config, items):
