@@ -62,7 +62,7 @@ class SaltDeploymentTest(unittest.TestCase):
 
     def tearDown(self) -> None:
         t = time.time() - self.startTime
-        print("%s: %.3f" % (self.id(), t))
+        log.info("%s: %.3f", self.id(), t)
 
     def test_01_minion_delete(self):
         # given
