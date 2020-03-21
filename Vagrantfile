@@ -39,7 +39,7 @@ Vagrant.configure("2") do |config|
   config.vm.synced_folder "salt", "/srv/salt"
 
   config.vm.provision "install salt requisites", type: "shell" do |s|
-    s.path = "https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/c3a41412272e15f8687f312af63088a8d3938182/setup_salt_requisites.sh"
+    s.path = "https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/e0985c4e8f9bf5c66923a1fb22b2df197504b3ea/setup_salt_requisites.sh"
   end
 
   config.vm.provision "salt configuration", type: "shell", env: {

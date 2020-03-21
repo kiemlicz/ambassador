@@ -23,7 +23,7 @@ platforms:
   - name: debian9
     lifecycle:
       pre_converge:
-        - remote: 'sudo su -c "bash <(wget --no-check-certificate -qO- https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/9bc130ba6800b1df66a3e34901d0c18dca560fd4/setup_salt_requisites.sh)"'
+        - remote: 'sudo su -c "bash <(wget --no-check-certificate -qO- https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/e0985c4e8f9bf5c66923a1fb22b2df197504b3ea/setup_salt_requisites.sh)"'
     driver:
       box: "debian/stretch64"
       customize:
@@ -67,4 +67,4 @@ kdbx:
 
 ```
 
-Run with: `.test/runner.sh`
+Then from runner, run tests with: `.test/runner.sh`
