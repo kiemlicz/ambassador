@@ -6,7 +6,6 @@ import json
 import time
 import pprint
 from kubernetes import client, config
-from functools import wraps
 from retrying import retry
 
 
@@ -93,7 +92,7 @@ class SaltDeploymentTest(unittest.TestCase):
         new_masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
         self.assertEqual(len(set(old_masters) & set(new_masters)), 0)  # all new masters
 
-    @retry(Exception, delay=10)
+    @retry(retry_on_exception=lambda e: isinstance(e, Exception), delay=10)
     def assert_connected_minions(self):
         # given
         masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
@@ -111,8 +110,8 @@ class SaltDeploymentTest(unittest.TestCase):
         self.assertEqual(len(pong), SaltDeploymentTest.minion_count, "Wrong PONG response: {}".format(pong))
 
 
-log = logging.getLogger("k8s-test")
 logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+log = logging.getLogger("k8s-test")
 pp = pprint.PrettyPrinter(indent=4)
 
 config.load_kube_config()
