@@ -13,6 +13,12 @@ WORKDIR /srv
 
 
 FROM salt-base AS salt-minion
+# hostname from `docker run -h` must be used as minion ID
+
+RUN dnf -y --nogpgcheck install python3-pip && \
+    pip3 install --upgrade docker
+
+VOLUME /etc/salt/minion.d
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD [ "/usr/bin/salt-minion" ]
@@ -35,7 +41,7 @@ COPY .travis/config/master.conf /etc/salt/master.d/01-master.conf
 COPY .travis/entrypoint.sh /opt/
 
 RUN dnf -y --nogpgcheck install python3-pip git @development-tools redhat-rpm-config python3-devel libgit2-devel && \
-    pip3 install --upgrade pathlib pyOpenSSL pygit2==$pip3_pygit2_ver docker-py cherrypy jinja2 PyYAML requests_oauthlib google-auth && \
+    pip3 install --upgrade pathlib pyOpenSSL pygit2==$pip3_pygit2_ver docker-py cherrypy jinja2 PyYAML && \
     dnf -y --nogpgcheck install salt-master
 
 RUN if [ "$API_ENABLED" = true ]; then \
@@ -55,8 +61,16 @@ RUN if [ "$K8S_API_ENABLED" = true ]; then \
 # the salt-master should be installed but not running
 EXPOSE 4505:4505 4506:4506
 
+VOLUME /etc/salt/pki/master
+VOLUME /var/cache/salt/master/queues
+VOLUME /etc/pki/tls/certs
+VOLUME /etc/salt/cloud.providers.d
+VOLUME /srv/thorium
+VOLUME /srv/pillar
+VOLUME /etc/salt/master.d
+
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD [ "/usr/bin/salt-master" ]
+CMD [ "/opt/entrypoint.sh" ]
 
 
 FROM salt-base AS salt-test

@@ -92,7 +92,7 @@ class SaltDeploymentTest(unittest.TestCase):
         new_masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]
         self.assertEqual(len(set(old_masters) & set(new_masters)), 0)  # all new masters
 
-    @retry(retry_on_exception=lambda e: isinstance(e, Exception), delay=10)
+    @retry(retry_on_exception=lambda e: isinstance(e, Exception), stop_max_delay=300000, wait_exponential_max=10000)  # 5min deadline
     def assert_connected_minions(self):
         # given
         masters = [e.metadata.name for e in coreV1.list_namespaced_pod(namespace=namespace, label_selector="app=salt,role=master").items]

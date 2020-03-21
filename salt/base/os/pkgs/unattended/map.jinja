@@ -1,4 +1,8 @@
 {% set unattended = salt['grains.filter_by']({
+    'RedHat': {
+        'required_pkgs': ["dnf-automatic"],
+        'configs': []
+    },
     'Debian': {
         'required_pkgs': ["apt-listchanges", "unattended-upgrades"],
         'configs': [{

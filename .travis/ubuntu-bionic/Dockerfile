@@ -42,8 +42,7 @@ ENV SALTENV=$saltenv
 COPY .travis/config/master.conf /etc/salt/master.d/01-master.conf
 COPY .travis/entrypoint.sh /opt/
 
-RUN apt-get update && \
-    apt-get install -y python3-pip libffi-dev libgit2-dev git && \
+RUN apt-get install -y python3-pip libffi-dev libgit2-dev git && \
     pip3 install --upgrade pyOpenSSL pygit2==$pip3_pygit2_ver docker-py cherrypy jinja2 requests && \
     apt-get install -y salt-master
 
