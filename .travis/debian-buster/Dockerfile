@@ -42,7 +42,7 @@ COPY .travis/entrypoint.sh /opt/
 
 RUN apt-get update && \
     apt-get install -y python3-pip libffi-dev libgit2-dev git && \
-    pip3 install --upgrade pyOpenSSL pygit2==$pip3_pygit2_ver docker-py cherrypy jinja2 requests_oauthlib google-auth requests && \
+    pip3 install --upgrade pyOpenSSL pygit2==$pip3_pygit2_ver docker-py cherrypy jinja2 requests && \
     apt-get install -y salt-master
 
 RUN if [ "$API_ENABLED" = true ]; then \

@@ -1,6 +1,6 @@
 {% set default_pkgs = salt['grains.filter_by']({
       'default': {
-         'os_packages': ["cron", "vim", "sudo", "insserv", "git", "curl", "ca-certificates", "gnupg2", "python3-pip", "fonts-powerline"],
+         'os_packages': ["cron", "vim", "sudo", "insserv", "git", "zsh", "curl", "ca-certificates", "gnupg2", "python3-pip", "fonts-powerline"],
          'post_install': ['echo "command3"', 'echo "command4"', 'echo "command5"'],
       },
 
@@ -18,8 +18,8 @@ pkgs:
     - "python-pip: 9.0.1-2.3"
 {% endif %}
   pip3_packages:
-    - setuptools
-#    - setuptools==46.0.0
+#    - setuptools
+    - setuptools==46.0.0
     - google-api-python-client
     - google-auth-oauthlib
     - powerline-status
@@ -35,5 +35,4 @@ pkgs:
           - zsh
 {% endif %}
   purged:
-    - python3-setuptools
     - xserver-xorg-video-intel

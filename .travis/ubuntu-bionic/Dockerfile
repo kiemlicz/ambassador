@@ -44,7 +44,7 @@ COPY .travis/entrypoint.sh /opt/
 
 RUN apt-get update && \
     apt-get install -y python3-pip libffi-dev libgit2-dev git && \
-    pip3 install --upgrade pyOpenSSL pygit2==$pip3_pygit2_ver docker-py cherrypy jinja2 requests_oauthlib google-auth requests && \
+    pip3 install --upgrade pyOpenSSL pygit2==$pip3_pygit2_ver docker-py cherrypy jinja2 requests && \
     apt-get install -y salt-master
 
 RUN if [ "$API_ENABLED" = true ]; then \
@@ -80,7 +80,9 @@ ARG saltenv
 ENV SALTENV=$saltenv
 ENV LOG_LEVEL=$log_level
 
-RUN apt-get install -y python3-pip && pip3 install --upgrade pytest pytest-xdist redis
+# installing setuptools before tests since google-auth requires > 40.3 and bionic python3-setuptools is 39
+# pip3 installing setuptools during test run (with module reload and apt-get purge of python3-setuptools) doesn't help (in the one run)
+RUN apt-get install -y python3-pip && pip3 install --upgrade pytest pytest-xdist redis setuptools
 
 # workaround for salt's service state
 # somehow in masterless config the service provider cannot be overriden

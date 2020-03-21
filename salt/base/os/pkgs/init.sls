@@ -101,6 +101,7 @@ pkgs_pip3:
 pkgs_purged:
   pkg.purged:
     - pkgs: {{ pkgs.purged|tojson }}
+    - reload_modules: True
     - require:
       - pkg: os_packages
 {%- endif %}
