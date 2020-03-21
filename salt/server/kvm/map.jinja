@@ -2,7 +2,13 @@
     'RedHat': {
       'prerequisites': [],
       'groups': ["libvirt", "libvirt-qemu", "kvm"],
-      'users': []
+      'users': [],
+      'vfio': {
+        'enabled': False,
+        'configs': [],
+        'grub_update_cmd': "update-grub2",
+        'initramfs_update_cmd': "update-initramfs -u -k all"
+      }
     },
     'Debian': {
       'prerequisites': ["qemu-kvm", "bridge-utils", "libvirt-clients", "qemu-utils", "libvirt-daemon-system", "ovmf"],

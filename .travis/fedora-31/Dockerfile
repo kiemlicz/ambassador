@@ -13,6 +13,12 @@ WORKDIR /srv
 
 
 FROM salt-base AS salt-minion
+# hostname from `docker run -h` must be used as minion ID
+
+RUN dnf -y --nogpgcheck install python3-pip && \
+    pip3 install --upgrade docker
+
+VOLUME /etc/salt/minion.d
 
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD [ "/usr/bin/salt-minion" ]
@@ -35,7 +41,7 @@ COPY .travis/config/master.conf /etc/salt/master.d/01-master.conf
 COPY .travis/entrypoint.sh /opt/
 
 RUN dnf -y --nogpgcheck install python3-pip git @development-tools redhat-rpm-config python3-devel libgit2-devel && \
-    pip3 install --upgrade pathlib pyOpenSSL pygit2==$pip3_pygit2_ver docker-py cherrypy jinja2 PyYAML requests_oauthlib google-auth && \
+    pip3 install --upgrade pathlib pyOpenSSL pygit2==$pip3_pygit2_ver docker-py cherrypy jinja2 PyYAML && \
     dnf -y --nogpgcheck install salt-master
 
 RUN if [ "$API_ENABLED" = true ]; then \
@@ -55,20 +61,32 @@ RUN if [ "$K8S_API_ENABLED" = true ]; then \
 # the salt-master should be installed but not running
 EXPOSE 4505:4505 4506:4506
 
+VOLUME /etc/salt/pki/master
+VOLUME /var/cache/salt/master/queues
+VOLUME /etc/pki/tls/certs
+VOLUME /etc/salt/cloud.providers.d
+VOLUME /srv/thorium
+VOLUME /srv/pillar
+VOLUME /etc/salt/master.d
+
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD [ "/usr/bin/salt-master" ]
+CMD [ "/opt/entrypoint.sh" ]
 
 
-FROM salt-base AS dry-test
+FROM salt-base AS salt-test
 
-COPY .travis/reactor /srv/reactor
-COPY .travis/salt/dry-test-top.sls /srv/salt/base/top.sls
+ARG log_level="INFO"
+ARG saltenv
+ENV SALTENV=$saltenv
+ENV LOG_LEVEL=$log_level
+
+RUN dnf -y --nogpgcheck install -y python3-pip && pip3 install --upgrade pytest pytest-xdist redis
+
+COPY .travis/top.sls /srv/salt/base/top.sls
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/envoy_test.py /opt/
+COPY .travis/conftest.py .travis/test-runner-pytest.py .travis/pytest.ini /opt/
 
 WORKDIR /opt
 
-RUN salt-call --local saltutil.sync_all
-
-ENTRYPOINT [ "python3", "/opt/envoy_test.py" ]
-CMD []
+ENTRYPOINT [ "pytest", "test-runner-pytest.py" ]
+CMD ["--log-level", "INFO" ]

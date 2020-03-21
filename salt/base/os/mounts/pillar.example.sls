@@ -1,4 +1,7 @@
 mounts:
+  list: []
+---
+mounts:
   list:
     - dev: /dev/sda1
       target: /mnt/somewhere

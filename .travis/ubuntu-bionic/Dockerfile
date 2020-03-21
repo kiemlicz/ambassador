@@ -7,7 +7,7 @@ ENV DEBIAN_FRONTEND noninteractive
 
 COPY salt /srv/salt
 
-RUN apt-get update && apt-get install -y curl procps dirmngr iproute2 dumb-init && \
+RUN apt-get update && apt-get install -y curl dirmngr iproute2 dumb-init && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver
 
@@ -42,9 +42,8 @@ ENV SALTENV=$saltenv
 COPY .travis/config/master.conf /etc/salt/master.d/01-master.conf
 COPY .travis/entrypoint.sh /opt/
 
-RUN apt-get update && \
-    apt-get install -y python3-pip libffi-dev libgit2-dev git && \
-    pip3 install --upgrade pyOpenSSL pygit2==$pip3_pygit2_ver docker-py cherrypy jinja2 requests_oauthlib google-auth requests && \
+RUN apt-get install -y python3-pip libffi-dev libgit2-dev git && \
+    pip3 install --upgrade pyOpenSSL pygit2==$pip3_pygit2_ver docker-py cherrypy jinja2 requests && \
     apt-get install -y salt-master
 
 RUN if [ "$API_ENABLED" = true ]; then \
@@ -73,32 +72,16 @@ ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD [ "/opt/entrypoint.sh" ]
 
 
-FROM salt-base AS dry-test
+FROM salt-base AS salt-test
 
-#COPY .travis/reactor /srv/reactor
-COPY .travis/salt/dry-test-top.sls /srv/salt/base/top.sls
-COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/envoy_test.py /opt/
-
-WORKDIR /opt
-
-RUN salt-call --local saltutil.sync_all
-
-ENTRYPOINT [ "python3", "/opt/envoy_test.py" ]
-CMD []
-
-
-FROM salt-base AS masterless-test
-
-ARG log_level="info"
+ARG log_level="INFO"
 ARG saltenv
-
 ENV SALTENV=$saltenv
 ENV LOG_LEVEL=$log_level
 
-COPY .travis/pillar/masterless/ /srv/pillar/
-COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/salt/masterless-test-top.sls /srv/salt/base/top.sls
+# installing setuptools before tests since google-auth requires > 40.3 and bionic python3-setuptools is 39
+# pip3 installing setuptools during test run (with module reload and apt-get purge of python3-setuptools) doesn't help (in the one run)
+RUN apt-get install -y python3-pip && pip3 install --upgrade pytest pytest-xdist redis setuptools
 
 # workaround for salt's service state
 # somehow in masterless config the service provider cannot be overriden
@@ -106,28 +89,11 @@ COPY .travis/salt/masterless-test-top.sls /srv/salt/base/top.sls
 RUN printf '#!/bin/bash\necho "N 5"' > /sbin/runlevel && \
     chmod 775 /sbin/runlevel
 
-CMD salt-call --local state.highstate saltenv=$SALTENV -l $LOG_LEVEL
+COPY .travis/top.sls /srv/salt/base/top.sls
+COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
+COPY .travis/conftest.py .travis/test-runner-pytest.py .travis/pytest.ini /opt/
 
+WORKDIR /opt
 
-FROM salt-master AS master-compose-test
-
-ARG saltenv
-ARG log_level
-
-ENV SALTENV=$saltenv
-ENV LOG_LEVEL=$log_level
-
-COPY .travis/entrypoint_master_run.sh /opt/
-COPY .travis/scan_events.py /opt/
-COPY .travis/config/master.conf /etc/salt/master.d/master.conf
-COPY .travis/config/autosign.conf /etc/salt/autosign.conf
-COPY .travis/config/reactor_orch.conf /etc/salt/master.d/reactor.conf
-COPY .travis/config/reactor/orch /srv/reactor
-COPY .travis/pillar/ /srv/pillar/
-COPY .travis/salt/ /srv/salt/
-COPY .travis/salt/dev/top.sls /srv/salt/base/
-
-RUN chmod 600 /etc/salt/autosign.conf && \
-    salt-run saltutil.sync_all
-
-CMD [ "/opt/entrypoint_master_run.sh" ]
+ENTRYPOINT [ "pytest", "test-runner-pytest.py" ]
+CMD ["--log-level", "INFO" ]

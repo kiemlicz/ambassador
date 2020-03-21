@@ -9,19 +9,13 @@ fi
 source .travis/common.sh
 
 case "$1" in
-dry)
+salt-test)
     if [ "$TRAVIS" = "true" ]; then
         docker_update
     fi
     docker_build salt-minion "$BASE_PUB_NAME-minion-$DOCKER_IMAGE:$TAG"
     docker_build salt-master "$BASE_PUB_NAME-master-$DOCKER_IMAGE:$TAG"
-    docker_build dry-test "$BASE_PUB_NAME-dry-test-$DOCKER_IMAGE:$TAG"
-    ;;
-masterless)
-    if [ "$TRAVIS" = "true" ]; then
-        docker_update
-    fi
-    docker_build masterless-test "masterless-test-$DOCKER_IMAGE:$TAG"
+    docker_build salt-test "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:$TAG"
     ;;
 salt-master-run-compose)
     if [ "$TRAVIS" = "true" ]; then
@@ -57,4 +51,7 @@ salt-master-run-k8s)
       helm repo index --url $GH_URL .
     fi
     ;;
+*)
+    echo "No such test"
+  ;;
 esac

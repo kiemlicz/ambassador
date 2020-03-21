@@ -3,6 +3,25 @@
 
 {% set version_major = salt['pillar.get']("java:version_major", default="11") %}
 
+{% set openjdk_java = salt['grains.filter_by']({
+     'RedHat': {
+         'pkg_name': "java-" ~ version_major ~ "-openjdk",
+         'ext_pkgs': [],
+         'exports_file': '/etc/zsh/zshrc',
+         'environ_variable': 'JAVA_HOME',
+         'path_inside': 'bin',
+         'generic_link': '$(readlink -f /usr/bin/java | sed "s:\(jre\)*/bin/java::")',
+     },
+     'Debian': {
+         'exports_file': '/etc/zsh/zshrc',
+         'environ_variable': 'JAVA_HOME',
+         'path_inside': 'bin',
+         'generic_link': '$(readlink -f /usr/bin/java | sed "s:\(jre\)*/bin/java::")',
+         'pkg_name': "openjdk-" ~ version_major ~ "-jdk",
+         'ext_pkgs': []
+     },
+}, merge=salt['pillar.get']('java')) %}
+
 {% set oracle_java8 = salt['grains.filter_by']({
     'RedHat': {
         'pkg_name': "java-" ~ version_major ~ "-openjdk",
@@ -30,18 +49,6 @@
         ]
     },
 }, merge=salt['grains.filter_by']({
-   'zesty': {
-        'names': [
-           "deb http://ppa.launchpad.net/webupd8team/java/ubuntu zesty main",
-           "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu zesty main"
-         ],
-   },
-   'artful': {
-        'names': [
-           "deb http://ppa.launchpad.net/webupd8team/java/ubuntu artful main",
-           "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu artful main"
-         ],
-   },
    'bionic': {
         'names': [
            "deb http://ppa.launchpad.net/webupd8team/java/ubuntu bionic main",
@@ -73,25 +80,6 @@
         'pkg_name': "oracle-java" ~ version_major ~ "-installer-local",
         'ext_pkgs': []
     },
-}, merge=salt['pillar.get']('java')) %}
-
-{% set openjdk_java = salt['grains.filter_by']({
-     'RedHat': {
-         'pkg_name': "java-" ~ version_major ~ "-openjdk",
-         'ext_pkgs': [],
-         'exports_file': '/etc/zsh/zshrc',
-         'environ_variable': 'JAVA_HOME',
-         'path_inside': 'bin',
-         'generic_link': '$(readlink -f /usr/bin/java | sed "s:\(jre\)*/bin/java::")',
-     },
-     'Debian': {
-         'exports_file': '/etc/zsh/zshrc',
-         'environ_variable': 'JAVA_HOME',
-         'path_inside': 'bin',
-         'generic_link': '$(readlink -f /usr/bin/java | sed "s:\(jre\)*/bin/java::")',
-         'pkg_name': "openjdk-" ~ version_major ~ "-jdk",
-         'ext_pkgs': []
-     },
 }, merge=salt['pillar.get']('java')) %}
 
 {% set default_oracle_java = { "8": oracle_java8, "11": oracle_java11 }[version_major] %}

@@ -1,5 +1,5 @@
 groups:
   present:
-    - name: group1
-      system: True
-    - name: group2
+    - name: wireshark
+    - name: docker
+    - name: vboxusers

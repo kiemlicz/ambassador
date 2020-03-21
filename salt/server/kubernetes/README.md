@@ -55,6 +55,24 @@ Setup Kubernetes worker node
 Setup Kubernetes worker node
 
 #### Example pillar
+```
+#kubernetes may require concrete docker version, set with:
+#docker:
+#    version: "18.06.1~ce~3-0~ubuntu"
+#    version: "18.06.1~ce~3-0~debian"
+kubernetes:
+  network:
+    provider: flannel
+    cidr: "10.244.0.0/16"
+  master:
+    isolate: True
+  nodes:
+    masters:
+      - k8s1
+    workers:
+      - k8s2
+      - k8s3
+```
 
 # Provisioning PODs
 In this approach it is assumed that application images are already prepared. _Salt_ is used to orchestrate the application logic that would not be possible with Kubernetes tooling only. 
