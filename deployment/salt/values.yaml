@@ -98,6 +98,7 @@ saltMinion:
 
 # alter the Salt capabilities, set roles that best suit the needs
 clusterRole:
+  create: true
   resources:
     - pods
     - namespaces
