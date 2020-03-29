@@ -6,8 +6,13 @@ The most common way is to use [kitchen-salt](https://github.com/saltstack/kitche
 Following directory contains setup of kitchen test **runner** (the machine that will be running tests, **not the tests themselves**).  
 Basically it spawns LXC container (using Vagrant) and provisions it using Ambassador (create your own pillar configuration)
 
-The example `top.sls`
+Setup: `sudo python3 create.py --name zeus --ifc <interface> --config salt-minion.conf`
+
+The setup eventually runs `salt-call --local state.highstate` thus you are required to provide desired states
+
+Example:
 ```
+> cat top.sls
 server:
   'zeus':
     - os
