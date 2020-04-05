@@ -37,7 +37,7 @@ if not c.defined:
     c.set_config_item("lxc.net.0.link", args.ifc)
     c.set_config_item("lxc.net.0.flags", "up")
     if args.autostart:
-        c.set_config_item("lxc.start.auto", 1)
+        c.set_config_item("lxc.start.auto", "1")
     # todo increase size
     if not c.create(template="debian", flags=0, args={"release": "buster", "arch": "amd64"}):
         log.error("Unable to create LXC container")
