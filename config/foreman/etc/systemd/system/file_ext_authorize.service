@@ -5,8 +5,8 @@ After=network.target
 [Service]
 Type=simple
 User=root
-WorkingDirectory=/opt/file_ext_authorize/
-Environment=FLASK_APP=/opt/file_ext_authorize/file_ext_authorize.py
+WorkingDirectory=/srv/file_ext_authorize/
+Environment=FLASK_APP=/srv/file_ext_authorize/file_ext_authorize.py
 ExecStart=/usr/local/bin/flask run --host='0.0.0.0'
 Restart=on-abort
 

@@ -6,7 +6,7 @@ The most common way is to use [kitchen-salt](https://github.com/saltstack/kitche
 Following directory contains setup of kitchen test **runner** (the machine that will be running tests, **not the tests themselves**).  
 Basically it spawns LXC container (using Vagrant) and provisions it using Ambassador (create your own pillar configuration)
 
-Setup: `sudo python3 create.py --name zeus --ifc <interface> --config salt-minion.conf`
+Setup: `sudo SHELL=/bin/bash python3 .test/create.py --name <name> --ifc <interface> --configs <the config> <the other config> [--kdbx the.db.kdbx] [--kdbx-pass thepassword] [--kdbx-key the.key]`
 
 The setup eventually runs `salt-call --local state.highstate` thus you are required to provide desired states
 

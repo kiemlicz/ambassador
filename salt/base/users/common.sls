@@ -7,7 +7,8 @@
     - name: {{ username }}
     - fullname: {{ user.fullname|default(username) }}
     - shell: {{ user.shell|default("/bin/bash") }}
-    - home: {{ user.home_dir|default("/home/" ~ username) }}
+    # strip trailing /
+    - home: {{ user.home_dir|default("/home/" ~ username)|regex_replace('/+$', '') }}
 {%- if user.password is defined %}
     - password: {{ user.password }}
 {% endif %}
