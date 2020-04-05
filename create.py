@@ -59,7 +59,12 @@ for dir in args.directories:
     dir_util.copy_tree(dir, os.path.join(container_rootfs, "srv", dir))
 
 if args.top:
-    copyfile(args.top, os.path.join(container_rootfs, args.top_location, "top.sls"))
+    l = args.top_location
+    if l.startswith("/"):
+        l = l[1:]
+    dest = os.path.join(container_rootfs, l, "top.sls")
+    log.info("Copying: %s, into: %s", args.top, dest)
+    copyfile(args.top, dest)
 
 Path(os.path.join(container_rootfs, "srv", "keys")).mkdir(parents=True, exist_ok=True)
 kdbx_salt_config = {'kdbx': {'driver': 'kdbx'}}
