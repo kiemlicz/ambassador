@@ -11,8 +11,8 @@ from pathlib import Path
 from pykeepass import PyKeePass
 
 
-logging.basicConfig(level=logging.INFO)
 log = logging.getLogger()
+log.setLevel(logging.INFO)
 parser = argparse.ArgumentParser(description='Setup LXC container and provision with Salt')
 parser.add_argument('--name', help="provide container name", required=True)
 parser.add_argument('--ifc', help="provide interface to attach container to", required=True)
@@ -36,15 +36,21 @@ if not c.defined:
     c.set_config_item("lxc.net.0.type", "veth")
     c.set_config_item("lxc.net.0.link", args.ifc)
     c.set_config_item("lxc.net.0.flags", "up")
+    if args.autostart:
+        c.set_config_item("lxc.start.auto", 1)
     # todo increase size
     if not c.create(template="debian", flags=0, args={"release": "buster", "arch": "amd64"}):
         log.error("Unable to create LXC container")
         sys.exit(3)
 
-    if not c.running and c.start():
-        if not c.get_ips(timeout=60):
-            log.error("Unable to start LXC container")
-            sys.exit(3)
+if not c.running:
+    log.info("Starting %s", container_name)
+    if not c.start():
+        log.error("Unable to start %s, check output of command: lxc-start -n %s -F", container_name, container_name)
+        sys.exit(3)
+    if not c.get_ips(timeout=60):
+        log.error("Unable to start LXC container")
+        sys.exit(3)
 
 log.info("Inserting files")
 container_rootfs = os.path.join(args.rootfs, container_name, "rootfs")
@@ -75,9 +81,12 @@ if args.kdbx:
     log.info("Inserting secrets")
     kdbx = PyKeePass(args.kdbx, args.kdbx_pass, args.kdbx_key)  # fixme how will it behave if no key
     entry = kdbx.find_entries_by_path(container_name, first=True)
-    for attachment in entry.attachments:
-        with open(os.path.join(container_rootfs, "srv", "keys", attachment.filename), 'wb') as a:
-            a.write(attachment.data)
+    if entry and entry.attachments:
+        for attachment in entry.attachments:
+            with open(os.path.join(container_rootfs, "srv", "keys", attachment.filename), 'wb') as a:
+                a.write(attachment.data)
+    else:
+        log.warning("No secrets for: %s found", container_name)
 
 if args.configs:
     for config in args.configs:
