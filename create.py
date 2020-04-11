@@ -36,6 +36,8 @@ if not c.defined:
     c.set_config_item("lxc.net.0.type", "veth")
     c.set_config_item("lxc.net.0.link", args.ifc)
     c.set_config_item("lxc.net.0.flags", "up")
+    c.set_config_item("lxc.apparmor.profile", "unconfined")  # todo otherwise apache2 won't start, find proper solution
+
     if args.autostart:
         c.set_config_item("lxc.start.auto", "1")
     # todo increase size
