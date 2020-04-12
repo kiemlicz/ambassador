@@ -22,6 +22,7 @@
         'ssl': {},
         'services': ["foreman", "foreman-proxy", "dynflowd", "dnsmasq"],
         'setup': [],
+        'overrides': {}
     },
 }, merge=salt['grains.filter_by']({
        'stretch': {
