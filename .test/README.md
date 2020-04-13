@@ -3,14 +3,12 @@ Due to numerous docker limitations tests should be performed in LXC container or
 
 The most common way is to use [kitchen-salt](https://github.com/saltstack/kitchen-salt), the Kitchen plugin that provides Salt provisioner
 
-Following directory contains setup of kitchen test **runner** (the machine that will be running tests, **not the tests themselves**).  
+Following directory contains setup of kitchen test **runner** (the machine that will be running tests).  
 Basically it spawns LXC container (using Vagrant) and provisions it using Ambassador (create your own pillar configuration)
 
-Setup: `sudo SHELL=/bin/bash python3 .test/create.py --name <name> --ifc <interface> --configs <the config> <the other config> [--kdbx the.db.kdbx] [--kdbx-pass thepassword] [--kdbx-key the.key]`
+Setup: `sudo SHELL=/bin/bash python3 create.py --name <name> --ifc <interface> --configs <the config> <the other config> [--kdbx the.db.kdbx] [--kdbx-pass thepassword] [--kdbx-key the.key]`
 
-The setup eventually runs `salt-call --local state.highstate` thus you are required to provide desired states
-
-Example:
+The setup eventually runs `salt-call --local state.highstate` thus provide desired states:
 ```
 > cat top.sls
 server:
@@ -20,17 +18,15 @@ server:
     - vagrant
     - users
 ```
-
-Clone this project, add at least following files:  
-1. `kitchen.local.yml`
+Example `kitchen.local.yml` with remote vagrant:
 ```
 platforms:
-  - name: debian9
+  - name: debian10
     lifecycle:
       pre_converge:
-        - remote: 'sudo su -c "bash <(wget --no-check-certificate -qO- https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/e0985c4e8f9bf5c66923a1fb22b2df197504b3ea/setup_salt_requisites.sh)"'
+        - remote: 'sudo su -c "bash <(wget --no-check-certificate -qO- https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/1fb26207f7d9665989fc7019b1c0ac919383331a/setup_salt_requisites.sh)"'
     driver:
-      box: "debian/stretch64"
+      box: "debian/buster64"
       customize:
         host: maybe_remote
         username: coolguy
@@ -61,15 +57,4 @@ suites:
             extra:
               pillar: "to add"
 ```
-
-2. `.test/minion-zeus.override.conf` for any runner minion config overrides, like:
-```
-kdbx:
-  driver: kdbx
-  db_file: /the/keepass/file/keepass.kdbx
-  password: pass
-  key_file: /the/key/file/keepass.key
-
-```
-
 Then from runner, run tests with: `.test/runner.sh`
