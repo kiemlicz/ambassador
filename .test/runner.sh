@@ -5,7 +5,7 @@
 
 echo "Test started"
 readonly test_start_ts=$(date +%s.%N)
-pushd /root/projects/ambassador
+pushd /home/ghrunner/projects/ambassador
 
 LOGFILE=/var/log/ambassador/amb.kvm.$(date -d "today" +"%Y%m%d%H%M")
 touch $LOGFILE
