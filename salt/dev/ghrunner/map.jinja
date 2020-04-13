@@ -3,7 +3,7 @@
 {% set ghrunner = salt['grains.filter_by']({
   'default': {
     'download_url': url,
-    'destination_dir': '/opt',
+    'destination_dir': '/opt/ghrunner' ~ version,
     'generic_link': '/opt/gh-runner',
     'owner': 'root',
   }

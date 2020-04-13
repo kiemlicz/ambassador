@@ -27,9 +27,13 @@ def managed(name, download_url, destination_dir, user, group, enforce_toplevel=T
         return __utils__['common.fail'](ret, "DEVTOOL: failed to list archive ({}), error:".format(download_url, str(e)))
 
     extract_dir = os.path.commonprefix(archive_contents)  # relative path
-    if not extract_dir and not enforce_toplevel:
-        return __utils__['common.fail'](ret, "DEVTOOL: Cannot find root directory in extracted archive, try setting enforce_toplevel: True", comments=archive_contents)
-
+    log.info("Extract to directory: %s", extract_dir)
+    kwargs = {}
+    if not extract_dir or extract_dir == "./":
+        if not enforce_toplevel:
+            return __utils__['common.fail'](ret, "DEVTOOL: Cannot find root directory in extracted archive, try setting enforce_toplevel: True", comments=archive_contents)
+        else:
+            kwargs['enforce_toplevel'] = True
     extract_location = os.path.join(destination_dir, extract_dir)
     log.debug("Will extract to: {0}".format(extract_location))
 
@@ -37,7 +41,8 @@ def managed(name, download_url, destination_dir, user, group, enforce_toplevel=T
 
     # todo check if user/group may be left for windows or will cause failure
     extract_result = __states__['archive.extracted'](name=destination_dir, source=download_url, user=user, group=group,
-                                                     enforce_ownership_on=extract_location, skip_verify=True, trim_output=50)
+                                                     enforce_ownership_on=extract_location, skip_verify=True,
+                                                     trim_output=50, **kwargs)
     if not extract_result['result']:
         return __utils__['common.fail'](ret, "DEVTOOL: Cannot extract archive from: {0}".format(download_url), comments=[extract_result['comment']])
 
