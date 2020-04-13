@@ -1,0 +1,10 @@
+{% set version = '2.168.0' %}
+{% set url = 'https://github.com/actions/runner/releases/download/v' + version + '/actions-runner-linux-x64-' + version + '.tar.gz' %}
+{% set ghrunner = salt['grains.filter_by']({
+  'default': {
+    'download_url': url,
+    'destination_dir': '/opt',
+    'generic_link': '/opt/gh-runner',
+    'owner': 'root',
+  }
+}, merge=salt['pillar.get']('ghrunner')) %}
