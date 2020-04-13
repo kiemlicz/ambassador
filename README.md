@@ -22,6 +22,7 @@ The "installation" process ends up with LXC container containing foreman&salt fu
 Simply follow:  
 1. Clone this repo with [submodules](https://github.com/kiemlicz/util/wiki/git): `git submodule update --init`
 2. Ensure you have LXC configured: `requisites.sh`
+3. Install `pip3 install pyyaml pykeepass` and `apt install python3-lxc`
 3. Provide `ambassador-installer.override.conf` to override any Salt masterless Vagrant provisioner settings, e.g. add your own pillar:
 ```
 ext_pillar:

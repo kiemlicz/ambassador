@@ -20,8 +20,9 @@
         'group': "foreman",
         'pxe': "ipxe",
         'ssl': {},
-        'services': ["foreman", "foreman-proxy", "dynflowd", "dnsmasq"],
+        'services': ["foreman", "foreman-proxy"],
         'setup': [],
+        'overrides': {}
     },
 }, merge=salt['grains.filter_by']({
        'stretch': {
@@ -36,8 +37,8 @@
        'buster': {
             'pkg_name': "foreman-installer",
             'names': [
-                "deb http://deb.theforeman.org/ buster 1.24",
-                "deb http://deb.theforeman.org/ plugins 1.24"
+                "deb http://deb.theforeman.org/ buster 2.0",
+                "deb http://deb.theforeman.org/ plugins 2.0"
             ],
             'file': "/etc/apt/sources.list.d/foreman.list",
             'key_url': "https://deb.theforeman.org/pubkey.gpg"
