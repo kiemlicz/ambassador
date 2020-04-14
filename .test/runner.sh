@@ -5,7 +5,7 @@
 
 echo "Test started"
 readonly test_start_ts=$(date +%s.%N)
-pushd /home/ghrunner/projects/ambassador
+pushd /home/ghrunner/projects/ambassador || exit 4
 
 LOGFILE=/var/log/ambassador/amb.kvm.$(date -d "today" +"%Y%m%d%H%M")
 touch $LOGFILE
@@ -24,4 +24,5 @@ if [[ $result -ne 0 ]]; then
     echo "Test fail, find the logs attached (test time: $test_time)" | mail -A $LOGFILE -s "Ambassador test failed" $(git config user.email)
 fi
 
-popd > /dev/null
+popd > /dev/null || exit 5
+exit $result
