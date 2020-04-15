@@ -51,7 +51,7 @@ git_global_config_{{ username }}_{{ k }}:
 {% endfor %}
 {%- endif %}
 
-{% if user.known_hosts is defined %}
+{% if user.known_hosts is defined and user.known_hosts %}
 {{ username }}_setup_ssh_known_hosts:
   ssh_known_hosts.present:
     - names: {{ user.known_hosts|tojson }}

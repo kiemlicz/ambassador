@@ -6,14 +6,14 @@
         'repo_id': "virtualbox",
         'baseurl': "http://download.virtualbox.org/virtualbox/rpm/fedora/$releasever/$basearch",
         'gpgkey': "https://www.virtualbox.org/download/oracle_vbox.asc",
-        'pkg_name': "virtualbox-6.0",
+        'pkg_name': "virtualbox-6.1",
     },
     'Debian': {
         'file': '/etc/apt/sources.list.d/virtualbox.list',
         'names': [
             "deb [arch=amd64] https://download.virtualbox.org/virtualbox/debian " + dist_codename + " contrib"
         ],
-        'key_url': "https://www.virtualbox.org/download/oracle_vbox.asc",
+        'key_url': "https://www.virtualbox.org/download/oracle_vbox_2016.asc",
         'pkg_name': "virtualbox-6.1",
     }
 }, merge=salt['grains.filter_by']({
