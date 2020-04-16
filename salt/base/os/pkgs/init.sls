@@ -30,6 +30,7 @@ pkgs:
 pkgs_fromrepo_{{ fromrepo_config.from }}:
   pkg.latest:
     - pkgs: {{ fromrepo_config.pkgs | tojson }}
+    - fromrepo: {{ fromrepo_config.from }}
     - only_upgrade: {{ fromrepo_config.only_upgrade|default(False) }}
 {{ pkg_latest_opts() | indent(4) }}
     - reload_modules: True
