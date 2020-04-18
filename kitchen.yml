@@ -16,9 +16,6 @@ provisioner:
   require_chef: false
   is_file_root: true
   salt_file_root: /srv
-  salt_minion_config_template: .test/minion.erb
-  salt_minion_config_dropin_files:
-    - .local/overrides.conf
   salt_copy_filter:
     - .idea
     - .kitchen
