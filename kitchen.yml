@@ -32,9 +32,6 @@ provisioner:
     - kitchen.yml
     - README.md
     - requisites.sh
-    - setup.sh
-    - setup_foreman.sh
-    - setup_salt.sh
     - upload_templates.py
 
 # provide platform definitions in kitchen.local.yml
