@@ -3,8 +3,14 @@
 # runner script - to be run by cron
 # as cron clears ENVs the local binaries must be fully qualified
 
+if [ -z $1 ]; then
+  echo "Usage: $0 <hostname for test box>"
+  exit 1
+fi
+
 echo "Test started"
 readonly test_start_ts=$(date +%s.%N)
+export PROVISIONED_HOSTNAME=$1
 pushd /home/ghrunner/projects/ambassador || exit 4
 
 LOGFILE=/var/log/ambassador/amb.kvm.$(date -d "today" +"%Y%m%d%H%M")
