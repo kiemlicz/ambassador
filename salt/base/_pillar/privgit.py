@@ -9,6 +9,7 @@ import salt.utils
 import salt.utils.dictupdate
 import salt.utils.gitfs
 from salt.exceptions import SaltConfigurationError
+from salt.defaults import DEFAULT_TARGET_DELIM
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +32,7 @@ def ext_pillar(minion_id, pillar, *args, **kwargs):
 
     The pillar data:
     ```
+    privgit:
      - main:
          url: git@bitbucket.org:user/repo.git
          branch: master
@@ -40,7 +42,7 @@ def ext_pillar(minion_id, pillar, *args, **kwargs):
            thekey
            -----END RSA PRIVATE KEY-----
          env: base
-         root; pillar
+         root: pillar
     ```
     Use:
     privkey_location
@@ -52,6 +54,7 @@ def ext_pillar(minion_id, pillar, *args, **kwargs):
     with raw content (instead of *_location)
 
     Entries must be formed as list
+    It is possible to fetch previous pillar from configured key (`lookup_key`)
 
     It is possible to use following 'flat' syntax:
     ```
@@ -81,6 +84,21 @@ def ext_pillar(minion_id, pillar, *args, **kwargs):
             }})
         return d
 
+    def previous_pillar():
+        r = pillar
+        key = kwargs['lookup_key'] if 'lookup_key' in kwargs else ext_name
+        for each in key.split(DEFAULT_TARGET_DELIM):
+            if each in r:
+                r = r[each]
+            else:
+                log.error("key: %s (part: %s) not found in pillar", key, each)
+                return []
+        if isinstance(r, list):
+            return r
+        else:
+            log.error("key: %s must be a list", key)
+            return []
+
     def write_file(path, content, perms):
         __salt__['file.write'](path, content)
         __salt__['file.set_mode'](path, perms)
@@ -95,14 +113,17 @@ def ext_pillar(minion_id, pillar, *args, **kwargs):
     opt_privkey_loc = 'privkey_location'
     opt_pubkey_loc = 'pubkey_location'
 
-    cachedir = __salt__['config.get']('cachedir')
+    privgit_args = kwargs['repositories'] if 'repositories' in kwargs else []
+    privgit_pillar = previous_pillar()
+    privgit_deflatten_pillar = deflatten_pillar()
 
     repositories = collections.OrderedDict()
-    repositories = __utils__['common.merge'](args, repositories)
-    repositories = __utils__['common.merge'](pillar[ext_name] if ext_name in pillar else [], repositories)
-    repositories = __utils__['common.merge'](deflatten_pillar(), repositories)
+    repositories = __utils__['common.merge'](privgit_args, repositories)
+    repositories = __utils__['common.merge'](privgit_pillar, repositories)
+    repositories = __utils__['common.merge'](privgit_deflatten_pillar, repositories)
 
-    log.info("Using following repositories: {}".format(repositories))
+    log.info("Using following repositories: %s", repositories)
+    cachedir = __salt__['config.get']('cachedir')
     ret = {}
     for repository_name, repository_opts in repositories.items():
         if opt_privkey in repository_opts and opt_pubkey in repository_opts:
@@ -129,7 +150,7 @@ def ext_pillar(minion_id, pillar, *args, **kwargs):
             {"privkey": privgit_privkey},
             {"pubkey": privgit_pubkey}]}
 
-        log.debug("generated private git configuration: {}".format(repo))
+        log.debug("generated private git configuration: %s", repo)
 
         try:
             # workaround, otherwise GitFS doesn't perform fetch and "remote ref does not exist"
@@ -138,7 +159,6 @@ def ext_pillar(minion_id, pillar, *args, **kwargs):
             loaded_pillar = salt.loader.pillars(local_opts, __salt__)
             ret = loaded_pillar['git'](minion_id, pillar, repo)
         except Exception as e:
-            log.exception(
-                "Fatal error in privgit, for: {} {}, repository will be omitted".format(privgit_branch, privgit_url))
+            log.exception("Fatal error in privgit, for: %s %s, repository will be omitted", privgit_branch, privgit_url)
 
     return ret

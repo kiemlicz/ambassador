@@ -101,9 +101,10 @@ The syntax:
 ```
 ext_pillar:                # Salt option
   - privgit:               # extension name
-    - name1:               # first entry identifier
-        param1:            # the parameters dict
-        param2:            # append in config only the options that most likely won't be changed by users
+      repositories:
+        - name1:               # first entry identifier
+            param1:            # the parameters dict
+            param2:            # append in config only the options that most likely won't be changed by users
 ```
 Fully static configuration (use _git_pillar_ instead of such):
 ```
