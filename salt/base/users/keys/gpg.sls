@@ -18,3 +18,8 @@ gpg_key_{{ username }}_{{ gpg }}:
 {%- endfor %}
 {%- endif %}
 {%- endfor %}
+
+gpg_keypairs_generation_completed:
+  test.show_notification:
+    - name: GPG Keypairs import completed
+    - text: GPG Keypair already exists or was not specified
