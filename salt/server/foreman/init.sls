@@ -1,7 +1,7 @@
 {% from "foreman/map.jinja" import foreman with context %}
 {% from "_macros/dev_tool.macros.jinja" import repo_pkg with context %}
-{%- set ip = salt['network.ip_addrs'](cidr="192.168.8.0/24")|first %}
-{%- set fqdn = salt['network.get_fqdn']() %}
+{%- set ip = salt['network.ip_addrs'](cidr=foreman.cidr)|first %}
+{%- set fqdn = foreman.fqdn %}
 
 include:
   - os

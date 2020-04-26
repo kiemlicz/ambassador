@@ -7,6 +7,7 @@
 
 foreman:
   fqdn: {{ fqdn }}
+  cidr: "127.0.0.0/24"
   installer_options:
     - "--no-enable-puppet"
     - "--puppet-server=false"
