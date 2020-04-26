@@ -68,19 +68,19 @@ if args.top:
     log.info("Copying: %s, into: %s", args.top, dest)
     copyfile(args.top, dest)
 
-Path(os.path.join(container_rootfs, "srv", "keys")).mkdir(parents=True, exist_ok=True)
 kdbx_salt_config = {'kdbx': {'driver': 'kdbx'}}
 if args.kdbx_key:
+    Path(os.path.join(container_rootfs, "etc", "salt", "keys")).mkdir(parents=True, exist_ok=True)
     key_filename = os.path.basename(args.kdbx_key)
-    copyfile(args.kdbx_key, os.path.join(container_rootfs, "srv", "keys", key_filename))
-    kdbx_salt_config['kdbx']['key_file'] = os.path.join(os.sep, "srv", "keys", key_filename)
+    copyfile(args.kdbx_key, os.path.join(container_rootfs, "etc", "salt", "keys", key_filename))
+    kdbx_salt_config['kdbx']['key_file'] = os.path.join(os.sep, "etc", "salt", "keys", key_filename)
 if args.kdbx_pass:
     kdbx_salt_config['kdbx']['password'] = args.kdbx_pass
 if args.kdbx:
-    Path(os.path.join(container_rootfs, "srv", "kdbx")).mkdir(parents=True, exist_ok=True)
+    Path(os.path.join(container_rootfs, "etc", "salt", "kdbx")).mkdir(parents=True, exist_ok=True)
     kdbx_filename = os.path.basename(args.kdbx)
-    copyfile(args.kdbx, os.path.join(container_rootfs, "srv", "kdbx", kdbx_filename))
-    kdbx_salt_config['kdbx']['db_file'] = os.path.join(os.sep, "srv", "kdbx", kdbx_filename)
+    copyfile(args.kdbx, os.path.join(container_rootfs, "etc", "salt", "kdbx", kdbx_filename))
+    kdbx_salt_config['kdbx']['db_file'] = os.path.join(os.sep, "etc", "salt", "kdbx", kdbx_filename)
     kdbx_config = os.path.join(container_rootfs, "etc", "salt", "minion.d", "{}-kdbx.conf".format(container_name))
     Path(os.path.dirname(kdbx_config)).mkdir(parents=True, exist_ok=True)
     with open(kdbx_config, 'w') as minion_config_file:
@@ -90,7 +90,7 @@ if args.kdbx:
     entry = kdbx.find_entries_by_path(container_name, first=True)
     if entry and entry.attachments:
         for attachment in entry.attachments:
-            with open(os.path.join(container_rootfs, "srv", "keys", attachment.filename), 'wb') as a:
+            with open(os.path.join(container_rootfs, "etc", "salt", "keys", attachment.filename), 'wb') as a:
                 a.write(attachment.data)
     else:
         log.warning("No secrets for: %s found", container_name)
@@ -107,7 +107,7 @@ c.attach_wait(lxc.attach_run_command, ["curl", "-o", "/tmp/pre.sh", "-L", "https
 c.attach_wait(lxc.attach_run_command, ["curl", "-o", "/tmp/bootstrap-salt.sh", "-L", "https://bootstrap.saltstack.com"])
 c.attach_wait(lxc.attach_run_command, ["bash", "/tmp/pre.sh"])
 c.attach_wait(lxc.attach_run_command, ["bash", "/tmp/bootstrap-salt.sh", "-x", "python3"])
-c.attach_wait(lxc.attach_run_command, ["gpg", "--homedir", "/etc/salt/gpgkeys", "--import", "/srv/keys/pillargpg.gpg"])
+c.attach_wait(lxc.attach_run_command, ["gpg", "--homedir", "/etc/salt/gpgkeys", "--import", "/etc/salt/keys/pillargpg.gpg"])
 c.attach_wait(lxc.attach_run_command, ["salt-call", "--local", "saltutil.sync_all"])
 c.attach_wait(lxc.attach_run_command, ["salt-call", "--local", "state.highstate"])
 end_time = datetime.datetime.now()
