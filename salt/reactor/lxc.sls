@@ -11,5 +11,5 @@ lxc_init:
              seed: {{ data['data']['seed']|default(True) }}
              install: {{ data['data']['install']|default(True) }}
 {%- if 'config' in data['data'] %}
-             config: {{ data['data']['config']|default(True) }}
+             config: {{ data['data']['config'] }}
 {%- endif %}
