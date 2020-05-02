@@ -10,7 +10,7 @@ lxc:
       - sls: os
 {%- for config in lxc.config %}
 lxc_config_{{ config.name }}:
-  file_ext.managed:
+  file.managed:
     - name: {{ config.name }}
 {%- if config.contents is defined %}
     - contents: {{ config.contents | yaml_encode }}

@@ -22,7 +22,7 @@ lxc_container_{{ name }}:
         config: {{ container.config }}
 {%- endif %}
     - require:
-      - lxc: {{ name }}
+      - sls: lxc.install
 {% endfor %}
 
 lxc-containers-notification:
