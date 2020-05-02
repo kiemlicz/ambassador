@@ -2,15 +2,13 @@
     'Debian': {
         'pkgs': ["lxc", "bridge-utils", "debootstrap", "libvirt0", "libpam-cgroup", "libpam-cgfs"],
         'service': "lxc",
-        'config': {
-          'net_file': "/etc/default/lxc-net",
-          'net_source': "salt://lxc/lxc-net",
-          'sysctl_location': '/etc/sysctl.d/local.conf',
-        },
+        'config': [{
+          'name': "/etc/default/lxc-net",
+          'source': "salt://lxc/lxc-net",
+        }],
+        'sysctl_location': '/etc/sysctl.d/local.conf',
         'containers': {
 
         }
     },
-    'Windows': {
-    }
 }, merge=salt['pillar.get']('lxc', merge=True)) %}
