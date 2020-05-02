@@ -8,6 +8,21 @@ lxc_container_{{ name }}:
     - network_profile: {{ container.network_profile|default(None) }}
     - options: {{ container.options|default(None) }}
     - template: {{ container.template|default(None) }}
+  event.send:
+    - name: 'salt/lxc/{{ name }}/created'
+    - data:
+        name: {{ name }}
+        profile: {{ container.profile|default(None) }}
+        network_profile: {{ container.network_profile|default(None) }}
+        template: {{ container.template|default(None) }}
+        seed: {{ container.seed|default(True) }}
+        install: {{ container.install|default(True) }}
+{%- if container.config is defined %}
+        # this will be the minion's config, otherwise only id is set
+        config: {{ container.config }}
+{%- endif %}
+    - require:
+      - lxc: {{ name }}
 {% endfor %}
 
 lxc-containers-notification:
