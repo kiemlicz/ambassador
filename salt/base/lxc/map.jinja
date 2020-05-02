@@ -7,8 +7,6 @@
           'source': "salt://lxc/lxc-net",
         }],
         'sysctl_location': '/etc/sysctl.d/local.conf',
-        'containers': {
-
-        }
+        'containers': {}
     },
 }, merge=salt['pillar.get']('lxc', merge=True)) %}
