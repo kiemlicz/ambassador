@@ -37,6 +37,8 @@ server:
     - samba
     - users
     - mail
+# cannot test in Docker, must be tested on regular VM
+#    - lxc
   'server-host':
     - os
     - os.pkgs.unattended
