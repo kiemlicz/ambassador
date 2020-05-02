@@ -17,6 +17,9 @@ lxc_container_{{ name }}:
         template: {{ container.template|default(None) }}
         seed: {{ container.seed|default(True) }}
         install: {{ container.install|default(True) }}
+{%- if container.bootstrap_args is defined %}
+        bootstrap_args: {{ container.bootstrap_args }}
+{%- endif %}
 {%- if container.config is defined %}
         # this will be the minion's config, otherwise only id is set
         config: {{ container.config }}
