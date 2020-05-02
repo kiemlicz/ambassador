@@ -1,4 +1,8 @@
+{%- from "os/network/map.jinja" import network with context %}
 include:
+{%- if network.enabled %}
+  - os.network
+{%- endif %}
   - os.repositories
   - os.mounts
   - os.hosts
