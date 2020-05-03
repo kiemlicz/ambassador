@@ -1,5 +1,5 @@
 {% from "lxc/map.jinja" import lxc with context %}
-{% for name, container in lxc.containers.items() %}
+{%- for name, container in lxc.containers.items() %}
 lxc_container_{{ name }}:
   lxc.present:
     - name: {{ name }}
@@ -26,7 +26,7 @@ lxc_container_{{ name }}:
 {%- endif %}
     - require:
       - sls: lxc.install
-{% endfor %}
+{%- endfor %}
 
 lxc-containers-notification:
   test.show_notification:
