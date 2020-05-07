@@ -135,12 +135,14 @@ def install():
 start_time = datetime.datetime.now()
 
 if use_lxc:
+    log.info("Installing into LXC container")
     container_name = args.name
     c = ensure_container(container_name)
     populate_files(os.path.join(args.rootfs, container_name, "rootfs"))
     log.info("Running inside: %s", container_name)
     c.attach_wait(install)
 else:
+    log.info("Installing directly onto this host")
     populate_files(os.sep)
     install()
 
