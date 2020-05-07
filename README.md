@@ -23,16 +23,15 @@ Simply follow:
 1. Clone this repo with [submodules](https://github.com/kiemlicz/util/wiki/git): `git submodule update --init`
 2. Ensure you have LXC configured: `requisites.sh`
 3. Install `pip3 install pyyaml pykeepass` and `apt install python3-lxc`
-3. Provide `ambassador-installer.override.conf` to override any Salt masterless Vagrant provisioner settings, e.g. add your own pillar:
+3. Optionally provide `ambassador-installer.override.conf` to override any Salt masterless settings, e.g. add your own pillar:
 ```
 ext_pillar:
   - git:
     - branch git@bitbucket.org:someone/pillar_repo.git:
       - root: pillar
       - env: base
-```
-This file is required, create empty if no overrides.  
-4. `./setup.sh -n ambassador -u your_username,other_username_allowed_to_ssh_into_ambassador [--deploy_priv priv.key] [--deploy_pub key.pub] [--pillar_pub key.gpg.pub] [--pillar_priv key.gpg] [--ambassador_kdbx ambassador.kdbx] [--ambassador_key ambassador.key]`
+```  
+4. `sudo SHELL=/bin/bash python3 install.py --name ambassador --ifc [ifc] --configs config/ambassador-installer.conf --top config/ambassador-top.sls --directories salt extensions/file_ext_authorize [--kdbx the.db.kdbx] [--kdbx-pass thepassword] [--kdbx-key the.key]`
 
 Since foreman still doesn't support 'dockerized' deployment (cannot specify plugins for Foreman Docker images, no official foreman-proxy image).  
 The provided `docker-compose.yml` can be used only to setup external DB or any other services. Use `docker-compose.override.yml` for any overrides:

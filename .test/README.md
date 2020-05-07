@@ -6,7 +6,7 @@ The most common way is to use [kitchen-salt](https://github.com/saltstack/kitche
 Following directory contains setup of kitchen test **runner** (the machine that will be running tests).  
 Basically it spawns LXC container (using Vagrant) and provisions it using Ambassador (create your own pillar configuration)
 
-Setup: `sudo SHELL=/bin/bash python3 create.py --name <name> --ifc <interface> --configs <the config> <the other config> [--kdbx the.db.kdbx] [--kdbx-pass thepassword] [--kdbx-key the.key]`
+Setup: `sudo SHELL=/bin/bash python3 install.py --name <name> --ifc <interface> --configs <the config> <the other config> [--kdbx the.db.kdbx] [--kdbx-pass thepassword] [--kdbx-key the.key]`
 
 The setup eventually runs `salt-call --local state.highstate` thus provide desired states:
 ```
