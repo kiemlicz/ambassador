@@ -2,19 +2,22 @@ import argparse
 import datetime
 import logging
 import os
-from distutils import dir_util
-from pathlib import Path
-from shutil import copyfile
 import urllib.request
 import sys
 import yaml
+import lxc
+import ssl
+import encodings.idna
+from distutils import dir_util
+from pathlib import Path
+from shutil import copyfile
 from pykeepass import PyKeePass
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
 parser = argparse.ArgumentParser(description='Setup LXC container and provision with Salt')
-parser.add_argument('--lxc', help="install within LXC container", required=True, action='store_true')
+parser.add_argument('--lxc', help="install within LXC container", required=False, default=False, action='store_true')
 parser.add_argument('--name', help="provide container name", required=False)
 parser.add_argument('--ifc', help="provide interface to attach container to", required=True)
 parser.add_argument('--configs', help="provide Salt Minion config", required=True, nargs='+', type=str)
@@ -28,7 +31,7 @@ parser.add_argument('--rootfs', help="provide container rootfs path", required=F
 parser.add_argument('--autostart', help="should the container autostart", required=False, default=True, action='store_true')
 args = parser.parse_args()
 
-lxc = args.lxc
+use_lxc = args.lxc
 prereq_url = "https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/1fb26207f7d9665989fc7019b1c0ac919383331a/setup_salt_requisites.sh"
 bootstrap_url = "https://bootstrap.saltstack.com"
 
@@ -74,6 +77,7 @@ def populate_files(rootfs):
         log.info("Copying: %s, into: %s", args.top, dest)
         copyfile(args.top, dest)
 
+    Path(os.path.join(rootfs, "etc", "salt", "minion.d")).mkdir(parents=True, exist_ok=True)
     for config in args.configs:
         log.info("Copying Salt config: %s", config)
         # todo check without basename
@@ -96,6 +100,7 @@ def populate_files(rootfs):
         Path(os.path.dirname(kdbx_config)).mkdir(parents=True, exist_ok=True)
         with open(kdbx_config, 'w') as minion_config_file:
             yaml.dump(kdbx_salt_config, minion_config_file)
+
         log.info("Inserting secrets")
         kdbx = PyKeePass(args.kdbx, args.kdbx_pass, args.kdbx_key)  # fixme how will it behave if no key
         entry = kdbx.find_entries_by_path(container_name, first=True)
@@ -108,9 +113,12 @@ def populate_files(rootfs):
 
 
 def install():
-    response = urllib.request.urlopen(prereq_url)
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    response = urllib.request.urlopen(prereq_url, context=ctx)
     prereq_script = response.read().decode('utf-8')
-    response = urllib.request.urlopen(bootstrap_url)
+    response = urllib.request.urlopen(bootstrap_url, context=ctx)
     bootstrap_script = response.read().decode('utf-8')
     with open("/tmp/prereq.sh", "w+") as prereq, open("/tmp/bootstrap-salt.sh", "w+") as bootstrap:
         prereq.write(prereq_script)
@@ -126,7 +134,7 @@ def install():
 
 start_time = datetime.datetime.now()
 
-if lxc:
+if use_lxc:
     container_name = args.name
     c = ensure_container(container_name)
     populate_files(os.path.join(args.rootfs, container_name, "rootfs"))
