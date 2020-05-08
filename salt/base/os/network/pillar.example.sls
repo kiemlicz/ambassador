@@ -1,3 +1,7 @@
+---
+network:
+  enabled: False  # don't manage network interfaces
+---
 network:
   enabled: True
   interfaces:
