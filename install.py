@@ -43,8 +43,9 @@ def ensure_container(container_name):
         c.set_config_item("lxc.net.0.type", "veth")
         c.set_config_item("lxc.net.0.link", args.ifc)
         c.set_config_item("lxc.net.0.flags", "up")
-        c.set_config_item("lxc.apparmor.profile",
-                          "unconfined")  # todo otherwise apache2 won't start, find proper solution
+        # I think this uses lxc-generate-aa-rules.py
+        c.set_config_item("lxc.apparmor.profile", "generated")
+        c.set_config_item("lxc.apparmor.allow_nesting", "1")
 
         if args.autostart:
             c.set_config_item("lxc.start.auto", "1")
