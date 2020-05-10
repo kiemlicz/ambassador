@@ -28,7 +28,7 @@ parser.add_argument('--kdbx', help="KDBX file containing further secrets", requi
 parser.add_argument('--kdbx-pass', help="KDBX password", required=False)
 parser.add_argument('--kdbx-key', help="KDBX key file", required=False)
 parser.add_argument('--rootfs', help="provide container rootfs path", required=False, default=os.path.join(os.sep, "var", "lib", "lxc"))
-parser.add_argument('--autostart', help="should the container autostart", required=False, default=True, action='store_true')
+parser.add_argument('--autostart', help="should the LXC container autostart", required=False, default=False, action='store_true')
 args = parser.parse_args()
 
 use_lxc = args.lxc
