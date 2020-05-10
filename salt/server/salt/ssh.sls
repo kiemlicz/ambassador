@@ -20,6 +20,8 @@ salt_ssh_{{ config.name }}:
 salt_ssh:
   pkg.latest:
     - name: {{ salt_installer.ssh.pkg_name }}
+    - fromrepo: {{ salt_installer.repository.origin|default(None) }}
+    - reload_modules: True
 {{ pkg_latest_opts() | indent(4) }}
     - require:
       - pkgrepo_ext: salt_repository

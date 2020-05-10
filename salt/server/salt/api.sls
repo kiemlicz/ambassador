@@ -20,6 +20,8 @@ salt_api_{{ config.name }}:
 salt_api:
   pkg.latest:
     - name: {{ salt_installer.api.pkg_name }}
+    - fromrepo: {{ salt_installer.repository.origin|default(None) }}
+    - reload_modules: True
 {{ pkg_latest_opts() | indent(4) }}
     - require:
       - pkgrepo_ext: salt_repository

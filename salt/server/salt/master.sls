@@ -24,6 +24,8 @@ salt_master_{{ config.name }}:
 salt_master:
   pkg.latest:
     - name: {{ salt_installer.master.pkg_name }}
+    - fromrepo: {{ salt_installer.repository.origin|default(None) }}
+    - reload_modules: True
 {{ pkg_latest_opts() | indent(4) }}
     - require:
       - pkgrepo_ext: salt_repository
