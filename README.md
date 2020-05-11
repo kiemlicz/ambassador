@@ -16,8 +16,7 @@ Setup any environment: dev, prod, work, home using Salt (SaltStack's) and PXE bo
 Will aim to be both Linux&Windows friendly.
 
 # Setup
-As the best way of documenting things is writing automation scripts, this automation server's installation process
-is also automated.  
+As the best way of documenting things is writing automation scripts, this automation server's installation process is also automated.  
 The "installation" process ends up with LXC container containing foreman&salt fully setup and configured.  
 Simply follow:  
 1. Clone this repo with [submodules](https://github.com/kiemlicz/util/wiki/git): `git submodule update --init`

@@ -16,7 +16,7 @@ from pykeepass import PyKeePass
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
-parser = argparse.ArgumentParser(description='Setup LXC container and provision with Salt')
+parser = argparse.ArgumentParser(description='Installs Salt Minion for further box provisioning. Uses host directly or LXC container')
 parser.add_argument('--lxc', help="install within LXC container", required=False, default=False, action='store_true')
 parser.add_argument('--name', help="provide container name", required=False)
 parser.add_argument('--ifc', help="provide interface to attach container to", required=True)
@@ -80,7 +80,7 @@ def populate_files(rootfs):
 
     Path(os.path.join(rootfs, "etc", "salt", "minion.d")).mkdir(parents=True, exist_ok=True)
     for config in args.configs:
-        log.info("Copying Salt config: %s", config)
+        log.info("Copying Salt Minion config: %s", config)
         # todo check without basename
         copyfile(config, os.path.join(rootfs, "etc", "salt", "minion.d", os.path.basename(config)))
 
