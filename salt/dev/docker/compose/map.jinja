@@ -10,7 +10,7 @@
       'url': "https://github.com/docker/compose/releases/download/" + version + "/docker-compose-" + os + "-" + arch,
       'location': "/opt/docker-compose",
       'owner': "root",
-      'owner_link_location': "/root/bin/docker-compose"
+      'owner_link_location': "/usr/local/bin/docker-compose"
     }
   },
 }, merge=salt['pillar.get']('docker:compose')) %}
