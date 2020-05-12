@@ -22,6 +22,8 @@
         'ssl': {},
         'services': ["foreman", "foreman-proxy"],
         'setup': [],
+        'cidr': "192.168.1.0/24",
+        'fqdn': "localhost",
         'overrides': {}
     },
 }, merge=salt['grains.filter_by']({

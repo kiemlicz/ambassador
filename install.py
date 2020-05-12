@@ -67,8 +67,11 @@ def ensure_container(container_name):
 def populate_files(rootfs):
     log.info("Inserting files")
     for dir in args.directories:
+        if not os.path.isdir(dir):
+            log.error("Omitting: %s, since not directory", dir)
+            continue
         log.info("Copying directory: %s", dir)
-        dir_util.copy_tree(dir, os.path.join(rootfs, "srv", dir))
+        dir_util.copy_tree(dir, os.path.join(rootfs, "srv", os.path.basename(os.path.normpath(dir))))
 
     if args.top:
         l = args.top_location
@@ -78,6 +81,7 @@ def populate_files(rootfs):
         log.info("Copying: %s, into: %s", args.top, dest)
         copyfile(args.top, dest)
 
+    Path(os.path.join(rootfs, "etc", "salt", "gpgkeys")).mkdir(parents=True, exist_ok=True, mode=0o700)
     Path(os.path.join(rootfs, "etc", "salt", "minion.d")).mkdir(parents=True, exist_ok=True)
     for config in args.configs:
         log.info("Copying Salt Minion config: %s", config)
@@ -117,17 +121,17 @@ def install():
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
-    response = urllib.request.urlopen(prereq_url, context=ctx)
-    prereq_script = response.read().decode('utf-8')
+    # response = urllib.request.urlopen(prereq_url, context=ctx)
+    # prereq_script = response.read().decode('utf-8')
     response = urllib.request.urlopen(bootstrap_url, context=ctx)
     bootstrap_script = response.read().decode('utf-8')
     with open("/tmp/prereq.sh", "w+") as prereq, open("/tmp/bootstrap-salt.sh", "w+") as bootstrap:
-        prereq.write(prereq_script)
+        # prereq.write(prereq_script)
         bootstrap.write(bootstrap_script)
-    os.chmod("/tmp/prereq.sh", 0o755)
+    # os.chmod("/tmp/prereq.sh", 0o755)
     os.chmod("/tmp/bootstrap-salt.sh", 0o755)
-    os.system("/tmp/prereq.sh")
-    os.system("/tmp/bootstrap-salt.sh -x python3")
+    # os.system("/tmp/prereq.sh")
+    os.system("/tmp/bootstrap-salt.sh -U -x python3")  # todo add -p
     os.system("gpg --homedir /etc/salt/gpgkeys --import /etc/salt/keys/pillargpg.gpg")
     os.system("salt-call --local saltutil.sync_all")
     os.system("salt-call --local state.highstate")

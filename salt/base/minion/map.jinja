@@ -7,6 +7,9 @@
           'health_file': "/tmp/salt/healthz",
           'event_tag': "salt/minion/" ~ grains['id'] ~ "/minion_ready",
           'service': "salt-minion",
+          'startup': {
+            'pip3': []
+          }
       },
       'Debian': {
           'name': "deb http://repo.saltstack.com/py3/debian/10/amd64/latest buster main",
@@ -16,6 +19,9 @@
           'health_file': "/tmp/salt/healthz",
           'event_tag': "salt/minion/" ~ grains['id'] ~ "/minion_ready",
           'service': "salt-minion",
+          'startup': {
+            'pip3': []
+          }
       },
       'Windows': {
 
