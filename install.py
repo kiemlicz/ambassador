@@ -32,7 +32,6 @@ parser.add_argument('--autostart', help="should the LXC container autostart", re
 args = parser.parse_args()
 
 use_lxc = args.lxc
-prereq_url = "https://gist.githubusercontent.com/kiemlicz/1aa8c2840f873b10ecd744bf54dcd018/raw/1fb26207f7d9665989fc7019b1c0ac919383331a/setup_salt_requisites.sh"
 bootstrap_url = "https://bootstrap.saltstack.com"
 
 
@@ -121,18 +120,17 @@ def install():
     ctx = ssl.create_default_context()
     ctx.check_hostname = False
     ctx.verify_mode = ssl.CERT_NONE
-    # response = urllib.request.urlopen(prereq_url, context=ctx)
-    # prereq_script = response.read().decode('utf-8')
     response = urllib.request.urlopen(bootstrap_url, context=ctx)
     bootstrap_script = response.read().decode('utf-8')
-    with open("/tmp/prereq.sh", "w+") as prereq, open("/tmp/bootstrap-salt.sh", "w+") as bootstrap:
-        # prereq.write(prereq_script)
+    with open("/tmp/bootstrap-salt.sh", "w+") as bootstrap:
         bootstrap.write(bootstrap_script)
-    # os.chmod("/tmp/prereq.sh", 0o755)
     os.chmod("/tmp/bootstrap-salt.sh", 0o755)
-    # os.system("/tmp/prereq.sh")
-    os.system("/tmp/bootstrap-salt.sh -U -x python3")  # todo add -p
-    os.system("gpg --homedir /etc/salt/gpgkeys --import /etc/salt/keys/pillargpg.gpg")
+    # it seems that OS packages: `libffi-dev zlib1g-dev libgit2-dev git` are somehow not needed for pygit2 to run
+    os.system("/tmp/bootstrap-salt.sh -U -x python3")  # consider: -p libgit2-dev
+    if os.path.isfile("/etc/salt/keys/pillargpg.gpg"):
+        os.system("gpg --homedir /etc/salt/gpgkeys --import /etc/salt/keys/pillargpg.gpg")
+    else:
+        log.warning("/etc/salt/keys/pillargpg.gpg not found")
     os.system("salt-call --local saltutil.sync_all")
     os.system("salt-call --local state.highstate")
 
