@@ -33,6 +33,22 @@ provisioner:
     - README.md
     - requisites.sh
     - upload_templates.py
+  pillars:
+    top.sls:
+      base:
+        '*':
+          - startup
+    startup.sls:
+      minion:
+        startup:
+          pip3:
+            - pyOpenSSL
+            - pygit2==1.0.3
+            - docker-py
+            - cherrypy
+            - jinja2
+            - PyYAML
+            - pykeepass
 
 # provide platform definitions in kitchen.local.yml
 platforms: []
