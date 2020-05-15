@@ -5,13 +5,18 @@ import os
 import urllib.request
 import sys
 import yaml
-import lxc
 import ssl
 import encodings.idna
 from distutils import dir_util
 from pathlib import Path
 from shutil import copyfile
 from pykeepass import PyKeePass
+
+HAS_LIBS = True
+try:
+    import lxc
+except ImportError:
+    HAS_LIBS = False
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
@@ -138,6 +143,8 @@ def install():
 start_time = datetime.datetime.now()
 
 if use_lxc:
+    if not HAS_LIBS:
+        raise Exception("Missing module: python3-lxc")
     log.info("Installing into LXC container")
     container_name = args.name
     c = ensure_container(container_name)
