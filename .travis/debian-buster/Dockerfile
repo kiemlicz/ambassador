@@ -5,7 +5,7 @@ ARG salt_ver=""
 
 COPY salt /srv/salt
 
-RUN apt-get update && apt-get install -y curl dumb-init && \
+RUN apt-get update && apt-get install -y curl dumb-init python3-pip && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
     sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver
 
@@ -15,8 +15,7 @@ WORKDIR /srv
 FROM salt-base AS salt-minion
 # hostname from `docker run -h` must be used as minion ID
 
-RUN apt-get install -y python3-pip && \
-    pip3 install --upgrade docker
+RUN pip3 install --upgrade docker
 
 VOLUME /etc/salt/minion.d
 
@@ -40,11 +39,11 @@ ENV SALTENV=$saltenv
 COPY .travis/config/master.conf /etc/salt/master.d/01-master.conf
 COPY .travis/entrypoint.sh /opt/
 
-RUN apt-get install -y python3-pip libffi-dev libgit2-dev git && \
-    pip3 install --upgrade pyOpenSSL pygit2==$pip3_pygit2_ver docker-py cherrypy jinja2 requests && \
+RUN pip3 install --upgrade pyOpenSSL pygit2==$pip3_pygit2_ver docker-py jinja2 requests && \
     apt-get install -y salt-master
 
 RUN if [ "$API_ENABLED" = true ]; then \
+        pip3 install --upgrade cherrypy \
         apt-get install -y salt-api; \
     fi
 
@@ -77,7 +76,7 @@ ARG saltenv
 ENV SALTENV=$saltenv
 ENV LOG_LEVEL=$log_level
 
-RUN apt-get install -y python3-pip && pip3 install --upgrade pytest pytest-xdist redis
+RUN pip3 install --upgrade pytest pytest-xdist redis
 
 # workaround for salt's service state
 # somehow in masterless config the service provider cannot be overriden
