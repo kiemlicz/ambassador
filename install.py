@@ -10,13 +10,18 @@ import encodings.idna
 from distutils import dir_util
 from pathlib import Path
 from shutil import copyfile
-from pykeepass import PyKeePass
 
-HAS_LIBS = True
+HAS_PYKEEPASS_LIBS = True
+try:
+    from pykeepass import PyKeePass
+except ImportError:
+    HAS_PYKEEPASS_LIBS = False
+
+HAS_LXC_LIBS = True
 try:
     import lxc
 except ImportError:
-    HAS_LIBS = False
+    HAS_LXC_LIBS = False
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
@@ -101,6 +106,8 @@ def populate_files(rootfs):
     if args.kdbx_pass:
         kdbx_salt_config['kdbx']['password'] = args.kdbx_pass
     if args.kdbx:
+        if not HAS_PYKEEPASS_LIBS:
+            raise Exception("Missing module, perform: pip3 install pykeepass")
         Path(os.path.join(rootfs, "etc", "salt", "kdbx")).mkdir(parents=True, exist_ok=True)
         kdbx_filename = os.path.basename(args.kdbx)
         copyfile(args.kdbx, os.path.join(rootfs, "etc", "salt", "kdbx", kdbx_filename))
@@ -143,8 +150,8 @@ def install():
 start_time = datetime.datetime.now()
 
 if use_lxc:
-    if not HAS_LIBS:
-        raise Exception("Missing module: python3-lxc")
+    if not HAS_LXC_LIBS:
+        raise Exception("Missing package, perform: sudo apt install python3-lxc")
     log.info("Installing into LXC container")
     container_name = args.name
     c = ensure_container(container_name)
