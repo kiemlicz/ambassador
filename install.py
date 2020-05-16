@@ -138,7 +138,9 @@ def install():
         bootstrap.write(bootstrap_script)
     os.chmod("/tmp/bootstrap-salt.sh", 0o755)
     # it seems that OS packages: `libffi-dev zlib1g-dev libgit2-dev git` are somehow not needed for pygit2 to run
-    os.system("/tmp/bootstrap-salt.sh -U -x python3")  # consider: -p libgit2-dev
+    os.system("/tmp/bootstrap-salt.sh -U -x python3 -p python3-pip")  # consider: -p libgit2-dev
+    # install required packages manually (since startup states won't be able to reload the main process to enable pygit2)
+    os.system("pip3 install --upgrade pyOpenSSL pygit2==1.0.3 cherrypy jinja2 PyYAML pykeepass")
     if os.path.isfile("/etc/salt/keys/pillargpg.gpg"):
         os.system("gpg --homedir /etc/salt/gpgkeys --import /etc/salt/keys/pillargpg.gpg")
     else:
