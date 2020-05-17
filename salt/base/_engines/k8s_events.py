@@ -29,9 +29,7 @@ def start(timeout=None,
     c = _get_client()
 
     if __opts__.get('__role') == 'master':
-        fire_master = salt.utils.event.get_master_event(
-            __opts__,
-            __opts__['sock_dir']).fire_event
+        fire_master = salt.utils.event.get_master_event(__opts__, __opts__['sock_dir']).fire_event
     else:
         fire_master = None
 
