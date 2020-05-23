@@ -74,14 +74,15 @@ def top(**kwargs):
 
         saltenv = extract("locations/{}/parameters?search=saltenv".format(loc_id), 'value', 'base')
         host_id = extract("hosts?" + urllib.parse.quote("search=location_id={} and name={} and params.salt_master={}".format(loc_id, minion_id, salt_master_host)), 'id', None)
-        r = {saltenv: {}}
+        # mind that it is impossible to specify minionIDs in ext_nodes
+        top = extract("locations/{}/parameters?search=top.sls".format(loc_id), 'value', {saltenv: {}})
 
         if host_id:
             host_salt_states = extract("hosts/{}/parameters?search=salt_states".format(host_id), 'value', [])
             if host_salt_states:
-                r[saltenv] = host_salt_states
-        log.info("top.sls created: %s", r)
-        return r
+                top[saltenv] = host_salt_states
+        log.info("top.sls created: %s", top)
+        return top
     except Exception:  # pylint: disable=broad-except
         log.exception("Could not fetch host top.sls data via Foreman API:")
         return {}
