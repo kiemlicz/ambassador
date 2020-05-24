@@ -31,6 +31,5 @@ lxc_container_{{ name }}:
 {%- endfor %}
 
 lxc-containers-notification:
-  test.show_notification:
+  test.succeed_without_changes:
   - name: LXC containers setup completed
-  - text: "LXC containers setup completed"

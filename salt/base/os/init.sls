@@ -15,6 +15,5 @@ include:
   - os.services
 
 os-notification:
-  test.show_notification:
+  test.succeed_without_changes:
     - name: OS basic setup completed
-    - text: "OS basic setup completed"

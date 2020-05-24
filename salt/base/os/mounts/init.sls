@@ -11,6 +11,5 @@
 {% endfor %}
 
 mounts-notification:
-  test.show_notification:
+  test.succeed_without_changes:
     - name: Mounts setup completed
-    - text: "Mounts setup completed"

@@ -9,6 +9,5 @@
 {% endfor %}
 
 hosts-notification:
-  test.show_notification:
+  test.succeed_without_changes:
     - name: Hosts setup completed
-    - text: "Hosts setup completed"

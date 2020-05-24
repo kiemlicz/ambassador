@@ -20,6 +20,5 @@
 {%- endfor %}
 
 groups-notification:
-  test.show_notification:
+  test.succeed_without_changes:
     - name: Gropus setup completed
-    - text: "Groups setup completed"

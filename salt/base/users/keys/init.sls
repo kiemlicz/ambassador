@@ -3,6 +3,5 @@ include:
   - users.keys.gpg
 
 keypairs_generation_completed:
-  test.show_notification:
+  test.succeed_without_changes:
     - name: Keypairs import completed
-    - text: Keypair already exists or was not specified

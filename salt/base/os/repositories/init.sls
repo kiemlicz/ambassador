@@ -11,6 +11,5 @@
 {% endfor %}
 
 repositories-notification:
-  test.show_notification:
+  test.succeed_without_changes:
     - name: Repositories setup completed
-    - text: "Repositories setup completed"
