@@ -8,6 +8,8 @@ lxc_container_{{ name }}:
     - network_profile: {{ container.network_profile|default(None) }}
     - options: {{ container.options|default(None) }}
     - template: {{ container.template|default(None) }}
+    - require:
+      - sls: lxc.install
   event.send:
     - name: 'salt/lxc/{{ name }}/created'
     - data:
@@ -25,7 +27,7 @@ lxc_container_{{ name }}:
         config: {{ container.config }}
 {%- endif %}
     - require:
-      - sls: lxc.install
+      - lxc: lxc_container_{{ name }}
 {%- endfor %}
 
 lxc-containers-notification:
