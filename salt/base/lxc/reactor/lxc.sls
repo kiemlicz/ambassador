@@ -13,5 +13,5 @@ lxc_init:
       - bootstrap_args: {{ data['data']['bootstrap_args'] }}
 {%- endif %}
 {%- if 'config' in data['data'] %}
-          config: {{ data['data']['config'] }}
+      - config: {{ data['data']['config'] }}
 {%- endif %}
