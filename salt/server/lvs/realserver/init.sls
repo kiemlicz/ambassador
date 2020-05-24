@@ -4,6 +4,7 @@ import json
 
 {% from "keepalived/map.jinja" import keepalived with context %}
 
+# fixme - refactor
 
 def run():
   keepalived = {{ keepalived|json }}

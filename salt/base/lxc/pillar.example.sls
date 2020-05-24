@@ -1,6 +1,6 @@
 lxc:
   containers:
-    keepalived:
+    keepalived-{{ grains['host'] }}:
       running: True
       network_profile:
         eth0:

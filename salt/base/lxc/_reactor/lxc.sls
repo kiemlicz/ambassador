@@ -13,5 +13,6 @@ lxc_init:
       - bootstrap_args: {{ data['data']['bootstrap_args'] }}
 {%- endif %}
 {%- if 'config' in data['data'] %}
+# fixme there is an issue with config in pillar (mapping values are not allowed in this context when using config: | ...
       - config: {{ data['data']['config'] }}
 {%- endif %}
