@@ -54,7 +54,8 @@ def ext_pillar_saltcheck(pillars_with_dependencies: Tuple[List[Dict[str, Any]], 
 
 @pytest.fixture(scope="session")
 def salt_client(saltenv: str) -> salt.client.Caller:
-    # not running sync_all in Dockerfile so that no Minion ID is generated
+    log.info("Salt Client initialization")
+    # don't run sync_all in Dockerfile so that no Minion ID is generated there
     sync_result = salt.client.Caller().cmd("saltutil.sync_all", saltenv=saltenv)
     log.info("saltutil.sync_all: %s", pp.pformat(sync_result))
     # return new Caller instance that will have 'synced' modules loaded
@@ -75,6 +76,7 @@ def pillars_with_dependencies(salt_client: salt.client.Caller, pillar_location: 
 
     pillar.example.sls must be found right under state root directory (same level as init.sls)
     '''
+    log.info("Generating Pillar")
     all_pillars = {}  # state sls path -> list(pillar1, pillar2)
     state_pillar_dependencies = {}  # state sls name -> list(pillar_key1, pillar_key2)
     for pillar_file in Path(pillar_location).glob('**/pillar.example.sls'):
