@@ -21,6 +21,7 @@ env:
     - CHART_BRANCH="gh-pages"
     - BASE_PUB_NAME="envoy"
     - K8S_API_ENABLED=true
+    - SALTENV=server
 
 jobs:
   allow_failures:

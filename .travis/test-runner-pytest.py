@@ -54,10 +54,12 @@ def ext_pillar_saltcheck(pillars_with_dependencies: Tuple[List[Dict[str, Any]], 
 
 @pytest.fixture(scope="session")
 def salt_client(saltenv: str) -> salt.client.Caller:
-    log.info("Salt Client initialization")
+    log.info("Salt Client initialization (saltenv: %s)", saltenv)
     # don't run sync_all in Dockerfile so that no Minion ID is generated there
     sync_result = salt.client.Caller().cmd("saltutil.sync_all", saltenv=saltenv)
     log.info("saltutil.sync_all: %s", pp.pformat(sync_result))
+    if not sync_result['modules'] or not sync_result['utils'] or not sync_result['states']:
+        log.warning("Modules to sync not found, the tests may fail")
     # return new Caller instance that will have 'synced' modules loaded
     return salt.client.Caller()
 
@@ -72,27 +74,31 @@ def pillars_with_dependencies(salt_client: salt.client.Caller, pillar_location: 
     '''
     Generates the test pillar dict based on **every** pillar.example.sls found in Salt State Tree
     All pillar.example.sls'es are found and merged together, if pillar.example.sls contains multiple YAML documents -
-    they are treated as separate files and both tested (cartesian product)
+    they are treated as separate files and all tested (cartesian product)
 
     pillar.example.sls must be found right under state root directory (same level as init.sls)
     '''
     log.info("Generating Pillar")
     all_pillars = {}  # state sls path -> list(pillar1, pillar2)
     state_pillar_dependencies = {}  # state sls name -> list(pillar_key1, pillar_key2)
-    for pillar_file in Path(pillar_location).glob('**/pillar.example.sls'):
-        sls_dir = pillar_file.parent
-        all_pillars[sls_dir] = []
-        with open(str(pillar_file), 'r') as stream:
-            sls = str(Path(*sls_dir.relative_to(pillar_location).parts[1:])).replace("/", ".")  # remove saltenv which is first directory
-            for key, group in itertools.groupby(stream, lambda line: line.startswith('---')):
-                if not key:  # filter out entries with: "---" only
-                    pillar_string = "".join(list(group))
-                    rendered = salt_client.cmd("slsutil.renderer", string=pillar_string)
-                    all_pillars[sls_dir].append(rendered)
-                    state_pillar_dependencies.setdefault(sls, set()).update(rendered.keys())
-    generated = [salt_client.cmd("slsutil.merge_all", list(e)) for e in itertools.product(*all_pillars.values())]
-    generated.append({})  # add empty pillar
-    # generated's first entry contains every first pillar.example.sls entry
+    try:
+        for pillar_file in Path(pillar_location).glob('**/pillar.example.sls'):
+            sls_dir = pillar_file.parent
+            all_pillars[sls_dir] = []
+            with open(str(pillar_file), 'r') as stream:
+                sls = str(Path(*sls_dir.relative_to(pillar_location).parts[1:])).replace("/", ".")  # remove saltenv which is first directory
+                for key, group in itertools.groupby(stream, lambda line: line.startswith('---')):
+                    if not key:  # filter out entries with: "---" only
+                        pillar_string = "".join(list(group))
+                        rendered = salt_client.cmd("slsutil.renderer", string=pillar_string)
+                        all_pillars[sls_dir].append(rendered)
+                        state_pillar_dependencies.setdefault(sls, set()).update(rendered.keys())
+        generated = [salt_client.cmd("slsutil.merge_all", list(e)) for e in itertools.product(*all_pillars.values())]
+        generated.append({})  # add empty pillar
+        # generated's first entry contains every first pillar.example.sls entry
+    except Exception as e:
+        log.exception("Unable to render Pillar: \n%s", pillar_string)
+        raise RuntimeError("Cannot generate pillar") from e
 
     tops = salt_client.cmd("state.show_top")
     for env, states in tops.items():
