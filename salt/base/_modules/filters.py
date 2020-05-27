@@ -5,6 +5,10 @@ def find(list, regex):
     return filter(re.compile(regex).search, list)
 
 
+def first(generator, default):
+    return next(generator, default)
+
+
 def ips_in_subnet(ip_addresses, cidr):
     return (e for e in ip_addresses if __salt__['network.ip_in_subnet'](e, cidr))
 
