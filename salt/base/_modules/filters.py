@@ -21,7 +21,8 @@ def ips_in_subnet(ip_addresses, cidr):
 
 
 def ifc_for_ip(ip_address, ip_interfaces_dict):
-    log.info("Available interfaces: %s\nIP: %s", ip_interfaces_dict, ip_address)
+    log.info("Available interfaces: %s, IP: %s", ip_interfaces_dict, ip_address)
     if not ip_interfaces_dict:
         log.error("Cannot find interface for IP: %s, empty iterfaces dict: %s", ip_address, ip_interfaces_dict)
+        return None
     return next((k for k,v in ip_interfaces_dict.items() if ip_address in v))
