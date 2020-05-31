@@ -4,7 +4,7 @@
 kmod_loaded_{{ kmod.name }}:
   kmod.present:
     - name: {{ kmod.name }}
-    - persist: {{ kmod.persist }}
+    - persist: {{ kmod.persist|default(False) }}
     - require:
       - sls: os.pkgs
 {%- endfor %}
@@ -13,7 +13,7 @@ kmod_loaded_{{ kmod.name }}:
 kmod_unloaded_{{ kmod.name }}:
   kmod.absent:
     - name: {{ kmod.name }}
-    - persist: {{ kmod.persist }}
+    - persist: {{ kmod.persist|default(False) }}
     - require:
       - sls: os.pkgs
 {%- endfor %}

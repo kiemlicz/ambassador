@@ -1,3 +1,3 @@
 include:
-  - keepalived.install
-  - keepalived.config
+  - .install
+  - .config

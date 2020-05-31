@@ -1,6 +1,4 @@
-{% from "keepalived/map.jinja" import keepalived with context %}
-
-
+{%- from "keepalived/map.jinja" import keepalived with context %}
 keepalived:
   pkg.latest:
     - name: {{ keepalived.pkg_name }}
