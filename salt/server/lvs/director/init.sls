@@ -5,14 +5,13 @@
 lvs_director:
   pkg.latest:
     - name: {{ lvs.pkg_name }}
+{% if not is_container()|to_bool %}
   kmod.present:
     - name: {{ lvs.module }}
-{% if not is_container()|to_bool %}
     - persist: {{ lvs.persist_module }}
-{% endif %}
     - require:
       - pkg: {{ lvs.pkg_name }}
-
+{% endif %}
 # todo assert this is needed
 
 lvs_director_ip_forward:
