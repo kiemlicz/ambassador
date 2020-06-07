@@ -1,10 +1,7 @@
-{% from "mail/map.jinja" import mail with context %}
-{% from "_common/util.jinja" import is_docker with context %}
-
+{%- from "mail/map.jinja" import mail with context -%}
 
 include:
   - os
-
 
 mail:
   pkg.latest:
@@ -33,6 +30,6 @@ mail_service:
   service.running:
     - name: {{ mail.service }}
     - enable: True
-{% if is_docker() %}
+{%- if salt.condition.docker() %}
     - provider: service
-{% endif %}
+{%- endif %}

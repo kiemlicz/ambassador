@@ -6,3 +6,12 @@ def pillar_eq(key_1, key_2, fail_if_no_key=True):
         return False
 
     return value_1 == value_2
+
+def container():
+    return lxc() or docker()
+
+def lxc():
+    return __salt__['file.directory_exists']("/dev/.lxc") or __salt__['grains.get']("virtual") == "LXC"
+    
+def docker():
+    return  __salt__['grains.get']("virtual_subtype") == "Docker"

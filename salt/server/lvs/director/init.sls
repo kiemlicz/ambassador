@@ -1,17 +1,15 @@
-{% from "lvs/map.jinja" import lvs with context %}
-{% from "_common/util.jinja" import is_container with context %}
-
+{%- from "lvs/map.jinja" import lvs with context %}
 
 lvs_director:
   pkg.latest:
     - name: {{ lvs.pkg_name }}
-{% if not is_container()|to_bool %}
+{%- if not salt.condition.container() %}
   kmod.present:
     - name: {{ lvs.module }}
     - persist: {{ lvs.persist_module }}
     - require:
       - pkg: {{ lvs.pkg_name }}
-{% endif %}
+{%- endif %}
 # todo assert this is needed
 
 lvs_director_ip_forward:

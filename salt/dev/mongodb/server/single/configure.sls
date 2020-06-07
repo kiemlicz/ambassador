@@ -1,10 +1,8 @@
-{% from "mongodb/server/single/map.jinja" import mongodb with context %}
-{% from "_common/ip.jinja" import ip with context %}
-{% from "_common/util.jinja" import is_docker with context %}
+{%- from "mongodb/server/single/map.jinja" import mongodb with context %}
+{%- from "_common/ip.jinja" import ip with context %}
 
-
-{% set discriminator = mongodb.config.service %}
-{% set bind = {
+{%- set discriminator = mongodb.config.service %}
+{%- set bind = {
   'port': mongodb.port,
   'ip': mongodb.ip|default(ip())
 } %}
@@ -45,6 +43,6 @@ mongodb_config:
       - service: {{ mongodb.config.service }}
   service.running:
     - name: {{ mongodb.config.service }}
-{% if not is_docker() %}
+{%- if not salt.condition.docker() %}
     - enable: True
-{% endif %}
+{%- endif %}
