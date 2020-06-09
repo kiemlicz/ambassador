@@ -1,16 +1,17 @@
-{%- set real_servers = salt.pillar.get("lvs:rs", []) %}
+{%- set real_servers = salt.saltutil.runner('manage.up', tgt="G@lvs:rs:True", tgt_type="compound") %}
+
 real_servers_network_setup:
   salt.state:
-    - tgt: {{ real_servers|join(",") }}
-    - tgt_type: list
+    - tgt: "G@lvs:rs:True"
+    - tgt_type: compound
     - sls:
       - os.network
     - saltenv: server
 
 real_servers_network_setup_apply:
   salt.function:
-    - tgt: {{ real_servers|join(",") }}
-    - tgt_type: list
+    - tgt: "G@lvs:rs:True"
+    - tgt_type: compound
     - name: system.reboot
     - onchanges:
       - salt: real_servers_network_setup
@@ -24,8 +25,8 @@ wait_for_real_servers_setup:
 
 real_servers_setup:
   salt.state:
-    - tgt: {{ real_servers|join(",") }}
-    - tgt_type: list
+    - tgt: "G@lvs:rs:True"
+    - tgt_type: compound
     - highstate: True
     - saltenv: server
     - require:

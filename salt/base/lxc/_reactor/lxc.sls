@@ -14,5 +14,5 @@ lxc_init:
 {%- endif %}
 {%- if 'config' in data['data'] %}
 # fixme there is an issue with config in pillar (mapping values are not allowed in this context when using config: | ...
-      - config: {{ data['data']['config'] }}
+      - config: {{ data['data']['config']|tojson }}
 {%- endif %}

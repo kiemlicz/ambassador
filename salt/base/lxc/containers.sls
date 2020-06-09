@@ -24,7 +24,7 @@ lxc_container_{{ name }}:
 {%- endif %}
 {%- if container.config is defined %}
         # this will be the minion's config, otherwise only id is set
-        config: {{ container.config }}
+        config: {{ container.config|tojson }}
 {%- endif %}
     - require:
       - lxc: lxc_container_{{ name }}
