@@ -39,3 +39,66 @@ keepalived:
         <<:  *service1
         state: BACKUP
         priority: 50
+---
+{%- set interface = "eth0" %}
+{%- set real_servers = {'vm1': ["192.168.1.4", "192.168.1.5"]} %}
+{%- set virtual_ips = ["192.168.1.2"] %} 
+keepalived:
+  configs:
+    - location: /etc/keepalived/keepalived.d/instances.conf
+      contents: |
+        vrrp_instance apache {
+          advert_int 1
+          authentication {
+            auth_pass somepass
+            auth_type PASS
+          }
+          garp_master_refresh 30
+          interface {{ interface }}
+          {%- if grains['id'] == 'keepalived-vm1' %}
+          priority 100
+          state MASTER
+          {%- else %}
+          priority 50
+          state BACKUP
+          {%- endif %}
+          virtual_ipaddress {
+            {%- for vip in virtual_ips %}
+            {{ vip }} dev {{ interface }} scope global
+            {%- endfor %}
+          }
+          virtual_router_id 1
+        }
+    - location: /etc/keepalived/keepalived.d/virtual_server.conf
+      contents: |
+        {%- for vip in virtual_ips %}
+          virtual_server {{ vip }} 80 {
+            delay_loop 6
+            lb_algo sh            
+            lb_kind DR
+            sh-fallback
+            protocol TCP
+            quorum 1
+            
+            {%- for minion, addrs in real_servers.items() %}
+            real_server {{ addrs|first }} 80 {
+                TCP_CHECK {
+                  connect_timeout 3
+                }
+                inhibit_on_failure 
+                weight 1
+            }
+            {%- endfor %}
+          }
+        {%- endfor %}
+    - location: /etc/keepalived/keepalived.conf
+      contents: |
+        include /etc/keepalived/keepalived.d/*.conf
+    - location: /etc/keepalived/keepalived.d/global_defs.conf
+      contents: |
+        global_defs {
+            lvs_sync_daemon {{ interface }} internal
+            script_user keepalived_script
+            enable_script_security
+            vrrp_garp_master_refresh 30
+        }
