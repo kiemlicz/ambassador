@@ -84,12 +84,12 @@ _Salt Master_
  2. Deployed in POD
 
 _Salt Minion_
- 1. Deployed as a _DaemonSet_ 
+ 1. Deployed as a _DaemonSet_ when using [`docker_events`](https://docs.saltstack.com/en/latest/ref/engines/all/salt.engines.docker_events.html) or as _Deployment_ when using [`k8s_events`](https://github.com/kiemlicz/ambassador/blob/master/salt/base/_engines/k8s_events.py)
  2. Deployed directly on Kubernetes Nodes
  
 | Minion\Master | Separate VM | POD |
 | - | - | - |
-| **DaemonSet** | The VM must be able to route traffic to k8s PODs. Minions must have k8s Node's `docker.sock` mounted | Minions must have Node's `docker.sock` mounted |
+| **POD** | The VM must be able to route traffic to k8s PODs. Minions must have k8s Node's `docker.sock` mounted | Minions must have Node's `docker.sock` mounted |
 | **K8s Nodes** | Only k8s Nodes - VM connectivity must be possible. It must be possible to install _Salt Minion_ on k8s Nodes | Node-POD communication must be possible. It must be possible to install _Salt Minion_ on k8s Nodes | 
 
 

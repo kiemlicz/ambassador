@@ -1,7 +1,6 @@
-{% from "kubernetes/map.jinja" import kubernetes with context %}
-{% from "_common/repo.jinja" import repository with context %}
-{% from "_common/util.jinja" import pkg_latest_opts with context %}
-
+{%- from "kubernetes/map.jinja" import kubernetes with context %}
+{%- from "_common/repo.jinja" import repository with context %}
+{%- from "_common/util.jinja" import pkg_latest_opts with context %}
 
 {{ repository("kube_repository", kubernetes) }}
 kubeadm:
