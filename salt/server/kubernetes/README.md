@@ -13,10 +13,10 @@ Some prerequisites must be met first:
 use_superseded:
   - module.run
 ```
- - if you want to receive _kubeconfig_ on the _Salt Master_, set: `file_recv: True` in _Salt Master_ config
+ - if you want to receive `KUBECONFIG` on the _Salt Master_, set: `file_recv: True` in _Salt Master_ config
 
 1. Set pillar on the Salt Master:
-Specify in the Pillar: master and worker nodes, CIDR of the Kubernetes Nodes k8s interface (for some network plugins you need to specify CIDR as well):
+Specify the Pillar for master and worker nodes, CIDR of the Kubernetes Nodes k8s interface (for some network plugins you need to specify CIDR as well):
 ```
 kubernetes:
     nodes:
@@ -28,8 +28,7 @@ kubernetes:
            - k8s3
            - k8s4
 ```
-2. Sync modules first: `salt-run saltutil.sync_all && salt '*' saltutil.sync_all refresh=True`
-3. `salt-run state.orchestrate kubernetes._orchestrate.cluster saltenv=server pillar='{"kubernetes": {"nodes": {"masters": [k8s1]", "workers": [k8s2,k8s3]}}}'`
+2. `salt-run state.orchestrate kubernetes._orchestrate.cluster saltenv=server pillar='{"kubernetes": {"nodes": {"masters": [k8s1], "workers": [k8s2, k8s3]}}}'`
 
 ### `kubernetes.master`
 Setup Kubernetes master node

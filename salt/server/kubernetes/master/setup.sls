@@ -1,17 +1,13 @@
-{% from "kubernetes/master/map.jinja" import kubernetes with context %}
-{% from "kubernetes/network/map.jinja" import kubernetes as kubernetes_network with context %}
+{%- from "kubernetes/master/map.jinja" import kubernetes with context %}
+{%- from "kubernetes/network/map.jinja" import kubernetes as kubernetes_network with context %}
 
-{% set masters = kubernetes.nodes.masters %}
-
-{% if not masters %}
-
+{%- set masters = kubernetes.nodes.masters %}
+{%- if not masters %}
 kubernetes-no-masters:
     test.fail_without_changes:
         - name: Kubernetes master nodes not specifed
-
-{% else %}
-
-{% if kubernetes.master.reset %}
+{%- else %}
+{%- if kubernetes.master.reset %}
 kubeadm_master_reset:
   cmd.run:
     - name: "echo y | kubeadm reset"
@@ -83,7 +79,7 @@ kubernetes_upload_config:
 propagate_cert_key:
   module.run:
     - mine.send:
-        - func: kubernetes_cert_key
+        - kubernetes_cert_key
         - mine_function: cmd.run
         - "kubeadm alpha certs certificate-key"
         - saltenv: {{ saltenv }}
@@ -94,7 +90,7 @@ propagate_cert_key:
 propagate_token:
   module.run:
     - mine.send:
-        - func: kubernetes_token
+        - kubernetes_token
         - mine_function: cmd.script
         - {{ kubernetes.master.token_script }}
         - saltenv: {{ saltenv }}
@@ -104,7 +100,7 @@ propagate_token:
 propagate_hash:
   module.run:
     - mine.send:
-        - func: kubernetes_hash
+        - kubernetes_hash
         - mine_function: cmd.run
         - "openssl x509 -pubkey -in {{ kubernetes.config.ca_cert }} | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'"
         - python_shell: True
@@ -114,7 +110,7 @@ propagate_hash:
 propagate_ip:
   module.run:
     - mine.send:
-        - func: kubernetes_master_ip
+        - kubernetes_master_ip
         - mine_function: network.ip_addrs
         - cidr: {{ kubernetes_network.nodes.cidr }}
     - require:

@@ -1,8 +1,20 @@
-{% set masters = salt['pillar.get']('kubernetes:nodes:masters') %}
-
-{% if masters|length < 1 %}
+{%- set masters = salt['pillar.get']('kubernetes:nodes:masters', []) %}
+{%- set workers = salt['pillar.get']('kubernetes:nodes:workers', []) %}
+{%- if masters|length < 1 %}
 {{ raise('ERROR: at least one master must be specified') }}
-{% endif %}
+{%- endif %}
+
+sync_modules_master:
+  salt.runner:
+  - name: saltutil.sync_all
+
+sync_modules_minions:
+  salt.function:
+  - name: saltutil.sync_all
+  - tgt: "{{ (masters+workers)|join(',') }}"
+  - tgt_type: list
+  - kwarg:
+      refresh: True
 
 setup_first_master:
   salt.state:
@@ -13,8 +25,11 @@ setup_first_master:
     - kubernetes.master
   - saltenv: {{ saltenv }}
   - pillar: {{ pillar }}
+  - require:
+    - salt: sync_modules_master
+    - salt: sync_modules_minions
 
-{% if masters|length > 1 %}
+{%- if masters|length > 1 %}
 setup_masters:
   salt.state:
   - tgt: "{{ masters[1:] }}"
@@ -26,11 +41,11 @@ setup_masters:
   - pillar: {{ pillar }}
   - require_in:
     - salt: setup_workers
-{% endif %}
+{%- endif %}
 
 setup_workers:
   salt.state:
-  - tgt: "{{ salt['pillar.get']('kubernetes:nodes:workers')|join(",") }}"
+  - tgt: "{{ workers|join(",") }}"
   - tgt_type: "list"
   - sls:
     - docker.events
@@ -38,4 +53,4 @@ setup_workers:
   - saltenv: {{ saltenv }}
   - pillar: {{ pillar }}
   - require:
-      - salt: setup_master
+      - salt: setup_first_master
