@@ -16,12 +16,13 @@ sync_modules_minions:
   - kwarg:
       refresh: True
 
+# https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/high-availability/#steps-for-the-first-control-plane-node
 setup_first_master:
   salt.state:
   - tgt: "{{ masters|first }}"
   - sls:
     - docker
-    - docker.events
+    - keepalived
     - kubernetes.master
   - saltenv: {{ saltenv }}
   - pillar: {{ pillar }}
@@ -32,13 +33,16 @@ setup_first_master:
 {%- if masters|length > 1 %}
 setup_masters:
   salt.state:
-  - tgt: "{{ masters[1:] }}"
+  - tgt: "{{ masters[1:]|join(',') }}"
+  - tgt_type: list
   - sls:
     - docker
-    - docker.events
+    - keepalived    
     - kubernetes.master
   - saltenv: {{ saltenv }}
   - pillar: {{ pillar }}
+  - require:
+    - salt: setup_first_master
   - require_in:
     - salt: setup_workers
 {%- endif %}
@@ -46,9 +50,8 @@ setup_masters:
 setup_workers:
   salt.state:
   - tgt: "{{ workers|join(",") }}"
-  - tgt_type: "list"
+  - tgt_type: list
   - sls:
-    - docker.events
     - kubernetes.worker
   - saltenv: {{ saltenv }}
   - pillar: {{ pillar }}

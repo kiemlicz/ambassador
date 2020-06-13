@@ -5,9 +5,7 @@
        'reset': False,
        'isolate': True,
        'upload_config': True,
-       'token_script': "salt://kubernetes/master/token.sh",
-       'multi_master_config': "salt://kubernetes/master/kubeadm-config.yaml",
-       'multi_master_config_location': "/etc/kubernetes/mmaster.yaml",
+       'token_script': "salt://kubernetes/master/token.sh"
      }
   },
 }, merge=kubernetes_defaults) %}
