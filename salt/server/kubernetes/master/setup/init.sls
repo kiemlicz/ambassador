@@ -32,6 +32,7 @@ allow_schedule_on_master:
 {%- endif %}
 
 {%- if masters|length > 1 %}
+# fixme separate cert gen
 propagate_cert_key:
   module.run:
     - mine.send:

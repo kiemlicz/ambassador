@@ -1,0 +1,7 @@
+{% set cert = salt['grains.filter_by']({
+    'default': {
+      'pki_dir': "/etc/pki",
+      'ca': "",
+      'ca_key': ""
+    },
+}, merge=salt['pillar.get']('cert', merge=True)) %}
