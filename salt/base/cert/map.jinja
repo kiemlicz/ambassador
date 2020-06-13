@@ -2,6 +2,8 @@
     'default': {
       'pki_dir': "/etc/pki",
       'ca': "",
-      'ca_key': ""
+      'ca_key': "",
+      'ca_keylen': 4096,
+      'cn': ""
     },
 }, merge=salt['pillar.get']('cert', merge=True)) %}
