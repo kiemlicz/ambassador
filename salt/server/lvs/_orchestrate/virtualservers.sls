@@ -3,5 +3,7 @@ virtual_servers_setup:
   salt.state:
     - tgt: "G@lvs:vs:True and L@{{ salt.pillar.get('lvs:vs', '')|join(',') }}" 
     - tgt_type: compound
-    - highstate: True
+    - sls:
+      - keepalived
+      - lvs.director
     - saltenv: server

@@ -27,7 +27,9 @@ real_servers_setup:
   salt.state:
     - tgt: "G@lvs:rs:True"
     - tgt_type: compound
-    - highstate: True
+    - sls:
+      - lxc
+      - lvs.realserver
     - saltenv: server
     - require:
       - salt: wait_for_real_servers_setup
