@@ -5,7 +5,24 @@
        'reset': False,
        'isolate': True,
        'upload_config': True,
-       'token_script': "salt://kubernetes/master/token.sh"
+       'token_script': "salt://kubernetes/master/token.sh",
+       'pki': {
+         'dir': "/etc/kubernetes/pki",
+         'user': 'root',
+         'group': 'root'
+       },      
+       'ca': {
+        'host': salt['grains.get']('id'),
+        'pub': 'ca.crt',
+        'priv': 'ca.key',
+        'cn': "kubernetes",
+        'days_valid': 3650
+       },
+       'apiserver': {
+        'pub': 'apiserver.crt',
+        'priv': 'apiserver.key',
+        'subjectAltName': "DNS: " ~ grains['host'] ~ ", DNS:kubernetes, DNS: kubernetes.default, DNS: kubernetes.default.svc, DNS:kubernetes.default.svc.cluster.local, IP Address: 10.96.0.1",
+       }
      }
   },
 }, merge=kubernetes_defaults) %}

@@ -15,6 +15,13 @@ use_superseded:
 ```
  - if you want to receive `KUBECONFIG` on the _Salt Master_, set: `file_recv: True` in _Salt Master_ config
 
+ - _Salt Master_ config must contain (if using Kubernetes multi-master setup):
+```
+peer:
+  .*:
+    - x509.sign_remote_certificate
+```
+
 1. Set pillar on the Salt Master:
 Specify the Pillar for master and worker nodes, CIDR of the Kubernetes Nodes k8s interface (for some network plugins you need to specify CIDR as well):
 ```
@@ -27,6 +34,17 @@ kubernetes:
         workers:
            - k8s3
            - k8s4
+
+# must be added if Salt controlled CA
+x509_signing_policies:
+  kubernetes:
+    - minions: 'k8s*'
+    - signing_private_key: /etc/kubernetes/pki/ca.key
+    - signing_cert: /etc/kubernetes/pki/ca.crt
+    - basicConstraints: "critical CA:false"
+    - subjectKeyIdentifier: hash
+    - authorityKeyIdentifier: keyid,issuer:always
+    - days_valid: 365
 ```
 2. `salt-run state.orchestrate kubernetes._orchestrate.cluster saltenv=server pillar='{"kubernetes": {"nodes": {"masters": [k8s1], "workers": [k8s2, k8s3]}}}'`
 

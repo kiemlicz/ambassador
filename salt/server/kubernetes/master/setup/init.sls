@@ -32,7 +32,7 @@ allow_schedule_on_master:
 {%- endif %}
 
 {%- if masters|length > 1 %}
-# fixme separate cert gen
+# fixme separate cert gen, then you shouldn't upload the certs to Secret (--upload-certs)
 propagate_cert_key:
   module.run:
     - mine.send:
