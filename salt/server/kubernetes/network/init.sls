@@ -3,3 +3,5 @@
 
 include:
   - kubernetes.network.{{ kubernetes.network.provider }}
+
+# fixme assert DNS service works

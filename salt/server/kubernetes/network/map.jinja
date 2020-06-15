@@ -1,16 +1,27 @@
-{% from "kubernetes/map.jinja" import kubernetes as kubernetes_defaults with context %}
+{%- from "kubernetes/map.jinja" import kubernetes as kubernetes_defaults with context %}
 # fixme delete flannel, add kube-router, calico and weave-net
-{% set kubernetes = salt['grains.filter_by']({
-  'default': {
-    'network': {
-      'provider': 'flannel',
+{%- set default_network_provider = "flannel" %}
+{%- set network_provider = {
+  'flannel' : {
       'cidr': "10.244.0.0/16",
       'source': "https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"
+  },
+  'calico': {
+      'cidr': "10.244.0.0/16",
+      'source': "https://docs.projectcalico.org/v3.14/manifests/calico.yaml"
+  }
+} %}
+{%- set kubernetes = salt['grains.filter_by']({
+  'default': {
+    'network': {
+      'provider': default_network_provider,
+      'config': network_provider[default_network_provider]
     },
     'nodes': {
       'cidr': "192.168.0.0/16",
       'master_vip': None,
-      'port': 6443,
+      'apiserver_port': 6443,
     }
   },
 }, merge=kubernetes_defaults) %}
+

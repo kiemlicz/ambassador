@@ -21,7 +21,7 @@ kubeadm_worker_reset:
 {%- set main_master_id = ips.keys()|sort|first %}
 join_master:
     cmd.run:
-        - name: "kubeadm join --token {{ tokens[main_master_id]['stdout'] }} {{ ips[main_master_id][0] }}:{{ kubernetes_network.nodes.port }} --discovery-token-ca-cert-hash sha256:{{ hashes[main_master_id] }}"
+        - name: "kubeadm join --token {{ tokens[main_master_id]['stdout'] }} {{ ips[main_master_id][0] }}:{{ kubernetes_network.nodes.apiserver_port }} --discovery-token-ca-cert-hash sha256:{{ hashes[main_master_id] }}"
         - require:
             - pkg: kubeadm
 {%- else %}
