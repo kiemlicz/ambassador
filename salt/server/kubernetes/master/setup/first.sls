@@ -8,6 +8,10 @@ include:
 - .ca
 {%- endif %}
 
+{%- if kubernetes_network.nodes.master_vip is not defined %}
+{{ raise("VIP address must be provided in kubernetes_network.nodes.master_vip") }}
+{%- endif %}
+
 # https://kubernetes.io/docs/concepts/cluster-administration/certificates/
 # https://kubernetes.io/docs/setup/best-practices/certificates/#certificate-paths
 kubernetes_apiserver_key:
