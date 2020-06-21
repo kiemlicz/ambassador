@@ -5,7 +5,7 @@
        'reset': False,
        'isolate': True,
        'upload_config': True,
-       'token_script': "salt://kubernetes/master/token.sh",
+       'certificate_key': salt['grains.get_or_set_hash']('kubernetes:master:certificate_key', length=32, chars='abcdef0123456789'),
        'pki': {
          'dir': "/etc/kubernetes/pki",
          'user': 'root',

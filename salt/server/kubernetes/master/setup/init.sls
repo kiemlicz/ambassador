@@ -32,34 +32,37 @@ allow_schedule_on_master:
 {%- endif %}
 
 {%- if masters|length > 1 %}
-# fixme separate cert gen, then you shouldn't upload the certs to Secret (--upload-certs)
 propagate_cert_key:
   module.run:
     - mine.send:
         - kubernetes_cert_key
-        - mine_function: cmd.run
-        - "kubeadm alpha certs certificate-key"
-        - saltenv: {{ saltenv }}
+        - mine_function: grains.get
+        - "kubernetes:master:certificate_key"
     - require:
       - cmd: kubeadm_init
 {%- endif %}
 
+ensure_token:
+  module.run:
+    - kubeadm.token_create: []
+    - unless:
+      - fun: kubeadm.token_list    
+    - require:
+      - cmd: kubeadm_init
 propagate_token:
   module.run:
     - mine.send:
         - kubernetes_token
-        - mine_function: cmd.script
-        - {{ kubernetes.master.token_script }}
-        - saltenv: {{ saltenv }}
+        - mine_function: kubeadm.token_list
     - require:
-      - cmd: kubeadm_init
+      - module: ensure_token
 
 propagate_hash:
   module.run:
     - mine.send:
         - kubernetes_hash
         - mine_function: cmd.run
-        - "openssl x509 -pubkey -in {{ kubernetes.config.ca_cert }} | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'"
+        - "openssl x509 -pubkey -in {{ kubernetes.master.pki.dir }}/{{ kubernetes.master.ca.pub }} | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'"
         - python_shell: True
     - require:
       - cmd: kubeadm_init

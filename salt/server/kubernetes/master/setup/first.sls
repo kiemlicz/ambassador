@@ -44,11 +44,11 @@ kubernetes_apiserver_cert:
 
 # for now assuming keepalived
 # remove --upload-certs if certs issues
-{%- set cmd = "kubeadm init --control-plane-endpoint " ~ vip ~ ":" ~ kubernetes_network.nodes.apiserver_port ~ " --upload-certs --pod-network-cidr " ~ kubernetes_network.network.config.cidr %}
+{%- set cmd = "kubeadm init --control-plane-endpoint " ~ vip ~ ":" ~ kubernetes_network.nodes.apiserver_port ~ " --upload-certs --pod-network-cidr " ~ kubernetes_network.network.config.cidr ~ " --certificate-key " ~ kubernetes.master.certificate_key %}
 {%- else %}
 # single plane
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
-{%- set cmd = "kubeadm init --pod-network-cidr " ~ kubernetes_network.network.config.cidr %}
+{%- set cmd = "kubeadm init --pod-network-cidr " ~ kubernetes_network.network.config.cidr  ~ " --certificate-key " ~ kubernetes.master.certificate_key %}
 {%- endif %}
 
 kubeadm_init:
