@@ -2,8 +2,8 @@
 {%- from "kubernetes/network/map.jinja" import kubernetes as kubernetes_network with context %}
 
 #load modules ip_vs, ip_vs_rr, ip_vs_wrr, ip_vs_sh, nf_conntrack_ipv4
-
 {%- set masters = kubernetes.nodes.masters %}
+{%- set main_master_id = kubernetes.nodes.masters|first %}
 {%- set tokens = salt['mine.get'](masters|join(","), "kubernetes_token", tgt_type="list") %}
 {%- set ips = salt['mine.get'](masters|join(","), "kubernetes_master_ip", tgt_type="list") %}
 {%- set hashes = salt['mine.get'](masters|join(","), "kubernetes_hash", tgt_type="list") -%}
@@ -18,10 +18,9 @@ kubeadm_worker_reset:
     - require_in:
         - cmd: join_master
 {%- endif %}
-{%- set main_master_id = ips.keys()|sort|first %}
 join_master:
     cmd.run:
-        - name: "kubeadm join --token {{ tokens[main_master_id]['stdout'] }} {{ ips[main_master_id][0] }}:{{ kubernetes_network.nodes.apiserver_port }} --discovery-token-ca-cert-hash sha256:{{ hashes[main_master_id] }}"
+        - name: "kubeadm join {{ ips[main_master_id][0] }}:{{ kubernetes_network.nodes.apiserver_port }} --token {{ tokens[main_master_id]|selectattr('usages', 'match', '.*authentication.*')|map(attribute="token")|first }} --discovery-token-ca-cert-hash sha256:{{ hashes[main_master_id] }}"
         - require:
             - pkg: kubeadm
 {%- else %}
