@@ -8,7 +8,7 @@ include:
 - .ca
 {%- endif %}
 
-{%- if kubernetes_network.nodes.master_vip is not defined %}
+{%- if not kubernetes_network.nodes.master_vip %}
 {{ raise("VIP address must be provided in kubernetes_network.nodes.master_vip") }}
 {%- endif %}
 

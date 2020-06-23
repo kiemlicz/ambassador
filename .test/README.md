@@ -58,3 +58,32 @@ suites:
               pillar: "to add"
 ```
 Then from runner, run tests with: `.test/runner.sh`
+
+## Running tests locally
+```
+#!/usr/bin/env bash
+
+export KUBECTL_VER="v1.17.3"
+export DOCKER_IMAGE="debian-buster"
+export BASE_IMAGE_TAG="buster"
+export BASE_PUB_NAME="envoy"
+export PIP3_KUBERNETES_VER="10.0.1"
+export PIP3_PYGIT2_VER="1.0.3"
+export CONTEXT="syntax-test"
+export TEST="syntax"
+export K8S_API_ENABLED=true
+export SALTENV=server
+
+docker rm salt-test || true
+.travis/prepare.sh salt-test
+# https://github.com/pytest-dev/pytest-xdist/issues/402
+
+docker run \
+   --name salt-test \
+   --network=host \
+   --hostname "$CONTEXT-host" \
+   --privileged \
+   "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:latest" --log-level INFO --tests $TEST -n 1 -v
+#docker run -it --entrypoint bash --name salt-test --network=host --hostname "$CONTEXT-host" --privileged "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:latest"
+
+```

@@ -12,10 +12,11 @@ kubeadm_master_reset:
         - cmd: kubeadm_init
 {%- endif -%}
 
-include:
 {%- if grains['id'] == masters|first %}
+include:
 - .first
 {%- else %}
+include:
 - .other
 {%- endif %}
 

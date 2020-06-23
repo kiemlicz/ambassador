@@ -6,7 +6,7 @@ kubernetes:
     isolate: True
   nodes:
     masters:
-      - node1
+      - {{ salt['grains.get']('id') }}
     workers:
       - node2
 ---
@@ -18,8 +18,9 @@ kubernetes:
     isolate: False
     reset: True
   nodes:
+    master_vip: 1.2.3.4/32
     masters:
-      - node1
+      - {{ salt['grains.get']('id') }}
       - node2
     workers:
       - node3
