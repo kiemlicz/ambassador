@@ -2,10 +2,17 @@ import logging
 import os
 
 
-def managed(name, home_dir, username,
-           branch, target, identity=None,
-           render=False, override=False,
-           onlyif=None, unless=None, saltenv='base'):
+def managed(
+    name,
+    home_dir, 
+    username,
+    branch, 
+    target, 
+    identity=None,
+    render=False, 
+    override=False,
+    saltenv='base'
+    ):
     '''
     This state manages dotfiles: the 'name' repo is parsed and placed under 'home_dir'
 
@@ -45,13 +52,6 @@ def managed(name, home_dir, username,
     run_check_cmd_kwargs = {'runas': username}
     if 'shell' in __grains__:
         run_check_cmd_kwargs['shell'] = __grains__['shell']
-
-    # check if users.dotfiles should be applied
-    cret = __states__['git.mod_run_check'](run_check_cmd_kwargs, onlyif, unless)
-    if isinstance(cret, dict):
-        log.info("DOTFILE: not running due to onlyif/unless condition")
-        ret.update(cret)
-        return ret
 
     def clone_repo():
         tdir = __salt__['temp.dir'](prefix="tmpcfg-", parent="/tmp/")

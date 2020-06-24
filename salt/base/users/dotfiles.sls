@@ -11,6 +11,8 @@
     - override: {{ user.dotfile.override|default(False) }}
     - identity: {{ user.sec.ssh.dotfile.privkey_location}}
     - saltenv: {{ saltenv }}
+    - unless: {{ user.dotfile.unless|default(None) }}
+    - onlyif: {{ user.dotfile.onlyif|default(None) }}
     - require:
       - sls: users.keys
       - sls: users.common
