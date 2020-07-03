@@ -38,13 +38,13 @@ saltMaster:
 
   readinessProbe:
     tcpSocket:
-      port: publisher
+      port: pubsub
     initialDelaySeconds: 15
     periodSeconds: 20
 
   livenessProbe:
     tcpSocket:
-      port: publisher
+      port: pubsub
     initialDelaySeconds: 45
     periodSeconds: 40
 
@@ -70,8 +70,10 @@ saltMinion:
 
   env: []
 
-  # not using --local in minion probes, this way the probe succeeds only when established master communication
-  # still not sure if this is good idea (master crash will cause minion restart as well)
+  # not using --local in minion probes, may seem like a good idea, however:
+  # - this way the probe succeeds only when established master communication
+  # - master won't be able to reach not ready minion
+  # still not sure if would be a good idea (master crash will cause minion restart as well)
   readinessProbe:
     exec:
       command:

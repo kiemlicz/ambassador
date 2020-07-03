@@ -2,7 +2,7 @@ apiVersion: v2
 #appVersion: 2.2.0
 description: Salt deployment for in-k8s automations and orchestration
 name: salt
-version: 2.1.1
+version: 2.1.2
 type: application
 
 maintainers:

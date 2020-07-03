@@ -38,9 +38,9 @@ spec:
           startupProbe: {{ .Values.saltMaster.startupProbe | toYaml | nindent 12 }}
 {{- end }}
           ports:
-            - name: publisher
+            - name: pubsub
               containerPort: 4505
-            - name: reqserver
+            - name: reqreply
               containerPort: 4506
           volumeMounts:
             - mountPath: /etc/salt/pki/master
