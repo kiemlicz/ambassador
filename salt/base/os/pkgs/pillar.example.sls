@@ -16,7 +16,8 @@ pkgs:
   pip3_packages:
 #    - setuptools
     - setuptools==46.0.0
-    - google-api-python-client
+# for the latest (1.12.1): pkg_resources.ContextualVersionConflict: (six 1.12.0 (/usr/lib/python3/dist-packages), Requirement.parse('six<2dev,>=1.13.0'), {'google-api-python-client'})
+    - google-api-python-client==1.12.0
     - google-auth-oauthlib
     - powerline-status
   post_install:

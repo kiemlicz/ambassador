@@ -92,7 +92,7 @@ saltMinion:
     initialDelaySeconds: 45
     periodSeconds: 40
 
-  # typically when --local is used for readiness/liveness probe the startup probe shouldn't be defined
+  # typically when --local is used for readiness/liveness probe, the startup probe shouldn't be defined
   startupProbe: {}
 
   # pick nodes where Salt Minion should be deployed
