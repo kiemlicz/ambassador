@@ -2,12 +2,17 @@ ARG tag="buster-slim"
 FROM debian:$tag AS salt-base
 # "" == latest
 ARG salt_ver=""
+ARG master_user="root"
+ARG minion_user="root"
 
-COPY salt /srv/salt
+RUN useradd -ms /bin/bash salt
+
+COPY --chown=salt:salt salt /srv/salt
 
 RUN apt-get update && apt-get install -y curl dumb-init python3-pip && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
-    sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver
+    sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver && \
+    chown -R salt.salt /etc/salt /var/cache/salt /var/log/salt
 
 WORKDIR /srv
 
@@ -19,6 +24,7 @@ RUN pip3 install --upgrade docker
 
 VOLUME /etc/salt/minion.d
 
+USER $minion_user:$minion_user
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD [ "/usr/bin/salt-minion" ]
 
@@ -65,6 +71,7 @@ VOLUME /srv/thorium
 VOLUME /srv/pillar
 VOLUME /etc/salt/master.d
 
+USER $master_user:$master_user
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
 CMD [ "/opt/entrypoint.sh" ]
 
@@ -90,5 +97,7 @@ COPY .travis/conftest.py .travis/test-runner-pytest.py .travis/pytest.ini /opt/
 
 WORKDIR /opt
 
+# tests are extensive, root required
+USER root:root
 ENTRYPOINT [ "pytest", "test-runner-pytest.py" ]
 CMD ["--log-level", "INFO" ]
