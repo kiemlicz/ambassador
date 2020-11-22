@@ -8,6 +8,9 @@
     merge=salt['grains.filter_by']({
       'bionic': {
         'os_packages': ["cron", "vim", "sudo", "man-db", "rsync", "zsh", "git", "curl", "ntp",  "ca-certificates", "gnupg2", "python3-pip", "vim-gtk3", "fonts-powerline"],
+      },
+      'buster': {
+        'os_packages': ["cron", "vim", "sudo", "insserv", "git", "zsh", "curl", "ca-certificates", "gnupg2", "python3-pip", "fonts-powerline", "initscripts"],
       }
     }, grain='oscodename')) %}
 pkgs:
@@ -16,8 +19,9 @@ pkgs:
   pip3_packages:
 #    - setuptools
     - setuptools==46.0.0
+    - six<1.13.0
     - google-api-python-client~=1.11.0
-    - google-api-core==1.22.2
+    - google-api-core<=1.22.2
     - google-auth-oauthlib~=0.4.1
     - powerline-status
   post_install:
