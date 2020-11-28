@@ -63,9 +63,9 @@ def ensure_container(container_name):
             log.error("Unable to create LXC container")
             sys.exit(3)
     if not c.running:
-        log.info("Starting %s", container_name)
+        log.info(f"Starting {container_name}")
         if not c.start():
-            log.error("Unable to start %s, check output of command: lxc-start -n %s -F", container_name, container_name)
+            log.error(f"Unable to start {container_name}, check output of command: lxc-start -n {container_name} -F")
             sys.exit(3)
         if not c.get_ips(timeout=60):
             log.error("Unable to start LXC container")
@@ -77,9 +77,9 @@ def populate_files(rootfs):
     log.info("Inserting files")
     for dir in args.directories:
         if not os.path.isdir(dir):
-            log.error("Omitting: %s, since not directory", dir)
+            log.error(f"Omitting: {dir}, since not directory")
             continue
-        log.info("Copying directory: %s", dir)
+        log.info(f"Copying directory: {dir}")
         dir_util.copy_tree(dir, os.path.join(rootfs, "srv", os.path.basename(os.path.normpath(dir))))
 
     if args.top:
@@ -87,13 +87,13 @@ def populate_files(rootfs):
         if l.startswith("/"):
             l = l[1:]
         dest = os.path.join(rootfs, l, "top.sls")
-        log.info("Copying: %s, into: %s", args.top, dest)
+        log.info(f"Copying: {args.top}, into: {dest}")
         copyfile(args.top, dest)
 
     Path(os.path.join(rootfs, "etc", "salt", "gpgkeys")).mkdir(parents=True, exist_ok=True, mode=0o700)
     Path(os.path.join(rootfs, "etc", "salt", "minion.d")).mkdir(parents=True, exist_ok=True)
     for config in args.configs:
-        log.info("Copying Salt Minion config: %s", config)
+        log.info(f"Copying Salt Minion config: {config}")
         # todo check without basename
         copyfile(config, os.path.join(rootfs, "etc", "salt", "minion.d", os.path.basename(config)))
 
@@ -125,7 +125,7 @@ def populate_files(rootfs):
                 with open(os.path.join(rootfs, "etc", "salt", "keys", attachment.filename), 'wb') as a:
                     a.write(attachment.data)
         else:
-            log.warning("No secrets for: %s found", container_name)
+            log.warning(f"No secrets for: {container_name} found")
 
 
 def install():
@@ -137,16 +137,22 @@ def install():
     with open("/tmp/bootstrap-salt.sh", "w+") as bootstrap:
         bootstrap.write(bootstrap_script)
     os.chmod("/tmp/bootstrap-salt.sh", 0o755)
+
+    def assert_ret_code(command):
+        exit_code = os.system(command)
+        if exit_code:
+            raise RuntimeError(f"Command {command} failed with {exit_code}")
+
     # it seems that OS packages: `libffi-dev zlib1g-dev libgit2-dev git` are somehow not needed for pygit2 to run
-    os.system("/tmp/bootstrap-salt.sh -U -x python3 -p python3-pip")  # consider: -p libgit2-dev
+    assert_ret_code("/tmp/bootstrap-salt.sh -U -x python3 -p python3-pip")  # consider: -p libgit2-dev
     # install required packages manually (since startup states won't be able to reload the main process to enable pygit2)
-    os.system("pip3 install --upgrade pyOpenSSL pygit2==1.0.3 cherrypy jinja2 PyYAML pykeepass")
+    assert_ret_code("pip3 install --upgrade pyOpenSSL pygit2==1.0.3 cherrypy jinja2 PyYAML pykeepass")
     if os.path.isfile("/etc/salt/keys/pillargpg.gpg"):
-        os.system("gpg --homedir /etc/salt/gpgkeys --import /etc/salt/keys/pillargpg.gpg")
+        assert_ret_code("gpg --homedir /etc/salt/gpgkeys --import /etc/salt/keys/pillargpg.gpg")
     else:
         log.warning("/etc/salt/keys/pillargpg.gpg not found")
-    os.system("salt-call --local saltutil.sync_all")
-    os.system("salt-call --local state.highstate")
+    assert_ret_code("salt-call --local saltutil.sync_all")
+    assert_ret_code("salt-call --local state.highstate")
 
 
 start_time = datetime.datetime.now()
@@ -166,4 +172,4 @@ else:
     install()
 
 end_time = datetime.datetime.now()
-log.info("Completed: %s", end_time - start_time)
+log.info(f"Completed: {end_time - start_time}")
