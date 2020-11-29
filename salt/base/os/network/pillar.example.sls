@@ -12,7 +12,7 @@ network:
       require:
         - network: eth0
 ---
-# example pillar that setup bridge interface instead of existsing eth
+# example pillar that setup bridge interface instead of existing eth
 {%- set ip = salt.filters.first(salt.filters.ips_in_subnet(grains['ipv4'], cidr="127.0.0.0/24"), "127.0.0.1") %}
 {%- set interface = salt.filters.ifc_for_ip(ip, grains['ip_interfaces'])|default("lo") %}
 network:

@@ -13,7 +13,7 @@ Some prerequisites must be met first:
 - _Salt Minion_ configuration must contain:
 ```
 mine_functions:
-  real_server_ip:
+  minion_ip:
   - mine_function: network.ip_addrs
 grains:
   lvs:
@@ -102,7 +102,7 @@ kernel_modules:
 ```
 {%- set ip = salt.filters.ips_in_subnet(grains['ipv4'], cidr="192.168.1.0/24")|first %}
 {%- set interface = salt.filters.ifc_for_ip(ip, grains['ip_interfaces']) %}
-{%- set real_servers = salt.saltutil.runner('mine.get', tgt='vm*', fun="real_server_ip")|default({}) %}
+{%- set real_servers = salt.saltutil.runner('mine.get', tgt='vm*', fun="minion_ip")|default({}) %}
 {%- if not real_servers %}
 {{ raise("Real servers not found") }}
 {%- endif %}

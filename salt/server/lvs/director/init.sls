@@ -20,6 +20,7 @@ lvs_director_ip_forward:
     - name: "net.ipv4.ip_forward"
     - value: 1
 
+#fixme only for LVS DR
 # http://www.austintek.com/LVS/LVS-HOWTO/HOWTO/LVS-HOWTO.LVS-DR.html#set_rp_filter
 lvs_director_rp_filter:
   sysctl.present:

@@ -41,6 +41,23 @@ propagate_cert_key:
         - "kubernetes:master:certificate_key"
     - require:
       - cmd: kubeadm_init
+propagate_ip:
+  module.run:
+    - mine.send:
+        - kubernetes_master_ip
+        - mine_function: network.ip_addrs
+        - cidr: {{ kubernetes_network.nodes.master_vip }}
+    - require:
+      - cmd: kubeadm_init
+{%- else %}
+propagate_ip:
+  module.run:
+    - mine.send:
+        - kubernetes_master_ip
+        - mine_function: network.ip_addrs
+        - cidr: {{ kubernetes_network.nodes.cidr }}
+    - require:
+      - cmd: kubeadm_init
 {%- endif %}
 
 ensure_token:
@@ -68,17 +85,5 @@ propagate_hash:
     - require:
       - cmd: kubeadm_init
 
-propagate_ip:
-  module.run:
-    - mine.send:
-        - kubernetes_master_ip
-        - mine_function: network.ip_addrs
-{%- if kubernetes_network.nodes.master_vip %}
-        - cidr: {{ kubernetes_network.nodes.master_vip }}
-{%- else %}
-        - cidr: {{ kubernetes_network.nodes.cidr }}
-{%- endif %}
-    - require:
-      - cmd: kubeadm_init
 
 #todo the cmd.run should be wrapped with script and return stateful data
