@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 
 
 def __virtual__():
-    return True if __utils__['gdrive.has_libs']() else (False, "Cannot load file.ext, install: pyasn1-modules and google-auth-oauthlib libraries")
+    return True if __utils__['gdrive.has_libs']() else (False, "Cannot load file.ext, install: pyasn1-modules and google-auth-oauthlib gdrive libraries")
 
 
 def managed(name, source=None, contents=None, **kwargs):
@@ -39,7 +39,7 @@ def managed(name, source=None, contents=None, **kwargs):
         return delegate_to_file_managed(source, contents)
 
     gdrive = _get_client()
-    contents = gdrive.get_file_contents(source)
+    contents = gdrive.get(source)
     return delegate_to_file_managed(source=None, contents=contents)
 
 
@@ -128,7 +128,7 @@ def recurse(name,
         source = source + posixpath.sep
 
     gdrive = _get_client()
-    dir_hierarchy = gdrive.walk(source, include_pat, exclude_pat, source)
+    dir_hierarchy = gdrive.walk(source, source, include_pat, exclude_pat)
     log.debug("google drive walk result: {}".format(dir_hierarchy))
 
     def handle(file_list, absolute_dest_path):
