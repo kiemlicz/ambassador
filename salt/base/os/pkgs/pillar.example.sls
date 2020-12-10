@@ -23,6 +23,7 @@ pkgs:
     - google-api-python-client~=1.11.0
     - google-api-core<=1.22.2
     - google-auth-oauthlib~=0.4.1
+    - gdrive
     - powerline-status
   post_install:
     - "echo 'test'"
