@@ -78,6 +78,8 @@ pkgs_pip:
 {% endif %}
 
 {% if pkgs.pip3_packages is defined and pkgs.pip3_packages %}
+# todo upgrading pip must be handled separately
+# it will switch default /usr/bin/pip3 to /usr/local/bin/pip3
 pip3_provider:
   pkg.latest:
     - name: pip3_provider

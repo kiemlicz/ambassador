@@ -6,8 +6,7 @@ try:
     from google.oauth2.credentials import Credentials
     from googleapiclient.discovery import build
     from salt.ext.six.moves.urllib.parse import urlparse, parse_qs
-    from gdrive.auth import GoogleAuth
-    from gdrive.client import GDriveClient
+    import gdrive
 
     HAS_GOOGLE_LIBS = True
 except ImportError:
@@ -30,6 +29,6 @@ def client(profile):
                               token_uri=profile['token_url'],
                               client_id=profile['client_id'],
                               client_secret=profile['client_secret'])
-    auth = GoogleAuth(credentials)
+    auth = gdrive.auth.GoogleAuth(credentials)
     log.debug("building drive service for client: {}".format(profile['client_id']))
-    return GDriveClient(auth)
+    return gdrive.client.GDriveClient(auth)
