@@ -57,6 +57,7 @@ pkgs_sources:
 {{ retry(attempts=2)| indent(4) }}
 {% endif %}
 
+#todo drop python2
 {% if pkgs.pip_packages is defined and pkgs.pip_packages %}
 pip_provider:
   pkg.latest:
@@ -87,11 +88,28 @@ pip3_provider:
     - reload_modules: True
     - require:
       - pkg: os_packages
+{%- if pkgs.unsafe_pip %}
+upgrade_pip3:
+  pip.installed:
+  - name: pip
+  - bin_env: /usr/bin/pip3
+  - upgrade: True
+  - reload_modules: True
+  - require:
+    - pkg: os_packages
+  - require_in:
+    - pip: pip3_packages
+{%- endif %}
 pkgs_pip3:
   pip.installed:
     - name: pip3_packages
     - pkgs: {{ pkgs.pip3_packages|tojson }}
+{%- if pkgs.unsafe_pip %}
+# todo try just: pip3
     - bin_env: '/usr/bin/pip3'
+{%- else %}
+    - bin_env: '/usr/local/bin/pip3'
+{%- endif %}    
     - reload_modules: True
 {%- if pkgs.pip3_user is defined %}
     - user: {{ pkgs.pip3_user }}

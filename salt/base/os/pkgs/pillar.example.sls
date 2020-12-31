@@ -15,6 +15,7 @@
     }, grain='oscodename')) %}
 pkgs:
   dist_upgrade: True
+  unsafe_pip: True
   os_packages: {{ default_pkgs.os_packages | tojson }}
   pip3_packages:
 #    - setuptools

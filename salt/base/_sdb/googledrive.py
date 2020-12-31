@@ -4,7 +4,7 @@ log = logging.getLogger(__name__)
 
 
 def __virtual__():
-    has_libs = __utils__['gdrive.has_libs']()
+    has_libs = __utils__['googledrive.has_libs']()
     if not has_libs:
         # somehow sdb modules doesn't print missing lib message nicely, instead you will just see KeyError 'kdbx.get'
         # that's why this additional log message
@@ -18,4 +18,4 @@ def get(key, profile=None):
 
 
 def _get_client(profile):
-    return __utils__['gdrive.client'](profile)
+    return __utils__['googledrive.client'](profile)

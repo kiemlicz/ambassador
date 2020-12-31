@@ -11,9 +11,10 @@ from salt.ext.six.moves.urllib.parse import urlparse
 
 log = logging.getLogger(__name__)
 
+__virtualname__ = "file_ext"
 
 def __virtual__():
-    return True if __utils__['gdrive.has_libs']() else (False, "Cannot load file.ext, install: pyasn1-modules and google-auth-oauthlib gdrive libraries")
+    return __virtualname__ if __utils__['googledrive.has_libs']() else (False, "Cannot load file.ext, install: pyasn1-modules and google-auth-oauthlib gdrive libraries")
 
 
 def managed(name, source=None, contents=None, **kwargs):
@@ -146,4 +147,4 @@ def recurse(name,
 
 def _get_client():
     profile = __salt__['config.get']('gdrive', merge="recurse")
-    return __utils__['gdrive.client'](profile)
+    return __utils__['googledrive.client'](profile)
