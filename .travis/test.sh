@@ -37,12 +37,6 @@ salt-test)
     # in order to return proper exit code instead of always 0 (of kill command)
     exit $result
     ;;
-salt-master-run-compose)
-    # --exit-code-from master isn't the way to go as implies --abort-on-container-exit
-    docker-compose -f .travis/docker-compose.yml --project-directory=. up --no-build --no-recreate
-    echo "scanning compose's containers"
-    exit $(docker-compose -f .travis/docker-compose.yml --project-directory=. ps -q | xargs docker inspect -f '{{ .State.ExitCode }}' | grep -v 0 | wc -l | tr -d ' ')
-    ;;
 salt-master-run-k8s)
     echo -e "Starting kubernetes deployment\n$(date)\n"
     trap k8s_log_error EXIT TERM INT

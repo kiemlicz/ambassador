@@ -50,7 +50,7 @@ docker_build() {
         "${build_args[@]}" \
         --target $1 \
         -t "${2-$DOCKER_IMAGE}" \
-        -f .travis/"$DOCKER_IMAGE"/Dockerfile .
+        -f deployment/docker/"$DOCKER_IMAGE"/Dockerfile .
 }
 
 # $1 full repo/name:tag

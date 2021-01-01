@@ -17,13 +17,6 @@ salt-test)
     docker_build salt-master "$BASE_PUB_NAME-master-$DOCKER_IMAGE:$TAG"
     docker_build salt-test "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:$TAG"
     ;;
-salt-master-run-compose)
-    if [ "$TRAVIS" = "true" ]; then
-        docker_update
-    fi
-    docker_compose_update
-    docker-compose -f .travis/docker-compose.yml --project-directory=. up --no-start
-    ;;
 salt-master-run-k8s)
     salt_install
     sudo salt-call --local saltutil.sync_all
