@@ -93,7 +93,7 @@ RUN printf '#!/bin/bash\necho "N 5"' > /sbin/runlevel && \
 
 COPY .travis/top.sls /srv/salt/base/top.sls
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/conftest.py .travis/test-runner-pytest.py .travis/pytest.ini /opt/
+COPY .travis/conftest.py .travis/test-runner-pytest.py .travis/pytest.ini .travis/test_pillar.py /opt/
 
 WORKDIR /opt
 

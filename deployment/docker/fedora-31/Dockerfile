@@ -84,7 +84,7 @@ RUN dnf -y --nogpgcheck install -y python3-pip && pip3 install --upgrade pytest 
 
 COPY .travis/top.sls /srv/salt/base/top.sls
 COPY .travis/config/masterless.conf /etc/salt/minion.d/masterless.conf
-COPY .travis/conftest.py .travis/test-runner-pytest.py .travis/pytest.ini /opt/
+COPY .travis/conftest.py .travis/test-runner-pytest.py .travis/pytest.ini .travis/test_pillar.py /opt/
 
 WORKDIR /opt
 
