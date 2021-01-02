@@ -12,9 +12,10 @@ case "$1" in
 salt-test)
     if [ "$TRAVIS" = "true" ]; then
         docker_update
+        # for publish purposes, by default not required anywhere else than Travis
+        docker_build salt-minion "$BASE_PUB_NAME-minion-$DOCKER_IMAGE:$TAG"
+        docker_build salt-master "$BASE_PUB_NAME-master-$DOCKER_IMAGE:$TAG"
     fi
-    docker_build salt-minion "$BASE_PUB_NAME-minion-$DOCKER_IMAGE:$TAG"
-    docker_build salt-master "$BASE_PUB_NAME-master-$DOCKER_IMAGE:$TAG"
     docker_build salt-test "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:$TAG"
     ;;
 salt-master-run-k8s)

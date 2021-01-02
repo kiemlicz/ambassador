@@ -33,10 +33,11 @@ docker_build() {
     fi
     build_args=(
         "--build-arg=salt_ver=$SALT_VER"
+        "--build-arg=pip3_ver=$PIP3_VER"
         "--build-arg=master_user=${MASTER_USER-root}"
         "--build-arg=minion_user=${MINION_USER-root}"
         "--build-arg=log_level=${LOG_LEVEL-info}"
-        "--build-arg=saltenv=$SALTENV"
+        "--build-arg=saltenv=${SALTENV-base}"
         "--build-arg=kubectl_ver=$KUBECTL_VER"
         "--build-arg=pip3_pygit2_ver=$PIP3_PYGIT2_VER"
         "--build-arg=pip3_kubernetes_ver=$PIP3_KUBERNETES_VER"

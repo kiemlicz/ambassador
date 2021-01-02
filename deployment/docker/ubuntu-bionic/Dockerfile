@@ -2,19 +2,24 @@ ARG tag="bionic"
 FROM ubuntu:$tag AS salt-base
 # "" == latest
 ARG salt_ver=""
+ARG pip3_ver="20.3.3"
 ARG master_user="root"
 ARG minion_user="root"
-
 ENV DEBIAN_FRONTEND noninteractive
+ENV PIP3_VER=$pip3_ver
 
-RUN useradd -ms /bin/bash salt
+# using pip-based salt installation, otherwise pip-installing (during state execution) may fail
+# reload doesn't reload dependencies and possibly old apt-based python packages are still used
+# e.g. gdrive needs new cryptodome, old is present due to salt bootstrap script, "incomplete" reload fails further executions
+RUN useradd -ms /bin/bash salt && \
+    apt-get update && apt-get install -y curl dirmngr procps iproute2 dumb-init python3-pip python3-apt && \
+    pip3 install pip=="$PIP3_VER" && \
+    mkdir -p /var/cache/salt /var/log/salt && \
+    curl -o /opt/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
+    sh /opt/bootstrap-salt.sh -x python3 -X -P -n $salt_ver && \
+    chown -R salt.salt /etc/salt /var/cache/salt /var/log/salt
 
 COPY --chown=salt:salt salt /srv/salt
-
-RUN apt-get update && apt-get install -y curl dirmngr iproute2 dumb-init python3-pip && \
-    curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
-    sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver && \
-    chown -R salt.salt /etc/salt /var/cache/salt /var/log/salt
 
 WORKDIR /srv
 
@@ -47,12 +52,10 @@ ENV SALTENV=$saltenv
 COPY .travis/config/master.conf /etc/salt/master.d/01-master.conf
 COPY .travis/entrypoint.sh /opt/
 
-RUN pip3 install --upgrade pyOpenSSL pygit2==$pip3_pygit2_ver docker-py jinja2 requests && \
-    apt-get install -y salt-master
+RUN pip3 install --upgrade pyOpenSSL pygit2==$pip3_pygit2_ver docker jinja2 requests
 
 RUN if [ "$API_ENABLED" = true ]; then \
-        pip3 install --upgrade cherrypy \
-        apt-get install -y salt-api; \
+        pip3 install --upgrade cherrypy; \
     fi
 
 RUN if [ "$K8S_API_ENABLED" = true ]; then \

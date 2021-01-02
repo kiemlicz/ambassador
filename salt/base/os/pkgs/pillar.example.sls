@@ -15,14 +15,14 @@
     }, grain='oscodename')) %}
 pkgs:
   dist_upgrade: True
-  unsafe_pip: True
+  #unsafe_pip: True
   os_packages: {{ default_pkgs.os_packages | tojson }}
   pip3_packages:
 #    - setuptools
-    - setuptools==46.0.0
+    # - setuptools==46.0.0
     - six<1.13.0
-    - google-api-python-client~=1.11.0
-    - google-api-core<=1.22.2
+    # - google-api-python-client~=1.11.0
+    # - google-api-core<=1.22.2
     - google-auth-oauthlib~=0.4.1
     - gdrive
     - powerline-status

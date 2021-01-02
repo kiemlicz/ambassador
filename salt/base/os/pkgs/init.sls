@@ -105,10 +105,9 @@ pkgs_pip3:
     - name: pip3_packages
     - pkgs: {{ pkgs.pip3_packages|tojson }}
 {%- if pkgs.unsafe_pip %}
-# todo try just: pip3
-    - bin_env: '/usr/bin/pip3'
-{%- else %}
     - bin_env: '/usr/local/bin/pip3'
+{%- else %}
+    - bin_env: '/usr/bin/pip3'
 {%- endif %}    
     - reload_modules: True
 {%- if pkgs.pip3_user is defined %}
