@@ -29,7 +29,7 @@ readonly test_time=$(echo "$test_stop_ts - $test_start_ts" | bc)
 
 if [ $result -ne 0 ]; then
     echo "Test failure, completed with code: $result"
-    echo "Test fail, find the logs attached (test time: $test_time)" | mail -A $LOGFILE -s "Ambassador test failed" $(git config user.email)
+    echo "Test fail, find the logs attached (test time: $test_time)" | mail -A $LOGFILE -s "Ambassador test failed (host: $1)" $(git config user.email)
 fi
 
 popd > /dev/null || exit 5
