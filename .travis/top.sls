@@ -48,3 +48,7 @@ server:
     - scala
     - sbt
     - intellij
+# test/debug states, use CONTEXT=debug
+#  'debug-host':
+#    - minion.debug.1
+#    - minion.debug.2
