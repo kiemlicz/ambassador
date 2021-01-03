@@ -32,7 +32,7 @@ VOLUME /etc/salt/minion.d
 
 USER $minion_user:$minion_user
 ENTRYPOINT ["/usr/bin/dumb-init", "--"]
-CMD [ "/usr/bin/salt-minion" ]
+CMD [ "/usr/local/bin/salt-minion" ]
 
 
 FROM salt-base AS salt-master
