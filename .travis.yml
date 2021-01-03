@@ -11,11 +11,12 @@ services:
 
 env:
   global:
-    - SALT_VER="" # use "" for latest stable, other options: "git 2019.2.2"
+    - SALT_VER="git v3002.2" # use "" for latest stable, other options: "git 2019.2.2"
     - MASTER_USER="salt"
     - MINION_USER="root"
     - COMPOSE_VER="1.22.0"
     - KUBECTL_VER="v1.17.3"
+    - PIP3_VER="20.3.3"
     - PIP3_PYGIT2_VER="1.0.3"
     - PIP3_KUBERNETES_VER="10.0.1"
     - GH_URL="https://kiemlicz.github.io/ambassador/"
