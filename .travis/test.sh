@@ -2,6 +2,7 @@
 
 set -e
 
+source .env
 source .travis/common.sh
 
 k8s_log_error() {
