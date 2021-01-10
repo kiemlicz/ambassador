@@ -6,6 +6,7 @@ if [ -z "$DOCKER_IMAGE" ]; then
     exit 1
 fi
 
+source .env
 source .travis/common.sh
 
 case "$1" in
