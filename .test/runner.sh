@@ -10,9 +10,10 @@ fi
 
 echo "Test started"
 readonly test_start_ts=$(date +%s.%N)
+readonly project_dir=$(dirname "$(dirname $0)")
 export PROVISIONED_HOSTNAME=$1
 shift
-pushd /home/ghrunner/projects/ambassador || exit 4
+pushd $project_dir || exit 4
 
 LOGFILE=/var/log/ambassador/amb.kvm.$(date -d "today" +"%Y%m%d%H%M")
 touch $LOGFILE
