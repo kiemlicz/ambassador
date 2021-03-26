@@ -144,7 +144,7 @@ def install():
             raise RuntimeError(f"Command {command} failed with {exit_code}")
 
     # it seems that OS packages: `libffi-dev zlib1g-dev libgit2-dev git` are somehow not needed for pygit2 to run
-    assert_ret_code("/tmp/bootstrap-salt.sh -U -x python3 -p python3-pip")  # consider: -p libgit2-dev
+    assert_ret_code("/tmp/bootstrap-salt.sh -U -x python3 -p python3-pip -p rustc -p libssl-dev")  # consider: -p libgit2-dev
     # install required packages manually (since startup states won't be able to reload the main process to enable pygit2)
     assert_ret_code("pip3 install --upgrade pyOpenSSL pygit2==1.0.3 cherrypy jinja2 PyYAML pykeepass")
     if os.path.isfile("/etc/salt/keys/pillargpg.gpg"):
