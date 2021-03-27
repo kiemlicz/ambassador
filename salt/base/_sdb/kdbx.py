@@ -27,6 +27,7 @@ def __virtual__():
 
 def get(key, profile=None):
     query_parsed = urlparse(key)
+    query_path = list(filter(None, query_parsed.path.split('/')))
     query_dict = __utils__['urlutils.query_string_to_dict'](query_parsed.query)
     filename = query_dict['attachment'] if 'attachment' in query_dict else None
     attributes = query_dict['attributes'] if 'attributes' in query_dict else None
@@ -34,9 +35,9 @@ def get(key, profile=None):
     if filename and attributes:
         raise CommandExecutionError("Cannot fetch both attributes and attachments")
 
-    e = _get_first_entry_by_path(query_parsed.path, profile)
+    e = _get_first_entry_by_path(query_path, profile)
     if not e:
-        log.error("KDBX entries by path: {}, didn't return entries".format(query_parsed.path))
+        log.error("KDBX entries by path: {}, didn't return entries".format(query_path))
         return None
 
     if attributes:

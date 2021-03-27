@@ -146,7 +146,7 @@ def install():
     # it seems that OS packages: `libffi-dev zlib1g-dev libgit2-dev git` are somehow not needed for pygit2 to run
     assert_ret_code("/tmp/bootstrap-salt.sh -U -x python3 -p python3-pip -p rustc -p libssl-dev")  # consider: -p libgit2-dev
     # install required packages manually (since startup states won't be able to reload the main process to enable pygit2)
-    assert_ret_code("pip3 install --upgrade pyOpenSSL pygit2==1.0.3 cherrypy jinja2 PyYAML pykeepass gdrive==0.0.6") # fixme must be installed from Salt itself
+    assert_ret_code("pip3 install --upgrade pyOpenSSL pygit2==1.0.3 cherrypy jinja2 PyYAML pykeepass==4.0.0 gdrive==0.0.6") # fixme must be installed from Salt itself
     if os.path.isfile("/etc/salt/keys/pillargpg.gpg"):
         assert_ret_code("gpg --homedir /etc/salt/gpgkeys --import /etc/salt/keys/pillargpg.gpg")
     else:
