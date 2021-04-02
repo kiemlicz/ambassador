@@ -31,6 +31,7 @@ parser.add_argument('--lxc', help="install within LXC container", required=False
 parser.add_argument('--name', help="provide container name", required=False)
 parser.add_argument('--ifc', help="provide interface to attach container to", required=False)
 parser.add_argument('--configs', help="provide Salt Minion config", required=True, nargs='+', type=str)
+# parser.add_argument('--pips', help="Required PIP packages", required=False, nargs='+', type=str, default=["pip==20.3.3", "six==1.15.0"])
 parser.add_argument('--directories', help="provide directories to copy to container (/srv)", required=False, nargs='+', type=str, default=["salt"])
 parser.add_argument('--top', help="provide top.sls file", required=False, type=str)
 parser.add_argument('--top-location', help="provide top.sls file location", required=False, type=str, default="/srv/salt/base")
@@ -138,21 +139,25 @@ def install():
         bootstrap.write(bootstrap_script)
     os.chmod("/tmp/bootstrap-salt.sh", 0o755)
 
-    def assert_ret_code(command):
-        exit_code = os.system(command)
-        if exit_code:
-            raise RuntimeError(f"Command {command} failed with {exit_code}")
-
     # it seems that OS packages: `libffi-dev zlib1g-dev libgit2-dev git` are somehow not needed for pygit2 to run
-    assert_ret_code("/tmp/bootstrap-salt.sh -U -x python3 -p python3-pip -p rustc -p libssl-dev")  # consider: -p libgit2-dev
+    _assert_ret_code("/tmp/bootstrap-salt.sh -U -x python3 -p python3-pip -p rustc -p libssl-dev")  # consider: -p libgit2-dev
     # install required packages manually (since startup states won't be able to reload the main process to enable pygit2)
-    assert_ret_code("pip3 install --upgrade pyOpenSSL pygit2==1.0.3 cherrypy jinja2 PyYAML pykeepass==4.0.0 gdrive==0.0.6") # fixme must be installed from Salt itself
+    _assert_ret_code("pip3 install --upgrade pyOpenSSL pygit2==1.0.3 cherrypy jinja2 PyYAML pykeepass==4.0.0 gdrive==0.0.7") # fixme must be installed from Salt itself
     if os.path.isfile("/etc/salt/keys/pillargpg.gpg"):
-        assert_ret_code("gpg --homedir /etc/salt/gpgkeys --import /etc/salt/keys/pillargpg.gpg")
+        _assert_ret_code("gpg --homedir /etc/salt/gpgkeys --import /etc/salt/keys/pillargpg.gpg")
     else:
         log.warning("/etc/salt/keys/pillargpg.gpg not found")
-    assert_ret_code("salt-call --local saltutil.sync_all")
-    assert_ret_code("salt-call --local state.highstate")
+
+
+def run():
+    _assert_ret_code("salt-call --local saltutil.sync_all")
+    _assert_ret_code("salt-call --local state.highstate")
+
+
+def _assert_ret_code(command):
+    exit_code = os.system(command)
+    if exit_code:
+        raise RuntimeError(f"Command {command} failed with {exit_code}")
 
 
 start_time = datetime.datetime.now()
@@ -160,16 +165,17 @@ start_time = datetime.datetime.now()
 if use_lxc:
     if not HAS_LXC_LIBS:
         raise Exception("Missing package, perform: sudo apt install python3-lxc")
-    log.info("Installing into LXC container")
     container_name = args.name
+    log.info(f"Installing into LXC container, will attach to: {container_name}")
     c = ensure_container(container_name)
     populate_files(os.path.join(args.rootfs, container_name, "rootfs"))
-    log.info("Running inside: %s", container_name)
     c.attach_wait(install)
+    c.attach_wait(run)
 else:
     log.info("Installing directly onto this host")
     populate_files(os.sep)
     install()
+    run()
 
 end_time = datetime.datetime.now()
 log.info(f"Completed: {end_time - start_time}")
