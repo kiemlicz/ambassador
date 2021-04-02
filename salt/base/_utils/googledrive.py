@@ -1,7 +1,6 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
-import importlib
 log = logging.getLogger(__name__)
 
 try:
@@ -11,6 +10,7 @@ try:
 
     HAS_GOOGLE_LIBS = True
 except ImportError:
+    log.exception("Cannot import gdrive pip library")
     HAS_GOOGLE_LIBS = False
 
 

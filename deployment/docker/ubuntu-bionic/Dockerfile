@@ -90,7 +90,7 @@ ENV LOG_LEVEL=$log_level
 
 # installing setuptools before tests since google-auth requires > 40.3 and bionic python3-setuptools is 39
 # pip3 installing setuptools during test run (with module reload and apt-get purge of python3-setuptools) doesn't help (in the one run)
-RUN apt-get install -y python3-pip && pip3 install --upgrade pytest pytest-xdist redis setuptools
+RUN pip3 install --upgrade pytest pytest-xdist redis setuptools
 
 # workaround for salt's service state
 # somehow in masterless config the service provider cannot be overriden

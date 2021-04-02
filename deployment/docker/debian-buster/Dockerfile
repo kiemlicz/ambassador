@@ -7,15 +7,13 @@ ARG master_user="root"
 ARG minion_user="root"
 ENV PIP3_VER=$pip3_ver
 
-# using pip-based salt installation, otherwise pip-installing (during state execution) may fail
-# reload doesn't reload dependencies and possibly old apt-based python packages are still used
-# e.g. gdrive needs new cryptodome, old is present due to salt bootstrap script, "incomplete" reload fails further executions
+# receiving a lot of issues when not upgrading `six` and `pip` prior to salt run...
 RUN useradd -ms /bin/bash salt && \
     apt-get update && apt-get install -y curl procps dumb-init python3-pip python3-apt && \
-    pip3 install pip=="$PIP3_VER" && \
+    pip3 install pip=="$PIP3_VER" six==1.15.0 && \
     mkdir -p /var/cache/salt /var/log/salt && \
-    curl -o /opt/bootstrap-salt.sh -L https://bootstrap.saltstack.com && \
-    sh /opt/bootstrap-salt.sh -x python3 -X -P -n $salt_ver && \
+    curl -o /opt/bootstrap-salt.sh -L https://bootstrap.saltproject.io && \
+    sh /opt/bootstrap-salt.sh -x python3 -X -p rustc -p libssl-dev -n $salt_ver &&\
     chown -R salt.salt /etc/salt /var/cache/salt /var/log/salt
 
 COPY --chown=salt:salt salt /srv/salt

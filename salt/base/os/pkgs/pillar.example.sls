@@ -15,16 +15,12 @@
     }, grain='oscodename')) %}
 pkgs:
   dist_upgrade: True
-  #unsafe_pip: True
+  # unsafe_pip: True
   os_packages: {{ default_pkgs.os_packages | tojson }}
   pip3_packages:
-#    - setuptools
-    # - setuptools==46.0.0
-    - six<1.13.0
-    # - google-api-python-client~=1.11.0
-    # - google-api-core<=1.22.2
+#    - pip==20.3.3 # handled via unsafe_pip or outside the salt run
+    - gdrive==0.0.7
     - google-auth-oauthlib~=0.4.1
-    - gdrive
     - powerline-status
   post_install:
     - "echo 'test'"
