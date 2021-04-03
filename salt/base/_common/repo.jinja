@@ -43,6 +43,9 @@
     - makedirs: True
     - create: True
     - context:
-      pin: {{ conf.pin }}
-      priority : {{ conf.priority }}
+{%- if conf.package is defined %}
+        package: {{ conf.package }}
+{%- endif %}
+        pin: {{ conf.pin }}
+        priority: {{ conf.priority }}
 {% endmacro %}
