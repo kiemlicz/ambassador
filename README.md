@@ -1,17 +1,16 @@
 # Ambassador
 [![Build status](https://travis-ci.org/kiemlicz/ambassador.svg?branch=master)](https://travis-ci.org/kiemlicz/ambassador)
 
-Automated netboot&provisioning server
+Automated netboot&provisioning server, [Foreman](https://www.theforeman.org/) and [Salt](https://www.theforeman.org/) based.
 
 ## Rationale
 Any setup takes time, practically it is never one-time action.  
-Updates break sometimes, anything breaks at some point - sometimes it's better to wipe everything/some part out
-and start over.  
-Unfortunately as some setup work had already been done such solution may not be sensible.  
 Maintaining multi-node environments is cumbersome (configuration synchronization, duplicated installation process).
 Sometimes it would also be useful to keep your favourite os hacks/tips/tricks in structured manner (like in some configuration management solution)
+Moreover updates sometimes break, anything breaks at some point - then it _may be_ better to wipe everything/some part out
+and start over. Unfortunately as some setup work had already been done such solution may be too radical.  
 
-Setup any environment: dev, prod, work, home using Salt (SaltStack's) and PXE booting (the Foreman's).
+Setup any environment: dev, prod, work, home using Salt and PXE booting (the Foreman's).
 
 Will aim to be both Linux&Windows friendly.
 
@@ -19,9 +18,8 @@ Will aim to be both Linux&Windows friendly.
 As the best way of documenting things is writing automation scripts, this automation server's installation process is also automated.  
 The "installation" process ends up with LXC container containing foreman&salt fully setup and configured.  
 Simply follow:  
-1. Clone this repo with [submodules](https://github.com/kiemlicz/util/wiki/git): `git submodule update --init`
-2. Ensure you have LXC configured: `requisites.sh`
-3. Install `pip3 install pyyaml pykeepass` and `apt install python3-lxc`
+1. Clone this repo
+2. Ensure you have requirements configured: `requisites.sh`
 3. Optionally provide `ambassador-installer.override.conf` to override any Salt masterless settings, e.g. add your own pillar:
 ```
 ext_pillar:

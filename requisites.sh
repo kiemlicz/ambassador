@@ -20,7 +20,8 @@
 
 apt-get update
 #ubuntu-archive-keyring for ubuntu archives creation
-apt-get install lxc bridge-utils debootstrap vagrant vagrant-lxc
+apt-get install lxc bridge-utils debootstrap vagrant vagrant-lxc python3-lxc python3-pip
+pip3 install pyyaml pykeepass
 
 #ubuntu-archive-keyring not working for yakkety (and up)
 apt-get install ubuntu-archive-keyring

@@ -26,12 +26,22 @@ except ImportError:
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
+
+def _default_ifc():
+    with open("/proc/net/route") as fh:
+        for line in fh:
+            fields = line.strip().split()
+            if fields[1] != '00000000' or not int(fields[3], 16) & 2:
+                # If not default route or not RTF_GATEWAY, skip it
+                continue
+            return fields[0]
+
+
 parser = argparse.ArgumentParser(description='Installs Salt Minion for further box provisioning. Uses host directly or LXC container')
 parser.add_argument('--lxc', help="install within LXC container", required=False, default=False, action='store_true')
 parser.add_argument('--name', help="provide container name", required=False)
-parser.add_argument('--ifc', help="provide interface to attach container to", required=False)
+parser.add_argument('--ifc', help="provide interface to attach container to, default interface otherwise", required=False, default=_default_ifc())
 parser.add_argument('--configs', help="provide Salt Minion config", required=True, nargs='+', type=str)
-# parser.add_argument('--pips', help="Required PIP packages", required=False, nargs='+', type=str, default=["pip==20.3.3", "six==1.15.0"])
 parser.add_argument('--directories', help="provide directories to copy to container (/srv)", required=False, nargs='+', type=str, default=["salt"])
 parser.add_argument('--top', help="provide top.sls file", required=False, type=str)
 parser.add_argument('--top-location', help="provide top.sls file location", required=False, type=str, default="/srv/salt/base")
