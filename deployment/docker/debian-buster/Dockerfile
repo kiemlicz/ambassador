@@ -2,29 +2,30 @@ ARG tag="buster-slim"
 FROM debian:$tag AS salt-base
 # "" == latest
 ARG salt_ver=""
-ARG pip3_ver="20.3.3"
 ARG master_user="root"
 ARG minion_user="root"
-ENV PIP3_VER=$pip3_ver
 
+COPY config/requirements.txt /tmp
+# fixme install using install script
 # receiving a lot of issues when not upgrading `six` and `pip` prior to salt run...
 RUN useradd -ms /bin/bash salt && \
-    apt-get update && apt-get install -y curl procps dumb-init python3-pip python3-apt && \
-    pip3 install pip=="$PIP3_VER" six==1.15.0 && \
+    apt-get update && apt-get install -y curl procps dumb-init python3-pip python3-apt rustc libssl-dev && \
+    pip3 install -r /tmp/requirements.txt && \
     mkdir -p /var/cache/salt /var/log/salt && \
-    curl -o /opt/bootstrap-salt.sh -L https://bootstrap.saltproject.io && \
-    sh /opt/bootstrap-salt.sh -x python3 -X -p rustc -p libssl-dev -n $salt_ver &&\
+    curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltproject.io && \
+    sh /tmp/bootstrap-salt.sh -x python3 -X -n $salt_ver &&\
     chown -R salt.salt /etc/salt /var/cache/salt /var/log/salt
 
 COPY --chown=salt:salt salt /srv/salt
+RUN rm -rf /tmp/bootstrap-salt.sh && rm -rf /tmp/requirements.txt
 
 WORKDIR /srv
 
 
 FROM salt-base AS salt-minion
 # hostname from `docker run -h` must be used as minion ID
-
-RUN pip3 install --upgrade docker
+# todo confirm not needed
+#RUN pip3 install --upgrade docker
 
 VOLUME /etc/salt/minion.d
 
@@ -38,8 +39,6 @@ FROM salt-base AS salt-master
 ARG api_enabled=false
 ARG k8s_api_enabled=false
 ARG kubectl_ver
-ARG pip3_kubernetes_ver
-ARG pip3_pygit2_ver
 ARG saltenv
 ENV API_ENABLED=$api_enabled
 ENV K8S_API_ENABLED=$k8s_api_enabled
@@ -49,17 +48,15 @@ ENV SALTENV=$saltenv
 COPY .travis/config/master.conf /etc/salt/master.d/01-master.conf
 COPY .travis/entrypoint.sh /opt/
 
-RUN pip3 install --upgrade pyOpenSSL pygit2==$pip3_pygit2_ver docker jinja2 requests
-
 RUN if [ "$API_ENABLED" = true ]; then \
-        pip3 install --upgrade cherrypy; \
+        pip3 install --upgrade pyOpenSSL cherrypy; \
     fi
 
 RUN if [ "$K8S_API_ENABLED" = true ]; then \
         curl -LO https://storage.googleapis.com/kubernetes-release/release/$kubectl_ver/bin/linux/amd64/kubectl && \
         chmod +x kubectl && \
         mv kubectl /usr/bin/ && \
-        pip3 install kubernetes==$pip3_kubernetes_ver && \
+        pip3 install kubernetes~=10.0.1 && \
         salt-run saltutil.sync_all; \
     fi
 
