@@ -1,10 +1,10 @@
 mounts:
   list: []
----
-mounts:
-  list:
-    - dev: /dev/sda1
-      target: /mnt/somewhere
-      file_type: ext4
-      options:
-        - user
+#---
+#mounts:
+#  list:
+#    - dev: /dev/sda1
+#      target: /mnt/somewhere
+#      file_type: ext4
+#      options:
+#        - user

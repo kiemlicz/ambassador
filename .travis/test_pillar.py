@@ -24,7 +24,7 @@ def generate(salt_client: salt.client.Caller, location: str) -> Tuple[List[Dict[
 
     pillar.example.sls must be found right under state root directory (same level as init.sls)
     """
-    log.info("Generating Pillar")
+    log.info(f"Generating Pillar (location: {location}/**/pillar.example.sls)")
     all_pillars = {}  # state sls path -> list(pillar1, pillar2)
     state_pillar_dependencies = {}  # state sls name -> list(pillar_key1, pillar_key2)
     try:
@@ -39,6 +39,7 @@ def generate(salt_client: salt.client.Caller, location: str) -> Tuple[List[Dict[
                         rendered = salt_client.cmd("slsutil.renderer", string=pillar_string)
                         all_pillars[sls_dir].append(rendered)
                         state_pillar_dependencies.setdefault(sls, set()).update(rendered.keys())
+
         generated = [salt_client.cmd("slsutil.merge_all", list(e)) for e in itertools.product(*all_pillars.values())]
         generated.append({})  # add empty pillar
         # generated's first entry contains every first pillar.example.sls entry

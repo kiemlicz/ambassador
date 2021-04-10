@@ -102,8 +102,10 @@ def test_syntax(salt_client: salt.client.Caller, redis_client: redis.Redis, pill
     tops = salt_client.cmd("state.show_top")
     assert len(tops) != 0, "NOT expecting empty state.show_top output"
     chunk = pillar_chunk(pillars, worker)
-    log.info("Got: %s pillars to test against", len(chunk))
-    for pillar in chunk:
+    log.info(f"Worker #{worker}, got: {len(chunk)} pillars to test against")
+    for i in range(len(chunk)):
+        log.info(f"Testing {i} out of {len(chunk)}")
+        pillar = chunk[i]
         try:
             states_evaluated = 0
             states_already_cached = 0

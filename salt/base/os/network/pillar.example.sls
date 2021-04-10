@@ -1,16 +1,17 @@
 ---
 network:
   enabled: False  # don't manage network interfaces via `os` state
----
-network:
-  enabled: True
-  interfaces:
-    eth0:
-      type: eth
-    eth1:
-      type: eth
-      require:
-        - network: eth0
+# disabled in order not to syntax test it
+#---
+#network:
+#  enabled: True
+#  interfaces:
+#    eth0:
+#      type: eth
+#    eth1:
+#      type: eth
+#      require:
+#        - network: eth0
 ---
 # example pillar that setup bridge interface instead of existing eth
 {%- set ip = salt.filters.first(salt.filters.ips_in_subnet(grains['ipv4'], cidr="127.0.0.0/24"), "127.0.0.1") %}
