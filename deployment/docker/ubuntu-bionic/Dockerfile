@@ -11,6 +11,7 @@ COPY config/requirements.txt /tmp
 # receiving a lot of issues when not upgrading `six` and `pip` prior to salt run...
 RUN useradd -ms /bin/bash salt && \
     apt-get update && apt-get install -y curl dirmngr procps iproute2 dumb-init python3-pip python3-apt rustc libssl-dev && \
+    pip3 install setuptools-rust~=0.12.1 && \
     pip3 install -r /tmp/requirements.txt && \
     mkdir -p /var/cache/salt /var/log/salt && \
     curl -o /tmp/bootstrap-salt.sh -L https://bootstrap.saltproject.io && \
@@ -85,7 +86,7 @@ ENV LOG_LEVEL=$log_level
 
 # installing setuptools before tests since google-auth requires > 40.3 and bionic python3-setuptools is 39
 # pip3 installing setuptools during test run (with module reload and apt-get purge of python3-setuptools) doesn't help (in the one run)
-RUN pip3 install --upgrade pytest pytest-xdist redis setuptools
+RUN pip3 install --upgrade pytest pytest-xdist redis
 
 # workaround for salt's service state
 # somehow in masterless config the service provider cannot be overriden
