@@ -131,7 +131,7 @@ def test_saltcheck(salt_client: salt.client.Caller, saltenv: str, ext_pillar_sal
         # output formatting
         minion_id = salt_client.cmd("grains.get", "id")
         log.info("Starting tests for minion id: %s", minion_id)
-        highstate_result = salt_client.cmd("state.highstate", saltenv=saltenv)
+        highstate_result = salt_client.cmd("state.highstate", saltenv=saltenv, l=logging.getLevelName(log.level))
         log.debug("Highstate result:\n%s", pp.pformat(highstate_result))
         assert isinstance(highstate_result, dict), "Unexpected highstate return: {}, expected dict".format(pp.pformat(highstate_result))
         assert all([e['result'] for e in highstate_result.values()]), "Highstate contains failures:\n{}".format(pp.pformat([{**e, 'comment': "".join(e['comment'])} for e in highstate_result.values() if not e['result']]))

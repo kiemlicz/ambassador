@@ -32,7 +32,12 @@ case "$1" in
 salt-test)
     # privileged mode is necessary for e.g. setting: net.ipv4.ip_forward or running docker in docker
     # check if https://stackoverflow.com/questions/33013539/docker-loading-kernel-modules is possible on travis
-    docker run --name salt-test --network=host --hostname "$CONTEXT-host" --privileged "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:$TAG" --tests $TEST -n $(nproc) --log-level INFO
+    opts="--tests $TEST --log-level ${TEST_LIVE_LOG-INFO}"
+    # without -n the xdist is disabled and live log is streamed
+    if [ -z "$TEST_LIVE_LOG" ]; then
+      opts="$opts -n $(nproc)"
+    fi
+    docker run --name salt-test --network=host --hostname "$CONTEXT-host" --privileged "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:$TAG" $opts
     result=$?
     kill %1  # kill the while loop
     # in order to return proper exit code instead of always 0 (of kill command)
