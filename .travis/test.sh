@@ -35,6 +35,7 @@ salt-test)
     opts="--tests $TEST --log-level ${TEST_LIVE_LOG-INFO}"
     # without -n the xdist is disabled and live log is streamed
     if [ -z "$TEST_LIVE_LOG" ]; then
+      echo "pytest xdist enabled"
       opts="$opts -n $(nproc)"
     fi
     docker run --name salt-test --network=host --hostname "$CONTEXT-host" --privileged "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:$TAG" $opts
