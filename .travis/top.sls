@@ -27,7 +27,8 @@ server:
     - kvm
     - kubernetes.client
     - kubernetes.minikube
-    - kubernetes.master
+# no point in syntax tests as won't work on empty pillar
+#    - kubernetes.master
     - kubernetes.worker
     - kubernetes.helm
     - vagrant
