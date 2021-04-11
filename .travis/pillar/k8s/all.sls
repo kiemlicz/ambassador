@@ -3,4 +3,3 @@ pkgs:
     - google-auth
     - google-auth-oauthlib
     - pyasn1-modules
-    - gdrive
