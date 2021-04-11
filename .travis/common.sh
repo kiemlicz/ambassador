@@ -61,7 +61,8 @@ docker_push() {
 }
 
 salt_install() {
-    sudo apt-get update && sudo apt-get install -y curl python3-setuptools python3-pip
+    sudo apt-get update && sudo apt-get install -y curl python3-setuptools python3-pip rustc
+    sudo pip3 install setuptools-rust~=0.12.1
     sudo pip3 install -r $TRAVIS_BUILD_DIR/config/requirements.txt
     sudo mkdir -p /etc/salt/minion.d/
     sudo cp ${1-".travis/config/masterless.conf"} /etc/salt/minion.d/
