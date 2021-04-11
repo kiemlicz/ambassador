@@ -63,6 +63,7 @@ def generate(salt_client: salt.client.Caller, location: str) -> Tuple[List[Dict[
     log.info(f"Generated pillars (#{len(generated)}) based on:\n{pp.pformat({k: len(v) for k, v in all_pillars.items()})}\nDependencies:\n{pp.pformat(state_pillar_dependencies)}")
     return generated, state_pillar_dependencies
 
+
 def client(saltenv: str) -> salt.client.Caller:
     log.info(f"Salt Client initialization (saltenv: {saltenv})")
     client = salt.client.Caller()
@@ -74,6 +75,7 @@ def client(saltenv: str) -> salt.client.Caller:
     client.function("sys.reload_modules")
     log.info(f"Client reloaded after saltutil.sync_all")  # otherwise the custom modules wouldn't be visible under this `client` instance
     return client
+
 
 if __name__ == "__main__":
     o = sys.argv[1]
