@@ -61,7 +61,7 @@ class SaltK8sEngineTest(unittest.TestCase):
                                                        transport=self.master_opts['transport'],
                                                        opts=self.master_opts)
 
-    @timeout_decorator.timeout(120)
+    @timeout_decorator.timeout(180)
     def test_01_k8s_events_add(self):
         # given
 
@@ -95,7 +95,7 @@ class SaltK8sEngineTest(unittest.TestCase):
             else:
                 self.fail("no MODIFIED event received")
 
-    @timeout_decorator.timeout(120)
+    @timeout_decorator.timeout(180)
     def test_02_k8s_events_mod(self):
         # given
         # deployment exists from previous test
@@ -112,7 +112,7 @@ class SaltK8sEngineTest(unittest.TestCase):
         self.assertEqual(len(mod_events), 3)
         self.assertEqual(len(add_events), 1)
 
-    @timeout_decorator.timeout(120)
+    @timeout_decorator.timeout(180)
     def test_03_k8s_events_del(self):
         # given
         # deployment exists from previous test
@@ -128,8 +128,12 @@ class SaltK8sEngineTest(unittest.TestCase):
         self.assertEqual(len(del_events), 3, "improper total number of 'deleted' events\n{}".format(pp.pformat([{'name': e['object']['metadata']['name'], 'type': e['type']} for e in del_events])))
 
 
+logging.basicConfig(
+    format='[%(asctime)s] [%(levelname)-8s] %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
 log = logging.getLogger("k8s-test")
-logging.basicConfig(stream=sys.stderr, level=logging.INFO)
 pp = pprint.PrettyPrinter(indent=4)
 
 config.load_incluster_config()

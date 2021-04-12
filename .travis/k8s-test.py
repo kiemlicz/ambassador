@@ -20,15 +20,14 @@ class KubectlSaltBackend(object):
         return output
 
     def _loads(self, stdout):
-        log.debug("Loading: {}".format(stdout))
+        log.debug(f"Loading: {stdout}")
         # todo this is not the best approach
         # stdout may be polluted with salt's print statements (like 'No return')
         # thus the loads(...) will fail as stdout contains not only the JSON
         try:
             return json.loads(stdout)
         except json.decoder.JSONDecodeError as e:
-            log.error("Unable to parse output: {}".format(stdout))
-            log.exception(e)
+            log.exception(f"Unable to parse output: {stdout}")
             return {}
 
     def run(self, cmd):
@@ -58,10 +57,11 @@ class SaltDeploymentTest(unittest.TestCase):
             self.fail("No Salt Master instances found in namespace: {}".format(namespace))
         self.saltMaster = KubectlSaltBackend(testinfra.get_host("kubectl://{}?namespace={}".format(next(iter(self.masters)), namespace)))
         self.startTime = time.time()
+        log.info(f"Salt deployment setup completed")
 
     def tearDown(self) -> None:
         t = time.time() - self.startTime
-        log.info("%s: %.3f", self.id(), t)
+        log.info(f"Salt deployment test completed {self.id()}: {t}")
 
     def test_01_minion_delete(self):
         # given
@@ -110,7 +110,11 @@ class SaltDeploymentTest(unittest.TestCase):
         self.assertEqual(len(pong), SaltDeploymentTest.minion_count, "Wrong PONG response: {}".format(pong))
 
 
-logging.basicConfig(stream=sys.stderr, level=logging.INFO)
+logging.basicConfig(
+    format='[%(asctime)s] [%(levelname)-8s] %(message)s',
+    level=logging.INFO,
+    datefmt='%Y-%m-%d %H:%M:%S',
+)
 log = logging.getLogger("k8s-test")
 pp = pprint.PrettyPrinter(indent=4)
 
