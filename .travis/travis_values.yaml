@@ -28,7 +28,7 @@ saltMaster:
       event_return: rawfile_json
       rawfile_json.filename: /var/log/salt/events
 
-      log_level: warn
+      log_level: warning
 
       ext_pillar_first: True
       pillar_merge_lists: True
@@ -154,7 +154,7 @@ saltMinion:
       providers:
        service: service
 
-      log_level: warn
+      log_level: warning
       log_fmt_console: '%(asctime)s,%(msecs)03d [%(levelname)-8s] %(message)s'
 
       # todo research
