@@ -80,6 +80,8 @@ jobs:
         - SALTENV=server
         - CONTEXT=k8s
         - CHANGE_MINIKUBE_NONE_USER=true # adjusts minikube permissions when driver=none
+        - BUILD_DIR=".local"
+        - CHART_BRANCH="gh-pages"
       before_install: .travis/prepare.sh salt-master-run-k8s
       script: .travis/test.sh salt-master-run-k8s
       after_success: .travis/publish.sh chart
