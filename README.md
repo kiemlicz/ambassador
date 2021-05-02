@@ -18,9 +18,8 @@ Will aim to be both Linux&Windows friendly.
 As the best way of documenting things is writing automation scripts, this automation server's installation process is also automated.  
 The "installation" process ends up with LXC container containing foreman&salt fully setup and configured.  
 Simply follow:  
-1. Clone this repo
-2. Ensure you have requirements configured: `requisites.sh`
-3. Optionally provide `ambassador-installer.override.conf` to override any Salt masterless settings, e.g. add your own pillar:
+1. `git clone https://github.com/kiemlicz/ambassador.git`
+2. Optionally provide `ambassador-installer.override.conf` to override any Salt masterless settings, e.g. add your own pillar:
 ```
 ext_pillar:
   - git:

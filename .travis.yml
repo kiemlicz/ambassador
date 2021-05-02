@@ -10,13 +10,6 @@ services:
   - redis
 
 jobs:
-  allow_failures:
-    - env:
-        - DOCKER_IMAGE=fedora-31
-        - CONTEXT=syntax-test
-        - TEST=syntax
-      before_install: .travis/prepare.sh salt-test
-      script: .travis/test.sh salt-test
   include:
     - stage: test
       name: "Test and publish"
@@ -34,12 +27,6 @@ jobs:
       before_install: .travis/prepare.sh salt-test
       script: .travis/test.sh salt-test
       after_success: .travis/publish.sh docker
-    - env:
-        - DOCKER_IMAGE=fedora-31
-        - CONTEXT=syntax-test
-        - TEST=syntax
-      before_install: .travis/prepare.sh salt-test
-      script: .travis/test.sh salt-test
 # todo it is possible to merge the stages however: how to run syntax tests first (in parallel) and then saltcheck using one runner only
     - stage: saltcheck
       name: "Saltcheck tests"
