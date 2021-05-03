@@ -28,6 +28,7 @@ parser = argparse.ArgumentParser(description='Installs Salt Minion for further m
 parser.add_argument('--to', help="where to install to: host, docker, lxc", required=False, default="host")
 parser.add_argument('--name', help="provide container name", required=False)
 parser.add_argument('--ifc', help="provide interface to attach container to, default interface otherwise", required=False, default=common.default_ifc())
+parser.add_argument('--requirements', help="pip requirements file", required=False, type=argparse.FileType('r'), default="config/requirements.txt")
 parser.add_argument('--configs', help="provide Salt Minion config", required=False, nargs='+', type=str, default=["config/ambassador-installer.conf", "config/ambassador-installer.override.conf"])
 parser.add_argument('--directories', help="provide directories to copy to container (/srv)", required=False, nargs='+', type=str, default=["salt"])
 parser.add_argument('--top', help="provide top.sls file", required=False, type=str, default="config/ambassador-top.sls")
@@ -112,17 +113,17 @@ def populate_files(rootfs):
             log.warning(f"No secrets for: {container_name} found")
 
 
-def requisites(pip_dependencies):
+def requisites(requirements_file):
     # https://github.com/saltstack/salt/issues/24925
     # I guess that due to that issue, it is impossible to use salt to install it's own dependencies and properly reload
     # 1. I've received: SIX version conflict (originally installed as dist-packages, after pip upgrade didn't reload six from site-packages)
     # 2. some type errors when installing gdrive (auth dependencies not reloaded)
     # 3. pip install --upgrade pip
     # lets ensure the absolute salt minion requirements are satisfied
-    # common.assert_ret_code("apt update && apt install -y python3-pip")
-    # fixme read that file and don't copy to container
-    #common.assert_ret_code("pip3 install -r config/requirements-main.txt -r config/requirements-gitfs.txt")
-    log.info(f"Mandatory requisites installed ({pip_dependencies})")
+    requirements = " ".join(map(lambda l: l.rstrip(), filter(lambda l: not l.startswith("#"), requirements_file.readlines())))
+    common.assert_ret_code("apt update && apt install -y python3-pip")
+    common.assert_ret_code(f"pip3 install {requirements}")
+    log.info(f"Mandatory requisites installed: {requirements}")
 
 
 def install():
@@ -156,7 +157,7 @@ def host_install():
 
 
 @common.exe_time
-def lxc_install(name: str, autostart: bool, ifc: str, **kwargs):
+def lxc_install(name: str, autostart: bool, ifc: str, requirements: str, **kwargs):
     # you may want to enable IP forwarding
     # run lxc-checkconfig
     # check: sed -i '/^GRUB_CMDLINE_LINUX/s/"$/cgroup_enable=memory swapaccount=1"/' /etc/default/grub
@@ -168,7 +169,7 @@ def lxc_install(name: str, autostart: bool, ifc: str, **kwargs):
 
     # populate_files(os.path.join(args.rootfs, name, "rootfs"))
 
-    c.attach_wait(requisites, "argument")
+    c.attach_wait(requisites, requirements)
     # c.attach_wait(install)
     # c.attach_wait(run)
 
@@ -186,6 +187,5 @@ if __name__ == "__main__":
             'docker': docker_install
         }[to]
     kwargs = vars(args)
-    log.info(f"kwargs = {kwargs}")
     where_to = args.to
     install(where_to)(**kwargs)
