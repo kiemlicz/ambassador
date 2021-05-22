@@ -9,3 +9,4 @@ pygit2==1.0.3
 pyOpenSSL~=20.0.1
 # requests
 # docker
+pypass~=0.2.1

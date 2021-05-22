@@ -2,8 +2,29 @@ import datetime
 import logging
 import ssl
 import os
+import yaml
+from pathlib import Path
+from typing import Dict, Any, List, Tuple
+from shutil import copyfile
+from distutils import dir_util
 
 log = logging.getLogger(__name__)
+
+
+def transfer(files: List[Tuple[str, str]]) -> None:
+    for src, dst in files:
+        Path(dst).mkdir(parents=True, exist_ok=True)
+        if os.path.isfile(src):
+            copyfile(src, dst)
+        elif os.path.isdir(dst):
+            log.info(f"Copying directory: {src}")
+            dir_util.copy_tree(src, dst)
+
+
+def generate(config: Dict[str, Any], location: str):
+    Path(os.path.dirname(location)).mkdir(parents=True, exist_ok=True)
+    with open(location, 'w') as f:
+        yaml.dump(config, f)
 
 
 def exe_time(f):
