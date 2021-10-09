@@ -39,7 +39,7 @@ parser.add_argument('--rootfs', help="provide container rootfs path", required=F
 parser.add_argument('--autostart', help="should the LXC container autostart", required=False, default=False,
                     action='store_true')
 parser.add_argument('--kdbx', help="KDBX file containing further secrets", required=False)  # replace with libsecret API
-parser.add_argument('--kdbx-pass', help="KDBX password", required=False)
+parser.add_argument('--kdbx-pass', help="KDBX password", required=False)  # fixme avoid passing this, assume that the DB is already open somewhere, no such lib exists
 parser.add_argument('--kdbx-key', help="KDBX key file", required=False)
 parser.add_argument('--log', help="log level (TRACE, DEBUG, INFO, WARN, ERROR)", required=False, default="INFO")
 args = parser.parse_args()
