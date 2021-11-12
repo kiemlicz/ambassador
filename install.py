@@ -148,8 +148,7 @@ def requisites(requirements_file):
     # 2. some type errors when installing gdrive (auth dependencies not reloaded)
     # 3. pip install --upgrade pip
     # lets ensure the absolute salt minion requirements are satisfied
-    requirements = " ".join(
-        map(lambda l: l.rstrip(), filter(lambda l: not l.startswith("#"), requirements_file.readlines())))
+    requirements = " ".join(map(lambda l: l.rstrip(), filter(lambda l: not l.startswith("#"), requirements_file.readlines())))
     common.assert_ret_code("apt update && apt install -y python3-pip")
     common.assert_ret_code(f"pip3 install {requirements}")
     log.info(f"Mandatory requisites installed: {requirements}")
@@ -164,8 +163,8 @@ def install():
     os.chmod("/tmp/bootstrap-salt.sh", 0o755)
 
     # it seems that OS packages: `libffi-dev zlib1g-dev libgit2-dev git` are somehow not needed for pygit2 to run
-    common.assert_ret_code(
-        "/tmp/bootstrap-salt.sh -U -x python3 -p python3-pip -p rustc -p libssl-dev")  # consider: -p libgit2-dev
+    # consider: -p libgit2-dev
+    common.assert_ret_code("/tmp/bootstrap-salt.sh -U -x python3 -p python3-pip -p rustc -p libssl-dev")
     if os.path.isfile("/etc/salt/keys/pillargpg.gpg"):
         common.assert_ret_code("gpg --homedir /etc/salt/gpgkeys --import /etc/salt/keys/pillargpg.gpg")
     else:

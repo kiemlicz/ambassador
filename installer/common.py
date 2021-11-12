@@ -3,8 +3,9 @@ import logging
 import ssl
 import os
 import yaml
+import subprocess
 from pathlib import Path
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Union
 from shutil import copyfile
 from distutils import dir_util
 
@@ -54,7 +55,10 @@ def default_ssl_context():
     return ctx
 
 
-def assert_ret_code(command):
-    exit_code = os.system(command)
-    if exit_code:
-        raise RuntimeError(f"Command {command} failed with {exit_code}")
+def assert_ret_code(command: Union[List[str], str]) -> None:
+    if isinstance(command, str):
+        returncode = subprocess.call(command, shell=True)
+    else:
+        returncode = subprocess.call(command)
+    if returncode:
+        raise RuntimeError(f"Command {' '.join(command)} failed with {returncode}")
