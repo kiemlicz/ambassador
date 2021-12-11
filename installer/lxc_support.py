@@ -8,6 +8,9 @@ except ImportError:
     HAS_LXC_LIBS = False
 log = logging.getLogger(__name__)
 
+DEBIAN_RELEASE = "bullseye"
+DEBIAN_ARCH = "amd64"
+
 
 def ensure_container(container_name: str, autostart: bool, ifc: str) -> lxc.Container:
     c = lxc.Container(name=container_name)
@@ -23,7 +26,7 @@ def ensure_container(container_name: str, autostart: bool, ifc: str) -> lxc.Cont
         if autostart:
             c.set_config_item("lxc.start.auto", "1")
         # todo increase size
-        if not c.create(template="debian", flags=0, args={"release": "buster", "arch": "amd64"}):
+        if not c.create(template="debian", flags=0, args={"release": DEBIAN_RELEASE, "arch": DEBIAN_ARCH}):
             log.error("Unable to create LXC container")
             sys.exit(3)
     if not c.running:

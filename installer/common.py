@@ -1,13 +1,14 @@
 import datetime
 import logging
-import ssl
 import os
-import yaml
+import ssl
 import subprocess
-from pathlib import Path
-from typing import Dict, Any, List, Tuple, Union
-from shutil import copyfile
 from distutils import dir_util
+from pathlib import Path
+from shutil import copyfile
+from typing import Dict, Any, List, Tuple, Union, Iterator
+
+import yaml
 
 log = logging.getLogger(__name__)
 
@@ -20,6 +21,16 @@ def transfer(files: List[Tuple[str, str]]) -> None:
         elif os.path.isdir(dst):
             log.info(f"Copying directory: {src}")
             dir_util.copy_tree(src, dst)
+
+
+def file_mappings(input: List[str], dst_dir: str) -> Iterator[Tuple[str, str]]:
+    f = filter(lambda i: os.path.isfile(i), input)
+    return zip(f, map(lambda i: os.path.join(dst_dir, os.path.basename(i)), f))
+
+
+def dir_mappings(input: List[str], dst_dir: str) -> Iterator[Tuple[str, str]]:
+    d = filter(lambda i: os.path.isdir(i), input)
+    return zip(d, map(lambda i: os.path.join(dst_dir, os.path.basename(os.path.normpath(i))), d))
 
 
 def generate(config: Dict[str, Any], location: str):
