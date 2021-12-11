@@ -13,6 +13,12 @@ import yaml
 log = logging.getLogger(__name__)
 
 
+class KDBXSupport:
+    """
+    KDBX config dump
+    """
+    pass
+
 def transfer(files: List[Tuple[str, str]]) -> None:
     for src, dst in files:
         Path(dst).mkdir(parents=True, exist_ok=True)
