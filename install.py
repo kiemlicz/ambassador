@@ -62,7 +62,7 @@ secrets_api = args.secrets
 secrets_client_cert = args.secrets_cert
 secrets_client_key = args.secrets_key
 
-# args?
+# keep it in args?
 SALT_KEY_LOCATION = os.path.join(os.sep, "etc", "salt", "keys")
 SALT_MINION_CONFIG = os.path.join(os.sep, "etc", "salt", "minion.d")
 SALT_TREE_ROOT = os.path.join(os.sep, "srv")
