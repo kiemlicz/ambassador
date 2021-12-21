@@ -65,6 +65,7 @@ secrets_client_key = args.secrets_key
 # args?
 SALT_KEY_LOCATION = os.path.join(os.sep, "etc", "salt", "keys")
 SALT_MINION_CONFIG = os.path.join(os.sep, "etc", "salt", "minion.d")
+SALT_TREE_ROOT = os.path.join(os.sep, "srv")
 # fixme breaks logging init
 HAS_PYKEEPASS_LIBS = True
 try:
@@ -78,7 +79,7 @@ except ImportError:
 def files_to_transfer(
         kdbx: List[str], gpg_keys: List[str],
         kdbx_keys: List[str]) -> List[Tuple[str, str]]:
-    state_tree_mapping = list(dir_mappings(main, os.path.join(os.sep, "srv")))  # dir
+    state_tree_mapping = list(dir_mappings(main, SALT_TREE_ROOT))  # dir
     salt_conf_mapping = list(file_mappings(configs, SALT_MINION_CONFIG))  # file *.conf
     kdbx_mapping = list(file_mappings(kdbx, SALT_KEY_LOCATION))  # files
     kdbx_keys_mapping = list(file_mappings(kdbx_keys, SALT_KEY_LOCATION))
