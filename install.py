@@ -2,12 +2,11 @@ import argparse
 import logging
 import os
 import urllib.request
-from typing import Tuple, List, Dict, Any, Iterator
+from typing import Tuple, List, Dict, Any
 
 import requests
 
 from installer import common, lxc_support
-
 # import encodings.idna
 from installer.common import dir_mappings, file_mappings
 
@@ -57,13 +56,14 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 bootstrap_url = "https://bootstrap.saltproject.io"
-main = ['salt']      # todo handle extensions/file_ext
+main = ['salt']  # todo handle extensions/file_ext
 configs = args.configs
 secrets_api = args.secrets
 secrets_client_cert = args.secrets_cert
 secrets_client_key = args.secrets_key
 
-SALT_KEY_LOCATION=os.path.join(os.sep, "etc", "salt", "keys")
+# args?
+SALT_KEY_LOCATION = os.path.join(os.sep, "etc", "salt", "keys")
 
 # fixme breaks logging init
 HAS_PYKEEPASS_LIBS = True
@@ -78,12 +78,11 @@ except ImportError:
 def files_to_transfer(
         kdbx: List[str], gpg_keys: List[str],
         kdbx_keys: List[str]) -> List[Tuple[str, str]]:
-
     state_tree_mapping = list(dir_mappings(main, os.path.join(os.sep, "srv")))  # dir
     salt_conf_mapping = list(file_mappings(configs, os.path.join(os.sep, "etc", "salt", "minion.d")))  # file *.conf
-    kdbx_mapping = list(file_mappings(kdbx, os.path.join(os.sep, "etc", "salt", "keys")))  # files
-    kdbx_keys_mapping = list(file_mappings(kdbx_keys, os.path.join(os.sep, "etc", "salt", "keys")))
-    gpg_keys_mapping = list(file_mappings(gpg_keys, os.path.join(os.sep, "etc", "salt", "keys")))
+    kdbx_mapping = list(file_mappings(kdbx, SALT_KEY_LOCATION))  # files
+    kdbx_keys_mapping = list(file_mappings(kdbx_keys, SALT_KEY_LOCATION))
+    gpg_keys_mapping = list(file_mappings(gpg_keys, SALT_KEY_LOCATION))
 
     return state_tree_mapping + salt_conf_mapping + kdbx_mapping + kdbx_keys_mapping + gpg_keys_mapping
 
