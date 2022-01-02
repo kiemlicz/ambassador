@@ -3,7 +3,15 @@
 *.out
 .runner/
 .vagrant/
+##### local
 .local/
+# local experiments
+salt/base/top.sls
+kitchen.local.yml
+docker-compose.override.yml
+config/ambassador-installer.override.conf
+minion-zeus.override.conf
+##### local end
 venv/
 .venv/
 __pycache__/
@@ -12,14 +20,8 @@ __pycache__/
 .kitchen/
 .target/
 Gemfile.lock
-# local experiments
-salt/base/top.sls
 # local overrides for kitchen tests
-kitchen.local.yml
 requirements.lock
-docker-compose.override.yml
-ambassador-installer.override.conf
-minion-zeus.override.conf
 # chart dependencies
 deployment/salt/charts/*.tgz
 # lock file with precise dependent Chart information, ignoring for now
