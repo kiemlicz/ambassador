@@ -1,11 +1,13 @@
 # used by install.py
 pip~=21.0.1
 six~=1.15.0
+# to be removed
 pykeepass~=4.0.0
 gdrive==0.0.8
 jinja2~=2.11.3
 PyYAML~=5.4.1
-pygit2==1.0.3
+#pygit2==1.0.3
+pygit2~=1.7.2
 # verify this is needed (should be needed for gitfs but double check)
 pyOpenSSL~=20.0.1
 # requests

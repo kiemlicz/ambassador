@@ -27,7 +27,8 @@ ext_pillar:
       - root: pillar
       - env: base
 ```  
-4. `sudo SHELL=/bin/bash python3 install.py --name ambassador --ifc [ifc] --configs config/ambassador-installer.conf --top config/ambassador-top.sls --directories salt extensions/file_ext_authorize [--kdbx the.db.kdbx] [--kdbx-pass thepassword] [--kdbx-key the.key]`
+3. `sudo apt install lxc bridge-utils debootstrap python3-lxc`
+4. `sudo SHELL=/bin/bash python3 installer/install.py --to lxc --name ambassador --ifc [ifc] [--kdbx the.db.kdbx] [--kdbx-pass thepassword] [--kdbx-key the.key] [--secrets https://secrets.server.com/path]`
 
 Since foreman still doesn't support 'dockerized' deployment (cannot specify plugins for Foreman Docker images, no official foreman-proxy image).  
 The provided `docker-compose.yml` can be used only to setup external DB or any other services. Use `docker-compose.override.yml` for any overrides:
