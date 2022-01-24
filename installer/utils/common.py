@@ -25,7 +25,7 @@ def transfer(files: Iterator[Tuple[str, str]]) -> None:
             log.debug(f"Copying file: {src} -> {dst}")
             copyfile(src, dst)
         elif os.path.isdir(src):
-            log.debug(f"Copying directory: {src}")
+            log.debug(f"Copying directory: {src} -> {dst}")
             dir_util.copy_tree(src, dst)
         else:
             log.error(f"Omitting: {src} as neither file nor directory")
