@@ -24,6 +24,15 @@
         }
     },
 }, merge=salt['grains.filter_by']({
+       'bullseye': {
+         'repository': {
+           'names': [
+                "deb [signed-by=/usr/share/keyrings/salt-archive-keyring.gpg arch=amd64] https://repo.saltproject.io/py3/debian/11/amd64/latest bullseye main"
+           ],
+           'key_url': "https://repo.saltproject.io/py3/debian/11/amd64/latest/salt-archive-keyring.gpg",
+           'origin': 'bullseye'
+         }
+       },
        'buster': {
          'repository': {
            'names': [
@@ -31,14 +40,6 @@
            ],
            'key_url': "https://repo.saltstack.com/py3/debian/10/amd64/latest/SALTSTACK-GPG-KEY.pub",
            'origin': 'buster'
-         }
-       },
-       'stretch': {
-         'repository': {
-            'names': [
-                "deb http://repo.saltstack.com/py3/debian/9/amd64/latest stretch main"
-            ],
-            'key_url': "https://repo.saltstack.com/py3/debian/9/amd64/latest/SALTSTACK-GPG-KEY.pub"
          }
        }
    }, grain='oscodename', merge=salt['pillar.get']('salt_installer'))) %}

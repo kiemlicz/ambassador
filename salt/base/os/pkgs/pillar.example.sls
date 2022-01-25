@@ -11,6 +11,9 @@
       },
       'buster': {
         'os_packages': ["cron", "vim", "sudo", "insserv", "git", "zsh", "curl", "ca-certificates", "gnupg2", "python3-pip", "fonts-powerline", "initscripts"],
+      },
+      'bullseye': {
+        'os_packages': ["cron", "vim", "sudo", "insserv", "git", "zsh", "curl", "ca-certificates", "gnupg2", "python3-pip", "fonts-powerline", "initscripts"],
       }
     }, grain='oscodename')) %}
 pkgs:
