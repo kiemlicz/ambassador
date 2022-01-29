@@ -12,7 +12,12 @@ DEBIAN_RELEASE = "bullseye"
 DEBIAN_ARCH = "amd64"
 
 
-def ensure_container(container_name: str, autostart: bool, ifc: str) -> lxc.Container:
+def ensure_container(
+        container_name: str,
+        autostart: bool,
+        ifc: str,
+        **kwargs
+) -> lxc.Container:
     c = lxc.Container(name=container_name)
     if not c.defined:
         # two interfaces?
@@ -23,10 +28,14 @@ def ensure_container(container_name: str, autostart: bool, ifc: str) -> lxc.Cont
         c.set_config_item("lxc.apparmor.profile", "generated")
         c.set_config_item("lxc.apparmor.allow_nesting", "1")
 
+        release = DEBIAN_RELEASE
+        if 'release' in kwargs:
+            release = kwargs['release']
+
         if autostart:
             c.set_config_item("lxc.start.auto", "1")
         # todo increase size
-        if not c.create(template="debian", flags=0, args={"release": DEBIAN_RELEASE, "arch": DEBIAN_ARCH}):
+        if not c.create(template="debian", flags=0, args={"release": release, "arch": DEBIAN_ARCH}):
             log.error("Unable to create LXC container")
             sys.exit(3)
     if not c.running:

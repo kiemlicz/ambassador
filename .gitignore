@@ -9,7 +9,7 @@
 salt/base/top.sls
 kitchen.local.yml
 docker-compose.override.yml
-config/ambassador-installer.override.conf
+config/ambassador-installer.override.*.conf
 minion-zeus.override.conf
 ##### local end
 venv/

@@ -41,14 +41,6 @@ parser.add_argument(
     type=argparse.FileType('r'),
     default="config/requirements.txt"
 )
-parser.add_argument(
-    '--configs',
-    help="provide Salt Minion config",
-    required=False,
-    nargs='+',
-    type=str,
-    default=["config/ambassador-installer.conf", "config/ambassador-installer.override.conf"]
-)
 parser.add_argument("--secrets", help="URL of service providing secrets",
                     required=False)  # support file:// by creating adapter  todo fails if not provided
 parser.add_argument("--secrets-certs", help="API client cert", required=False,
@@ -74,9 +66,7 @@ logging.basicConfig(
 )
 log = logging.getLogger(__name__)
 bootstrap_url = "https://bootstrap.saltproject.io"
-main = ['salt']  # todo handle extensions/file_ext todo some files (configs) are provided as default args some are not
-top_file = "config/ambassador-top.sls"  # todo mount from gitfs
-configs = args.configs
+
 secrets_api = args.secrets
 secrets_client_cert = args.secrets_certs
 secrets_client_key = args.secrets_key
@@ -90,19 +80,19 @@ where_to = args.to
 SALT_KEY_LOCATION = os.path.join(os.sep, "etc", "salt", "keys")
 SALT_MINION_CONFIG = os.path.join(os.sep, "etc", "salt", "minion.d")
 SALT_TREE_ROOT = os.path.join(os.sep, "srv")
-SALT_TOP_LOCATION = os.path.join(os.sep, "srv", "salt", "base")  # todo mount from gitfs
 SALT_GPG_LOCATION = os.path.join(os.sep, "etc", "salt", "gpgkeys")
 
 
 # fixme stop using kdbx in salt
 # how to properly handle transfer of files? e.g. given set of files with their dest (ideally generated dynamically?)
 # handle rest calls not here
-def files_to_transfer() -> List[Tuple[str, str]]:
+def files_to_transfer(container_name) -> List[Tuple[str, str]]:
+    main = ['salt']  # todo handle extensions/file_ext todo some files (configs) are provided as default args some are not
+    configs = ["config/ambassador-installer.conf", f"config/ambassador-installer.override.{container_name}.conf"]
     state_tree_mapping = list(dir_mappings(main, SALT_TREE_ROOT))  # dir
     salt_conf_mapping = list(file_mappings(configs, SALT_MINION_CONFIG))  # file *.conf
-    tops = list(file_mappings([top_file], SALT_TOP_LOCATION))
     kdbx_mapping = list(file_mappings([kdbx_file, kdbx_key], SALT_KEY_LOCATION))  # kdbx db to be removed
-    all_files = state_tree_mapping + salt_conf_mapping + kdbx_mapping + tops  # + kdbx_keys_mapping + gpg_keys_mapping
+    all_files = state_tree_mapping + salt_conf_mapping + kdbx_mapping  # + kdbx_keys_mapping + gpg_keys_mapping
     log.debug(f"Files to transfer: {all_files}")
     return all_files
 
@@ -210,7 +200,7 @@ def install():
 def run():
     env = os.environ.copy()
     env['SHELL'] = "/bin/bash"  # don't propagate SHELL env
-    common.assert_ret_code("salt-call --local saltutil.sync_all", env)
+    common.assert_ret_code("salt-call --local saltutil.sync_all", env)  # todo use python api?
     common.assert_ret_code("salt-call --local state.highstate", env)
 
 
@@ -232,26 +222,37 @@ def lxc_deployment(name: str, autostart: bool, ifc: str, requirements: str, **kw
     if not HAS_LXC_LIBS:
         raise RuntimeError("Missing package, perform: sudo apt install lxc bridge-utils debootstrap python3-lxc")
     log.info(f"LXC container installation, will attach to: {name}, autostart: {autostart}, detected interface: {ifc}")
-    lxc_rootfs = os.path.join("/var/lib/lxc", name, "rootfs")
+    salt_container = f"{name}-salt"
+    foreman_container = f"{name}"
     secrets = fetch_secrets()  # do we have to use dict everywhere? can we have some struct here?
-    c = lxc_support.ensure_container(name, autostart, ifc)
+    salt_lxc = lxc_support.ensure_container(salt_container, autostart, ifc)
+    foreman_lxc = lxc_support.ensure_container(foreman_container, autostart, ifc, release="buster")
 
-    def add_lxc_rootfs(mapping_tuple):
-        return mapping_tuple[0], os.path.join(lxc_rootfs, mapping_tuple[1].strip('/'))
+    def prepare_files(container):
+        def add_lxc_rootfs(mapping_tuple):
+            return mapping_tuple[0], os.path.join(os.path.join("/var/lib/lxc", container, "rootfs"), mapping_tuple[1].strip('/'))
 
-    common.transfer(
-        map(lambda f: add_lxc_rootfs(f), files_to_transfer())
-    )
+        common.transfer(
+            map(lambda f: add_lxc_rootfs(f), files_to_transfer(container))
+        )
 
-    common.create(
-        map(lambda f: add_lxc_rootfs(f), files_to_create(name, secrets))
-    )
+        common.create(
+            map(lambda f: add_lxc_rootfs(f), files_to_create(container, secrets))
+        )
+
+    prepare_files(salt_container)
+    prepare_files(foreman_container)
 
     # run in container
-    c.attach_wait(requisites, requirements)
-    c.attach_wait(install)
-    c.attach_wait(run)
-
+    # todo run in parallel
+    log.info("Provisioning Salt LXC")
+    salt_lxc.attach_wait(requisites, requirements)  # todo verify requisites are the same for both containers
+    salt_lxc.attach_wait(install)
+    salt_lxc.attach_wait(run)
+    log.info("Provisioning Foreman LXC")
+    foreman_lxc.attach_wait(requisites, requirements)
+    foreman_lxc.attach_wait(install)
+    foreman_lxc.attach_wait(run)
 
 # setup this
 # https://docs.saltproject.io/en/latest/ref/renderers/all/salt.renderers.gpg.html#different-gpg-location
@@ -274,3 +275,31 @@ if __name__ == "__main__":
     # don't accept dirs and configs separately
     kwargs = vars(args)
     proceed(where_to)(**kwargs)
+
+
+
+#
+# [DEBUG   ] Could not LazyLoad roots.init: 'roots.init' is not available.
+# [DEBUG   ] Updating gitfs fileserver cache
+# [DEBUG   ] Re-using gitfs object for process 1749
+#     [DEBUG   ] Updating roots fileserver cache
+# [DEBUG   ] Gathering pillar data for state run
+#     [DEBUG   ] Finished gathering pillar data for state run
+#     [INFO    ] Loading fresh modules for state activity
+#     [DEBUG   ] LazyLoaded jinja.render
+# [DEBUG   ] LazyLoaded yaml.render
+# [DEBUG   ] Re-using gitfs object for process 1749
+#     [DEBUG   ] Re-using gitfs object for process 1749
+#     [DEBUG   ] Re-using gitfs object for process 1749
+#     [DEBUG   ] Could not find file 'salt://top.sls' in saltenv 'base'
+# [DEBUG   ] No contents loaded for saltenv 'base'
+#     [DEBUG   ] Re-using gitfs object for process 1749
+#     [DEBUG   ] Re-using gitfs object for process 1749
+#     [DEBUG   ] Could not find file 'salt://top.sls' in saltenv 'dev'
+# [DEBUG   ] No contents loaded for saltenv 'dev'
+#     [DEBUG   ] Re-using gitfs object for process 1749
+#     [DEBUG   ] Re-using gitfs object for process 1749
+#     [DEBUG   ] Could not find file 'salt://top.sls' in saltenv 'server'
+# [DEBUG   ] No contents loaded for saltenv 'server'
+#     [DEBUG   ] No contents found in top file. If this is not expected, verify that the 'file_roots' specified in 'etc/master' are accessible. The 'file_roots' configuration is: {'base': ['/srv/salt/base'], 'dev': ['/srv/salt/dev', '/srv/salt/base'], 'server': ['/srv/salt/server', '/srv/salt/dev', '/srv/salt/base']}
+# [DEBUG   ] LazyLoaded nested.output
