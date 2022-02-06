@@ -34,6 +34,15 @@ ensure_fqdn_hosts:
     - clean: True
     - require:
       - sls: os
+{%- if salt['service.enabled']("systemd-resolved") %}
+# in order to force systemd-resolved to return proper fqdn
+  file.symlink:
+    - name: /etc/resolv.conf
+    - target: /run/systemd/resolve/resolv.conf
+    - require:
+      - host: ensure_fqdn_hosts
+
+{%- endif %}
 
 install_foreman:
   cmd.run:
