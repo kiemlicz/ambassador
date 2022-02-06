@@ -1,5 +1,12 @@
 {% from "os/hosts/map.jinja" import hosts with context %}
 
+{%- if salt['service.enabled']("systemd-resolved") %}
+systemd_resolved_use_server_dns:
+# in order to force systemd-resolved to return proper fqdn
+  file.symlink:
+    - name: /etc/resolv.conf
+    - target: /run/systemd/resolve/resolv.conf
+{%- endif %}
 
 {% for address, aliases in hosts.items() %}
 {{ address }}_host:
