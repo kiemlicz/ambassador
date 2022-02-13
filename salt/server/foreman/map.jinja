@@ -15,6 +15,10 @@
           'name': "/srv/tftp/",
           'source': 'salt://foreman/config/tftp/',
           'user': 'foreman-proxy'
+        },{
+          'name': "/etc/foreman/dynflow/",
+          'source': 'salt://foreman/config/dynflow/',
+          'group': 'foreman'
         }],
         'user': "foreman",
         'group': "foreman",
@@ -27,15 +31,6 @@
         'overrides': {}
     },
 }, merge=salt['grains.filter_by']({
-       'stretch': {
-            'pkg_name': "foreman-installer",
-            'names': [
-                "deb http://deb.theforeman.org/ stretch 1.24",
-                "deb http://deb.theforeman.org/ plugins 1.24"
-            ],
-            'file': "/etc/apt/sources.list.d/foreman.list",
-            'key_url': "https://deb.theforeman.org/pubkey.gpg"
-       },
        'bullseye': {
             'pkg_name': "foreman-installer",
             'names': [
@@ -48,8 +43,17 @@
        'buster': {
             'pkg_name': "foreman-installer",
             'names': [
-                "deb http://deb.theforeman.org/ buster 2.4",
-                "deb http://deb.theforeman.org/ plugins 2.4"
+                "deb http://deb.theforeman.org/ buster 3.1",
+                "deb http://deb.theforeman.org/ plugins 3.1"
+            ],
+            'file': "/etc/apt/sources.list.d/foreman.list",
+            'key_url': "https://deb.theforeman.org/pubkey.gpg"
+       },
+       'focal': {
+            'pkg_name': "foreman-installer",
+            'names': [
+                "deb http://deb.theforeman.org/ focal 3.1",
+                "deb http://deb.theforeman.org/ plugins 3.1"
             ],
             'file': "/etc/apt/sources.list.d/foreman.list",
             'key_url': "https://deb.theforeman.org/pubkey.gpg"

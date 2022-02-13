@@ -27,11 +27,25 @@ foreman_{{ secret.name }}:
       - cmd: install_foreman
 {%- endfor %}
 
+{%- if salt['service.enabled']("systemd-resolved") %}
+purge_wrong_fqdn:
+  # grains fqdn won't contain proper fqdn
+  host.absent:
+    - name: {{ grains['fqdn'] }}
+    - ip:
+        - 127.0.1.1
+ensure_fqdn_hosts:
+  host.only:
+    - name: {{ ip }}
+    - hostnames:
+      - {{ fqdn }}
+{%- else %}
 ensure_fqdn_hosts:
   host.present:
     - names: {{ salt.dns_ext.aliases(fqdn) }}
     - ip: {{ ip }}
     - clean: True
+{%- endif %}
     - require:
       - sls: os
 
