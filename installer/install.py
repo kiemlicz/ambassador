@@ -1,4 +1,5 @@
 import argparse
+import io
 import json
 import logging
 import os
@@ -22,7 +23,6 @@ except ImportError:
 """
 If running in VM, ensure that NIC promisc mode works
 """
-# fixme add uninstall based on copied files
 parser = argparse.ArgumentParser(
     description='Installs Salt Minion for further masterless box provisioning. Uses host directly or LXC container'
 )
@@ -47,16 +47,35 @@ parser.add_argument("--secrets-certs", help="API client cert", required=False,
                     default=".local/ambassador-installer.crt")
 parser.add_argument("--secrets-key", help="API client key", required=False, default=".local/ambassador-installer.key")
 parser.add_argument("--secrets-ca", help="CA to verify secret server", required=False, default=".local/ca.crt")
-parser.add_argument('--rootfs', help="provide container rootfs path", required=False,
-                    default=os.path.join(os.sep, "var", "lib", "lxc"))
 parser.add_argument('--autostart', help="should the LXC container autostart", required=False, default=False,
                     action='store_true')
 parser.add_argument('--kdbx', help="KDBX file containing further secrets",
                     required=False)  # fixme replace with libsecret API in salt
-parser.add_argument('--kdbx-pass', help="KDBX password",
-                    required=False)  # fixme avoid passing this, assume that the DB is already open somewhere, no such lib exists
-parser.add_argument('--kdbx-key', help="KDBX key file", required=False)
-parser.add_argument('--log', help="log level (TRACE, DEBUG, INFO, WARN, ERROR)", required=False, default="INFO")
+parser.add_argument(
+    '--kdbx-pass',
+    help="KDBX password",
+    required=False
+)  # fixme avoid passing this, assume that the DB is already open somewhere, no such lib exists
+# the problem with kdbx is: we would need to keep kdbx in kdbx in order to have only --secret-api (downloading kdbx)
+# so it is better to get rid of kdbx salt integration (replace with some rest api calls)
+parser.add_argument(
+    '--kdbx-key',
+    help="KDBX key file",
+    required=False
+)
+parser.add_argument(
+    '--log',
+    help="log level (TRACE, DEBUG, INFO, WARN, ERROR)",
+    required=False,
+    default="INFO"
+)
+parser.add_argument(
+    '--uninstall',
+    help="Remove deployment entirely",
+    required=False,
+    default=False,
+    action='store_true'
+)
 args = parser.parse_args()
 
 logging.basicConfig(
@@ -76,18 +95,20 @@ kdbx_key = args.kdbx_key
 kdbx_pass = args.kdbx_pass
 where_to = args.to
 
-# keep it in args?
+# no point in bloating args with these
+LXC_ROOTFS = os.path.join(os.sep, "var", "lib", "lxc")
 SALT_KEY_LOCATION = os.path.join(os.sep, "etc", "salt", "keys")
 SALT_MINION_CONFIG = os.path.join(os.sep, "etc", "salt", "minion.d")
 SALT_TREE_ROOT = os.path.join(os.sep, "srv")
 SALT_GPG_LOCATION = os.path.join(os.sep, "etc", "salt", "gpgkeys")
 
 
-# fixme stop using kdbx in salt
+# fixme stop using kdbx in salt and integrate with some external pass manager
 # how to properly handle transfer of files? e.g. given set of files with their dest (ideally generated dynamically?)
 # handle rest calls not here
 def files_to_transfer(container_name) -> List[Tuple[str, str]]:
-    main = ['salt']  # todo handle extensions/file_ext todo some files (configs) are provided as default args some are not
+    # todo handle extensions/file_ext todo some files (configs) are provided as default args some are not
+    main = ['salt']
     configs = ["config/ambassador-installer.conf", f"config/ambassador-installer.override.{container_name}.conf"]
     state_tree_mapping = list(dir_mappings(main, SALT_TREE_ROOT))  # dir
     salt_conf_mapping = list(file_mappings(configs, SALT_MINION_CONFIG))  # file *.conf
@@ -139,41 +160,32 @@ def fetch_secrets() -> Secret:  # path of downloaded files?
         return Secret({})
 
 
-# if args.top:
-#     l = args.top_location
-#     if l.startswith("/"):
-#         l = l[1:]
-#     dest = os.path.join(rootfs, l, "top.sls")
-#     log.info(f"Copying: {args.top}, into: {dest}")
-#     copyfile(args.top, dest)
-#
-# Path(os.path.join(rootfs, "etc", "salt", "gpgkeys")).mkdir(parents=True, exist_ok=True, mode=0o700)
-# Path(os.path.join(rootfs, "etc", "salt", "minion.d")).mkdir(parents=True, exist_ok=True)
-# for config in args.configs:
-#     log.info(f"Copying Salt Minion config: {config}")
-#     # todo check without basename
-#     copyfile(config, os.path.join(rootfs, "etc", "salt", "minion.d", os.path.basename(config)))
-
-
-@common.exe_time("requirements")
-def requisites(requirements_file):
+@common.measure_time("requirements")
+def requisites(*args) -> None:  # todo how to pass multiple args without accepting only the list?
     # https://github.com/saltstack/salt/issues/24925
     # I guess that due to that issue, it is impossible to use salt to install it's own dependencies and properly reload
     # 1. I've received: SIX version conflict (originally installed as dist-packages, after pip upgrade didn't reload six from site-packages)
     # 2. some type errors when installing gdrive (auth dependencies not reloaded)
     # 3. pip install --upgrade pip
     # lets ensure the absolute salt minion requirements are satisfied
+    args = [e for s in args for e in s]  # flatten due to inability to pass multiple args to attach_wait(...)
+    if len(args) <= 1:
+        raise RuntimeError(
+            f"requisites function takes two params: requirements_file and list of packages. Provided (#{len(args)}): {args}"
+        )
+    required_pip = args[0]
+    required_pkgs = args[1]
     log.info("Installing mandatory requirements")
-    requirements = " ".join(
-        list(map(lambda l: l.rstrip(), filter(lambda l: not l.startswith("#"), requirements_file.readlines())))
-    )
-    # fixme parsing comments is still broken, e.g. pipdep=~1.2.3  # comment which will break it
-    common.assert_ret_code("apt update && apt install -y python3-pip libgit2-1.1 libssl-dev rustc")
-    common.assert_ret_code(f"pip3 install {requirements}")
-    log.info(f"Mandatory requisites installed: {requirements}")
+
+    # apt update auto accept old repo entry for buster
+    common.assert_ret_code(f"apt update -y && apt install -y {' '.join(required_pkgs)}")
+    # latest pip typically is required, cannot upgrade it in one run as some dependencies may require latest pip
+    common.assert_ret_code(f"pip3 install --upgrade pip")
+    common.assert_ret_code(f"pip3 install {required_pip}")
+    log.info(f"Mandatory requisites installed: {required_pip}")
 
 
-@common.exe_time("installation")
+@common.measure_time("installation")
 def install():
     log.info("Installing Salt")
     ctx = common.default_ssl_context()
@@ -184,8 +196,6 @@ def install():
         bootstrap.write(bootstrap_script)
         os.chmod("/tmp/bootstrap-salt.sh", 0o755)
 
-    # it seems that OS packages: `libffi-dev zlib1g-dev libgit2-dev git` are somehow not needed for pygit2 to run
-    # consider: -p libgit2-dev
     common.assert_ret_code("/tmp/bootstrap-salt.sh -U -x python3")
 
     if os.path.isfile(pillar_key):
@@ -196,7 +206,7 @@ def install():
     log.info("Salt installed")
 
 
-@common.exe_time("provisioning")
+@common.measure_time("provisioning")
 def run():
     env = os.environ.copy()
     env['SHELL'] = "/bin/bash"  # don't propagate SHELL env
@@ -204,7 +214,7 @@ def run():
     common.assert_ret_code("salt-call --local state.highstate", env)
 
 
-@common.exe_time("deployment")
+@common.measure_time("deployment")
 def this_host_deployment():
     log.info("Installing directly onto this host")
     # populate_files(os.sep)
@@ -213,8 +223,8 @@ def this_host_deployment():
     # run()
 
 
-@common.exe_time("deployment")
-def lxc_deployment(name: str, autostart: bool, ifc: str, requirements: str, **kwargs):
+@common.measure_time("deployment")
+def lxc_deployment(name: str, autostart: bool, ifc: str, requirements: io.TextIOWrapper, **kwargs):
     # you may want to enable IP forwarding
     # run lxc-checkconfig
     # check: sed -i '/^GRUB_CMDLINE_LINUX/s/"$/cgroup_enable=memory swapaccount=1"/' /etc/default/grub
@@ -222,15 +232,21 @@ def lxc_deployment(name: str, autostart: bool, ifc: str, requirements: str, **kw
     if not HAS_LXC_LIBS:
         raise RuntimeError("Missing package, perform: sudo apt install lxc bridge-utils debootstrap python3-lxc")
     log.info(f"LXC container installation, will attach to: {name}, autostart: {autostart}, detected interface: {ifc}")
-    salt_container = f"{name}-salt"
-    foreman_container = f"{name}"
-    secrets = fetch_secrets()  # do we have to use dict everywhere? can we have some struct here?
-    salt_lxc = lxc_support.ensure_container(salt_container, autostart, ifc)
-    foreman_lxc = lxc_support.ensure_container(foreman_container, autostart, ifc, release="buster")
+    container_name = f"{name}"
+    secrets = fetch_secrets()
+    required_pkgs = ["python3-pip", "libssl-dev", "rustc", "libgit2-28"]
+    ambassador_lxc = lxc_support.ensure_container(container_name, autostart, ifc, template="ubuntu", release="focal")
+
+    required_pip = " ".join(
+        list(map(lambda l: common.remove_comment(l).rstrip(), requirements.readlines()))
+    )
 
     def prepare_files(container):
         def add_lxc_rootfs(mapping_tuple):
-            return mapping_tuple[0], os.path.join(os.path.join("/var/lib/lxc", container, "rootfs"), mapping_tuple[1].strip('/'))
+            return mapping_tuple[0], os.path.join(
+                os.path.join(LXC_ROOTFS, container, "rootfs"),
+                mapping_tuple[1].strip('/')
+            )
 
         common.transfer(
             map(lambda f: add_lxc_rootfs(f), files_to_transfer(container))
@@ -240,26 +256,41 @@ def lxc_deployment(name: str, autostart: bool, ifc: str, requirements: str, **kw
             map(lambda f: add_lxc_rootfs(f), files_to_create(container, secrets))
         )
 
-    prepare_files(salt_container)
-    prepare_files(foreman_container)
+    prepare_files(container_name)
 
-    # run in container
-    # todo run in parallel
-    log.info("Provisioning Salt LXC")
-    salt_lxc.attach_wait(requisites, requirements)  # todo verify requisites are the same for both containers
-    salt_lxc.attach_wait(install)
-    salt_lxc.attach_wait(run)
-    log.info("Provisioning Foreman LXC")
-    foreman_lxc.attach_wait(requisites, requirements)
-    foreman_lxc.attach_wait(install)
-    foreman_lxc.attach_wait(run)
+    log.info("Provisioning LXC")
+    ambassador_lxc.attach_wait(requisites, (required_pip, required_pkgs))
+    ambassador_lxc.attach_wait(install)
+    ambassador_lxc.attach_wait(run)
+
+
+@common.measure_time("uninstall")
+def lxc_uninstall(name: str, **kwargs):
+    salt_container = f"{name}-salt"
+    foreman_container = f"{name}"
+    log.info(f"Removing: {salt_container}")
+    lxc_support.remove_container(salt_container)
+    log.info(f"Removing: {foreman_container}")
+    lxc_support.remove_container(foreman_container)
+
 
 # setup this
 # https://docs.saltproject.io/en/latest/ref/renderers/all/salt.renderers.gpg.html#different-gpg-location
 # setup pypass
 
-@common.exe_time("installation")
-def docker_install():
+@common.measure_time("deployment")
+def docker_deployment():
+    pass
+
+
+@common.measure_time("uninstall")
+def this_host_uninstall():
+    # todo track all files and remove them
+    pass
+
+
+@common.measure_time("uninstall")
+def docker_uninstall():
     pass
 
 
@@ -268,38 +299,23 @@ if __name__ == "__main__":
         return {
             'host': this_host_deployment,
             'lxc': lxc_deployment,
-            'docker': docker_install
+            'docker': docker_deployment
+        }[to]
+
+
+    def uninstall(to: str):
+        return {
+            'host': this_host_uninstall,
+            'lxc': lxc_uninstall,
+            'docker': docker_uninstall
         }[to]
 
 
     # don't accept dirs and configs separately
     kwargs = vars(args)
-    proceed(where_to)(**kwargs)
-
-
-
-#
-# [DEBUG   ] Could not LazyLoad roots.init: 'roots.init' is not available.
-# [DEBUG   ] Updating gitfs fileserver cache
-# [DEBUG   ] Re-using gitfs object for process 1749
-#     [DEBUG   ] Updating roots fileserver cache
-# [DEBUG   ] Gathering pillar data for state run
-#     [DEBUG   ] Finished gathering pillar data for state run
-#     [INFO    ] Loading fresh modules for state activity
-#     [DEBUG   ] LazyLoaded jinja.render
-# [DEBUG   ] LazyLoaded yaml.render
-# [DEBUG   ] Re-using gitfs object for process 1749
-#     [DEBUG   ] Re-using gitfs object for process 1749
-#     [DEBUG   ] Re-using gitfs object for process 1749
-#     [DEBUG   ] Could not find file 'salt://top.sls' in saltenv 'base'
-# [DEBUG   ] No contents loaded for saltenv 'base'
-#     [DEBUG   ] Re-using gitfs object for process 1749
-#     [DEBUG   ] Re-using gitfs object for process 1749
-#     [DEBUG   ] Could not find file 'salt://top.sls' in saltenv 'dev'
-# [DEBUG   ] No contents loaded for saltenv 'dev'
-#     [DEBUG   ] Re-using gitfs object for process 1749
-#     [DEBUG   ] Re-using gitfs object for process 1749
-#     [DEBUG   ] Could not find file 'salt://top.sls' in saltenv 'server'
-# [DEBUG   ] No contents loaded for saltenv 'server'
-#     [DEBUG   ] No contents found in top file. If this is not expected, verify that the 'file_roots' specified in 'etc/master' are accessible. The 'file_roots' configuration is: {'base': ['/srv/salt/base'], 'dev': ['/srv/salt/dev', '/srv/salt/base'], 'server': ['/srv/salt/server', '/srv/salt/dev', '/srv/salt/base']}
-# [DEBUG   ] LazyLoaded nested.output
+    if args.uninstall:
+        log.info("Ambassador will be removed")
+        uninstall(where_to)(**kwargs)
+    else:
+        log.info("Ambassador will be installed")
+        proceed(where_to)(**kwargs)

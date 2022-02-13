@@ -10,6 +10,7 @@ log = logging.getLogger(__name__)
 
 DEBIAN_RELEASE = "bullseye"
 DEBIAN_ARCH = "amd64"
+DEBIAN_TEMPLATE = "debian"
 
 
 def ensure_container(
@@ -31,11 +32,14 @@ def ensure_container(
         release = DEBIAN_RELEASE
         if 'release' in kwargs:
             release = kwargs['release']
+        template = DEBIAN_TEMPLATE
+        if 'template' in kwargs:
+            template = kwargs['template']
 
         if autostart:
             c.set_config_item("lxc.start.auto", "1")
         # todo increase size
-        if not c.create(template="debian", flags=0, args={"release": release, "arch": DEBIAN_ARCH}):
+        if not c.create(template=template, flags=0, args={"release": release, "arch": DEBIAN_ARCH}):
             log.error("Unable to create LXC container")
             sys.exit(3)
     if not c.running:
@@ -47,3 +51,9 @@ def ensure_container(
             log.error("Unable to start LXC container")
             sys.exit(5)
     return c
+
+
+def remove_container(container_name: str) -> None:
+    c = lxc.Container(name=container_name)
+    if not (c.shutdown() and c.destroy()):
+        log.error(f"Cannot remove container: {container_name}")

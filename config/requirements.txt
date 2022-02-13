@@ -1,12 +1,11 @@
 # used by install.py
-pip~=21.3.1
+pip~=22.0
 six~=1.15.0
-# to be removed
-pykeepass~=4.0.0
-gdrive==0.0.8
+pykeepass~=4.0.0  # to be removed
+gdrive~=0.0.8
 jinja2~=2.11.3
-PyYAML~=5.4.1
-#pygit2==1.0.3
+# not for ubuntu distros
+#PyYAML~=5.4.1
 pygit2~=1.7.2
 # verify this is needed (should be needed for gitfs but double check)
 pyOpenSSL~=20.0.1

@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import re
 import ssl
 import subprocess
 from distutils import dir_util
@@ -9,13 +10,6 @@ from shutil import copyfile
 from typing import Dict, List, Tuple, Union, Iterator
 
 log = logging.getLogger(__name__)
-
-
-class KDBXSupport:
-    """
-    KDBX config dump
-    """
-    pass
 
 
 def transfer(files: Iterator[Tuple[str, str]]) -> None:
@@ -50,7 +44,7 @@ def create(configs: Iterator[Tuple[str, str]]):
             f.write(contents)
 
 
-def exe_time(phase):
+def measure_time(phase):
     def decor(f):
         def measure(*args, **kwargs):
             start_time = datetime.datetime.now()
@@ -89,3 +83,7 @@ def assert_ret_code(command: Union[List[str], str], env: Dict[str, str] = None) 
         returncode = subprocess.call(command, env=env)
     if returncode:
         raise RuntimeError(f"Command {' '.join(command)} failed with {returncode}")
+
+
+def remove_comment(line: str) -> str:
+    return re.sub(r"#.*$", "", line)
