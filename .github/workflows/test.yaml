@@ -16,11 +16,12 @@ jobs:
       DOCKER_IMAGE: ${{ matrix.image }}
       CONTEXT: syntax-test
     steps:
+      - run: 'echo "runnning in: $(pwd)"'
       - run: .github/prepare.sh salt-test
       - run: .github/test.sh salt-test syntax
 #      - run: .github/publish.sh docker
   saltcheck-test:
-    name: "Salt state rendering test"
+    name: "Salt state execution test"
     runs-on: ubuntu-20.04
     strategy:
       matrix:
