@@ -43,9 +43,12 @@ salt-test)
       opts="$opts -n $(nproc)"
     fi
     podman run -d --name $container_name --network=host --hostname $TEST_HOSTNAME --privileged --systemd=true "$BASE_PUB_NAME-salt-test-$BASE_IMAGE:$TAG"
-    # fixme this container most likely fails
+    # fixme this container most likely fails how to debug what causes problem: https://github.com/kiemlicz/ambassador/runs/5711219321?check_suite_focus=true
     podman ps -a
+    echo "logs:"
     podman logs $container_name
+    echo "inspect:"
+    podman inspect $container_name
     # fixme this container most likely fails
     # attach tests since container runs with systemd
     podman exec $container_name pytest test-runner-pytest.py $opts
