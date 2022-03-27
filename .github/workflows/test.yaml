@@ -17,6 +17,7 @@ jobs:
       CONTEXT: syntax-test
     steps:
       - run: 'echo "runnning in: $(pwd)"'
+      - run: 'ls -al'
       - run: .github/prepare.sh salt-test
       - run: .github/test.sh salt-test syntax
 #      - run: .github/publish.sh docker
