@@ -6,6 +6,7 @@ jobs:
   salt-render-test:
     name: "Salt state rendering test"
     runs-on: ubuntu-20.04
+    container: null
     services:
       redis:
         image: redis
