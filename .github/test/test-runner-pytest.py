@@ -1,17 +1,17 @@
-import pytest
-import os
 import json
-import pprint
 import logging
-import redis
+import os
+import pprint
 from hashlib import sha256
 from typing import List, Dict, Any, Tuple, Set
 
-import test_pillar
-import salt.client
+import pytest
+import redis
 import salt.minion
+import yaml
 from salt.exceptions import CommandExecutionError
 
+import test_pillar
 
 pp = pprint.PrettyPrinter(indent=4)
 log = logging.getLogger("test-runner")
@@ -30,6 +30,14 @@ def states_location(request) -> str:
 @pytest.fixture(scope="session")
 def saltenv() -> str:
     return os.environ.get("SALTENV", "server")
+
+
+@pytest.fixture(scope="session")
+def salt_id(request) -> None:
+    mid = request.config.getoption("--minion-id")
+    contents = {"id": mid}
+    with open("/etc/salt/minion.d/salt-test.conf", "w") as f:
+        f.write(yaml.dump(contents))
 
 
 @pytest.fixture(scope="session")
@@ -53,7 +61,7 @@ def ext_pillar_saltcheck(pillars_with_dependencies: Tuple[List[Dict[str, Any]], 
 
 
 @pytest.fixture(scope="session")
-def salt_client(saltenv: str) -> salt.client.Caller:
+def salt_client(saltenv: str, salt_id: None) -> salt.client.Caller:
     return test_pillar.client(saltenv)
 
 
@@ -63,7 +71,10 @@ def redis_client() -> redis.Redis:
 
 
 @pytest.fixture(scope="session")
-def pillars_with_dependencies(salt_client: salt.client.Caller, pillar_location: str) -> Tuple[List[Dict[str, Any]], Dict[str, Set[str]]]:
+def pillars_with_dependencies(
+        salt_client: salt.client.Caller,
+        pillar_location: str
+) -> Tuple[List[Dict[str, Any]], Dict[str, Set[str]]]:
     return test_pillar.generate(salt_client, pillar_location)
 
 
@@ -78,7 +89,7 @@ def pillar_chunk(pillars: List[Dict[str, Any]], worker_no: int) -> List[Dict[str
     n = len(pillars) // workers
     chunks = [pillars[i:i + n] for i in range(0, len(pillars), n)]
     i = 0
-    for not_distributed in pillars[n*workers:]:
+    for not_distributed in pillars[n * workers:]:
         chunks[i].append(not_distributed)
         i += 1
     return chunks[worker_no]
@@ -86,7 +97,11 @@ def pillar_chunk(pillars: List[Dict[str, Any]], worker_no: int) -> List[Dict[str
 
 @pytest.mark.syntax
 @pytest.mark.parametrize("worker", list(range(int(os.environ.get("PYTEST_XDIST_WORKER_COUNT", 1)))))
-def test_syntax(salt_client: salt.client.Caller, redis_client: redis.Redis, pillars_with_dependencies: Tuple[List[Dict[str, Any]], Dict[str, Set[str]]], ext_pillar_empty: Any, saltenv: str, states_location: str, worker: int):
+def test_syntax(
+        salt_client: salt.client.Caller, redis_client: redis.Redis,
+        pillars_with_dependencies: Tuple[List[Dict[str, Any]], Dict[str, Set[str]]], ext_pillar_empty: Any,
+        saltenv: str, states_location: str, worker: int
+):
     states_path = os.path.join(states_location, saltenv)
     assert os.path.isdir(states_path), "salt states not found: {}".format(states_path)
 
@@ -117,7 +132,15 @@ def test_syntax(salt_client: salt.client.Caller, redis_client: redis.Redis, pill
                         if pillar_hash is None:
                             log.warning("The state %s doesn't contain dedicated pillar, state is re-evaluated", state)
                         result_sls = salt_client.cmd("state.show_sls", state, saltenv=env, pillar=pillar)
-                        assert isinstance(result_sls, dict), "rendering of: {} (saltenv={}), failed with: {}\npillar: {}".format(state, env, "".join(result_sls) if isinstance(result_sls, list) else result_sls, pp.pformat(pillar))
+                        assert isinstance(result_sls, dict), "rendering of: {} (saltenv={}), failed with: {}\npillar: {}".format(
+                            state, env, "".join(
+                                result_sls
+                            ) if isinstance(
+                                result_sls, list
+                            ) else result_sls, pp.pformat(
+                                pillar
+                            )
+                        )
                         states_evaluated += 1
                     else:
                         states_already_cached += 1
@@ -135,8 +158,12 @@ def test_saltcheck(salt_client: salt.client.Caller, saltenv: str, ext_pillar_sal
         log.info("Starting tests for minion id: %s", minion_id)
         highstate_result = salt_client.cmd("state.highstate", saltenv=saltenv, l=logging.getLevelName(log.level))
         log.debug("Highstate result:\n%s", pp.pformat(highstate_result))
-        assert isinstance(highstate_result, dict), "Unexpected highstate return: {}, expected dict".format(pp.pformat(highstate_result))
-        assert all([e['result'] for e in highstate_result.values()]), "Highstate contains failures:\n{}".format(pp.pformat([{**e, 'comment': "".join(e['comment'])} for e in highstate_result.values() if not e['result']]))
+        assert isinstance(highstate_result, dict), "Unexpected highstate return: {}, expected dict".format(
+            pp.pformat(highstate_result)
+        )
+        assert all([e['result'] for e in highstate_result.values()]), "Highstate contains failures:\n{}".format(
+            pp.pformat([{**e, 'comment': "".join(e['comment'])} for e in highstate_result.values() if not e['result']])
+        )
         log.info("Running Saltcheck")
         saltcheck_result = salt_client.cmd("saltcheck.run_highstate_tests", saltenv=saltenv)
         log.info("Saltcheck result:\n%s", pp.pformat(saltcheck_result))

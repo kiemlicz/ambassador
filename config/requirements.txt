@@ -1,14 +1,14 @@
 # used by install.py
 pip~=22.0
 six~=1.15.0
-pykeepass~=4.0.0  # to be removed
+pykeepass~=4.0.0  # to be removed after sdb://kdbx/ removal
 gdrive~=0.0.8
-jinja2~=2.11.3
-# not for ubuntu distros
-#PyYAML~=5.4.1
+jinja2~=3.0.3  # jinja2~=2.11.3
+#PyYAML~=5.4.1  # not for ubuntu distros
 pygit2~=1.7.2
-# verify this is needed (should be needed for gitfs but double check)
+# Needed for Salt API
 pyOpenSSL~=20.0.1
-# requests
-# docker
-pypass~=0.2.1
+CherryPy~=8.9.1
+#
+docker~=5.0.3  # required to setup salt in docker
+MarkupSafe~=2.0.1  # https://github.com/saltstack/salt/issues/61666

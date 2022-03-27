@@ -1,0 +1,35 @@
+name: Ambassador test
+on:
+  - push
+
+jobs:
+  salt-render-test:
+    name: "Salt state rendering test"
+    runs-on: ubuntu-20.04
+    services:
+      redis:
+        image: redis
+    strategy:
+      matrix:
+        image: [ "debian:bullseye", "ubuntu:focal" ]
+    env:
+      DOCKER_IMAGE: ${{ matrix.image }}
+      CONTEXT: syntax-test
+    steps:
+      - run: .github/prepare.sh salt-test
+      - run: .github/test.sh salt-test syntax
+#      - run: .github/publish.sh docker
+  saltcheck-test:
+    name: "Salt state rendering test"
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        image: [ "debian:bullseye", "ubuntu:focal" ]
+        context: [ "base", "server" ]
+    env:
+      DOCKER_IMAGE: ${{ matrix.image }}
+      CONTEXT: ${{ matrix.context }}
+      TEST_LIVE_LOG: INFO
+    steps:
+      - run: .github/prepare.sh salt-test
+      - run: .github/test.sh salt-test saltcheck

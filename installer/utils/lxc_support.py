@@ -1,11 +1,8 @@
 import logging
 import sys
 
-HAS_LXC_LIBS = True
-try:
-    import lxc
-except ImportError:
-    HAS_LXC_LIBS = False
+import lxc
+
 log = logging.getLogger(__name__)
 
 DEBIAN_RELEASE = "bullseye"

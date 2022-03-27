@@ -18,7 +18,7 @@
     }, grain='oscodename')) %}
 pkgs:
   dist_upgrade: True
-  # unsafe_pip: True
+  unsafe_pip: True  # because we perform pip3 install --upgrade pip
   os_packages: {{ default_pkgs.os_packages | tojson }}
   pip3_packages:
 #    - pip==20.3.3 # handled via unsafe_pip or outside the salt run

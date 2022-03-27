@@ -7,19 +7,21 @@ if [ -z "$DOCKER_IMAGE" ]; then
 fi
 
 source .env
-source .travis/common.sh
-
+source .github/common.sh
+# todo research if github supports docker API2 (paths)
 case "$1" in
 salt-test)
-    if [ "$TRAVIS" = "true" ]; then
+    if [ "$CI" = "true" ]; then
         docker_update
         # for publish purposes, by default not required anywhere else than Travis
-        docker_build salt-minion "$BASE_PUB_NAME-minion-$DOCKER_IMAGE:$TAG"
-        docker_build salt-master "$BASE_PUB_NAME-master-$DOCKER_IMAGE:$TAG"
+        docker_build salt-minion "$BASE_PUB_NAME-minion-$BASE_IMAGE:$TAG"
+        docker_build salt-master "$BASE_PUB_NAME-master-$BASE_IMAGE:$TAG"
     fi
-    docker_build salt-test "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:$TAG"
+    # fixme this image was used to test both: syntax and saltcheck remove parameters suggesting that these two are different
+    podman_build salt-test "$BASE_PUB_NAME-salt-test-$BASE_IMAGE:$TAG"
     ;;
 salt-master-run-k8s)
+    echo "The k8s deployment is deprecated"
     salt_install
     sudo salt-call --local saltutil.sync_all
     echo "ID: $(salt-call --local grains.get id)"
@@ -35,7 +37,7 @@ salt-master-run-k8s)
     # Temporary dir for storing new packaged charts and index files
     mkdir $BUILD_DIR
     # clone existing charts
-    git clone --single-branch --branch $CHART_BRANCH https://github.com/$TRAVIS_REPO_SLUG.git $BUILD_DIR
+    git clone --single-branch --branch $CHART_BRANCH https://github.com/$GITHUB_REPOSITORY.git $BUILD_DIR
     helm dependency update deployment/salt
     helm package -d $BUILD_DIR deployment/salt
     cd $BUILD_DIR

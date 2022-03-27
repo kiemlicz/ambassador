@@ -2,12 +2,22 @@ import pytest
 
 
 def pytest_addoption(parser):
-    parser.addoption("--tests", action="store", nargs="+", type=str, required=True,
-                     help="provide file with data to insert")
-    parser.addoption("--pillar", action="store", type=str, default="/srv/salt",
-                     help="provide pillar.example.sls location")
-    parser.addoption("--states", action="store", type=str, default="/srv/salt",
-                     help="provide state tree location")
+    parser.addoption(
+        "--minion-id", type=str, required=True,
+        help="Salt Minion ID to set, required primary due to limitations of run environment"
+    )
+    parser.addoption(
+        "--tests", action="store", nargs="+", type=str, required=True,
+        help="provide file with data to insert"
+    )
+    parser.addoption(
+        "--pillar", action="store", type=str, default="/srv/salt",
+        help="provide pillar.example.sls location"
+    )
+    parser.addoption(
+        "--states", action="store", type=str, default="/srv/salt",
+        help="provide state tree location"
+    )
 
 
 def pytest_configure(config):

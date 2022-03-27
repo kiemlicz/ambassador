@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 source .env
-source .travis/common.sh
+source .github/common.sh
 
 case "$1" in
 docker)

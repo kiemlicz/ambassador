@@ -3,7 +3,7 @@
 set -e
 
 source .env
-source .travis/common.sh
+source .github/common.sh
 
 k8s_log_error() {
     local rv=$?
@@ -26,40 +26,48 @@ k8s_log_error() {
     esac
 }
 
-while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
+# was used for Travis so that it won't kill a process when nothing on stdout
+#while sleep 9m; do echo "=====[ $SECONDS seconds still running ]====="; done &
 
 case "$1" in
 salt-test)
+    TEST="$2"
+    TEST_HOSTNAME="$CONTEXT-host"
     # privileged mode is necessary for e.g. setting: net.ipv4.ip_forward or running docker in docker
     # check if https://stackoverflow.com/questions/33013539/docker-loading-kernel-modules is possible on travis
-    opts="--tests $TEST --log-level ${TEST_LIVE_LOG-INFO}"
+    opts="--tests $TEST --minion-id $TEST_HOSTNAME --log-level ${TEST_LIVE_LOG-INFO}"
     # without -n the xdist is disabled and live log is streamed
-    if [ -z "$TEST_LIVE_LOG" ]; then
+    if [ -z "$TEST_LIVE_LOG" ]; then  # fixme - is it possible to split test for saltcheck?
       echo "pytest xdist enabled (proc count: $(nproc))"
       opts="$opts -n $(nproc)"
     fi
-    docker run --name salt-test --network=host --hostname "$CONTEXT-host" --privileged "$BASE_PUB_NAME-salt-test-$DOCKER_IMAGE:$TAG" $opts
+    podman run -d --name salt-test --network=host --hostname $TEST_HOSTNAME --privileged --systemd=true "$BASE_PUB_NAME-salt-test-$BASE_IMAGE:$TAG"
+    # attach tests since container runs with systemd
+    podman exec salt-test pytest test-runner-pytest.py $opts
     result=$?
-    kill %1  # kill the while loop
+    echo "tests completed with code: $result"
+    podman stop salt-test
+#    kill %1  # kill the while loop
     # in order to return proper exit code instead of always 0 (of kill command)
     exit $result
     ;;
 salt-master-run-k8s)
+    # fixme deprecated
     echo -e "Starting kubernetes deployment\n$(date)\n"
     trap k8s_log_error EXIT TERM INT
 
     ns="salt-provisioning"
     helm dependency update deployment/salt
     kubectl create namespace $ns
-    helm install salt deployment/salt -f .travis/travis_values.yaml --namespace $ns --wait --timeout=300s
+    helm install salt deployment/salt -f .github/github_values.yaml --namespace $ns --wait --timeout=300s
 
     # deployment tests
-    python3 .travis/k8s-test.py $ns
+    python3 .github/k8s-test.py $ns
 
     # fixme this is terrible, maybe come up with dedicated test image?
     # upload and run salt tests
     master=$(kubectl -n $ns get pod -l app=salt,role=master -o jsonpath='{.items[0].metadata.name}')
-    kubectl -n $ns cp .travis/k8s-salt-test.py $ns/$master:/opt/
+    kubectl -n $ns cp .github/k8s-salt-test.py $ns/$master:/opt/
     kubectl -n $ns exec $master -- pip3 install timeout_decorator
     kubectl -n $ns exec $master -- python3 /opt/k8s-salt-test.py
 

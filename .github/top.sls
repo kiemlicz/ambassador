@@ -29,7 +29,7 @@ server:
     - kubernetes.minikube
 # no point in syntax tests as won't work on empty pillar
 #    - kubernetes.master
-    - kubernetes.worker
+#    - kubernetes.worker
     - kubernetes.helm
     - vagrant
   'base-host':

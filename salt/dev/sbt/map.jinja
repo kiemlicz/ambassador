@@ -1,7 +1,7 @@
 {% set sbt = salt['grains.filter_by']({
     'RedHat': {
-        'baseurl': "https://sbt.bintray.com/rpm",
-        'repo_id': "bintray--sbt-rpm",
+        'baseurl': "https://repo.scala-sbt.org/scalasbt/rpm",
+        'repo_id': "sbt-rpm",
         'exports_file': '/etc/zsh/zshrc',
         'environ_variable': 'SBT_HOME',
         'path_inside': 'bin',
@@ -10,7 +10,7 @@
     },
     'Debian': {
         'names': [
-            "deb https://dl.bintray.com/sbt/debian /"
+            "deb https://repo.scala-sbt.org/scalasbt/debian all main"
         ],
         'file': '/etc/apt/sources.list.d/sbt.list',
         'exports_file': '/etc/zsh/zshrc',
