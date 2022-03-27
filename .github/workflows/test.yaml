@@ -24,6 +24,8 @@ jobs:
   saltcheck-test:
     name: "Salt state execution test"
     runs-on: ubuntu-20.04
+    needs:
+      - salt-render-test
     strategy:
       matrix:
         image: [ "debian:bullseye", "ubuntu:focal" ]

@@ -33,6 +33,7 @@ case "$1" in
 salt-test)
     TEST="$2"
     TEST_HOSTNAME="$CONTEXT-host"
+    container_name="salt-test"
     # privileged mode is necessary for e.g. setting: net.ipv4.ip_forward or running docker in docker
     # check if https://stackoverflow.com/questions/33013539/docker-loading-kernel-modules is possible on travis
     opts="--tests $TEST --minion-id $TEST_HOSTNAME --log-level ${TEST_LIVE_LOG-INFO}"
@@ -41,12 +42,15 @@ salt-test)
       echo "pytest xdist enabled (proc count: $(nproc))"
       opts="$opts -n $(nproc)"
     fi
-    podman run -d --name salt-test --network=host --hostname $TEST_HOSTNAME --privileged --systemd=true "$BASE_PUB_NAME-salt-test-$BASE_IMAGE:$TAG"
+    ls -al $(which podman)
+    podman run -d --name $container_name --network=host --hostname $TEST_HOSTNAME --privileged --systemd=true "$BASE_PUB_NAME-salt-test-$BASE_IMAGE:$TAG"
+    echo "Container started (code: $?), waiting for $container_name running"
+    podman wait $container_name --condition=running
     # attach tests since container runs with systemd
-    podman exec salt-test pytest test-runner-pytest.py $opts
+    podman exec $container_name pytest test-runner-pytest.py $opts
     result=$?
     echo "tests completed with code: $result"
-    podman stop salt-test
+    podman stop $container_name
 #    kill %1  # kill the while loop
     # in order to return proper exit code instead of always 0 (of kill command)
     exit $result
