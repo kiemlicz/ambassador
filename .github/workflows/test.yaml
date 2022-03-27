@@ -16,8 +16,8 @@ jobs:
       DOCKER_IMAGE: ${{ matrix.image }}
       CONTEXT: syntax-test
     steps:
-      - run: 'echo "runnning in: $(pwd)"'
-      - run: 'ls -al'
+      - name: Check out repository code
+        uses: actions/checkout@v2
       - run: .github/prepare.sh salt-test
       - run: .github/test.sh salt-test syntax
 #      - run: .github/publish.sh docker
@@ -33,5 +33,7 @@ jobs:
       CONTEXT: ${{ matrix.context }}
       TEST_LIVE_LOG: INFO
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
       - run: .github/prepare.sh salt-test
       - run: .github/test.sh salt-test saltcheck
