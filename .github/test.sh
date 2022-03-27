@@ -42,10 +42,11 @@ salt-test)
       echo "pytest xdist enabled (proc count: $(nproc))"
       opts="$opts -n $(nproc)"
     fi
-    ls -al $(which podman)
     podman run -d --name $container_name --network=host --hostname $TEST_HOSTNAME --privileged --systemd=true "$BASE_PUB_NAME-salt-test-$BASE_IMAGE:$TAG"
-    echo "Container started (code: $?), waiting for $container_name running"
-    podman wait $container_name --condition=running
+    # fixme this container most likely fails
+    podman ps -a
+    podman logs $container_name
+    # fixme this container most likely fails
     # attach tests since container runs with systemd
     podman exec $container_name pytest test-runner-pytest.py $opts
     result=$?
