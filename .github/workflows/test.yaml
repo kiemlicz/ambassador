@@ -18,4 +18,6 @@ jobs:
           echo "Building Podman image"
           sudo podman build -t debug:latest podman
           echo "Running podman container"
-          sudo podman run --name debug_name --network=host --hostname bla --privileged --systemd=true "debug:latest"
+          sudo podman run -d --name debug_name --network=host --hostname bla --privileged --systemd=true "debug:latest"
+          echo "checking"
+          podman ps -a
