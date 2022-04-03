@@ -55,7 +55,7 @@ def generate(salt_client: salt.client.Caller, location: str) -> Tuple[List[Dict[
                 for result_details in r.values():
                     depends_on = state_pillar_dependencies[result_details['__sls__']] if result_details['__sls__'] in state_pillar_dependencies else None
                     if depends_on is not None:
-                        log.info(f"State {state}, depends on states: {result_details['__sls__']}, pillar keys: {depends_on}")
+                        log.debug(f"State {state}, depends on states: {result_details['__sls__']}, pillar keys: {depends_on}")
                         state_pillar_dependencies[state].update(depends_on)
                     else:
                         log.warning(f"Missing pillar.example.sls for sls: {result_details['__sls__']}")

@@ -47,12 +47,6 @@ salt-test)
     $PODMAN_EXE run -d --name $container_name --network=host --hostname $TEST_HOSTNAME --privileged --systemd=true "$BASE_PUB_NAME-salt-test-$BASE_IMAGE:$TAG"
     # fixme this container most likely fails how to debug what causes problem: https://github.com/kiemlicz/ambassador/runs/5711219321?check_suite_focus=true
     # https://github.com/kiemlicz/ambassador/runs/5711886182?check_suite_focus=true cmd is different
-    $PODMAN_EXE ps -a
-    echo "logs:"
-    $PODMAN_EXE logs $container_name
-    echo "inspect:"
-    $PODMAN_EXE inspect $container_name
-    # fixme this container most likely fails
     # run tests since container runs with systemd
     $PODMAN_EXE exec $container_name pytest test-runner-pytest.py $opts
     result=$?
