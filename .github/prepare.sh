@@ -14,7 +14,6 @@ salt-test)
     container_name="salt-test"
     podman_clear $container_name
     if [ "$CI" = "true" ]; then
-        docker_update
         # for publish purposes, by default not required anywhere else than Travis
         docker_build salt-minion "$BASE_PUB_NAME-minion-$BASE_IMAGE:$TAG"
         docker_build salt-master "$BASE_PUB_NAME-master-$BASE_IMAGE:$TAG"
