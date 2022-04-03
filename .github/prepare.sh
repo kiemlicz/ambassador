@@ -11,6 +11,10 @@ source .github/common.sh
 # todo research if github supports docker API2 (paths)
 case "$1" in
 salt-test)
+    container_name="salt-test"
+    echo "Stopping and removing $container_name if running"
+    podman stop $container_name || true
+    podman rm $container_name || true
     if [ "$CI" = "true" ]; then
         docker_update
         # for publish purposes, by default not required anywhere else than Travis
@@ -18,7 +22,8 @@ salt-test)
         docker_build salt-master "$BASE_PUB_NAME-master-$BASE_IMAGE:$TAG"
     fi
     # fixme this image was used to test both: syntax and saltcheck remove parameters suggesting that these two are different
-    podman_build salt-test "$BASE_PUB_NAME-salt-test-$BASE_IMAGE:$TAG"
+    podman_build $container_name "$BASE_PUB_NAME-salt-test-$BASE_IMAGE:$TAG"
+    nc -z 127.0.0.1 6379 || echo "Redis is not running - must be started before tests"
     ;;
 salt-master-run-k8s)
     echo "The k8s deployment is deprecated"

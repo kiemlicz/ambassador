@@ -23,7 +23,7 @@ lxc_config_{{ config.name }}:
     - require:
       - pkg: lxc_install
     - require_in:
-      - sysctl: net.ipv4.ip_forward
+      - sysctl: lxc_sysctl
 {%- endfor %}
 lxc_sysctl:
   sysctl.present:
