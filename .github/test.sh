@@ -47,6 +47,8 @@ salt-test)
     # fixme this container most likely fails how to debug what causes problem: https://github.com/kiemlicz/ambassador/runs/5711219321?check_suite_focus=true
     # https://github.com/kiemlicz/ambassador/runs/5711886182?check_suite_focus=true cmd is different
     podman ps -a
+    echo "podman bin:"
+    apt-cache policy podman
     echo "logs:"
     podman logs $container_name
     echo "inspect:"
