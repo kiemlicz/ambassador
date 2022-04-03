@@ -42,25 +42,22 @@ salt-test)
       echo "pytest xdist enabled (proc count: $(nproc))"
       opts="$opts -n $(nproc)"
     fi
+    # fixme configurable sudo
     # start the container with systemd
-    podman run --name $container_name --network=host --hostname $TEST_HOSTNAME --privileged --systemd=true "$BASE_PUB_NAME-salt-test-$BASE_IMAGE:$TAG"
+    $PODMAN_EXE run -d --name $container_name --network=host --hostname $TEST_HOSTNAME --privileged --systemd=true "$BASE_PUB_NAME-salt-test-$BASE_IMAGE:$TAG"
     # fixme this container most likely fails how to debug what causes problem: https://github.com/kiemlicz/ambassador/runs/5711219321?check_suite_focus=true
     # https://github.com/kiemlicz/ambassador/runs/5711886182?check_suite_focus=true cmd is different
-    podman ps -a
-    echo "podman bin:"
-    apt-cache policy podman
+    $PODMAN_EXE ps -a
     echo "logs:"
-    podman logs $container_name
+    $PODMAN_EXE logs $container_name
     echo "inspect:"
-    podman inspect $container_name
-    echo "journal:"
-    journalctl -xe --no-pager
+    $PODMAN_EXE inspect $container_name
     # fixme this container most likely fails
     # run tests since container runs with systemd
-    podman exec $container_name pytest test-runner-pytest.py $opts
+    $PODMAN_EXE exec $container_name pytest test-runner-pytest.py $opts
     result=$?
     echo "tests completed with code: $result"
-    podman stop $container_name
+    $PODMAN_EXE stop $container_name
 #    kill %1  # kill the while loop
     # in order to return proper exit code instead of always 0 (of kill command)
     exit $result

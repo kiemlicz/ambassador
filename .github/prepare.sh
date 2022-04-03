@@ -12,9 +12,7 @@ source .github/common.sh
 case "$1" in
 salt-test)
     container_name="salt-test"
-    echo "Stopping and removing $container_name if running"
-    podman stop $container_name || true
-    podman rm $container_name || true
+    podman_clear $container_name
     if [ "$CI" = "true" ]; then
         docker_update
         # for publish purposes, by default not required anywhere else than Travis
