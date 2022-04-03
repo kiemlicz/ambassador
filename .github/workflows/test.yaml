@@ -3,39 +3,17 @@ on:
   - push
 
 jobs:
-  salt-render-test:
-    name: "Salt state rendering test"
+  debug:
+    name: "Podman debug"
     runs-on: ubuntu-latest
     services:
       redis:
         image: redis
-    strategy:
-      matrix:
-        image: [ "debian:bullseye", "ubuntu:focal" ]
-    env:
-      DOCKER_IMAGE: ${{ matrix.image }}
-      CONTEXT: syntax-test
     steps:
       - name: Check out repository code
         uses: actions/checkout@v2
-      - run: .github/prepare.sh salt-test
-      - run: .github/test.sh salt-test syntax
-#      - run: .github/publish.sh docker
-  saltcheck-test:
-    name: "Salt state execution test"
-    runs-on: ubuntu-latest
-    needs:
-      - salt-render-test
-    strategy:
-      matrix:
-        image: [ "debian:bullseye", "ubuntu:focal" ]
-        context: [ "base", "server" ]
-    env:
-      DOCKER_IMAGE: ${{ matrix.image }}
-      CONTEXT: ${{ matrix.context }}
-      TEST_LIVE_LOG: INFO
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v2
-      - run: .github/prepare.sh salt-test
-      - run: .github/test.sh salt-test saltcheck
+      - run: |
+          echo "Building Podman image"
+          podman build -t debug:latest podman
+          echo "Running podman container"
+          podman run --name debug_name --network=host --hostname bla --privileged --systemd=true "debug:latest"

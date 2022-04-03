@@ -1,0 +1,9 @@
+FROM debian:bullseye as salt-test
+RUN apt update &&         apt install -y systemd systemd-sysv cron anacron crun &&        systemctl mask -- dev-hugepages.mount sys-fs-fuse-connections.mount &&        rm -f /etc/machine-id /var/lib/dbus/machine-id
+ENV container docker
+
+WORKDIR /opt
+STOPSIGNAL SIGRTMIN+3
+CMD ["/sbin/init"]
+#ENTRYPOINT [ "pytest", "test-runner-pytest.py" ]
+#CMD ["--log-level", "INFO" ]
