@@ -13,7 +13,8 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2
       - run: |
-          sudo podman run --help
+          echo "start"
+          podman run --help
           echo "Building Podman image"
           sudo podman build -t debug:latest podman
           echo "Running podman container"
