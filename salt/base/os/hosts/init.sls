@@ -1,6 +1,6 @@
 {% from "os/hosts/map.jinja" import hosts with context %}
 
-{%- if salt['service.enabled']("systemd-resolved") and not salt.condition.docker() %}
+{%- if salt['service.enabled']("systemd-resolved") and not (salt.condition.podman() or salt.condition.docker()) %}
 systemd_resolved_use_server_dns:
 # in order to force systemd-resolved to return proper fqdn, cannot modify resolv.conf in docker
   file.symlink:

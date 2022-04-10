@@ -78,7 +78,7 @@ def prepare_containerfile(
         apt install -y systemd systemd-sysv cron anacron crun &&\
         systemctl mask -- dev-hugepages.mount sys-fs-fuse-connections.mount &&\
         rm -f /etc/machine-id /var/lib/dbus/machine-id
-    ENV container docker
+    ENV container podman
     RUN {join_commands(requisite_commands(required_pkgs, required_pip))}
     RUN {join_commands(salt_download_commands(start_daemon=False, salt_version=saltver))}
         

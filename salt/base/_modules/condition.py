@@ -7,11 +7,19 @@ def pillar_eq(key_1, key_2, fail_if_no_key=True):
 
     return value_1 == value_2
 
+
 def container():
     return lxc() or docker()
 
+
 def lxc():
     return __salt__['file.directory_exists']("/dev/.lxc") or __salt__['grains.get']("virtual") == "LXC"
-    
+
+
 def docker():
-    return  __salt__['grains.get']("virtual_subtype") == "Docker"
+    return __salt__['grains.get']("virtual_subtype") == "Docker"
+
+
+# unable to properly detect podman, relying on custom environmental variable
+def podman():
+    return __salt__['environ.get']("container") == "podman"
