@@ -1,6 +1,6 @@
 {% set default_pkgs = salt['grains.filter_by']({
       'default': {
-         'os_packages': ["cron", "vim", "sudo", "insserv", "git", "zsh", "curl", "ca-certificates", "gnupg2", "python3-pip", "fonts-powerline"],
+         'os_packages': ["cron", "vim", "sudo", "git", "zsh", "curl", "ca-certificates", "gnupg2", "python3-pip", "fonts-powerline"],
          'post_install': ['echo "command3"', 'echo "command4"', 'echo "command5"'],
       },
 
