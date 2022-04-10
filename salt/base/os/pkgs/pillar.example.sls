@@ -22,8 +22,8 @@ pkgs:
   os_packages: {{ default_pkgs.os_packages | tojson }}
   pip3_packages:
 #    - pip==20.3.3 # handled via unsafe_pip or outside the salt run
-    - gdrive==0.0.8
-    - google-auth-oauthlib~=0.4.1
+    - gdrive==0.0.9
+    - google-auth-oauthlib~=0.5.1
     - powerline-status
   post_install:
     - "echo 'test'"

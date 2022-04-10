@@ -2,7 +2,7 @@
 pip~=22.0
 six~=1.15.0
 pykeepass~=4.0.0  # to be removed after sdb://kdbx/ removal
-gdrive~=0.0.8
+gdrive~=0.0.9
 jinja2~=3.0.3  # jinja2~=2.11.3
 #PyYAML~=5.4.1  # not for ubuntu distros
 pygit2~=1.7.2
