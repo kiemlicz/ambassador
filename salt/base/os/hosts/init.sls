@@ -6,6 +6,8 @@ systemd_resolved_use_server_dns:
   file.symlink:
     - name: /etc/resolv.conf
     - target: /run/systemd/resolve/resolv.conf
+    - force: True
+    - backupname: /etc/resolv.conf.bak
 {%- endif %}
 
 {% for address, aliases in hosts.items() %}
