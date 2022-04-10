@@ -61,7 +61,8 @@ def prepare_dockerfile(
     log.debug(f"Generated Dockerfile:\n{dockerfile}")
     return dockerfile
 
-
+## fixme install salt earlier
+## fixme is it testonly?
 def prepare_containerfile(
         base_image: str,
         required_pkgs: List[str],
@@ -78,13 +79,11 @@ def prepare_containerfile(
         systemctl mask -- dev-hugepages.mount sys-fs-fuse-connections.mount &&\
         rm -f /etc/machine-id /var/lib/dbus/machine-id
     ENV container docker
-    
-{copy_commands}
-    COPY .github/ambassador-test.conf /etc/salt/minion.d/
-            
     RUN {join_commands(requisite_commands(required_pkgs, required_pip))}
     RUN {join_commands(salt_download_commands(start_daemon=False, salt_version=saltver))}
-
+        
+{copy_commands}
+    COPY .github/ambassador-test.conf /etc/salt/minion.d/            
     COPY .github/top.sls /srv/salt/base/
     COPY .github/test /opt/
     RUN pip3 install --upgrade pytest pytest-xdist redis
