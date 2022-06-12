@@ -1,9 +1,11 @@
 {% from "vagrant/map.jinja" import vagrant with context %}
-
+{% from "_common/repo.jinja" import repository, preferences with context %}
 
 include:
   - os
+  - users
 
+{{ repository("vagrant_repository", vagrant, require=[{'sls': "os"}], require_in=[{'pkg': 'vagrant'}]) }}
 
 {% if vagrant.requisites is defined %}
 vagrant_requisites:
@@ -17,8 +19,7 @@ vagrant_requisites:
 
 vagrant:
   pkg.installed:
-    - pkgs: {{ vagrant.names | tojson }}
-    - sources: {{ vagrant.sources | tojson }}
+    - pkgs: {{ vagrant.pkgs | tojson }}
     - refresh: True
     - reload_modules: True
     - require:

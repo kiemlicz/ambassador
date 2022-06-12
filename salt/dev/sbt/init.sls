@@ -1,6 +1,5 @@
 {% from "sbt/map.jinja" import sbt with context %}
 {% from "_macros/dev_tool.macros.jinja" import add_environmental_variable,add_to_path,repo_pkg with context %}
-{% from "_common/repo.jinja" import repository with context %}
 
 include:
   - os
