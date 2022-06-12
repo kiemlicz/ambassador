@@ -1,12 +1,12 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import logging
+import ssl
+
 log = logging.getLogger(__name__)
 
 try:
-    import gdrive
-    from google.oauth2.credentials import Credentials
-    from salt.ext.six.moves.urllib.parse import urlparse, parse_qs
+    from gdrive import GoogleAuth, GDriveClient
 
     HAS_GOOGLE_LIBS = True
 except ImportError:
@@ -23,11 +23,19 @@ def has_libs():
 
 
 def client(profile):
-    credentials = Credentials(token=profile['access_token'],
-                              refresh_token=profile['refresh_token'],
-                              token_uri=profile['token_url'],
-                              client_id=profile['client_id'],
-                              client_secret=profile['client_secret'])
-    auth = gdrive.GoogleAuth(credentials)
-    log.debug("building drive service for client: {}".format(profile['client_id']))
-    return gdrive.GDriveClient(auth)
+    ctx = ssl.create_default_context(
+        purpose=ssl.Purpose.CLIENT_AUTH,
+        cafile=profile['cafile']
+    )
+    ctx.load_cert_chain(
+        certfile=profile['certfile'],
+        keyfile=profile['keyfile']
+    )
+    auth = GoogleAuth.from_settings(
+        profile['token_file'],
+        profile['secrets'],
+        profile['scopes'],
+        ctx
+    )
+    log.debug(f"Building Google drive service (secrets location: {profile['secrets']}")
+    return GDriveClient(auth)

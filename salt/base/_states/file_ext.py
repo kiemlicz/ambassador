@@ -8,13 +8,16 @@ import salt.version
 from salt.ext import six
 from salt.ext.six.moves.urllib.parse import urlparse
 
-
 log = logging.getLogger(__name__)
 
 __virtualname__ = "file_ext"
 
+
 def __virtual__():
-    return __virtualname__ if __utils__['googledrive.has_libs']() else (False, "Cannot load file.ext, install: pyasn1-modules and google-auth-oauthlib gdrive libraries")
+    return __virtualname__ if __utils__['googledrive.has_libs']() else (
+        False,
+        "Cannot load file.ext, install: pyasn1-modules and google-auth-oauthlib gdrive libraries"
+    )
 
 
 def managed(name, source=None, contents=None, **kwargs):
@@ -44,13 +47,15 @@ def managed(name, source=None, contents=None, **kwargs):
     return delegate_to_file_managed(source=None, contents=contents)
 
 
-def recurse(name,
-            source,
-            clean=False,
-            replace=True,
-            include_pat=None,
-            exclude_pat=None,
-            **kwargs):
+def recurse(
+        name,
+        source,
+        clean=False,
+        replace=True,
+        include_pat=None,
+        exclude_pat=None,
+        **kwargs
+):
     '''
     State that extends file.recurse with new source scheme (`gdrive://`)
     If other than `gdrive://` scheme is used, execution is delegated to `file.recurse` state
@@ -67,7 +72,9 @@ def recurse(name,
         return __states__['file.recurse'](name, source=source, **kwargs)
 
     def delegate_to_file_managed(path, contents, replace):
-        return __states__['file.managed'](path, source=None, makedirs=True, replace=replace, contents=contents, **kwargs)
+        return __states__['file.managed'](
+            path, source=None, makedirs=True, replace=replace, contents=contents, **kwargs
+        )
 
     def delegate_to_file_directory(path):
         return __states__['file.directory'](path, recurse=[], makedirs=True, clean=False, require=None, **kwargs)
@@ -146,5 +153,10 @@ def recurse(name,
 
 
 def _get_client():
-    profile = __salt__['config.get']('gdrive', merge="recurse")
+    profile = __salt__['config.get']('gdrive', merge="recurse").copy()
+    for k, v in profile.items():
+        if isinstance(v, str) and "salt://" in v:
+            loc = __salt__['cp.cache_file'](v)
+            profile[k] = loc
+
     return __utils__['googledrive.client'](profile)

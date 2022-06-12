@@ -23,7 +23,7 @@
     <!-- Note that commenting out mntoptions will give you the defaults.
          You will need to explicitly initialize it with the empty string
          to reset the defaults to nothing. -->
-    <mntoptions allow="nosuid,nodev,loop,encryption,fsck,nonempty,allow_root,allow_other,vers" />
+    <mntoptions allow="_netdev,noauto,nosuid,nodev,loop,encryption,fsck,nonempty,allow_root,allow_other,vers" />
     <!--
     <mntoptions deny="suid,dev" />
     <mntoptions allow="*" />

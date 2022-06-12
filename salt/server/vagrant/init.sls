@@ -17,7 +17,8 @@ vagrant_requisites:
 
 vagrant:
   pkg.installed:
-    - sources: {{ vagrant.sources }}
+    - pkgs: {{ vagrant.names | tojson }}
+    - sources: {{ vagrant.sources | tojson }}
     - refresh: True
     - reload_modules: True
     - require:

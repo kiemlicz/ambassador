@@ -34,28 +34,28 @@
        'bullseye': {
             'pkg_name': "foreman-installer",
             'names': [
-                "deb http://deb.theforeman.org/ buster 3.1",
-                "deb http://deb.theforeman.org/ plugins 3.1"
+                "deb http://deb.theforeman.org/ buster 3.2",
+                "deb http://deb.theforeman.org/ plugins 3.2"
             ],
             'file': "/etc/apt/sources.list.d/foreman.list",
-            'key_url': "https://deb.theforeman.org/pubkey.gpg"
+            'key_url': "https://deb.theforeman.org/foreman.asc"
        },
        'buster': {
             'pkg_name': "foreman-installer",
             'names': [
-                "deb http://deb.theforeman.org/ buster 3.1",
-                "deb http://deb.theforeman.org/ plugins 3.1"
+                "deb http://deb.theforeman.org/ buster 3.2",
+                "deb http://deb.theforeman.org/ plugins 3.2"
             ],
             'file': "/etc/apt/sources.list.d/foreman.list",
-            'key_url': "https://deb.theforeman.org/pubkey.gpg"
+            'key_url': "https://deb.theforeman.org/foreman.asc"
        },
        'focal': {
             'pkg_name': "foreman-installer",
             'names': [
-                "deb http://deb.theforeman.org/ focal 3.1",
-                "deb http://deb.theforeman.org/ plugins 3.1"
+                "deb http://deb.theforeman.org/ focal 3.2",
+                "deb http://deb.theforeman.org/ plugins 3.2"
             ],
             'file': "/etc/apt/sources.list.d/foreman.list",
-            'key_url': "https://deb.theforeman.org/pubkey.gpg"
+            'key_url': "https://deb.theforeman.org/foreman.asc"
        }
    }, grain='oscodename', merge=salt['pillar.get']('foreman'))) %}

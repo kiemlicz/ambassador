@@ -1,4 +1,5 @@
-{% set version = "2.2.14" %}
+{% set version = "2.2.19" %}
+{% set dist_codename = salt['grains.get']('lsb_distrib_codename') %}
 {% set vagrant = salt['grains.filter_by']({
   'RedHat': {
     'sources': [{'vagrant': "https://releases.hashicorp.com/vagrant/" + version + "/vagrant_" + version + "_x86_64.rpm"}],
@@ -6,7 +7,12 @@
   },
   'Debian': {
     'requisites': ["nfs-common", "nfs-kernel-server"],
-    'sources': [{'vagrant': "https://releases.hashicorp.com/vagrant/" + version + "/vagrant_" + version + "_x86_64.deb"}],
+    'sources': [],
+    'names': [
+        "deb [arch=amd64] https://apt.releases.hashicorp.com " ~ dist_codename ~ " main"
+    ],
+    'file': '/etc/apt/sources.list.d/vagrant.list',
+    'key_url': "https://apt.releases.hashicorp.com/gpg",
     'owner': 'root',
     'plugins': []
   },
@@ -25,14 +31,6 @@
         'name': "vagrant-libvirt",
         'pkgs': ["qemu", "libvirt-dev", "ebtables", "dnsmasq-base", "libxslt1-dev", "libxml2-dev", "zlib1g-dev", "ruby-dev"],
         'env': "CONFIGURE_ARGS='with-libvirt-include=/usr/include/libvirt with-libvirt-lib=/usr/lib64'"
-    }, {
-        'name': "vagrant-lxc",
-    }]
-  },
-  'stretch': {
-    'plugins': [{
-        'name': "vagrant-libvirt",
-        'pkgs': ["qemu", "libvirt-dev", "ebtables", "dnsmasq-base", "libxslt1-dev", "libxml2-dev", "zlib1g-dev", "ruby-dev"],
     }, {
         'name': "vagrant-lxc",
     }]
