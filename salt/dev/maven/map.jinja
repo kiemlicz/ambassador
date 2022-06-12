@@ -1,7 +1,7 @@
 {# {% import_yaml "defaults.yaml" as defaults %} #}
 
-{% set version = '3.8.5' %}
-{% set url = 'http://ftp.ps.pl/pub/apache/maven/maven-3/' + version + '/binaries/apache-maven-' + version + '-bin.tar.gz' %}
+{% set version = '3.8.6' %}
+{% set url = 'https://dlcdn.apache.org/maven/maven-3/' + version + '/binaries/apache-maven-' + version + '-bin.tar.gz' %}
 {% set maven = salt['grains.filter_by']({
     'default': {
         'download_url': url,
