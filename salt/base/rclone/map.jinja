@@ -1,0 +1,8 @@
+{% set rclone = salt['grains.filter_by']({
+    'Debian': {
+        'pkgs': ["rclone"],
+        'fuse_config': "/etc/fuse.conf",
+        'fuse_config_append': "user_allow_other",
+        'configs': [],
+    },
+}, merge=salt['pillar.get']('rclone', merge=True)) %}
