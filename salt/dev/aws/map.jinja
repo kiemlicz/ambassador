@@ -1,0 +1,8 @@
+{% set aws = salt['grains.filter_by']({
+    'default': {
+        'download_url': "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip",
+        'destination_dir': '/tmp',
+        'owner': 'root',
+        'location': "/usr/local/bin/aws"
+    }
+}, merge=salt['pillar.get']('aws')) %}
