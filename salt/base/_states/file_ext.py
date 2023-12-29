@@ -1,12 +1,13 @@
 import logging
 import os
 import posixpath
+import six
+import urllib.parse
 
 import salt.config
 import salt.utils.data
 import salt.version
-from salt.ext import six
-from salt.ext.six.moves.urllib.parse import urlparse
+
 
 log = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ def managed(name, source=None, contents=None, **kwargs):
     if not source:
         return delegate_to_file_managed(source, contents)
     source = salt.utils.data.decode(source)
-    if urlparse(source).scheme != 'gdrive':
+    if urllib.parse.urlparse(source).scheme != 'gdrive':
         return delegate_to_file_managed(source, contents)
 
     gdrive = _get_client()
@@ -129,7 +130,7 @@ def recurse(
         merge_ret(path, _ret)
 
     source = salt.utils.data.decode(source)
-    if urlparse(source).scheme != 'gdrive':
+    if urllib.parse.urlparse(source).scheme != 'gdrive':
         return delegate_to_file_recurse()
 
     if not source.endswith(posixpath.sep):
@@ -157,6 +158,7 @@ def _get_client():
     for k, v in profile.items():
         if isinstance(v, str) and "salt://" in v:
             loc = __salt__['cp.cache_file'](v)
+            log.info(f"minion cached: {v}")
             profile[k] = loc
 
     return __utils__['googledrive.client'](profile)

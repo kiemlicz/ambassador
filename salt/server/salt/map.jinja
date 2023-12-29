@@ -24,30 +24,30 @@
         }
     },
 }, merge=salt['grains.filter_by']({
+       'bookworm': {
+         'repository': {
+           'names': [
+                "deb [arch=amd64] https://repo.saltproject.io/salt/py3/debian/12/amd64/latest bookworm main"
+           ],
+           'key_url': "https://repo.saltproject.io/salt/py3/debian/12/arm64/SALT-PROJECT-GPG-PUBKEY-2023.gpg",
+           'origin': 'bookworm'
+         }
+       },
        'bullseye': {
          'repository': {
            'names': [
-                "deb [signed-by=/usr/share/keyrings/salt-archive-keyring.gpg arch=amd64] https://repo.saltproject.io/py3/debian/11/amd64/latest bullseye main"
+                "deb [arch=amd64] https://repo.saltproject.io/salt/py3/debian/11/amd64/latest bullseye main"
            ],
-           'key_url': "https://repo.saltproject.io/py3/debian/11/amd64/latest/salt-archive-keyring.gpg",
+           'key_url': "https://repo.saltproject.io/salt/py3/debian/11/amd64/SALT-PROJECT-GPG-PUBKEY-2023.gpg",
            'origin': 'bullseye'
-         }
-       },
-       'buster': {
-         'repository': {
-           'names': [
-                "deb http://repo.saltstack.com/py3/debian/10/amd64/latest buster main"
-           ],
-           'key_url': "https://repo.saltstack.com/py3/debian/10/amd64/latest/SALTSTACK-GPG-KEY.pub",
-           'origin': 'buster'
          }
        },
        'focal': {
          'repository': {
            'names': [
-                "deb [signed-by=/usr/share/keyrings/salt-archive-keyring.gpg arch=amd64] https://repo.saltproject.io/py3/ubuntu/20.04/amd64/latest focal main"
+                "deb [arch=amd64] https://repo.saltproject.io/salt/py3/ubuntu/20.04/amd64/latest focal main"
            ],
-           'key_url': "https://repo.saltproject.io/py3/ubuntu/20.04/amd64/latest/salt-archive-keyring.gpg",
+           'key_url': "https://repo.saltproject.io/salt/py3/ubuntu/20.04/amd64/SALT-PROJECT-GPG-PUBKEY-2023.gpg",
            'origin': 'focal'
          }
        }

@@ -2,7 +2,7 @@ import logging
 import traceback
 import imp
 
-from salt.ext.six import string_types
+from six import string_types
 from salt.exceptions import SaltRenderError
 
 log = logging.getLogger(__name__)

@@ -22,7 +22,7 @@ jobs:
         uses: actions/checkout@v2
       - run: .github/prepare.sh salt-test
       - run: .github/test.sh salt-test syntax
-#      - run: .github/publish.sh docker
+#      - run: .github/publish.sh docker # todo not yet available
   saltcheck-test:
     name: "Salt state execution test"
     runs-on: ubuntu-latest

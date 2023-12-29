@@ -22,6 +22,7 @@ def ensure_container(
         c.set_config_item("lxc.net.0.type", "veth")
         c.set_config_item("lxc.net.0.link", ifc)
         c.set_config_item("lxc.net.0.flags", "up")
+        c.set_config_item("lxc.net.0.hwaddr", "32:C9:55:54:5E:DF")
         # I think this uses lxc-generate-aa-rules.py
         c.set_config_item("lxc.apparmor.profile", "generated")
         c.set_config_item("lxc.apparmor.allow_nesting", "1")

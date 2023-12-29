@@ -21,7 +21,7 @@ minion_required_pip3_packages:
   pip.installed:
     - name: startup_pip3_packages
     - pkgs: {{ minion.startup.pip3|tojson }}
-    - bin_env: '/usr/bin/pip3'
+    - bin_env: '/usr/bin/salt-pip'
     - reload_modules: True
     - require:
       - pkg: python3-pip

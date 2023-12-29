@@ -41,10 +41,10 @@ import salt.config
 from salt.utils.versions import LooseVersion as _LooseVersion
 
 # Import 3rd-party libs
-from salt.ext import six
+import six
 # pylint: disable=import-error,no-name-in-module
-from salt.ext.six.moves import range  # pylint: disable=redefined-builtin
-from salt.ext.six.moves.urllib.parse import urlparse as _urlparse
+from six.moves import range  # pylint: disable=redefined-builtin
+from six.moves.urllib.parse import urlparse as _urlparse
 # pylint: enable=import-error,no-name-in-module
 
 # Set up logging

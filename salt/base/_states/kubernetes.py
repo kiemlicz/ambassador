@@ -86,7 +86,7 @@ import copy
 import logging
 
 # Import 3rd-party libs
-from salt.ext import six
+import six
 
 log = logging.getLogger(__name__)
 

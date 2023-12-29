@@ -7,7 +7,7 @@ import logging
 import salt.exceptions
 
 try:
-    from salt.ext.six.moves.urllib.parse import urlparse, parse_qs
+    from six.moves.urllib.parse import urlparse, parse_qs
     HAS_LIBS = True
 except ImportError:
     HAS_LIBS = False

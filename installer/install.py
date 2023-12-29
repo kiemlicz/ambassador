@@ -1,19 +1,14 @@
 import argparse
 import io
-import json
 import logging
 import os
-import urllib.request
 from pathlib import Path
-from typing import Tuple, List, Any
-
-import yaml
+from typing import Tuple, List
 
 from utils import commands
 from utils import common
 # import encodings.idna
-from utils.common import dir_mappings, file_mappings, env_default
-from utils.secret import Secret
+from utils.common import dir_mappings, dir_content_mappings, file_mappings, env_default, flatten, ExtraArg
 
 # no point in bloating args with these
 LXC_ROOTFS = os.path.join(os.sep, "var", "lib", "lxc")
@@ -21,21 +16,28 @@ SALT_KEY_LOCATION = os.path.join(os.sep, "etc", "salt", "keys")
 SALT_MINION_CONFIG = os.path.join(os.sep, "etc", "salt", "minion.d")
 SALT_TREE_ROOT = os.path.join(os.sep, "srv")
 SALT_GPG_LOCATION = os.path.join(os.sep, "etc", "salt", "gpgkeys")
-REQUIRED_PKGS_BASE = ["python3-pip", "libssl-dev", "rustc", "curl"]  # deb only
+REQUIRED_PKGS_BASE = ["python3-pip", "libssl-dev", "rustc", "curl", "swig"]  # deb only
 REQUIRED_PKGS = {
     "ubuntu": REQUIRED_PKGS_BASE + ["libgit2-28"],
-    "debian": REQUIRED_PKGS_BASE + ["libgit2-1.1"]
+    "debian": REQUIRED_PKGS_BASE + ["libgit2-1.5"]
+}
+REQUIRED_CONTAINER_PKGS = {
+    "podman": [],
+    "docker": ["dumb-init"]
 }
 MAIN_FILES_TO_TRANSFER = ['salt']
-CONFIGS_TO_TRANSFER = ["config/ambassador-installer.conf"]  # , f"config/ambassador-installer.override.conf"
-BASE_OS = "ubuntu"
-BASE_OS_RELEASE = "focal"
+CONFIGS_TO_TRANSFER = [
+    "config/ambassador-installer.conf"
+]  # , f"config/ambassador-installer.override.conf"  ### FIXME ADD THIS OVERRIDE SINCE IT WILL BE FILTERED OUT if not exists
+BASE_OS = "debian"
+BASE_OS_RELEASE = "bookworm"
+SALT_DOWNLOAD_URL = "https://bootstrap.saltproject.io"
 
 """
 If running in VM, ensure that NIC promisc mode works
 """
 parser = argparse.ArgumentParser(
-    description='Installs Salt Minion for further masterless box provisioning. Uses host directly or LXC container'
+    description='Installs Salt Minion for further masterless box provisioning. Uses host directly, LXC, Docker or Podman container'
 )  # fixme - the idea is to use this install script everywhere (ambassador setup, test setup) so that no setup duplication occurs
 parser.add_argument('--to', help="where to install to: host, docker, lxc", required=False, default="host")
 parser.add_argument('--name', help="provide container name", required=False)
@@ -49,58 +51,45 @@ parser.add_argument(
     '--requirements',
     help="pip requirements file",
     required=False,
+    nargs="+",
     type=argparse.FileType('r'),
-    default="config/requirements.txt"
+    default=[open("config/requirements.txt", "r", encoding="utf-8")]  # todo handle close
 )
 parser.add_argument(
     '--configs',
     help="Ambassador configuration file list",
-    nargs='+',
     required=False,
+    nargs='+',
     default=CONFIGS_TO_TRANSFER
 )
 parser.add_argument(
-    "--secrets", help="URL of service providing secrets",
-    required=False
-)  # support file:// by creating adapter  todo fails if not provided
-parser.add_argument(
-    "--secrets-certs", help="API client cert", required=False,
-    default=".local/ambassador-installer.crt"
+    '--extra',
+    help="Extra mappings to add",
+    required=False,
+    default=[],
+    action=ExtraArg,
 )
-parser.add_argument("--secrets-key", help="API client key", required=False, default=".local/ambassador-installer.key")
-parser.add_argument("--secrets-ca", help="CA to verify secret server", required=False, default=".local/ca.crt")
+parser.add_argument(
+    "--secrets",
+    help="Directory were secrets (salt keys) can be found",
+    required=False
+)
+
 parser.add_argument(
     "--base-os",
     help="Base image if deploying to docker or LXC",
     required=False,
     default=f"{BASE_OS}:{BASE_OS_RELEASE}"
 )
-parser.add_argument("--docker-tag", help="Docker tag for resulting image", required=False, default="latest")
+parser.add_argument("--tag", help="Docker/Podman tag for resulting image", required=False, default="latest")
 parser.add_argument(
-    "--docker-target",
-    help="Dockerfile's target to build: salt-minion, salt-master, salt-test",
+    "--target",
+    help="Dockerfile's/Containerfile's target to build: salt-minion, salt-master, salt-test",
     required=False, default="salt-test"
 )
 parser.add_argument(
     '--autostart', help="should the LXC container autostart", required=False, default=False,
     action='store_true'
-)
-parser.add_argument(
-    '--kdbx',
-    help="KDBX file containing further secrets",
-    required=False
-)  # fixme replace with libsecret API in salt
-parser.add_argument(
-    '--kdbx-pass',
-    help="KDBX password",
-    required=False
-)  # fixme avoid passing this, assume that the DB is already open somewhere, no such lib exists
-# the problem with kdbx is: we would need to keep kdbx in kdbx in order to have only --secret-api (downloading kdbx)
-# so it is better to get rid of kdbx salt integration (replace with some rest api calls)
-parser.add_argument(
-    '--kdbx-key',
-    help="KDBX key file",
-    required=False
 )
 parser.add_argument(
     '--log',
@@ -146,74 +135,31 @@ except ImportError:
     HAS_OCI_LIBS = False
 
 salt_version = args.salt_ver
-secrets_api = args.secrets
-secrets_client_cert = args.secrets_certs
-secrets_client_key = args.secrets_key
-secrets_ca = args.secrets_ca
+secrets = args.secrets  # rename to `secrets`
 configs = args.configs
-kdbx_file = args.kdbx
-kdbx_key = args.kdbx_key
-kdbx_pass = args.kdbx_pass
 where_to = args.to
+extra = args.extra
 
 
-# fixme stop using kdbx in salt and integrate with some external pass manager
-# how to properly handle transfer of files? e.g. given set of files with their dest (ideally generated dynamically?)
-# handle rest calls not here
+# fixme transfer ambassador ssl keypair to ambassador so that sdb REST can use this !!!
+
 def files_to_transfer() -> List[Tuple[str, str]]:
+    """
+
+    :return: List of mappings (tuples) src filename -> dst filename
+    """
     # todo handle extensions/file_ext todo some files (configs) are provided as default args some are not
     state_tree_mapping = list(dir_mappings(MAIN_FILES_TO_TRANSFER, SALT_TREE_ROOT))  # dir
     salt_conf_mapping = list(file_mappings(configs, SALT_MINION_CONFIG))  # file *.conf
-    kdbx_mapping = list(file_mappings([kdbx_file, kdbx_key], SALT_KEY_LOCATION))  # kdbx db to be removed
-    all_files = state_tree_mapping + salt_conf_mapping + kdbx_mapping  # + kdbx_keys_mapping + gpg_keys_mapping
+    salt_keys_mapping = list(dir_content_mappings([secrets], SALT_KEY_LOCATION))
+
+    all_files = state_tree_mapping + salt_conf_mapping + salt_keys_mapping + extra
     log.debug(f"Files to transfer: {all_files}")
     return all_files
 
 
-def files_to_create(container_name: str, secret: Secret) -> List[Tuple[Any, str]]:
-    def kdbx_config() -> str:
-        kdbx_salt_config = {
-            'kdbx': {
-                'driver': 'kdbx',
-                'db_file': os.path.join(SALT_KEY_LOCATION, os.path.basename(kdbx_file))
-            }
-        }
-        if kdbx_key:
-            kdbx_salt_config['kdbx']['key_file'] = os.path.join(SALT_KEY_LOCATION, os.path.basename(kdbx_key))
-        if kdbx_pass:
-            kdbx_salt_config['kdbx']['password'] = kdbx_pass
-
-        return yaml.dump(kdbx_salt_config)
-
-    def secret_keys() -> List[Tuple[str, str]]:
-        return [(e['contents'], os.path.join(SALT_KEY_LOCATION, e['filename'])) for e in secret.attachments()]
-
-    gen = [(kdbx_config(), os.path.join(SALT_MINION_CONFIG, "{}-kdbx.conf".format(container_name)))] + secret_keys()
-    log.debug(f"Will create following files: {gen}")
-    return gen
-
-
-def fetch_secrets() -> Secret:  # path of downloaded files?
-    """
-
-    :param uri:
-    :return: secrets json
-    """
-    if secrets_api:
-        ctx = common.default_ssl_context(cafile=secrets_ca)
-        ctx.load_cert_chain(certfile=secrets_client_cert, keyfile=secrets_client_key)
-        response = urllib.request.urlopen(secrets_api, context=ctx)
-        log.debug(f"'{secrets_api}' response: {response.code}")
-        if response:
-            return Secret(json.loads(response.read().decode('utf-8')))  # todo validate this is dict
-        else:
-            raise RuntimeError("Configured secrets API didn't respond")
-    else:
-        return Secret({})
-
-
-def required_pip(requirements_file) -> List[str]:
-    return list(map(lambda l: common.remove_comment(l).rstrip(), requirements_file.readlines()))
+def required_pip(requirements_files: List[io.TextIOWrapper]) -> List[str]:
+    return flatten([list(map(lambda l: common.remove_comment(l).rstrip(), r.readlines())) for r in requirements_files])
 
 
 @common.measure_time("requirements")
@@ -232,7 +178,6 @@ def requisites(*args) -> None:  # todo how to pass multiple args without accepti
     required_pip = args[0]
     required_pkgs = args[1]
     log.info("Installing mandatory requirements")
-    # fixme check if assertretcode breaks when given list has one failing command (set -e)
     # apt update auto accept old repo entry for buster
     common.assert_ret_code(commands.requisite_commands(required_pkgs, required_pip))
     log.info(f"Mandatory requisites installed: {required_pip}")
@@ -241,8 +186,9 @@ def requisites(*args) -> None:  # todo how to pass multiple args without accepti
 @common.measure_time("installation")
 def install():
     log.info("Installing Salt")
+    # TODO this setup is not specific for LXC, should be available everywhere
     pillar_key = os.path.join(SALT_KEY_LOCATION, "pillargpg.gpg")
-    common.assert_ret_code(commands.salt_download_commands())
+    common.assert_ret_code(commands.salt_download_and_install_commands(bootstrap_url=SALT_DOWNLOAD_URL))
 
     if os.path.isfile(pillar_key):
         Path(SALT_GPG_LOCATION).mkdir(parents=True, exist_ok=True, mode=0o600)
@@ -256,13 +202,13 @@ def install():
 def run():
     env = os.environ.copy()
     env['SHELL'] = "/bin/bash"  # don't propagate SHELL env
-    common.assert_ret_code("salt-call --local saltutil.sync_all", env)  # todo use python api?
-    common.assert_ret_code("salt-call --local state.highstate", env)
+    common.assert_ret_code(commands.salt_run_commands(), env)
 
 
 @common.measure_time("deployment")
 def this_host_deployment():
     log.info("Installing directly onto this host")
+    raise NotImplementedError("Install on this host option: not yet available")
     # populate_files(os.sep)
     # requisites()
     # proceed()
@@ -270,7 +216,7 @@ def this_host_deployment():
 
 
 @common.measure_time("deployment")
-def lxc_deployment(name: str, autostart: bool, ifc: str, base_os: str, requirements: io.TextIOWrapper, **kwargs):
+def lxc_deployment(name: str, autostart: bool, ifc: str, base_os: str, requirements: List[io.TextIOWrapper], **kwargs):
     if not HAS_LXC_LIBS:
         raise RuntimeError("Missing package, perform: sudo apt install lxc bridge-utils debootstrap python3-lxc")
     # you may want to enable IP forwarding
@@ -279,7 +225,6 @@ def lxc_deployment(name: str, autostart: bool, ifc: str, base_os: str, requireme
     # USE_LXC_BRIDGE="false" in /etc/default/lxc-net
     log.info(f"LXC container installation, will attach to: {name}, autostart: {autostart}, detected interface: {ifc}")
     container_name = f"{name}"
-    secrets = fetch_secrets()
     template, release = base_os.rsplit(":", 1)
     ambassador_lxc = lxc_support.ensure_container(
         container_name=container_name,
@@ -289,7 +234,6 @@ def lxc_deployment(name: str, autostart: bool, ifc: str, base_os: str, requireme
         release=release
     )
 
-    # todo filter-out docker
     req_pip = required_pip(requirements)
 
     def prepare_files(container):
@@ -303,55 +247,55 @@ def lxc_deployment(name: str, autostart: bool, ifc: str, base_os: str, requireme
             map(lambda f: add_lxc_rootfs(f), files_to_transfer())
         )
 
-        common.create(
-            map(lambda f: add_lxc_rootfs(f), files_to_create(container, secrets))
-        )
-
+    log.info("Provisioning LXC, inspect logs carefully since LXC doesn't forward exceptions")
     prepare_files(container_name)
-
-    log.info("Provisioning LXC")
-    ambassador_lxc.attach_wait(requisites, (req_pip, REQUIRED_PKGS[BASE_OS]))
+    ambassador_lxc.attach_wait(requisites, ([], REQUIRED_PKGS[BASE_OS]))
     ambassador_lxc.attach_wait(install)
+    ambassador_lxc.attach_wait(requisites, (req_pip, []))
     ambassador_lxc.attach_wait(run)
 
 
 @common.measure_time("deployment")
 def oci_deployment(
         name: str,
-        requirements: io.TextIOWrapper,
+        requirements: List[io.TextIOWrapper],
         base_os: str,
-        docker_target: str,
-        docker_tag: str,
+        target: str,
+        tag: str,
         **kwargs
-):  # fixme to be used in tests
+):
     if not HAS_OCI_LIBS:
         raise RuntimeError("Missing docker sdk, perform: sudo pip3 install docker")
-    # TODO this is not an ambassador (no foreman, no kdbx, check if these configs are required)
+
+    # todo implement secrets for OCI
+    # secrets = fetch_secrets()
+    # common.create(
+    #     map(lambda f: add_lxc_rootfs(f), files_to_create(secrets))
+    # )
+
+    all_mappings = files_to_transfer()
     base = base_os.rsplit(":", 1)[0]
     req_pip = required_pip(requirements)
-    req_pkgs = REQUIRED_PKGS[base] + ["dumb-init"]
-    # fixme remove these hardcoded filenames
-    files_to_copy = list(
-        filter(lambda f: "ambassador.kdbx" not in f[0] and "ambassador.key" not in f[0], files_to_transfer())
-    )
+    req_pkgs = REQUIRED_PKGS[base] + REQUIRED_CONTAINER_PKGS[kwargs['to']]
+
     if kwargs['to'] == "docker":
         log.info("Provisioning Docker image")
         dockerfile = oci_support.prepare_dockerfile(
             base_os,
             req_pkgs,
             req_pip,
-            files_to_copy,
+            all_mappings
         )
-        oci_support.build_docker(dockerfile, docker_target, docker_tag)
+        oci_support.build_docker(dockerfile, target, tag)
     elif kwargs['to'] == "podman":
         log.info("Provisioning Podman image")
         dockerfile = oci_support.prepare_containerfile(
             base_os,
             req_pkgs,
             req_pip,
-            files_to_copy,
+            all_mappings
         )
-        oci_support.build_podman(dockerfile, docker_target, docker_tag)
+        oci_support.build_podman(dockerfile, target, tag)
 
 
 @common.measure_time("uninstall")
@@ -361,11 +305,6 @@ def lxc_uninstall(name: str, **kwargs):
     ambassador_container = f"{name}"
     log.info(f"Removing: {ambassador_container}")
     lxc_support.remove_container(ambassador_container)
-
-
-# setup this
-# https://docs.saltproject.io/en/latest/ref/renderers/all/salt.renderers.gpg.html#different-gpg-location
-# setup pypass
 
 
 @common.measure_time("uninstall")

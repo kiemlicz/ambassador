@@ -8,12 +8,10 @@ def requisite_commands(required_pkgs: List[str], required_pip: List[str]) -> Lis
     # latest pip typically is required, cannot upgrade it in one run as some dependencies may require latest pip
     return [
         f"apt update -y && apt install -y {' '.join(required_pkgs)}",
-        f"pip3 install --upgrade pip",
-        f"pip3 install {' '.join(required_pip)}"
+        f"salt-pip install {' '.join(required_pip)}"
     ]
 
-
-def salt_download_commands(
+def salt_download_and_install_commands(
         start_daemon: bool = True,
         salt_version: str = None,
         bootstrap_url="https://bootstrap.saltproject.io"
@@ -33,4 +31,11 @@ def salt_download_commands(
     return [
         f"curl -o {loc} -L {bootstrap_url}",
         install
+    ]
+
+
+def salt_run_commands() -> List[str]:
+    return [
+        "salt-call --local saltutil.sync_all",
+        "salt-call --local state.highstate"
     ]

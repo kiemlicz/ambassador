@@ -8,7 +8,7 @@ from salt.exceptions import CommandExecutionError
 
 try:
     from pykeepass import PyKeePass
-    from salt.ext.six.moves.urllib.parse import urlparse
+    from six.moves.urllib.parse import urlparse
     HAS_LIBS = True
 except ImportError:
     HAS_LIBS = False

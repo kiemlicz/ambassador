@@ -18,8 +18,11 @@ salt-test)
         docker_build salt-minion "$BASE_PUB_NAME-minion-$BASE_IMAGE:$TAG"
         docker_build salt-master "$BASE_PUB_NAME-master-$BASE_IMAGE:$TAG"
     fi
-    # fixme this image was used to test both: syntax and saltcheck remove parameters suggesting that these two are different
-    podman_build $container_name "$BASE_PUB_NAME-salt-test-$BASE_IMAGE:$TAG"
+    podman_build $container_name "$BASE_PUB_NAME-salt-test-$BASE_IMAGE:$TAG" \
+      --configs config/ambassador-installer.conf .github/ambassador-test.conf \
+      --requirements config/requirements.txt .github/requirements-test.txt \
+      --extra .github/top.sls,/srv/salt/base/ \
+      --extra .github/test,/opt
     nc -z 127.0.0.1 6379 || echo "Redis is not running - must be started before tests"
     ;;
 salt-master-run-k8s)

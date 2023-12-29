@@ -1,5 +1,6 @@
 import argparse
 import datetime
+import itertools
 import logging
 import os
 import re
@@ -8,7 +9,7 @@ import subprocess
 from distutils import dir_util
 from pathlib import Path
 from shutil import copyfile
-from typing import Dict, List, Tuple, Union, Iterator
+from typing import Dict, List, Tuple, Union, Iterator, Any
 
 log = logging.getLogger(__name__)
 
@@ -26,16 +27,56 @@ def transfer(files: Iterator[Tuple[str, str]]) -> None:
             log.error(f"Omitting: {src} as neither file nor directory")
 
 
+def mappings(input: List[str], dst_dir: str) -> Iterator[Tuple[str, str]]:
+    """
+
+    :param input:
+    :param dst_dir:
+    :return: Both: file and dir mappings
+    """
+    files = []
+    dirs = []
+    for i in input:
+        if i is not None and os.path.isfile(i):
+            files.append(i)
+        elif i is not None and os.path.isdir(i):
+            dirs.append(i)
+        else:
+            log.warning(f"{i} omitted since not dir not file")
+    return itertools.chain(file_mappings(files, dst_dir), dir_mappings(dirs, dst_dir))  # concat
+
+
 def file_mappings(input: List[str], dst_dir: str) -> Iterator[Tuple[str, str]]:
+    """
+
+    :param input: list of files to be copied to dst_dir
+    :param dst_dir: destination
+    :return: iterator of tuples (src -> dst) ready to copy
+    """
     src_files = list(filter(lambda i: i is not None and os.path.isfile(i), input))
     dst_files = list(map(lambda i: os.path.join(dst_dir, os.path.basename(i)), src_files))
     return zip(src_files, dst_files)
 
 
 def dir_mappings(input: List[str], dst_dir: str) -> Iterator[Tuple[str, str]]:
+    """
+
+    :param input: list of directories to be copied to dst_dir
+    :param dst_dir: destination
+    :return: iterator of tuples (src -> dst) ready to copy
+    """
     src_dirs = list(filter(lambda i: i is not None and os.path.isdir(i), input))
     dst_dirs = list(map(lambda i: os.path.join(dst_dir, os.path.basename(os.path.normpath(i))), src_dirs))
     return zip(src_dirs, dst_dirs)
+
+
+def dir_content_mappings(input: List[str], dst_dir: str) -> Iterator[Tuple[str, str]]:
+    for directory in input:
+        for root, _, files in os.walk(directory):
+            for file in files:
+                full_path = os.path.join(root, file)
+                relative_path = os.path.relpath(full_path, start=directory)
+                yield full_path, os.path.join(dst_dir, relative_path)
 
 
 def create(configs: Iterator[Tuple[str, str]]):
@@ -91,6 +132,19 @@ def assert_ret_code(command: Union[List[str], str], env: Dict[str, str] = None) 
 
 def remove_comment(line: str) -> str:
     return re.sub(r"#.*$", "", line)
+
+
+def flatten(l: List[List[Any]]) -> List[Any]:
+    return [e for sub in l for e in sub]
+
+
+class ExtraArg(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        s, d = values.split(",")
+        if hasattr(namespace, "extra") and getattr(namespace, "extra") is not None:
+            namespace.extra.append((s, d))
+        else:
+            setattr(namespace, "extra", [(s, d)])
 
 
 class EnvDefault(argparse.Action):

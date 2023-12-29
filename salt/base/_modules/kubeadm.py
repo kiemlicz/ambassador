@@ -14,7 +14,7 @@ import re
 
 import salt.utils.files
 from salt.exceptions import CommandExecutionError
-from salt.ext.six.moves import zip
+from six.moves import zip
 
 ADMIN_CFG = "/etc/kubernetes/admin.conf"
 

@@ -53,25 +53,26 @@ import errno
 import logging
 import tempfile
 import signal
+import six
 from time import sleep
 from contextlib import contextmanager
-
+from six import iteritems
+from six.moves import range  # pylint: disable=import-error
 from salt.exceptions import CommandExecutionError
-from salt.ext.six import iteritems
-from salt.ext import six
+from salt.exceptions import TimeoutError
+
 import salt.utils.files
 import salt.utils.platform
 import salt.utils.templates
 import salt.utils.versions
 import salt.utils.yaml
-from salt.exceptions import TimeoutError
-from salt.ext.six.moves import range  # pylint: disable=import-error
 
 try:
     import kubernetes  # pylint: disable=import-self
     import kubernetes.client
     from kubernetes.client.rest import ApiException
     from urllib3.exceptions import HTTPError
+
     try:
         # There is an API change in Kubernetes >= 2.0.0.
         from kubernetes.client import V1beta1Deployment as AppsV1beta1Deployment
@@ -104,12 +105,14 @@ if not salt.utils.platform.is_windows():
     def _time_limit(seconds):
         def signal_handler(signum, frame):
             raise TimeoutError
+
         signal.signal(signal.SIGALRM, signal_handler)
         signal.alarm(seconds)
         try:
             yield
         finally:
             signal.alarm(0)
+
 
     POLLING_TIME_LIMIT = 30
 
@@ -205,14 +208,16 @@ def _setup_conn(**kwargs):
     if not (kubeconfig and context):
         if kwargs.get('api_url') or __salt__['config.option']('kubernetes.api_url'):
             salt.utils.versions.warn_until('Sodium',
-                    'Kubernetes configuration via url, certificate, username and password will be removed in Sodiom. '
-                    'Use \'kubeconfig\' and \'context\' instead.')
+                                           'Kubernetes configuration via url, certificate, username and password will be removed in Sodiom. '
+                                           'Use \'kubeconfig\' and \'context\' instead.')
             try:
                 return _setup_conn_old(**kwargs)
             except Exception:
-                raise CommandExecutionError('Old style kubernetes configuration is only supported up to python-kubernetes 2.0.0')
+                raise CommandExecutionError(
+                    'Old style kubernetes configuration is only supported up to python-kubernetes 2.0.0')
         else:
-            raise CommandExecutionError('Invalid kubernetes configuration. Parameter \'kubeconfig\' and \'context\' are required.')
+            raise CommandExecutionError(
+                'Invalid kubernetes configuration. Parameter \'kubeconfig\' and \'context\' are required.')
     kubernetes.config.load_kube_config(config_file=kubeconfig, context=context)
 
     # The return makes unit testing easier
@@ -352,7 +357,7 @@ def node_add_label(node_name, label_name, label_value, **kwargs):
             'metadata': {
                 'labels': {
                     label_name: label_value}
-                }
+            }
         }
         api_response = api_instance.patch_node(node_name, body)
         return api_response
@@ -385,7 +390,7 @@ def node_remove_label(node_name, label_name, **kwargs):
             'metadata': {
                 'labels': {
                     label_name: None}
-                }
+            }
         }
         api_response = api_instance.patch_node(node_name, body)
         return api_response

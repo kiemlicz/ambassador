@@ -4,7 +4,7 @@ import textwrap
 from pathlib import Path
 from typing import List, Tuple
 
-from .commands import requisite_commands, salt_download_commands
+from .commands import requisite_commands, salt_download_and_install_commands
 from .common import join_commands, assert_ret_code
 
 log = logging.getLogger(__name__)
@@ -24,7 +24,7 @@ def prepare_dockerfile(
     # syntax=docker/dockerfile:1.3-labs
     FROM {base_image} as salt-base
     RUN {join_commands(requisite_commands(required_pkgs, required_pip))}
-    RUN {join_commands(salt_download_commands(start_daemon=False, salt_version=saltver))}
+    RUN {join_commands(salt_download_and_install_commands(start_daemon=False, salt_version=saltver))}
 {copy_commands}
     WORKDIR /srv
     
@@ -61,8 +61,6 @@ def prepare_dockerfile(
     log.debug(f"Generated Dockerfile:\n{dockerfile}")
     return dockerfile
 
-## fixme install salt earlier
-## fixme is it testonly?
 def prepare_containerfile(
         base_image: str,
         required_pkgs: List[str],
@@ -70,7 +68,7 @@ def prepare_containerfile(
         copy_files: List[Tuple[str, str]],
         saltver: str = None
 ) -> str:
-    copy_commands = _copy_commands(copy_files)
+    copy_commands = _copy_commands(copy_files)  # fixme merge the copy, verify ambassador-test.conf
     containerfile = textwrap.dedent(
         f"""\
     FROM {base_image} as salt-test
@@ -78,21 +76,15 @@ def prepare_containerfile(
         apt install -y systemd systemd-sysv cron anacron crun &&\
         systemctl mask -- dev-hugepages.mount sys-fs-fuse-connections.mount &&\
         rm -f /etc/machine-id /var/lib/dbus/machine-id
-    ENV container podman
+    ENV container podman  # there is no counterpart of .dockerenv in podman
     RUN {join_commands(requisite_commands(required_pkgs, required_pip))}
-    RUN {join_commands(salt_download_commands(start_daemon=False, salt_version=saltver))}
+    RUN {join_commands(salt_download_and_install_commands(start_daemon=False, salt_version=saltver))}
         
 {copy_commands}
-    COPY .github/ambassador-test.conf /etc/salt/minion.d/            
-    COPY .github/top.sls /srv/salt/base/
-    COPY .github/test /opt/
-    RUN pip3 install --upgrade pytest pytest-xdist redis
     
     WORKDIR /opt
     STOPSIGNAL SIGRTMIN+3
     CMD ["/sbin/init"]
-    #ENTRYPOINT [ "pytest", "test-runner-pytest.py" ]
-    #CMD ["--log-level", "INFO" ]
     """
     )
     log.debug(f"Generated Containerfile:\n{containerfile}")
@@ -123,5 +115,5 @@ def _ensure_dir(filename: str):
     return d
 
 
-def _copy_commands(copy_files):
+def _copy_commands(copy_files: List[Tuple[str, str]]) -> str:
     return "\n".join(map(lambda t: f"    COPY {t[0]} {t[1]}", copy_files))

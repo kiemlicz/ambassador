@@ -29,7 +29,7 @@ import sys
 
 # Import Salt libs
 import salt.config
-import salt.ext.six as six
+import six
 import salt.loader
 import salt.utils.stringutils
 import salt.version
@@ -37,7 +37,7 @@ from salt.exceptions import (
     SaltInvocationError, SaltSystemExit
 )
 try:
-    from salt.ext.six.moves import range as six_range
+    from six.moves import range as six_range
 except ImportError:
     six_range = range
 

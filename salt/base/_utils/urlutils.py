@@ -1,5 +1,5 @@
 try:
-    from salt.ext.six.moves.urllib.parse import urlparse, parse_qs
+    from six.moves.urllib.parse import urlparse, parse_qs
 
     HAS_URLPARSE = True
 except ImportError:

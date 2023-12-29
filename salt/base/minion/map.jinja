@@ -8,7 +8,8 @@
           'event_tag': "salt/minion/" ~ grains['id'] ~ "/minion_ready",
           'service': "salt-minion",
           'startup': {
-            'pip3': []
+            'pip3': [],
+            'pkgs': []
           },
           'patch': {
             'files': []
@@ -23,7 +24,8 @@
           'event_tag': "salt/minion/" ~ grains['id'] ~ "/minion_ready",
           'service': "salt-minion",
           'startup': {
-            'pip3': []
+            'pip3': [],
+            'pkgs': []
           },
           'patch': {
             'files': []
