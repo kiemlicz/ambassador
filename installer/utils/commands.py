@@ -5,11 +5,13 @@ log = logging.getLogger(__name__)
 
 
 def requisite_commands(required_pkgs: List[str], required_pip: List[str]) -> List[str]:
-    # latest pip typically is required, cannot upgrade it in one run as some dependencies may require latest pip
-    return [
-        f"apt update -y && apt install -y {' '.join(required_pkgs)}",
-        f"salt-pip install {' '.join(required_pip)}"
-    ]
+    cmds = [f"apt update -y && apt install -y {' '.join(required_pkgs)}"]
+    if required_pip:
+        # latest pip typically is required, cannot upgrade it in one run as some dependencies may require latest pip
+        cmds.extend([
+            f"salt-pip install {' '.join(required_pip)}"
+        ])
+    return cmds
 
 def salt_download_and_install_commands(
         start_daemon: bool = True,

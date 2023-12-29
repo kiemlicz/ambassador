@@ -151,7 +151,10 @@ def files_to_transfer() -> List[Tuple[str, str]]:
     # todo handle extensions/file_ext todo some files (configs) are provided as default args some are not
     state_tree_mapping = list(dir_mappings(MAIN_FILES_TO_TRANSFER, SALT_TREE_ROOT))  # dir
     salt_conf_mapping = list(file_mappings(configs, SALT_MINION_CONFIG))  # file *.conf
-    salt_keys_mapping = list(dir_content_mappings([secrets], SALT_KEY_LOCATION))
+    if secrets:
+        salt_keys_mapping = list(dir_content_mappings([secrets], SALT_KEY_LOCATION))
+    else:
+        salt_keys_mapping = []
 
     all_files = state_tree_mapping + salt_conf_mapping + salt_keys_mapping + extra
     log.debug(f"Files to transfer: {all_files}")

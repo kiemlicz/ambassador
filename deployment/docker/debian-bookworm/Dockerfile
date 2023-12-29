@@ -1,4 +1,4 @@
-ARG tag="bullseye-slim"
+ARG tag="bookworm-slim"
 FROM debian:$tag AS salt-base
 # "" == latest
 ARG salt_ver=""

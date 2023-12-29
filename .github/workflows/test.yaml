@@ -13,7 +13,7 @@ jobs:
           - 6379:6379
     strategy:
       matrix:
-        image: [ "debian:bullseye", "ubuntu:focal" ]
+        image: [ "debian:bookworm", "ubuntu:focal" ]
     env:
       DOCKER_IMAGE: ${{ matrix.image }}
       CONTEXT: syntax-test
@@ -30,7 +30,7 @@ jobs:
       - salt-render-test
     strategy:
       matrix:
-        image: [ "debian:bullseye", "ubuntu:focal" ]
+        image: [ "debian:bookworm", "ubuntu:focal" ]
         context: [ "base", "server" ]
     env:
       DOCKER_IMAGE: ${{ matrix.image }}
