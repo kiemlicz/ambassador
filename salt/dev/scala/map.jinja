@@ -1,4 +1,4 @@
-{% set version = salt['pillar.get']("scala:version", default='2.13.8') %}
+{% set version = salt['pillar.get']("scala:version", default='2.13.12') %}
 {% set url = 'https://downloads.lightbend.com/scala/' + version + '/scala-' + version + '.tgz' %}
 {% set scala = salt['grains.filter_by']({
     'default': {

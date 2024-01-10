@@ -1,7 +1,7 @@
 {# default is openjdk due to https://www.linuxuprising.com/2019/06/new-oracle-java-11-installer-for-ubuntu.html #}
 {% set java_type = salt['pillar.get']("java:type", default="openjdk") %}
 
-{% set version_major = salt['pillar.get']("java:version_major", default="11") %}
+{% set version_major = salt['pillar.get']("java:version_major", default="17") %}
 
 {% set openjdk_java = salt['grains.filter_by']({
      'RedHat': {

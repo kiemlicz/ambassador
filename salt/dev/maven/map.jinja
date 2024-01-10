@@ -1,6 +1,6 @@
 {# {% import_yaml "defaults.yaml" as defaults %} #}
 
-{% set version = '3.8.6' %}
+{% set version = '3.9.6' %}
 {% set url = 'https://dlcdn.apache.org/maven/maven-3/' + version + '/binaries/apache-maven-' + version + '-bin.tar.gz' %}
 {% set maven = salt['grains.filter_by']({
     'default': {
