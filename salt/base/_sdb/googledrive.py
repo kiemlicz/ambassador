@@ -14,7 +14,7 @@ def __virtual__():
 
 def get(key, profile=None):
     client = _get_client(profile)
-    return client.get_file_plain_text(key)
+    return client.get(key)
 
 
 def _get_client(profile):
