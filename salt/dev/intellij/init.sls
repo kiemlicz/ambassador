@@ -15,6 +15,7 @@ intellij:
     - user: {{ intellij.owner }}
     - group: {{ intellij.owner }}
     - saltenv: {{ saltenv }}
+    - enforce_toplevel: False  # https://github.com/saltstack/salt/issues/44632
 {{ retry(attempts=4, interval=30)| indent(4) }}
     - require:
       - sls: users
