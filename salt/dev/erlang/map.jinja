@@ -1,6 +1,6 @@
 {# {% import_yaml "defaults.yaml" as defaults %} #}
 
-{% set os = salt['grains.get']('lsb_distrib_id') %}
+{% set os = salt['grains.get']('os') %}
 {% set dist_codename = salt['grains.get']('lsb_distrib_codename') %}
 {% set erlang = salt['grains.filter_by']({
     'RedHat': {
