@@ -1,11 +1,10 @@
 {% for username, user in salt['pillar.get']("users", {}).items() if user.vpn is defined and user.vpn %}
 
 {% for v in user.vpn %}
-{% set vpn_config = '{}_vpn_{}_config'.format(username, v.name) %}
 
 {% if v.source is defined %}
 {{ username }}_vpn_{{ v.name }}_directory:
-  file_ext.recurse:
+  file.recurse:
     - name: {{ v.location }}/{{ v.name }}
     - source: {{ v.source }}
 {% if v.include_pat is defined %}
@@ -19,13 +18,13 @@
     - require:
       - user: {{ username }}
 
-{% elif pillar[vpn_config] is defined or v.source_file is defined %}
+{% elif v.contents is defined or v.source_file is defined %}
 # fixme it is not possible to setup VPN using contents
 {{ username }}_vpn_{{ v.name }}_file:
-  file_ext.managed:
+  file.managed:
     - name: {{ v.location }}/{{ v.name }}
-{% if pillar[vpn_config] is defined %}
-    - contents_pillar: {{ vpn_config }}
+{% if v.contents is defined %}
+    - contents: {{ v.contents | yaml_encode }}
 {% elif v.source_file is defined %}
     - source: {{ v.source_file }}
 {% else %}

@@ -11,7 +11,7 @@ mail:
       - sls: os
 {% for name, config in mail.configs.items() if config %}
 mail_config_{{ config.location }}:
-  file_ext.managed:
+  file.managed:
     - name: {{ config.location }}
     - source: {{ config.source }}
     - makedirs: True

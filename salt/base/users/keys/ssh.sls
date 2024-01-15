@@ -10,7 +10,7 @@ def run():
     states = {}
 
     def _copy_key(location, user, group, mode=600, contents_pillar=None, source=None, contents=None):
-        s = { 'file_ext.managed': [
+        s = { 'file.managed': [
             { 'name': location },
             { 'user': user },
             { 'group': group },
@@ -21,13 +21,13 @@ def run():
             ]}
         ]}
         if contents_pillar:
-            s['file_ext.managed'].append({ 'contents_pillar': contents_pillar })
+            s['file.managed'].append({ 'contents_pillar': contents_pillar })
             return s
         elif source:
-            s['file_ext.managed'].append({ 'source': source })
+            s['file.managed'].append({ 'source': source })
             return s
         else:
-            s['file_ext.managed'].append({ 'contents': contents })
+            s['file.managed'].append({ 'contents': contents })
             return s
 
     for username, user in __salt__['pillar.get']("users", {}).items():
