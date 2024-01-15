@@ -9,7 +9,7 @@ include:
 
 {%- for config in salt_installer.master.config|selectattr("initial", "equalto", True)|list %}
 salt_master_{{ config.name }}:
-  file_ext.managed:
+  file.managed:
     - name: {{ config.name }}
     - contents: {{ config.contents | yaml_encode }}
     - template: jinja
@@ -44,7 +44,7 @@ salt_master_sync_modules:
 
 {%- for config in salt_installer.master.config|selectattr("initial", "equalto", False)|list %}
 salt_master_{{ config.name }}:
-  file_ext.managed:
+  file.managed:
     - name: {{ config.name }}
     - contents: {{ config.contents | yaml_encode }}
     - template: jinja

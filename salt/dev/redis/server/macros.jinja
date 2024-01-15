@@ -9,7 +9,7 @@
 {% macro redis_configure(redis, ip, port, instance_number, service) -%}
 
 redis_config_{{ ip }}_{{ port }}:
-  file_ext.managed:
+  file.managed:
     - name: /etc/redis/redis-{{ instance_number }}.conf
     - source: {{ redis.config.source }}
     - makedirs: True
@@ -24,13 +24,13 @@ redis_config_{{ ip }}_{{ port }}:
           dir: {{ redis.config.dir }}-{{ instance_number }}
           pid: "/var/run/redis-" ~ {{ instance_number }} ~ "/redis-server.pid"
     - require:
-      - file_ext: {{ redis.config.init_location }}
+      - file: {{ redis.config.init_location }}
 {% if salt['grains.get']("init") != 'systemd' %}
   file.symlink:
     - name: /etc/init.d/redis-server-{{ instance_number }}
     - target: {{ redis.config.init_location }}
     - require:
-      - file_ext: /etc/redis/redis-{{ instance_number }}.conf
+      - file: /etc/redis/redis-{{ instance_number }}.conf
     - watch_in:
       - service: {{ service }}
 {% endif %}
@@ -38,5 +38,5 @@ redis_config_{{ ip }}_{{ port }}:
     - name: {{ service }}
     - enable: True
     - watch:
-      - file_ext: /etc/redis/redis-server-{{ instance_number }}.conf
+      - file: /etc/redis/redis-server-{{ instance_number }}.conf
 {%- endmacro %}

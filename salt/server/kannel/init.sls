@@ -17,7 +17,7 @@ kannel_server:
     - enable: True
     - require:
       - pkg: kannel
-  file_ext.managed:
+  file.managed:
     - name: {{ kannel.conf }}
     - source: {{ kannel.conf_source }}
     - context:

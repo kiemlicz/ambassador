@@ -2,7 +2,7 @@
 
 
 redis_config_{{ redis.ip }}_{{ redis.port }}:
-  file_ext.managed:
+  file.managed:
     - name: {{ redis.config.conf_file }}
     - source: {{ redis.config.source }}
     - makedirs: True
@@ -15,4 +15,4 @@ redis_config_{{ redis.ip }}_{{ redis.port }}:
     - name: {{ redis.config.service }}
     - enable: True
     - watch:
-      - file_ext: {{ redis.config.conf_file }}
+      - file: {{ redis.config.conf_file }}

@@ -8,7 +8,7 @@ include:
 
 {%- for config in salt_installer.ssh.config %}
 salt_ssh_{{ config.name }}:
-  file_ext.managed:
+  file.managed:
     - name: {{ config.name }}
     - contents: {{ config.contents | yaml_encode }}
     - template: jinja

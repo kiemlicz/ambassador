@@ -17,7 +17,7 @@ mongodb:
 {{ pkg_latest_opts() | indent(4) }}
     - require:
       - sls: os
-  file_ext.managed:
+  file.managed:
     - name: {{ mongodb.config.init_location }}
     - source: {{ mongodb.config.init }}
     - mode: {{ mongodb.config.mode }}

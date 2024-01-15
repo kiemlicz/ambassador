@@ -7,7 +7,7 @@
   'ip': mongodb.ip|default(ip())
 } %}
 mongodb_init:
-  file_ext.managed:
+  file.managed:
     - name: {{ mongodb.config.init_location }}
     - source: {{ mongodb.config.init }}
     - mode: {{ mongodb.config.mode }}
@@ -18,7 +18,7 @@ mongodb_init:
     - require:
       - pkg: {{ mongodb.pkg_name }}
 mongodb_config:
-  file_ext.managed:
+  file.managed:
     - name: /etc/{{ mongodb.config.service }}.conf
     - source: {{ mongodb.config.source }}
     - makedirs: True
@@ -28,7 +28,7 @@ mongodb_config:
       mongodb: {{ mongodb|tojson }}
       discriminator: {{ discriminator }}
     - require:
-      - file_ext: {{ mongodb.config.init_location }}
+      - file: {{ mongodb.config.init_location }}
   file.directory:
     - names:
       - {{ mongodb.config.db_path }}/{{ discriminator }}
@@ -38,7 +38,7 @@ mongodb_config:
     - group: {{ mongodb.group }}
     - makedirs: True
     - require:
-      - file_ext: /etc/{{ mongodb.config.service }}.conf
+      - file: /etc/{{ mongodb.config.service }}.conf
     - require_in:
       - service: {{ mongodb.config.service }}
   service.running:

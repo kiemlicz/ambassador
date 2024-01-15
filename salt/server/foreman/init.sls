@@ -113,7 +113,7 @@ setup_foreman_{{ query.name }}:
 
 {% for override in foreman.overrides %}
 foreman_override_{{ override.name }}:
-  file_ext.managed:
+  file.managed:
     - name: {{ override.name }}
 {%- if override.contents is defined %}
     - contents: {{ override.contents | yaml_encode }}

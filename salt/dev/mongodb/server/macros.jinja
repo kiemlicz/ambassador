@@ -3,7 +3,7 @@
 {% set service = mongodb.config.service + '@' + bind.port|string %}
 
 mongodb_config_{{ bind.ip }}_{{ bind.port }}:
-  file_ext.managed:
+  file.managed:
     - name: /etc/{{ discriminator }}.conf
     - source: {{ mongodb.config.source }}
     - makedirs: True
@@ -13,7 +13,7 @@ mongodb_config_{{ bind.ip }}_{{ bind.port }}:
       mongodb: {{ mongodb|tojson }}
       discriminator: {{ discriminator }}
     - require:
-      - file_ext: {{ mongodb.config.init_location }}
+      - file: {{ mongodb.config.init_location }}
   file.directory:
     - names:
       - {{ mongodb.config.db_path }}/{{ discriminator }}
@@ -23,7 +23,7 @@ mongodb_config_{{ bind.ip }}_{{ bind.port }}:
     - group: {{ mongodb.group }}
     - makedirs: True
     - require:
-      - file_ext: /etc/{{ discriminator }}.conf
+      - file: /etc/{{ discriminator }}.conf
 
 mongodb_start_{{ bind.ip }}_{{ bind.port }}:
 {% if salt['grains.get']("init") != 'systemd' %}

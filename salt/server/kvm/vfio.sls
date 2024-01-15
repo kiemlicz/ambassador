@@ -11,7 +11,7 @@ grub_d_directory:
 
 {% for config in kvm.vfio.configs %}
 vfio_{{ config.name }}:
-  file_ext.managed:
+  file.managed:
     - name: {{ config.name }}
 {%- if config.contents is defined %}
     - contents: {{ config.contents | yaml_encode }}

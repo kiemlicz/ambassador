@@ -4,7 +4,7 @@
 
 
 redis_init_script:
-  file_ext.managed:
+  file.managed:
     - name: {{ redis.config.init_location }}
     - source: {{ redis.config.init }}
     - mode: {{ redis.config.mode }}

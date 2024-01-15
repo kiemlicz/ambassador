@@ -5,7 +5,7 @@
 {% for config in project.configs %}
 
 {{ username }}_project_{{ project.url }}_config_{{ config.name }}:
-  file_ext.managed:
+  file.managed:
     - name: {{ project.target }}/{{ config.name }}
 {% if config.contents is defined %}
     - contents: {{ config.contents | yaml_encode }}
