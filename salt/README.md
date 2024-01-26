@@ -37,7 +37,7 @@ Vagrant supports [_Salt_ provisioner](https://www.vagrantup.com/docs/provisionin
           salt.masterless = true
           salt.minion_config = "minion.conf"
           salt.run_highstate = true
-          salt.salt_args = [ "saltenv=server" ]
+          salt.salt_args = [ "saltenv=base" ]
         end
     ...
     end

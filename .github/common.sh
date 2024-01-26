@@ -69,9 +69,9 @@ minikube_ready() {
 }
 
 minikube_install() {
-  sudo salt-call --local state.apply kubernetes.client saltenv=server
-  sudo salt-call --local state.apply kubernetes.minikube saltenv=server
-  sudo salt-call --local state.apply kubernetes.helm saltenv=server
+  sudo salt-call --local state.apply kubernetes.client
+  sudo salt-call --local state.apply kubernetes.minikube
+  sudo salt-call --local state.apply kubernetes.helm
   minikube_ready
 }
 

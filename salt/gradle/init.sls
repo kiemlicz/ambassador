@@ -14,7 +14,6 @@ gradle:
     - destination_dir: {{ gradle.destination_dir }}
     - user: {{ gradle.owner }}
     - group: {{ gradle.owner }}
-    - saltenv: {{ saltenv }}
 {{ retry()| indent(4) }}
     - require:
       - sls: users

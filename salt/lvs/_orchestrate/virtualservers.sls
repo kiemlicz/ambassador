@@ -6,4 +6,3 @@ virtual_servers_setup:
     - sls:
       - keepalived
       - lvs.director
-    - saltenv: server

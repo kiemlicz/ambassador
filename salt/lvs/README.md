@@ -168,8 +168,8 @@ keepalived:
             vrrp_garp_master_refresh 30
         }
 ```
-2. `salt-run state.orchestrate lvs._orchestrate.realservers saltenv=server`
-3. `salt-run state.orchestrate lvs._orchestrate.virtualservers saltenv=server` However if Real Servers spawns LXC containers this step can be run from [LXC reactor](https://github.com/kiemlicz/ambassador/blob/master/salt/base/lxc/_reactor/lxc.sls)
+2. `salt-run state.orchestrate lvs._orchestrate.realservers saltenv=base`
+3. `salt-run state.orchestrate lvs._orchestrate.virtualservers saltenv=base` However if Real Servers spawns LXC containers this step can be run from [LXC reactor](https://github.com/kiemlicz/ambassador/blob/master/salt/base/lxc/_reactor/lxc.sls)
 
 ### `lvs.director`
 ### `lvs.realserver`

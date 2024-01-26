@@ -14,7 +14,6 @@ scala:
     - destination_dir: {{ scala.destination_dir }}
     - user: {{ scala.owner }}
     - group: {{ scala.owner }}
-    - saltenv: {{ saltenv }}
 {{ retry()| indent(4) }}
     - require:
       - sls: users

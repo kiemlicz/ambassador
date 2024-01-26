@@ -11,7 +11,6 @@ ghrunner:
     - destination_dir: {{ ghrunner.destination_dir }}
     - user: {{ ghrunner.owner }}
     - group: {{ ghrunner.owner }}
-    - saltenv: {{ saltenv }}
 {{ retry(attempts=2, interval=60)| indent(4) }}
     - require:
       - sls: users

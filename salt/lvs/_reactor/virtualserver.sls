@@ -4,7 +4,6 @@ virtual_server_init:
     - args:
       - mods:
         - lvs._orchestrate.virtualservers
-      - saltenv: server
       - pillar:
           lvs:
             vs:

@@ -72,7 +72,7 @@ export PIP3_PYGIT2_VER="1.0.3"
 export CONTEXT="syntax-test"
 export TEST="syntax"
 export K8S_API_ENABLED=true
-export SALTENV=server
+export SALTENV=base
 
 docker rm salt-test || true
 .travis/prepare.sh salt-test

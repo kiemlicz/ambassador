@@ -13,7 +13,6 @@ gatling:
     - destination_dir: {{ gatling.destination_dir }}
     - user: {{ gatling.owner }}
     - group: {{ gatling.owner }}
-    - saltenv: {{ saltenv }}
 {{ retry(attempts=5, interval=60)| indent(4) }}
     - require:
       - sls: java

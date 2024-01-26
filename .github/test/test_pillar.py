@@ -68,7 +68,7 @@ def client(saltenv: str) -> salt.client.Caller:
     log.info(f"Salt Client initialization (saltenv: {saltenv})")
     client = salt.client.Caller()
     # don't run sync_all in Dockerfile so that no Minion ID is generated there
-    sync_result = client.cmd("saltutil.sync_all", saltenv="server")
+    sync_result = client.cmd("saltutil.sync_all", saltenv="base")
     log.info(f"saltutil.sync_all: {pp.pformat(sync_result)}")
     if not sync_result['modules'] or not sync_result['utils'] or not sync_result['states']:
         log.warning("Modules to sync not found, the tests may fail")

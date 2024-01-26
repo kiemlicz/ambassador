@@ -6,7 +6,6 @@ real_servers_network_setup:
     - tgt_type: compound
     - sls:
       - os.network
-    - saltenv: server
 
 real_servers_network_setup_apply:
   salt.function:
@@ -30,6 +29,5 @@ real_servers_setup:
     - sls:
       - lxc
       - lvs.realserver
-    - saltenv: server
     - require:
       - salt: wait_for_real_servers_setup

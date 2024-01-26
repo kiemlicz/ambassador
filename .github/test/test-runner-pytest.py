@@ -29,7 +29,7 @@ def states_location(request) -> str:
 
 @pytest.fixture(scope="session")
 def saltenv() -> str:
-    return os.environ.get("SALTENV", "server")
+    return os.environ.get("SALTENV", "base")
 
 
 @pytest.fixture(scope="session")

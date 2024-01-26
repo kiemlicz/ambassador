@@ -10,7 +10,6 @@
     - render: {{ user.dotfile.render|default(False) }}
     - override: {{ user.dotfile.override|default(False) }}
     - identity: {{ user.sec.ssh.dotfile.privkey_location}}
-    - saltenv: {{ saltenv }}
     - unless: {{ user.dotfile.unless|default(False) }}
     - onlyif: {{ user.dotfile.onlyif|default(True) }}
     - require:

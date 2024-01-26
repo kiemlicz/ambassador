@@ -12,7 +12,6 @@ maven:
     - destination_dir: {{ maven.destination_dir }}
     - user: {{ maven.owner }}
     - group: {{ maven.owner }}
-    - saltenv: {{ saltenv }}
 {{ retry(attempts=5, interval=60)| indent(4) }}
     - require:
       - sls: users
