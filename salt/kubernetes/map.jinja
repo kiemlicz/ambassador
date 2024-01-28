@@ -1,35 +1,24 @@
+{% set version = "1.29" %}
 {% set kubernetes = salt['grains.filter_by']({
-      'RedHat': {
-          'baseurl': "https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64",
-          'repo_id': "kubernetes",
-          'gpgkey': "https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg",
-          'pkgs': ["kubelet", "kubeadm", "kubectl"],
-          'config': {
-            'locations': ["/etc/kubernetes/admin.conf"],
-          },
-          'user': "root",
-          'nodes': {
-            'masters': [],
-            'workers': []
-          }
-      },
-      'Debian': {
+      'default': {
           'names': [
-              "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+              "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v" ~ version ~ "/deb/ /"
           ],
           'file': '/etc/apt/sources.list.d/kubernetes.list',
-          'key_url': "https://packages.cloud.google.com/apt/doc/apt-key.gpg",
+          'key_url': "https://pkgs.k8s.io/core:/stable:/v" ~ version ~ "/deb/Release.key",
           'pkgs': ["kubelet", "kubeadm", "kubectl"],
           'config': {
             'locations': ["/etc/kubernetes/admin.conf"],
           },
           'user': "root",
+          "distro": "kubeadm",
+          'version': version,
           'nodes': {
             'masters': [],
             'workers': []
+          },
+          'container': {
+            'runtime': "docker"
           }
-      },
-      'Windows': {
-
-      },
+      }
 }, merge=salt['pillar.get']('kubernetes')) %}

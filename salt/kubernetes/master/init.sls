@@ -5,7 +5,11 @@
 {%- endif %}
 
 include:
-  - docker
-  - kubernetes.kubeadm
-  - kubernetes.master.setup
+  - {{ kubernetes.container.runtime }}
+{% if kubernetes.distro == "kubeadm" %}
+  - kubernetes.distro.kubeadm.master
+  - kubernetes.master.kubeadm.setup # kubeadm specific, refactor to be used like worker
+{% elif kubernetes.distro == "k3s" %}
+  - kubernetes.distro.k3s.master
+{% endif %}
   - kubernetes.network

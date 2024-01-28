@@ -10,3 +10,4 @@ kubeadm:
     - require:
       - pkgrepo_ext: kube_repository
       - service: docker
+      - sls: kubernetes.distro.requisites

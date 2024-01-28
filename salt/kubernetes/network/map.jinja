@@ -1,7 +1,12 @@
 {%- from "kubernetes/map.jinja" import kubernetes as kubernetes_defaults with context %}
 # fixme delete flannel, add kube-router, calico and weave-net
-{%- set default_network_provider = "flannel" %}
+# https://github.com/cilium/cilium-cli/releases/tag/
+{%- set default_network_provider = "cilium" %}
 {%- set network_provider = {
+  'cilium': {
+      'source': "https://github.com/cilium/cilium-cli/releases/download/v0.15.20/cilium-linux-amd64.tar.gz",
+      'extract': "/usr/local/bin/"
+  },
   'flannel' : {
       'cidr': "10.244.0.0/16",
       'source': "https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml"

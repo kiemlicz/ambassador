@@ -9,7 +9,7 @@ kubeadm_master_reset:
     - require:
         - pkg: kubeadm
     - require_in:
-        - cmd: kubeadm_init
+        - sls: kubernetes.distro.kubeadm
 {%- endif -%}
 
 {%- if grains['id'] == masters|first %}
@@ -28,7 +28,7 @@ allow_schedule_on_master:
     - env:
         - KUBECONFIG: {{ kubernetes.config.locations|join(':') }}
     - require:
-        - cmd: kubeadm_init
+        - sls: kubernetes.distro.{{ kubernetes.distro }}
 # todo else -> taint the node
 {%- endif %}
 
@@ -40,7 +40,7 @@ propagate_cert_key:
         - mine_function: grains.get
         - "kubernetes:master:certificate_key"
     - require:
-      - cmd: kubeadm_init
+      - sls: kubernetes.distro.{{ kubernetes.distro }}
 propagate_ip:
   module.run:
     - mine.send:
@@ -48,7 +48,7 @@ propagate_ip:
         - mine_function: network.ip_addrs
         - cidr: {{ kubernetes_network.nodes.master_vip }}
     - require:
-      - cmd: kubeadm_init
+      - sls: kubernetes.distro.{{ kubernetes.distro }}
 {%- else %}
 propagate_ip:
   module.run:
@@ -57,33 +57,7 @@ propagate_ip:
         - mine_function: network.ip_addrs
         - cidr: {{ kubernetes_network.nodes.cidr }}
     - require:
-      - cmd: kubeadm_init
+      - sls: kubernetes.distro.{{ kubernetes.distro }}
 {%- endif %}
-
-ensure_token:
-  module.run:
-    - kubeadm.token_create: []
-    - unless:
-      - fun: kubeadm.token_list    
-    - require:
-      - cmd: kubeadm_init
-propagate_token:
-  module.run:
-    - mine.send:
-        - kubernetes_token
-        - mine_function: kubeadm.token_list
-    - require:
-      - module: ensure_token
-
-propagate_hash:
-  module.run:
-    - mine.send:
-        - kubernetes_hash
-        - mine_function: cmd.run
-        - "openssl x509 -pubkey -in {{ kubernetes.master.pki.dir }}/{{ kubernetes.master.ca.pub }} | openssl rsa -pubin -outform der 2>/dev/null | openssl dgst -sha256 -hex | sed 's/^.* //'"
-        - python_shell: True
-    - require:
-      - cmd: kubeadm_init
-
 
 #todo the cmd.run should be wrapped with script and return stateful data

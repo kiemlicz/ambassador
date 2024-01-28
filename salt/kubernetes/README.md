@@ -7,7 +7,7 @@ Deploys and configures the Kubernetes Nodes.
  - [`kubernetes.helm`](#kuberneteshelm)
 
 ## Usage
-Some prerequisites must be met first:
+Some prerequisites must be met first (pre 3005 version):
  - _Salt Minion_ config must contain:
 ```
 use_superseded:
@@ -46,7 +46,7 @@ x509_signing_policies:
     - authorityKeyIdentifier: keyid,issuer:always
     - days_valid: 365
 ```
-2. `salt-run state.orchestrate kubernetes._orchestrate.cluster saltenv=server pillar='{"kubernetes": {"nodes": {"masters": [k8s1], "workers": [k8s2, k8s3]}}}'`
+2. `salt-run state.orchestrate kubernetes._orchestrate.cluster saltenv=base pillar='{"kubernetes": {"nodes": {"masters": [k8s1], "workers": [k8s2, k8s3]}}}'`
 
 ### `kubernetes.master`
 Setup Kubernetes master node
