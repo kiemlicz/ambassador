@@ -54,7 +54,7 @@ Setup Kubernetes master node
 #### Example pillar
 ```
 kubernetes:
-  network:
+  cni:
     provider: flannel
     cidr: "10.244.0.0/16"
   master:
@@ -78,7 +78,7 @@ Setup Kubernetes worker node
 #    version: "18.06.1~ce~3-0~ubuntu"
 #    version: "18.06.1~ce~3-0~debian"
 kubernetes:
-  network:
+  cni:
     provider: flannel
     cidr: "10.244.0.0/16"
   master:

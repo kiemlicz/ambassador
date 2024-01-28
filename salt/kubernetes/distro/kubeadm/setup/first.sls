@@ -1,6 +1,6 @@
 # fixme install LB first
 {%- from "kubernetes/master/map.jinja" import kubernetes with context %}
-{%- from "kubernetes/network/map.jinja" import kubernetes as kubernetes_network with context -%}
+{%- from "kubernetes/network/map.jinja" import kubernetes as kubernetes_cni with context -%}
 
 {%- if kubernetes.nodes.masters|length > 1 %}
 {%- if kubernetes.master.ca.host == grains['id'] %}
@@ -8,8 +8,8 @@ include:
 - .ca
 {%- endif %}
 
-{%- if not kubernetes_network.nodes.master_vip %}
-{{ raise("VIP address must be provided in kubernetes_network.nodes.master_vip") }}
+{%- if not kubernetes_cni.nodes.master_vip %}
+{{ raise("VIP address must be provided in kubernetes_cni.nodes.master_vip") }}
 {%- endif %}
 
 # https://kubernetes.io/docs/concepts/cluster-administration/certificates/
@@ -25,7 +25,7 @@ kubernetes_apiserver_key:
     - sls: kubernetes.master.setup.ca
 {%- endif %}  
 
-{%- set vip = kubernetes_network.nodes.master_vip.split('/')[0] %}
+{%- set vip = kubernetes_cni.nodes.master_vip.split('/')[0] %}
 kubernetes_apiserver_cert:
   x509.certificate_managed:
   - name: "{{ kubernetes.master.pki.dir }}/{{ kubernetes.master.apiserver.pub }}"
@@ -44,11 +44,11 @@ kubernetes_apiserver_cert:
 
 # for now assuming keepalived
 # remove --upload-certs if certs issues
-{%- set cmd = "kubeadm init --control-plane-endpoint " ~ vip ~ ":" ~ kubernetes_network.nodes.apiserver_port ~ " --upload-certs --pod-network-cidr " ~ kubernetes_network.network.config.cidr ~ " --certificate-key " ~ kubernetes.master.certificate_key %}
+{%- set cmd = "kubeadm init --control-plane-endpoint " ~ vip ~ ":" ~ kubernetes_cni.nodes.apiserver_port ~ " --upload-certs --pod-network-cidr " ~ kubernetes_cni.cni.config.cidr ~ " --certificate-key " ~ kubernetes.master.certificate_key %}
 {%- else %}
 # single plane
 # https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/
-{%- set cmd = "kubeadm init --pod-network-cidr " ~ kubernetes_network.network.config.cidr  ~ " --certificate-key " ~ kubernetes.master.certificate_key %}
+{%- set cmd = "kubeadm init --pod-network-cidr " ~ kubernetes_cni.cni.config.cidr  ~ " --certificate-key " ~ kubernetes.master.certificate_key %}
 {%- endif %}
 
 kubeadm_init:
@@ -57,7 +57,7 @@ kubeadm_init:
     - require:
       - pkg: kubeadm
     - require_in:
-      - sls: kubernetes.network.{{ kubernetes_network.network.provider }}
+      - sls: kubernetes.cni.{{ kubernetes_cni.cni.provider }}
     - unless: test -f /etc/kubernetes/admin.conf
 
 {%- if kubernetes.master.upload_config %}

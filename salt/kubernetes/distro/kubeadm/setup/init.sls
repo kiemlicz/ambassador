@@ -1,5 +1,5 @@
 {%- from "kubernetes/master/map.jinja" import kubernetes with context %}
-{%- from "kubernetes/network/map.jinja" import kubernetes as kubernetes_network with context %}
+{%- from "kubernetes/network/map.jinja" import kubernetes as kubernetes_cni with context %}
 {%- set masters = kubernetes.nodes.masters %}
 
 {%- if kubernetes.master.reset %}
@@ -46,7 +46,7 @@ propagate_ip:
     - mine.send:
         - kubernetes_master_ip
         - mine_function: network.ip_addrs
-        - cidr: {{ kubernetes_network.nodes.master_vip }}
+        - cidr: {{ kubernetes_cni.nodes.master_vip }}
     - require:
       - sls: kubernetes.distro.{{ kubernetes.distro }}
 {%- else %}
@@ -55,7 +55,7 @@ propagate_ip:
     - mine.send:
         - kubernetes_master_ip
         - mine_function: network.ip_addrs
-        - cidr: {{ kubernetes_network.nodes.cidr }}
+        - cidr: {{ kubernetes_cni.nodes.cidr }}
     - require:
       - sls: kubernetes.distro.{{ kubernetes.distro }}
 {%- endif %}

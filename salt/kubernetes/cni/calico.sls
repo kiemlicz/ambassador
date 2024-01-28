@@ -1,8 +1,8 @@
-{%- from "kubernetes/network/map.jinja" import kubernetes with context %}
+{%- from "kubernetes/cni/map.jinja" import kubernetes with context %}
 {%- from "_common/util.jinja" import retry with context %}
-kubernetes_network:
+kubernetes_cni:
   cmd.run:
-    - name: kubectl apply -f {{ kubernetes.network.config.source }}
+    - name: kubectl apply -f {{ kubernetes.cni.config.source }}
     - env:
         - KUBECONFIG: {{ kubernetes.config.locations|join(':') }}
 {{ retry(attempts=3)| indent(4) }}

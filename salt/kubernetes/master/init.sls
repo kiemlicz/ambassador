@@ -12,4 +12,4 @@ include:
 {% elif kubernetes.distro == "k3s" %}
   - kubernetes.distro.k3s.master
 {% endif %}
-  - kubernetes.network
+  - kubernetes.cni
