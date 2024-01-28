@@ -29,7 +29,6 @@ control_plane_load_balancers:
     - sls:
       - keepalived
       - lvs.director
-    - saltenv: server
 
 master_network_setup:
   salt.state:
@@ -37,7 +36,6 @@ master_network_setup:
     - tgt_type: list
     - sls:
       - os.network
-    - saltenv: server
     - require:
         - salt: control_plane_load_balancers
 
@@ -63,7 +61,6 @@ setup_first_master:
   - sls:
     - docker
     - kubernetes.master
-  - saltenv: {{ saltenv }}
   - pillar: {{ pillar }}
   - require:
     - salt: wait_for_masters_setup
@@ -76,7 +73,6 @@ setup_masters:
   - sls:
     - docker
     - kubernetes.master
-  - saltenv: {{ saltenv }}
   - pillar: {{ pillar }}
   - require:
     - salt: setup_first_master
@@ -90,7 +86,6 @@ setup_workers:
   - tgt_type: list
   - sls:
     - kubernetes.worker
-  - saltenv: {{ saltenv }}
   - pillar: {{ pillar }}
   - require:
       - salt: setup_first_master
