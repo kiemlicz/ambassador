@@ -4,7 +4,8 @@
 {%- set default_network_provider = "cilium" %}
 {%- set network_provider = {
   'cilium': {
-    'namespace': "cilium",
+    'release_name': "cilium",
+    'release_namespace': "cilium",
     'version': "1.14.6",
     'options': ""
   },

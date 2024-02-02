@@ -1,0 +1,17 @@
+{%- from "kubernetes/map.jinja" import kubernetes as kubernetes_defaults with context %}
+
+{% set kubernetes = salt['grains.filter_by']({
+  'default': {
+    'metallb': {
+        'release_name': "metallb",
+        'release_namespace': "metallb-system",
+        'version': "0.14.3",
+        'repo': "metallb",
+        'chart': "metallb",
+        'options': "",
+        'config': {
+            'addresses': [],
+        }
+    }
+  },
+}, merge=kubernetes_defaults) %}
