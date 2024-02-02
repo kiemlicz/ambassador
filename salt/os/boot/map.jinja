@@ -1,0 +1,5 @@
+{% set boot = salt['grains.filter_by']({
+    'default': {
+        'files': [],
+    },
+},  merge=salt['pillar.get']('boot')) %}

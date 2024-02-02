@@ -2,19 +2,12 @@
 
 {% set os = salt['grains.get']('os') %}
 {% set dist_codename = salt['grains.get']('lsb_distrib_codename') %}
+{% set arch = salt['grains.get']("osarch") %}
 
 {% set docker = salt['grains.filter_by']({
-    'RedHat': {
-        'baseurl': "https://download.docker.com/linux/fedora/$releasever/$basearch/stable",
-        'repo_id': "docker-ce-stable",
-        'gpgkey': "https://download.docker.com/linux/fedora/gpg",
-        'pkg_name': "docker-ce",
-        'service_name': "docker",
-        'config': '/etc/docker/daemon.json',
-    },
-    'Debian': {
+    'default': {
         'file': '/etc/apt/sources.list.d/docker.list',
-        'names': ["deb [arch=amd64] https://download.docker.com/linux/" ~ os.lower() ~ " " ~ dist_codename ~ " stable"],
+        'names': ["deb [arch=" ~ arch ~ "] https://download.docker.com/linux/" ~ os.lower() ~ " " ~ dist_codename ~ " stable"],
         'key_url': "https://download.docker.com/linux/" ~ os.lower() ~ "/gpg",
         'pkg_names': ["docker-ce", "docker-ce-cli", "containerd.io"],
         'required_pkgs': ["bridge-utils"],
@@ -23,6 +16,6 @@
     },
 }, merge=salt['grains.filter_by']({
     'sid': {
-        'names': ["deb [arch=amd64] https://download.docker.com/linux/" ~ os.lower() ~ " stretch stable edge"],
+        'names': ["deb [arch=" ~ arch ~ "] https://download.docker.com/linux/" ~ os.lower() ~ " stretch stable edge"],
     }
 }, grain='oscodename', merge=salt['pillar.get']('docker'))) %}
