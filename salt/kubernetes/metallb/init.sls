@@ -4,6 +4,7 @@
 include:
   - kubernetes.helm
 
+# For BGP remember to setup BGP session on router
 kubernetes_metallb:
   cmd.run:
     - name: |
