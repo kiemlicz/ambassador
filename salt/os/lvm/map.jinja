@@ -1,0 +1,4 @@
+{% set lvm = salt['grains.filter_by']({
+    'default': {
+    },
+}, merge=salt['pillar.get']('lvm')) %}

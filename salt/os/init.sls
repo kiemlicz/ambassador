@@ -7,6 +7,7 @@ include:
 {%- endif %}
   - os.repositories
   - os.mounts
+  - os.lvm
   - os.hosts
   - os.locale
   - os.groups
