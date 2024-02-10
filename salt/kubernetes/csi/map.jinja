@@ -1,0 +1,34 @@
+{%- from "kubernetes/map.jinja" import kubernetes as kubernetes_defaults with context %}
+
+{%- set default_csi_provider = "openebs" %}
+
+{%- set csi_provider = {
+  'longhorn': {
+    'check': "https://raw.githubusercontent.com/longhorn/longhorn/v1.6.0/scripts/environment_check.sh",
+    'release_name': "longhorn",
+    'release_namespace': "longhorn-system",
+    'pkgs': [ "open-iscsi" ],
+    'daemon': "iscsid"
+  },
+  'openebs': {
+    'helm': {
+        'name': "openebs",
+        'namespace': "openebs",
+        'version': "3.10.0",
+        'repo': "openebs",
+        'chart': "openebs",
+        'url': "https://openebs.github.io/charts",
+    },
+    'pkgs': [ "open-iscsi", "lvm2" ],
+    'service_name': "iscsid"
+  }
+} %}
+
+{%- set kubernetes = salt['grains.filter_by']({
+  'default': {
+    'csi': {
+      'provider': default_csi_provider,
+      'config': csi_provider[default_csi_provider]
+    },
+  },
+}, merge=kubernetes_defaults) %}

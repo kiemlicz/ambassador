@@ -4,10 +4,14 @@
 {%- set default_network_provider = "cilium" %}
 {%- set network_provider = {
   'cilium': {
-    'release_name': "cilium",
-    'release_namespace': "cilium",
-    'version': "1.14.6",
-    'options': ""
+    'helm': {
+        'name': "cilium",
+        'namespace': "cilium",
+        'version': "1.14.6",
+        'repo': "cilium",
+        'chart': "cilium",
+        'set': [],
+    },
   },
   'flannel' : {
       'cidr': "10.244.0.0/16",

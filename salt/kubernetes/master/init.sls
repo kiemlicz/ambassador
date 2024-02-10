@@ -13,3 +13,4 @@ include:
   - kubernetes.distro.k3s.master
 {% endif %}
   - kubernetes.cni
+  - kubernetes.csi

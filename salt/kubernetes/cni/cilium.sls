@@ -5,12 +5,23 @@
 include:
   - kubernetes.helm
 
-kubernetes_cni:
-  cmd.run:
-    - name: |
-        helm upgrade --install {{ kubernetes.cni.config.release_name }} cilium/cilium -n {{ kubernetes.cni.config.release_namespace }} --create-namespace \
-        --version {{ kubernetes.cni.config.version }} {{ kubernetes.cni.config.options }}
-    - env:
-        - KUBECONFIG: {{ kubernetes.config.locations|join(':') }}
+kubernetes_cni_repo:
+  helm.repo_managed:
+    - present:
+        - name: {{ kubernetes.cni.config.helm.repo }}
+          url: https://helm.cilium.io/
+kubernetes_cni_release:
+  helm.release_present:
+    - name: {{ kubernetes.cni.config.helm.name }}
+    - namespace: {{ kubernetes.cni.config.helm.namespace }}
+    - chart: {{kubernetes.cni.config.helm.repo}}/{{kubernetes.cni.config.helm.chart}}
+    - version: {{ kubernetes.cni.config.helm.version }}
+    - set: {{ kubernetes.cni.config.helm.set|tojson }}
+    - flags:
+      - "create-namespace"
+      - "wait"
+    - kvflags:
+        kubeconfig: {{ kubernetes.config.locations|join(':') }}
     - require:
+      - helm: kubernetes_cni_repo
       - sls: kubernetes.helm
