@@ -1,4 +1,3 @@
-{%- from "_common/conf.jinja" import k_v with context -%}
 {%- for k in settings.keys() %}
-{{ k_v(k, settings, ': ') }}
+{{ k }}: {{ settings[k] }}
 {% endfor %}

@@ -19,8 +19,10 @@ mail_config_{{ config.location }}:
     - user: {{ config.user }}
     - group: {{ config.group }}
     - mode: {{ config.mode }}
+    {%- if 'settings' in config %}
     - context:
-      settings: {{ config.settings|default({})|tojson }}
+        settings: {{ config.settings|tojson }}
+    {%- endif %}
     - require:
       - pkg: mail_pacakges
     - watch_in:
