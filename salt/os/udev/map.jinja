@@ -1,0 +1,5 @@
+{% set udev = salt['grains.filter_by']({
+    'default': {
+      'rules': [],
+    },
+}, merge=salt['pillar.get']('udev')) %}

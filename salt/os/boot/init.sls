@@ -4,7 +4,7 @@
 {{ file.name }}:
     file.managed:
         - name: {{ file.name }}
-        - contents: {{ file.contents }}
+        - contents: {{ file.contents | yaml_encode }}
 {% if 'mode' in file %}
         - mode: {{ file.mode }}
 {% endif %}
