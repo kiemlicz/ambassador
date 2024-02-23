@@ -6,7 +6,7 @@
     'Debian': {
         'required_pkgs': ["apt-listchanges", "unattended-upgrades"],
         'configs': [{
-          'location': "/etc/apt/apt.conf.d/02periodic",
+          'location': "/etc/apt/apt.conf.d/20auto-upgrades",
           'source': "salt://os/pkgs/unattended/templates/periodic.jinja",
           'settings': {
             'enabled': 1,
@@ -20,7 +20,11 @@
          'location': "/etc/apt/apt.conf.d/50unattended-upgrades",
          'source': "salt://os/pkgs/unattended/templates/unattended-upgrades.jinja",
          'settings': {
-            'origins_patterns': ["origin=Debian,codename=${distro_codename},label=Debian-Security"],
+            'origins_patterns': [
+                "origin=Debian,codename=${distro_codename},label=Debian",
+                "origin=Debian,codename=${distro_codename},label=Debian-Security",
+                "origin=Debian,codename=${distro_codename}-security,label=Debian-Security",
+            ],
             'package_blacklist': [],
             'mail': "root",
           }
