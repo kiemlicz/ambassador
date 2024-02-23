@@ -14,3 +14,7 @@ include:
 {% endif %}
   - kubernetes.cni
   - kubernetes.csi
+
+kubernetes-master-notification:
+  test.succeed_without_changes:
+    - name: Kubernetes master setup completed
