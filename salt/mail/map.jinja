@@ -28,16 +28,7 @@
               'dc_hide_mailname':'false',
               'dc_mailname_in_oh':'true',
               'dc_localdelivery':'mail_spool',
-              'MAIN_TLS_ENABLE': 1
             }
-          },
-          'passwd': {
-            'location': '/etc/exim4/passwd',
-            'source': 'salt://mail/templates/passwd',
-            'user': 'root',
-            'group': 'Debian-exim',
-            'mode': '640',
-            'settings': {}
           },
           'passwd.client': {
             'location': '/etc/exim4/passwd.client',
