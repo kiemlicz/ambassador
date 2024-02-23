@@ -1,5 +1,8 @@
-{% set masters = salt.saltutil.runner('manage.up', tgt="k3sm*") %}
-{% set workers = salt.saltutil.runner('manage.up', tgt="k3sw*") %}
+# add in CLI: pillar='{"kubernetes": {"nodes": {"masters": [k3sm1], "workers": [k3sw1]}}}'
+{% set default_masters = salt.saltutil.runner('manage.up', tgt="k3sm*") %}
+{% set default_workers = salt.saltutil.runner('manage.up', tgt="k3sw*") %}
+{%- set masters = salt['pillar.get']('kubernetes:nodes:masters', default_masters) %}
+{%- set workers = salt['pillar.get']('kubernetes:nodes:workers', default_workers) %}
 {% set allnodes = [] %}
 {% do allnodes.extend(masters) %}
 {% do allnodes.extend(workers) %}
@@ -10,7 +13,8 @@ sync_modules_master:
 
 sync_minions:
   salt.function:
-  - tgt: "k3s*"
+  - tgt: "{{ allnodes|join(',') }}"
+  - tgt_type: list
   - name: saltutil.sync_all
   - kwarg:
         refresh: True
@@ -41,7 +45,8 @@ sync_minions:
 
 setup_k3s_single_master:
   salt.state:
-  - tgt: "k3sm1*"
+  - tgt: "{{ masters|join(',') }}"
+  - tgt_type: list
   - highstate: True
   - pillar:
       kubernetes:
@@ -54,7 +59,8 @@ setup_k3s_single_master:
 
 setup_k3s_workers:
   salt.state:
-  - tgt: "k3sw*"
+  - tgt: "{{ workers|join(',') }}"
+  - tgt_type: list
   - highstate: True
   - pillar:
       kubernetes:
