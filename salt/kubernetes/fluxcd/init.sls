@@ -8,3 +8,10 @@ fluxcd_cli:
     - name: {{ kubernetes.fluxcd.cli_url }}
     - require:
       - sls: kubernetes.master
+
+fluxcd_bootstrap:
+  cmd.run:
+    - name: {{ kubernetes.fluxcd.bootstrap }}
+    - env: {{ kubernetes.fluxcd.bootstrap_envs|tojson }}
+    - require:
+      - cmd: fluxcd_cli
