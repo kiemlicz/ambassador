@@ -6,6 +6,7 @@ include:
   - os.network
 {%- endif %}
   - os.repositories
+  - os.udev
   - os.mounts
   - os.lvm
   - os.hosts
