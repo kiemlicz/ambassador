@@ -16,7 +16,7 @@ def requisite_commands(required_pkgs: List[str], required_pip: List[str]) -> Lis
 def salt_download_and_install_commands(
         start_daemon: bool = True,
         salt_version: str = None,
-        bootstrap_url="https://bootstrap.saltproject.io"
+        bootstrap_url="https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh"
 ) -> List[str]:
     """
     Executing list of commands instead of programmatic download to have common base for docker and other deployments

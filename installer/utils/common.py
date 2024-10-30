@@ -127,7 +127,7 @@ def assert_ret_code(command: Union[List[str], str], env: Dict[str, str] = None) 
         command = join_commands(command)
     completion = subprocess.run(command, shell=True, env=env)
     if completion.returncode:
-        raise RuntimeError(f"Command {command} failed with result: {completion}")
+        raise RuntimeError(f"ERROR!\nCommand {command} failed with result: {completion}\n")
 
 
 def remove_comment(line: str) -> str:

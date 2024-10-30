@@ -15,3 +15,4 @@ fluxcd_bootstrap:
     - env: {{ kubernetes.fluxcd.bootstrap_envs|tojson }}
     - require:
       - cmd: fluxcd_cli
+# todo add sops secret creation

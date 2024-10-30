@@ -31,7 +31,7 @@ CONFIGS_TO_TRANSFER = [
 ]  # , f"config/ambassador-installer.override.conf"  ### FIXME ADD THIS OVERRIDE SINCE IT WILL BE FILTERED OUT if not exists
 BASE_OS = "debian"
 BASE_OS_RELEASE = "bookworm"
-SALT_DOWNLOAD_URL = "https://bootstrap.saltproject.io"
+SALT_DOWNLOAD_URL = "https://github.com/saltstack/salt-bootstrap/releases/latest/download/bootstrap-salt.sh"
 
 """
 If running in VM, ensure that NIC promisc mode works
@@ -135,7 +135,7 @@ except ImportError:
     HAS_OCI_LIBS = False
 
 salt_version = args.salt_ver
-secrets = args.secrets  # rename to `secrets`
+secrets = args.secrets
 configs = args.configs
 where_to = args.to
 extra = args.extra
@@ -250,7 +250,7 @@ def lxc_deployment(name: str, autostart: bool, ifc: str, base_os: str, requireme
             map(lambda f: add_lxc_rootfs(f), files_to_transfer())
         )
 
-    log.info("Provisioning LXC, inspect logs carefully since LXC doesn't forward exceptions")
+    log.info("Provisioning LXC, inspect logs carefully since LXC doesn't forward exceptions") # return code is always -1
     prepare_files(container_name)
     ambassador_lxc.attach_wait(requisites, ([], REQUIRED_PKGS[BASE_OS]))
     ambassador_lxc.attach_wait(install)

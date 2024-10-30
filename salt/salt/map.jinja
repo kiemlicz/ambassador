@@ -3,7 +3,7 @@
 {% set salt_installer = salt['grains.filter_by']({
     'default': {
         'repository': {
-            'file': "/etc/apt/sources.list.d/saltstack.list",
+            'file': "/etc/apt/sources.list.d/salt.list",
         },
         'master': {
             'config': [],
@@ -17,12 +17,12 @@
             'config': [],
             'port': 9191,
             'pkg_name': "salt-api",
-            'file': "/etc/apt/sources.list.d/saltstack.list",
+            'file': "/etc/apt/sources.list.d/salt.list",
         },
         'ssh': {
             'config': [],
             'pkg_name': "salt-ssh",
-            'file': "/etc/apt/sources.list.d/saltstack.list",
+            'file': "/etc/apt/sources.list.d/salt.list",
         }
     },
 }, merge=salt['grains.filter_by']({
