@@ -12,7 +12,7 @@ from utils.common import dir_mappings, dir_content_mappings, file_mappings, env_
 
 # no point in bloating args with these
 LXC_ROOTFS = os.path.join(os.sep, "var", "lib", "lxc")
-SALT_KEY_LOCATION = os.path.join(os.sep, "etc", "salt", "keys")
+SALT_KEY_LOCATION = os.path.join(os.sep, "etc", "salt", "keys") # currently keys are in /etc/salt/gpgkeys
 SALT_MINION_CONFIG = os.path.join(os.sep, "etc", "salt", "minion.d")
 SALT_TREE_ROOT = os.path.join(os.sep, "srv")
 SALT_GPG_LOCATION = os.path.join(os.sep, "etc", "salt", "gpgkeys")
