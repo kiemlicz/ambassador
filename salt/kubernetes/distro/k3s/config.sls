@@ -10,7 +10,7 @@ k3s_config:
     - name: {{ k3s.distro_config.installer_file }}
     - contents: {{ k3s.distro_config.installer_config|yaml_encode }}
     - makedirs: True
-    - replace: False
+    - replace: True
     - user: {{ k3s.user }}
     - group: {{ k3s.group|default(k3s.user) }}
     - require:

@@ -10,6 +10,8 @@ kubernetes_cni_repo:
     - present:
         - name: {{ kubernetes.cni.config.helm.repo }}
           url: https://helm.cilium.io/
+
+{% if kubernetes.cni.install %}
 kubernetes_cni_release:
   helm.release_present:
     - name: {{ kubernetes.cni.config.helm.name }}
@@ -25,3 +27,4 @@ kubernetes_cni_release:
     - require:
       - helm: kubernetes_cni_repo
       - sls: kubernetes.helm
+{% endif %}

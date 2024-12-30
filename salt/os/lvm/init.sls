@@ -12,12 +12,14 @@ lvm_pkgs:
     lvm.pv_present:
       - require:
         - pkg: lvm_pkgs
-      - require_in:
-        - lvm: vg_{{ vg }}
 {%- endfor %}
 
+{% set exists = salt['lvm.vgdisplay'](vg) %}
+{% if not exists %}
 vg_{{ vg }}:
   lvm.vg_present:
     - name: {{ vg }}
     - devices: {{ pvs|tojson }}
+{%- endif %}
+
 {%- endfor %}

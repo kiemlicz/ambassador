@@ -7,7 +7,7 @@
     'helm': {
         'name': "cilium",
         'namespace': "cilium",
-        'version': "1.15.5",
+        'version': "1.16.4",
         'repo': "cilium",
         'chart': "cilium",
         'set': [],
@@ -26,7 +26,8 @@
   'default': {
     'cni': {
       'provider': default_network_provider,
-      'config': network_provider[default_network_provider]
+      'config': network_provider[default_network_provider],
+      'install': True
     },
     'nodes': {
       'cidr': "192.168.0.0/16",
