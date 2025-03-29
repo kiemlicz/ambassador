@@ -1,7 +1,0 @@
-{% set argocd = salt['grains.filter_by']({
-    'default': {
-        'download_url': "https://github.com/argoproj/argo-cd/releases/download/v2.4.2/argocd-linux-amd64",
-        'owner': 'root',
-        'location': "/usr/local/bin/argocd"
-    }
-}, merge=salt['pillar.get']('argocd')) %}
