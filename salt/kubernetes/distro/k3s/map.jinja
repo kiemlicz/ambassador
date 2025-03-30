@@ -8,6 +8,7 @@
         'installer_config': installer_config_contents,
         'installer_url': "https://get.k3s.io",
         'env': [],
+        'args': None,
         'token_file': "/var/lib/rancher/k3s/server/node-token"
     },
     'config': {
@@ -16,9 +17,10 @@
         'unit_name': "k3s-agent",
         'kubevip': {
             'vip': "127.0.0.1",
-            'vip_interface': "eth0",
+            'vip_interface': "lo",
             'bgp_peers': "",
-            'cidr': ""
+            'cidr': "",
+            'router_id': ""
         }
     }
   },

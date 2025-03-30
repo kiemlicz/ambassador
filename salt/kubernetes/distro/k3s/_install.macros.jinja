@@ -1,8 +1,11 @@
-{% macro k3s_install(installer_url, envs_list) %}
+{% macro k3s_install(installer_url, envs_list, args=None) %}
 k3s:
   cmd.script:
     - name: {{ installer_url }}
     - env: {{ envs_list | tojson }}
+{%- if args %}
+    - args: {{ args }}
+{%- endif %}
     - require:
       - file: k3s_config
 

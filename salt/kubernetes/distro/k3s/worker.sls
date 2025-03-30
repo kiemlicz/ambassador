@@ -11,5 +11,4 @@ include:
   - kubernetes.distro.requisites
   - kubernetes.distro.k3s.config
 
-{{ k3s_install(k3s.distro_config.installer_url, envs) }}
-
+{{ k3s_install(k3s.distro_config.installer_url, envs, k3s.distro_config.args) }}

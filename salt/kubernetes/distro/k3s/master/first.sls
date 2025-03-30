@@ -1,7 +1,6 @@
 {%- from "kubernetes/distro/k3s/map.jinja" import k3s with context %}
 {%- from "kubernetes/distro/k3s/_install.macros.jinja" import k3s_install with context %}
 {%- set masters = k3s.nodes.masters %}
-{%- set ip = salt.filters.ips_in_subnet(grains['ipv4'], cidr=k3s.config.kubevip.cidr)|first %}
 
 kube_vip_rbac:
   file.managed:
@@ -21,7 +20,7 @@ kube_vip_ds:
         vip: {{ k3s.config.kubevip.vip }}
         vip_interface: {{ k3s.config.kubevip.vip_interface }}
         bgp_peers: {{ k3s.config.kubevip.bgp_peers }}
-        router_id: {{ ip }}
+        router_id: {{ k3s.config.kubevip.router_id }}
     - require:
       - file: kube_vip_rbac
     - require_in:
