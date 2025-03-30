@@ -45,7 +45,9 @@ spec:
             - name: bgp_enable
               value: "true"
             - name: bgp_routerid
-              value: {{ router_id }}
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
             - name: bgp_as
               value: "65000"
             - name: bgp_peeraddress
