@@ -12,7 +12,14 @@
     },
     'config': {
         'locations': ["/etc/rancher/k3s/k3s.yaml"],
+        'statics': " /var/lib/rancher/k3s/server/manifests",
         'unit_name': "k3s-agent",
+        'kubevip': {
+            'vip': "127.0.0.1",
+            'vip_interface': "eth0",
+            'bgp_peers': "",
+            'cidr': ""
+        }
     }
   },
 }, merge=kubernetes_defaults) %}

@@ -45,7 +45,7 @@ sync_minions:
 
 setup_k3s_single_master:
   salt.state:
-  - tgt: "{{ masters|join(',') }}"
+  - tgt: "{{ masters|first }}"
   - tgt_type: list
   - highstate: True
   - pillar:
@@ -56,6 +56,23 @@ setup_k3s_single_master:
   - require:
       - salt: sync_modules_master
       - salt: sync_minions
+
+{%- if masters|length > 1 %}
+setup_k3s_other_masters:
+  salt.state:
+  - tgt: "{{ masters[1:]|join(',') }}"
+  - tgt_type: list
+  - highstate: True
+  - pillar:
+      kubernetes:
+        nodes:
+          masters: {{ masters|tojson }}
+          workers: {{ workers|tojson }}
+  - require:
+      - salt: setup_k3s_single_master
+  - require_in:
+      - salt: setup_k3s_workers
+{%- endif %}
 
 setup_k3s_workers:
   salt.state:
