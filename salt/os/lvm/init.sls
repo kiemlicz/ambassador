@@ -7,6 +7,9 @@ lvm_pkgs:
     - pkgs: {{ lvm.pkgs|tojson }}
 
 {%- for vg, pvs in lvm.vgs.items() %}
+{%- set exists = salt['lvm.vgdisplay'](vg) %}
+{%- if not exists %}
+# skip if exists, otherwise need to constantly adjust /dev/sdX
 {%- for pv in pvs %}
 {{ pv }}:
     lvm.pv_present:
@@ -14,8 +17,6 @@ lvm_pkgs:
         - pkg: lvm_pkgs
 {%- endfor %}
 
-{% set exists = salt['lvm.vgdisplay'](vg) %}
-{% if not exists %}
 vg_{{ vg }}:
   lvm.vg_present:
     - name: {{ vg }}
