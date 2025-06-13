@@ -1,6 +1,7 @@
 {% set lvm = salt['grains.filter_by']({
     'default': {
       'pkgs': ["lvm2", "thin-provisioning-tools"],
+      'modules': ["dm_thin_pool", "dm_snapshot"],
       'vgs': {}
     },
 }, merge=salt['pillar.get']('lvm')) %}
