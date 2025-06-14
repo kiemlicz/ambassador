@@ -86,3 +86,5 @@ setup_k3s_workers:
           workers: {{ workers|tojson }}
   - require:
       - salt: setup_k3s_single_master
+
+# todo label nodes here, once the full cluster setup is done

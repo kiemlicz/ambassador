@@ -5,6 +5,7 @@
 lvm_pkgs:
   pkg.latest:
     - pkgs: {{ lvm.pkgs|tojson }}
+    - reload_modules: True
 
 lvm_modules:
   kmod.present:
