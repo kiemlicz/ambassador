@@ -1,20 +1,4 @@
 {% set minion = salt['grains.filter_by']({
-      'RedHat': {
-          'baseurl': "https://repo.saltstack.com/py3/redhat/7/$basearch/latest",
-          'repo_id': "saltstack",
-          'gpgkey': "https://repo.saltstack.com/py3/redhat/7/$basearch/latest/SALTSTACK-GPG-KEY.pub",
-          'pkg': "salt-minion",
-          'health_file': "/tmp/salt/healthz",
-          'event_tag': "salt/minion/" ~ grains['id'] ~ "/minion_ready",
-          'service': "salt-minion",
-          'startup': {
-            'pip3': [],
-            'pkgs': []
-          },
-          'patch': {
-            'files': []
-          }
-      },
       'Debian': {
           'name': "deb http://repo.saltstack.com/py3/debian/10/amd64/latest buster main",
           'file': '/etc/apt/sources.list.d/salt.list',
@@ -29,9 +13,6 @@
           },
           'patch': {
             'files': []
-          }
-      },
-      'Windows': {
-
-      },
+          },
+      }
 }, merge=salt['pillar.get']('minion')) %}
