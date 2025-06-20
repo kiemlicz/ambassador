@@ -2,7 +2,7 @@
 
 # e.g. rename interfaces
 
-{% for file in minion.files %}
+{% for file in minion.startup.files %}
 {{ file.name }}:
     file.managed:
         - name: {{ file.name }}
