@@ -1,0 +1,3 @@
+{% set sysctls = salt['grains.filter_by']({
+    'default': {}
+}, merge=salt['pillar.get']('sysctls')) %}

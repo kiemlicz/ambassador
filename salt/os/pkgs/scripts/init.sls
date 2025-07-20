@@ -9,6 +9,7 @@ pkgs_scripts_{{ script.source }}:
     - require:
       - sls: os.pkgs
       - sls: os.modules
+      - sls: os.sysctl
 {% endfor %}
 {% endif %}
 
