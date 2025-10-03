@@ -9,4 +9,4 @@ kubectl:
     - pkgs: {{ kubernetes.client.pkgs|tojson }}
 {{ pkg_latest_opts() | indent(4) }}
     - require:
-      - pkgrepo_ext: kube_repository
+      - pkgrepo: kube_repository

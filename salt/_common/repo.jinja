@@ -4,7 +4,7 @@
 {% macro repository(id, repo, enabled=True, require=[], require_in=[], refresh=True, consolidate=False) %}
 {% if enabled %}
 {{ id }}:
-  pkgrepo_ext.managed:
+  pkgrepo.managed:
   {% if repo.names is defined %}
     - names: {{ repo.names|tojson }}
     - file: {{ repo.file }}
@@ -13,7 +13,6 @@
   {% elif repo.keyid is defined %}
     - keyid: {{ repo.keyid }}
     - keyserver: {{ repo.keyserver }}
-    - clean: True
   {% elif repo.key_url is defined %}
     - key_url: {{ repo.key_url }}
   {% endif %}

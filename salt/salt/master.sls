@@ -28,7 +28,7 @@ salt_master:
     - reload_modules: True
 {{ pkg_latest_opts() | indent(4) }}
     - require:
-      - pkgrepo_ext: salt_repository
+      - pkgrepo: salt_repository
   service.running:
     - name: {{ salt_installer.master.service }}
     - init_delay: {{ salt_installer.master.service_init_delay }}

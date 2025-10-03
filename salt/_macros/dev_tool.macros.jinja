@@ -52,7 +52,7 @@
     - pkgs: {{ conf_dict.required_pkgs|tojson }}
 {{ pkg_latest_opts() | indent(4) }}
     - require:
-      - pkgrepo_ext: "{{ state_id }}_repository"
+      - pkgrepo: "{{ state_id }}_repository"
     - require_in:
       - pkg: {{ state_id }}
 {% endif %}
@@ -67,7 +67,7 @@
 {% endif %}
 {{ pkg_latest_opts() | indent(4) }}
     - require:
-      - pkgrepo_ext: "{{ state_id }}_repository"
+      - pkgrepo: "{{ state_id }}_repository"
 {% else %}
   pkg.installed:
 {% if conf_dict.pkg_name is defined %}
@@ -79,6 +79,6 @@
     - version: {{ conf_dict.version }}
     - refresh: True
     - require:
-      - pkgrepo_ext: "{{ state_id }}_repository"
+      - pkgrepo: "{{ state_id }}_repository"
 {% endif %}
 {% endmacro %}

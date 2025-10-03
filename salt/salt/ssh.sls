@@ -24,4 +24,4 @@ salt_ssh:
     - reload_modules: True
 {{ pkg_latest_opts() | indent(4) }}
     - require:
-      - pkgrepo_ext: salt_repository
+      - pkgrepo: salt_repository

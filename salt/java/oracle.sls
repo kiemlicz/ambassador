@@ -23,7 +23,7 @@ java:
         'shared/accepted-oracle-license-v1-1': {'type': 'boolean', 'value': True}
   {% endif %}
     - require:
-      - pkgrepo_ext: {{ java_repo_id }}
+      - pkgrepo: {{ java_repo_id }}
     - require_in:
       - pkg: {{ java.pkg_name }}
 {% endif %}
@@ -33,7 +33,7 @@ java:
 {{ pkg_latest_opts(attempts=3) | indent(4) }}
     - require:
       - sls: os
-      - pkgrepo_ext: {{ java_repo_id }}
+      - pkgrepo: {{ java_repo_id }}
 {{ add_environmental_variable(java.environ_variable, java.generic_link, java.exports_file) }}
 {{ add_to_path(java.environ_variable, java.path_inside, java.exports_file) }}
 

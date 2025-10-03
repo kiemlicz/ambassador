@@ -8,6 +8,6 @@ kubeadm:
     - pkgs: {{ kubernetes.pkgs|tojson }}
 {{ pkg_latest_opts() | indent(4) }}
     - require:
-      - pkgrepo_ext: kube_repository
+      - pkgrepo: kube_repository
       - service: docker
       - sls: kubernetes.distro.requisites
