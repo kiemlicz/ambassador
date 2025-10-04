@@ -4,8 +4,13 @@
 {% macro repository(id, repo, enabled=True, require=[], require_in=[], refresh=True, consolidate=False) %}
 {% if enabled %}
 {{ id }}:
+{% if repo.file.endswith(".sources") %}
+  file.managed:
+    - name: {{ repo.file }}
+    - contents: {{ repo.contents|yaml_encode }}
+{% else %}
   pkgrepo.managed:
-  {% if repo.names is defined %}
+  {% if repo.names is defined and not repo.file.endswith('.sources') %}
     - names: {{ repo.names|tojson }}
     - file: {{ repo.file }}
   {% if repo.key_text is defined %}
@@ -27,6 +32,7 @@
     - gpgkey: {{ repo.gpgkey }}
   {% endif %}
   {% endif %}
+{% endif %}
 {{ retry()| indent(4) }}
     - require: {{ require }}
     - require_in: {{ require_in }}
