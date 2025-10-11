@@ -20,6 +20,7 @@
     - keyserver: {{ repo.keyserver }}
   {% elif repo.key_url is defined %}
     - key_url: {{ repo.key_url }}
+    - aptkey: False
   {% endif %}
     - refresh: {{ refresh }}
     - consolidate: {{ consolidate }}

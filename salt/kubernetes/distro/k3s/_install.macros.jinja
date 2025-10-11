@@ -8,6 +8,7 @@ k3s:
 {%- endif %}
     - require:
       - file: k3s_config
+      - file: k3s_registry_mirror
 
 k3s-running:
   service.running:

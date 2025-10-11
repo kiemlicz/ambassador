@@ -1,12 +1,15 @@
 {%- from "kubernetes/map.jinja" import kubernetes as kubernetes_defaults with context %}
 
 {% set installer_config_contents = '' %}
+{% set registries_contents = '' %}
 {% set k3s = salt['grains.filter_by']({
   'default': {
     'distro_config': {
         'installer_file': "/etc/rancher/k3s/config.yaml",
         'installer_config': installer_config_contents,
         'installer_url': "https://get.k3s.io",
+        'registries_file': "/etc/rancher/k3s/registries.yaml",
+        'registries': registries_contents,
         'env': [],
         'args': None,
         'token_file': "/var/lib/rancher/k3s/server/node-token"

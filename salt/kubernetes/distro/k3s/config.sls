@@ -15,3 +15,13 @@ k3s_config:
     - group: {{ k3s.group|default(k3s.user) }}
     - require:
       - service: docker
+k3s_registry_mirror:
+  file.managed:
+    - name: {{ k3s.distro_config.registries_file }}
+    - contents: {{ k3s.distro_config.registries|yaml_encode }}
+    - makedirs: True
+    - replace: True
+    - user: {{ k3s.user }}
+    - group: {{ k3s.group|default(k3s.user) }}
+    - require:
+        - file: k3s_config
