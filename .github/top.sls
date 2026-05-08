@@ -17,7 +17,6 @@ server:
     - sbt
     - intellij
     - grafana
-    - influxdb
     - virtualbox
     - docker
     - docker.compose
