@@ -11,4 +11,16 @@
 # that is the reason why there is macro that inspects saltenv and generates proper users state
 {% from "users/users.jinja" import users_state with context %}
 
-{{ users_state(saltenv) }}
+include:
+  - os
+  - users.common
+  - users.keys
+  - users.vpn
+  - users.dotfiles
+  - users.cron
+  - users.projects
+
+users-notification:
+  test.succeed_without_changes:
+    - name: User setup completed
+    - text: "user setup completed"

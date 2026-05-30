@@ -12,6 +12,7 @@ include:
   - os.locale
   - os.groups
   - os.pkgs
+  - os.binaries
   - os.sysctl
   - os.modules
   - os.pkgs.scripts

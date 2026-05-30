@@ -1,0 +1,7 @@
+{% set binaries = salt['grains.filter_by']({
+    'default': {
+        'location': "/usr/local/bin",
+        'archives': [],
+        'files': []
+    },
+}, merge=salt['pillar.get']('binaries')) %}
