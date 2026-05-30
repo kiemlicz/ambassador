@@ -1,10 +1,10 @@
-{% set version = "1.29" %}
+{% set version = "1.36" %}
 {% set kubernetes = salt['grains.filter_by']({
       'default': {
           'names': [
               "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v" ~ version ~ "/deb/ /"
           ],
-          'file': '/etc/apt/sources.list.d/kubernetes.list',
+          'file': '/etc/apt/sources.list.d/kubernetes.sources',
           'key_url': "https://pkgs.k8s.io/core:/stable:/v" ~ version ~ "/deb/Release.key",
           'pkgs': ["kubelet", "kubeadm", "kubectl"],
           'config': {

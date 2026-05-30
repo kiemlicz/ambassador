@@ -6,10 +6,10 @@
 
 {% set docker = salt['grains.filter_by']({
     'default': {
-        'file': '/etc/apt/sources.list.d/docker.list',
+        'file': '/etc/apt/sources.list.d/docker.source',
         'names': ["deb [arch=" ~ arch ~ " signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/" ~ os.lower() ~ " " ~ dist_codename ~ " stable"],
         'key_url': "https://download.docker.com/linux/" ~ os.lower() ~ "/gpg",
-        'pkg_names': ["docker-ce", "docker-ce-cli", "containerd.io"],
+        'pkg_names': ["docker-ce", "docker-ce-cli", "containerd.io", "docker-buildx-plugin", "docker-compose-plugin"],
         'required_pkgs': ["bridge-utils"],
         'service_name': "docker",
         'config': '/etc/docker/daemon.json',
