@@ -4,15 +4,17 @@
 {% macro repository(id, repo, enabled=True, require=[], require_in=[], refresh=True, consolidate=False) %}
 {% if enabled %}
 {{ id }}:
-{% if repo.file.endswith(".sources") %}
-  file.managed:
-    - name: {{ repo.file }}
-    - contents: {{ repo.contents|yaml_encode }}
-{% else %}
   pkgrepo.managed:
-  {% if repo.names is defined and not repo.file.endswith('.sources') %}
     - names: {{ repo.names|tojson }}
     - file: {{ repo.file }}
+  {% if (repo.file | regex_match(".*sources")) is not none %}
+    - types:
+      - deb
+    - aptkey: False
+    {% if repo.suites is defined %}
+    - suites: {{ repo.suites|tojson }}
+    {% endif %}
+  {% endif %}
   {% if repo.key_text is defined %}
     - key_text: {{ repo.key_text|yaml_encode }}
   {% elif repo.keyid is defined %}
@@ -24,16 +26,6 @@
   {% endif %}
     - refresh: {{ refresh }}
     - consolidate: {{ consolidate }}
-  {% else %}
-    - name: {{ repo.repo_id }}
-    - baseurl: {{ repo.baseurl }}
-    - humanname: {{ repo.humanname|default(repo.repo_id) }}
-    - gpgcheck: {{ 1 if repo.gpgkey is defined else 0 }}
-  {% if repo.gpgkey is defined %}
-    - gpgkey: {{ repo.gpgkey }}
-  {% endif %}
-  {% endif %}
-{% endif %}
 {{ retry()| indent(4) }}
     - require: {{ require }}
     - require_in: {{ require_in }}

@@ -7,9 +7,6 @@ repositories:
       'list':[],
       'preferences': [],
     },
-    'RedHat': {
-      'list': []
-    },
   }, merge=salt['grains.filter_by']({
     'buster': {
       'list': [{
