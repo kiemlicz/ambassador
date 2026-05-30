@@ -15,6 +15,7 @@ opentofu_key:
 opentofu_repokey:
   cmd.run:
     - name: "curl -fsSL https://packages.opentofu.org/opentofu/tofu/gpgkey | sudo gpg --no-tty --batch --dearmor -o /etc/apt/keyrings/opentofu-repo.gpg >/dev/null"
+    - creates: /etc/apt/keyrings/opentofu-repo.gpg
     - require:
         - sls: os
 # mode 644?
