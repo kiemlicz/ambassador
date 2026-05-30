@@ -1,0 +1,6 @@
+{% set opentofu = salt['grains.filter_by']({
+    'default': {
+      'file': "/etc/apt/sources.list.d/opentofu.sources",
+      'names': ["deb [signed-by=/etc/apt/keyrings/opentofu.gpg,/etc/apt/keyrings/opentofu-repo.gpg] https://packages.opentofu.org/opentofu/tofu/any/ any main"]
+    },
+}, merge=salt['pillar.get']('opentofu')) %}
