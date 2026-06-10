@@ -1,0 +1,7 @@
+{% set claude = salt['grains.filter_by']({
+    'default': {
+        'download_url': "claude.ai/install.sh",
+        'owner': 'root',
+        'location': "/usr/local/bin/claude"
+    }
+}, merge=salt['pillar.get']('claude')) %}
