@@ -5,13 +5,15 @@
 include:
   - kubernetes.helm
 
+{% if kubernetes.cni.install %}
+
+# fixme - the helm module doesn't exit anymore
 kubernetes_cni_repo:
   helm.repo_managed:
     - present:
         - name: {{ kubernetes.cni.config.helm.repo }}
           url: https://helm.cilium.io/
 
-{% if kubernetes.cni.install %}
 kubernetes_cni_release:
   helm.release_present:
     - name: {{ kubernetes.cni.config.helm.name }}
