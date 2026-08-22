@@ -10,7 +10,7 @@
          'path_inside': 'bin',
          'generic_link': '$(readlink -f /usr/bin/java | sed "s:\(jre\)*/bin/java::")',
          'pkg_name': "openjdk-" ~ version_major ~ "-jdk",
-         'ext_pkgs': []
+         'ext_pkgs': ["openjdk-" ~ version_major ~ "-source"]
      },
 }, merge=salt['pillar.get']('java')) %}
 
