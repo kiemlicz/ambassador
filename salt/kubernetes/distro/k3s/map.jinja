@@ -10,6 +10,8 @@
         'installer_url': "https://get.k3s.io",
         'registries_file': "/etc/rancher/k3s/registries.yaml",
         'registries': registries_contents,
+        'kubelet_confd': '/var/lib/rancher/k3s/agent/etc/kubelet.conf.d/',
+        'kubelet_configs': {},
         'env': [],
         'args': None,
         'token_file': "/var/lib/rancher/k3s/server/node-token"

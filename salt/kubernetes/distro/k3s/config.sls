@@ -15,6 +15,18 @@ k3s_config:
     - group: {{ k3s.group|default(k3s.user) }}
     - require:
       - service: docker
+{%- for kubelet_config_name,contents in k3s.distro_config.kubelet_configs.items() %}
+k3s_kubelet_config_{{ kubelet_config_name }}:
+  file.managed:
+    - name: {{ k3s.distro_config.kubelet_confd ~ kubelet_config_name }}
+    - contents: {{ contents|yaml_encode }}
+    - makedirs: True
+    - replace: True
+    - user: {{k3s.user}}
+    - group: {{k3s.group|default(k3s.user)}}
+    - require:
+        - file: k3s_config
+{%- endfor %}
 k3s_registry_mirror:
   file.managed:
     - name: {{ k3s.distro_config.registries_file }}
