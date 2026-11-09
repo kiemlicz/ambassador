@@ -9,6 +9,11 @@ k3s:
     - require:
       - file: k3s_config
       - file: k3s_registry_mirror
+    - retry:
+        until: True
+        attempts: 2
+        interval: 15
+        splay: 15
 
 k3s-running:
   service.running:

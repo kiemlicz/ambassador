@@ -1,10 +1,12 @@
 {% from "kubernetes/helm/map.jinja" import helm with context %}
 {% from "kubernetes/master/map.jinja" import kubernetes with context %}
+{% from "_common/util.jinja" import retry, pkg_latest_opts with context %}
 
 helm:
   cmd.script:
     - name: {{ helm.installer_url }}
     - env: {{ helm.options }}
+{{ retry(attempts=2)| indent(4) }}
 
 {%- for plugin in helm.plugins %}
 helm_plugin_{{ plugin }}:
