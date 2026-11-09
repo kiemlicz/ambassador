@@ -1,0 +1,9 @@
+# Managed by Salt
+{#- rendered at state runtime: paths that don't exist yet (e.g. pool not created) are skipped, exportfs fails on them #}
+{%- for export in exports %}
+{%- if salt['file.directory_exists'](export.path) %}
+{{ export.path }} {% for client in export.clients %}{{ client.host }}({{ client.options | join(',') }}) {% endfor %}
+{%- else %}
+# skipped, path missing: {{ export.path }}
+{%- endif %}
+{%- endfor %}{{- "\n" }}

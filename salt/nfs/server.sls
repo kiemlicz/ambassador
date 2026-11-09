@@ -19,11 +19,10 @@ nfs_server_exports:
   file.managed:
     - name: {{ nfs.server.exports_file }}
     - makedirs: True
-    - contents: |
-        # Managed by Salt
-{%- for export in nfs.server.exports %}
-        {{ export.path }} {% for client in export.clients %}{{ client.host }}({{ client.options | join(',') }}) {% endfor %}
-{%- endfor %}
+    - source: salt://nfs/exports.jinja
+    - template: jinja
+    - context:
+        exports: {{ nfs.server.exports | tojson }}
     - require:
       - pkg: nfs_server_pkgs
 
