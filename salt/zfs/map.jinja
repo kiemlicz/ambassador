@@ -1,0 +1,26 @@
+{% set zfs = salt['grains.filter_by']({
+    'Debian': {
+        'pkgs': ["zfs-dkms", "zfsutils-linux", "zfs-zed", "linux-headers-amd64", "bsd-mailx"],
+        'preferences_file': "/etc/apt/preferences.d/zfs.pref",
+        'preferences_package': "zfs-dkms zfsutils-linux zfs-zed libzfs* libzpool* libnvpair* libuutil* python3-pyzfs",
+        'saltext': "saltext.zfs",
+        'modprobe_conf': "/etc/modprobe.d/zfs.conf",
+        'module_params': {},
+        'zed_rc': "/etc/zfs/zed.d/zed.rc",
+        'zed': {
+            'ZED_EMAIL_ADDR': '"root"',
+            'ZED_NOTIFY_VERBOSE': '1',
+            'ZED_NOTIFY_DATA': '1',
+        },
+        'services': ["zfs-import-cache", "zfs-import.target", "zfs-mount", "zfs.target", "zfs-zed"],
+        'pools': {},
+        'datasets': {},
+        'sanoid': {
+            'pkgs': ["sanoid"],
+            'config': "/etc/sanoid/sanoid.conf",
+            'timer': "sanoid.timer",
+            'templates': {},
+            'datasets': {},
+        },
+    },
+}, merge=salt['pillar.get']('zfs', {}, merge=True)) %}

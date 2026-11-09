@@ -1,0 +1,12 @@
+{% set nfs = salt['grains.filter_by']({
+    'Debian': {
+        'server': {
+            'pkgs': ["nfs-kernel-server"],
+            'service': "nfs-server",
+            'exports_file': "/etc/exports.d/salt.exports",
+            'config_file': "/etc/nfs.conf",
+            'config': {},
+            'exports': [],
+        },
+    },
+}, merge=salt['pillar.get']('nfs', {}, merge=True)) %}
