@@ -1,11 +1,14 @@
 {% from "zfs/map.jinja" import zfs with context %}
 
-# No render-time zfs calls: a missing pool makes zfs.filesystem_present fail at runtime
+# Datasets of a missing pool are skipped (onlyif, result True), so highstate stays green until the pool is created.
+# Directories are managed only on a mounted dataset, never on the underlying root filesystem
+# (a non-empty mountpoint dir would block the later ZFS mount).
 include:
   - zfs
 
 {%- for dataset, conf in zfs.datasets.items() %}
 {%- set pool = dataset.split('/')[0] %}
+{%- set mounted = "zfs get -H -o value mounted " ~ dataset ~ " 2>/dev/null | grep -qx yes" %}
 zfs_dataset_{{ dataset }}:
   zfs.filesystem_present:
     - name: {{ dataset }}
@@ -13,6 +16,7 @@ zfs_dataset_{{ dataset }}:
 {%- if conf.properties is defined %}
     - properties: {{ conf.properties | tojson }}
 {%- endif %}
+    - onlyif: zpool list -H -o name {{ pool }}
     - require:
       - sls: zfs
 
@@ -26,6 +30,7 @@ zfs_dataset_{{ dataset }}_root:
     - user: {{ conf.get('user', 'root') }}
     - group: {{ conf.get('group', 'root') }}
     - mode: "{{ conf.get('mode', '0755') }}"
+    - onlyif: {{ mounted }}
     - require:
       - zfs: zfs_dataset_{{ dataset }}
 {%- endif %}
@@ -38,6 +43,7 @@ zfs_dataset_{{ dataset }}_dir_{{ dir }}:
     - group: {{ conf.get('group', 'root') }}
     - mode: "{{ conf.get('mode', '0755') }}"
     - makedirs: True
+    - onlyif: {{ mounted }}
     - require:
       - zfs: zfs_dataset_{{ dataset }}
 {%- endfor %}
