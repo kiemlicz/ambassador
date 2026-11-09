@@ -56,19 +56,9 @@ zfs_saltext:
   cmd.run:
     - name: salt-pip install {{ zfs.saltext }}
     - unless: salt-pip show {{ zfs.saltext }}
-
-# zfs/zpool modules load only when the zfs_support grain is true (/sys/module/zfs + zpool binary):
-# reload_grains/force_reload_modules make them usable later in this run (zfs.pools/zfs.datasets),
-# saltutil.refresh_grains persists the grain in the minion for later runs
-zfs_salt_refresh:
-  module.run:
-    - saltutil.refresh_grains:
-      - refresh_pillar: False
-    - reload_grains: True
-    - force_reload_modules: True
+    - reload_modules: True
     - require:
-      - kmod: zfs_module
-      - cmd: zfs_saltext
+      - kmod: zfs_module # zfs_support grain needs the module loaded
 
 {%- for param, value in zfs.module_params.items() %}
 zfs_module_param_{{ param }}:
@@ -110,4 +100,4 @@ zfs-notification:
     - require:
       - service: zfs_services
       - service: zfs_zed_running
-      - module: zfs_salt_refresh
+      - cmd: zfs_saltext
