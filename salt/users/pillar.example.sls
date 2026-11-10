@@ -14,6 +14,7 @@ users:
       - wireshark
       - docker
       - vboxusers
+    sudo_nopasswd: True # optional: /etc/sudoers.d/<username> with NOPASSWD: ALL
     user_dirs:
       - {{ home_dir }}/bin
       - {{ home_dir }}/downloads

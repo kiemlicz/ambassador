@@ -18,6 +18,19 @@
     - require:
       - sls: os # deliberately full sls (in case of urgent pkgs.post_install commands)
 
+{%- if user.sudo_nopasswd|default(False) %}
+{{ username }}_sudoers:
+  file.managed:
+    - name: /etc/sudoers.d/{{ username }}
+    - contents: "{{ username }} ALL=(ALL:ALL) NOPASSWD: ALL"
+    - user: root
+    - group: root
+    - mode: 440
+    - check_cmd: /usr/sbin/visudo -cf
+    - require:
+      - user: {{ username }}
+{%- endif %}
+
 {%- if user.user_dirs is defined and user.user_dirs %}
 {{ username }}_setup_directories:
   file.directory:

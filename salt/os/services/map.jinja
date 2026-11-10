@@ -1,6 +1,7 @@
 {% set services = salt['grains.filter_by']({
   'default': {
     'list':[],
+    'dropins_dir': '/etc/systemd/system/',
   },
   'Debian': {
     'list':[],
@@ -9,7 +10,4 @@
   'sid': {
     'list': [],
   },
-  'bullseye': {
-    'list': [],
-  }
 }, grain='oscodename', merge=salt['pillar.get']('services'))) %}
