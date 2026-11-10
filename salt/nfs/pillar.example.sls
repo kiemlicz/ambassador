@@ -7,7 +7,7 @@ nfs:
       - path: /tank/shares/someone
         clients:
           - host: 192.168.1.0/24
-            options: [rw, sync, no_subtree_check]
+            options: [rw, sync, no_subtree_check, mp] # mp: export only if a filesystem is mounted at path
 
 # clients: install nfs-common (os packages), mounts are handled by os.mounts:
 #mounts:

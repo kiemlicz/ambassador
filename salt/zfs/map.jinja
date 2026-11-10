@@ -1,3 +1,4 @@
+{#- import units: only one runs, -cache if /etc/zfs/zpool.cache is non-empty, else -scan (pools with cachefile=none) #}
 {% set zfs = salt['grains.filter_by']({
     'Debian': {
         'pkgs': ["zfs-dkms", "zfsutils-linux", "zfs-zed", "linux-headers-amd64", "bsd-mailx"],
@@ -12,7 +13,9 @@
             'ZED_NOTIFY_VERBOSE': '1',
             'ZED_NOTIFY_DATA': '1',
         },
-        'services': ["zfs-import-cache", "zfs-import.target", "zfs-mount", "zfs.target", "zfs-zed"],
+        'defaults_file': "/etc/default/zfs",
+        'defaults': {},
+        'services': ["zfs-import-cache", "zfs-import-scan", "zfs-import.target", "zfs-mount", "zfs.target", "zfs-zed"],
         'pools': {},
         'datasets': {},
         'sanoid': {

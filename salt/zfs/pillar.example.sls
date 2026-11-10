@@ -6,6 +6,8 @@ zfs:
   module_params:
     zfs_arc_max: 8589934592 # 8 GiB
     zfs_arc_min: 2147483648 # 2 GiB
+  defaults: # /etc/default/zfs
+    ZPOOL_IMPORT_PATH: '"/dev/disk/by-id"' # scan import keeps stable by-id vdev names
   pools:
     tank:
       create: False # one-shot flag, pass via CLI pillar only
@@ -13,6 +15,7 @@ zfs:
         ashift: 12
         autotrim: "off"
         autoexpand: "on"
+        cachefile: none # import by device scan (zfs-import-scan), a pool missing on one boot isn't dropped
       filesystem_properties: # zpool create -O, used only on creation
         compression: lz4
         atime: "off"

@@ -79,6 +79,21 @@ zfs_zed_config:
     - require:
       - pkg: zfs_pkgs
 
+zfs_defaults:
+{%- if zfs.defaults %}
+  file.keyvalue:
+    - name: {{ zfs.defaults_file }}
+    - key_values: {{ zfs.defaults | tojson }}
+    - separator: "="
+    - uncomment: "#"
+    - append_if_not_found: True
+{%- else %}
+  test.nop:
+    - name: {{ zfs.defaults_file }}
+{%- endif %}
+    - require:
+      - pkg: zfs_pkgs
+
 zfs_services:
   service.enabled:
     - names: {{ zfs.services | tojson }}
