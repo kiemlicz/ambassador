@@ -1,8 +1,13 @@
 {% macro k3s_install(installer_url, envs_list, args=None) %}
+{%- set version = envs_list | selectattr('INSTALL_K3S_VERSION', 'defined') | map(attribute='INSTALL_K3S_VERSION') | first | default('') %}
 k3s:
   cmd.script:
     - name: {{ installer_url }}
     - env: {{ envs_list | tojson }}
+{%- if version %}
+    # installer always reinstalls and restarts k3s, run it only when the version differs
+    - unless: /usr/local/bin/k3s --version | grep -qF "{{ version }}"
+{%- endif %}
 {%- if args %}
     - args: {{ args }}
 {%- endif %}
@@ -21,5 +26,11 @@ k3s-running:
     - enable: True
     - require:
       - cmd: k3s
+    - watch:
+      - file: k3s_config
+      - file: k3s_registry_mirror
+{%- for kubelet_config_name in k3s.distro_config.kubelet_configs %}
+      - file: k3s_kubelet_config_{{ kubelet_config_name }}
+{%- endfor %}
 
 {% endmacro %}
