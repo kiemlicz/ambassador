@@ -6,7 +6,7 @@
   'Debian': {
     'list':[],
   },
-}, merge=salt['grains.filter_by']({
+}, base='default', merge=salt['grains.filter_by']({
   'sid': {
     'list': [],
   },
