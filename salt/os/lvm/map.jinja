@@ -2,6 +2,9 @@
     'default': {
       'pkgs': ["lvm2", "thin-provisioning-tools"],
       'modules': ["dm_thin_pool", "dm_snapshot"],
+      'services': ["dm-event.socket", "lvm2-monitor.service"],
+      'config': {},
+      'thinpool_monitor': False,
       'vgs': {}
     },
 }, merge=salt['pillar.get']('lvm')) %}
